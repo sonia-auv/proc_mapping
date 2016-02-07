@@ -23,7 +23,7 @@
  * along with S.O.N.I.A. software. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "ros/ros.h"
+#include <ros/ros.h>
 
 int main(int argc, char **argv) {
   ros::init(argc, argv, "proc_mapping");

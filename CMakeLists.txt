@@ -8,12 +8,13 @@
 #===============================================================================
 # G L O B A L   P R O J E C T   C O N F I G U R A T I O N
 
-cmake_minimum_required(VERSION 2.8.3)
+cmake_minimum_required(VERSION 3.2.0)
 project(proc_mapping)
 
 if (NOT CMAKE_BUILD_TYPE)
   set(CMAKE_BUILD_TYPE Debug CACHE STRING
-     "Choose the type of build, options are: None Debug Release RelWithDebInfo MinSizeRel."
+     "Choose the type of build, options are: None Debug Release
+     RelWithDebInfo MinSizeRel."
      FORCE)
 endif (NOT CMAKE_BUILD_TYPE)
 
@@ -69,7 +70,7 @@ include_directories(
 
 add_executable(${PROJECT_NAME}_node ${proc_mapping_SRC_DIR}/${PROJECT_NAME}/main.cc ${proc_mapping_FILES})
 target_link_libraries(${PROJECT_NAME}_node ${catkin_LIBRARIES} ${lib_atlas_LIBRARIES})
-add_dependencies(${PROJECT_NAME}_node ${PROJECT_NAME}_generate_messages_cpp sonia_msgs_generate_messages_cpp)
+add_dependencies(${PROJECT_NAME}_node sonia_msgs_generate_messages_cpp)
 
 #==========================================================================
 # U N I T   T E S T S

@@ -1,7 +1,7 @@
 /**
- * \file	matrix_inl.h
+ * \file	object_mapper.h
  * \author	Thibaut Mattio <thibaut.mattio@gmail.com>
- * \date	06/02/2016
+ * \date	07/02/2016
  *
  * \copyright Copyright (c) 2015 S.O.N.I.A. All rights reserved.
  *
@@ -23,37 +23,35 @@
  * along with S.O.N.I.A. software. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#ifndef PROC_MAPPING_OBJECT_MAPPER_H_
+#define PROC_MAPPING_OBJECT_MAPPER_H_
+
 #include <memory>
 #include <vector>
-#include <opencv/cv.h>
-#include <pcl_ros/point_cloud.h>
 #include <lib_atlas/macros.h>
 
 namespace proc_mapping {
 
-class RawMap {
+class ObjectMapper {
  public:
   //==========================================================================
   // T Y P E D E F   A N D   E N U M
 
-  using Ptr = std::shared_ptr<RawMap>;
-  using ConstPtr = std::shared_ptr<const RawMap>;
+  using Ptr = std::shared_ptr<ObjectMapper>;
+  using ConstPtr = std::shared_ptr<const ObjectMapper>;
 
   //==========================================================================
   // P U B L I C   C / D T O R S
 
-  RawMap() ATLAS_NOEXCEPT;
+  ObjectMapper() ATLAS_NOEXCEPT;
 
-  ~RawMap() ATLAS_NOEXCEPT;
+  ~ObjectMapper() ATLAS_NOEXCEPT;
 
   //==========================================================================
   // P U B L I C   M E T H O D S
 
-  static pcl::PointCloud<pcl::PointXYZ> MatToPointXYZ(
-      const cv::Mat &m) ATLAS_NOEXCEPT;
-
-  static cv::Mat PointXYZToMat(
-      const pcl::PointCloud<pcl::PointXYZ> &point_cloud) ATLAS_NOEXCEPT;
 };
 
-}  // namespace proc_mapping
+} // namespace proc_mapping
+
+#endif // PROC_MAPPING_OBJECT_MAPPER_H_
