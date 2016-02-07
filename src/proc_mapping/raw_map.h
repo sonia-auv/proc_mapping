@@ -1,6 +1,6 @@
 /**
- * \file	main.cc
- * \author	Etienne Pilon <etienne.b.pilon@gmail.com>
+ * \file	matrix_inl.h
+ * \author	Thibaut Mattio <thibaut.mattio@gmail.com>
  * \date	06/02/2016
  *
  * \copyright Copyright (c) 2015 S.O.N.I.A. All rights reserved.
@@ -23,13 +23,18 @@
  * along with S.O.N.I.A. software. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "ros/ros.h"
+#include <opencv/cv.h>
+#include <pcl_ros/point_cloud.h>
 
-int main(int argc, char **argv) {
-  ros::init(argc, argv, "proc_mapping");
+namespace proc_mapping {
 
-  // ros::NodeHandle nh("~");
-  // TritechMicron tritech_micron(nh);
+class RawMap {
+ public:
+  static pcl::PointCloud<pcl::PointXYZ> MatToPointXYZ(
+      const cv::Mat &m) noexcept;
 
-  ros::spin();
-}
+  static cv::Mat PointXYZToMat(
+      const pcl::PointCloud<pcl::PointXYZ> &point_cloud) noexcept;
+};
+
+}  // namespace proc_mapping

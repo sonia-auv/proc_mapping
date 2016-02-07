@@ -1,6 +1,6 @@
 /**
- * \file	main.cc
- * \author	Etienne Pilon <etienne.b.pilon@gmail.com>
+ * \file	raw_map_test.cc
+ * \author	Thibaut Mattio <thibaut.mattio@gmail.com>
  * \date	06/02/2016
  *
  * \copyright Copyright (c) 2015 S.O.N.I.A. All rights reserved.
@@ -23,13 +23,9 @@
  * along with S.O.N.I.A. software. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "ros/ros.h"
+#include <gtest/gtest.h>
 
 int main(int argc, char **argv) {
-  ros::init(argc, argv, "proc_mapping");
-
-  // ros::NodeHandle nh("~");
-  // TritechMicron tritech_micron(nh);
-
-  ros::spin();
+  testing::InitGoogleTest(&argc, argv);
+  return RUN_ALL_TESTS();
 }
