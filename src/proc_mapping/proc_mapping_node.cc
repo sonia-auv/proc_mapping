@@ -44,4 +44,4 @@ ProcMappingNode::~ProcMappingNode() ATLAS_NOEXCEPT {}
 //------------------------------------------------------------------------------
 //
 
-} // namespace proc_mapping
+}  // namespace proc_mapping

@@ -28,18 +28,22 @@
 
 #include <memory>
 #include <vector>
+#include <opencv/cv.h>
 #include <lib_atlas/macros.h>
 #include "proc_mapping/interpreter/data_interpreter.h"
 
 namespace proc_mapping {
 
-class RawMapInterpreter : public DataInterpreter {
+class RawMapInterpreter : public DataInterpreter<cv::Mat>,
+                          public atlas::Observer<const cv::Mat &> {
  public:
   //==========================================================================
   // T Y P E D E F   A N D   E N U M
 
   using Ptr = std::shared_ptr<RawMapInterpreter>;
   using ConstPtr = std::shared_ptr<const RawMapInterpreter>;
+  using PtrList = std::vector<RawMapInterpreter::Ptr>;
+  using ConstPtrList = std::vector<RawMapInterpreter::ConstPtr>;
 
   //==========================================================================
   // P U B L I C   C / D T O R S
@@ -51,8 +55,17 @@ class RawMapInterpreter : public DataInterpreter {
   //==========================================================================
   // P U B L I C   M E T H O D S
 
+ private:
+  //==========================================================================
+  // P R I V A T E   M E T H O D S
+
+  void OnSubjectNotify(atlas::Subject<const cv::Mat &> &subject,
+                       const cv::Mat &map) ATLAS_NOEXCEPT override;
+
+  //==========================================================================
+  // P R I V A T E   M E M B E R S
 };
 
-} // namespace proc_mapping
+}  // namespace proc_mapping
 
-#endif //PROC_MAPPING_INTERPRETER_RAW_MAP_INTERPRETER_H_H_
+#endif  // PROC_MAPPING_INTERPRETER_RAW_MAP_INTERPRETER_H_H_

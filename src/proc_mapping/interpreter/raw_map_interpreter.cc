@@ -43,6 +43,10 @@ RawMapInterpreter::~RawMapInterpreter() ATLAS_NOEXCEPT {}
 
 //------------------------------------------------------------------------------
 //
+void RawMapInterpreter::OnSubjectNotify(
+    atlas::Subject<const cv::Mat &> &subject,
+    const cv::Mat &map) ATLAS_NOEXCEPT {
+  SetNewData(map);
+}
 
-
-} // namespace proc_mapping
+}  // namespace proc_mapping

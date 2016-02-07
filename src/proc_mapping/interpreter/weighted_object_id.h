@@ -1,5 +1,5 @@
 /**
- * \file	object_mapper.h
+ * \file	weighted_object_id.h
  * \author	Thibaut Mattio <thibaut.mattio@gmail.com>
  * \date	07/02/2016
  *
@@ -23,54 +23,69 @@
  * along with S.O.N.I.A. software. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef PROC_MAPPING_OBJECT_MAPPER_H_
-#define PROC_MAPPING_OBJECT_MAPPER_H_
+#ifndef PROC_MAPPING_INTERPRETER_WEIGHTED_OBJECT_ID_H_
+#define PROC_MAPPING_INTERPRETER_WEIGHTED_OBJECT_ID_H_
 
 #include <memory>
 #include <vector>
+#include <sonia_msgs/WeightedObjectId.h>
 #include <lib_atlas/macros.h>
-#include <lib_atlas/pattern/subject.h>
-#include <lib_atlas/pattern/observer.h>
-#include "proc_mapping/interpreter/weighted_object_id.h"
-#include "proc_mapping/interpreter/data_interpreter.h"
 
 namespace proc_mapping {
 
-class ObjectMapper
-    : public atlas::Observer<const WeightedObjectId::ConstPtrList &> {
+/**
+ * This class is a proxy for the sonia_msgs/WeightedObjectId class.
+ * This provide simple method for serializing and deserializing the object
+ * into/from the ROS message.
+ */
+class WeightedObjectId {
  public:
   //==========================================================================
   // T Y P E D E F   A N D   E N U M
 
-  using Ptr = std::shared_ptr<ObjectMapper>;
-  using ConstPtr = std::shared_ptr<const ObjectMapper>;
-  using PtrList = std::vector<ObjectMapper::Ptr>;
-  using ConstPtrList = std::vector<ObjectMapper::ConstPtr>;
+  using Ptr = std::shared_ptr<WeightedObjectId>;
+  using ConstPtr = std::shared_ptr<const WeightedObjectId>;
+  using PtrList = std::vector<WeightedObjectId::Ptr>;
+  using ConstPtrList = std::vector<WeightedObjectId::ConstPtr>;
+
+  /**
+   * This is the id of the object.
+   * Caution with the values of the IDs. The same enum is being declared
+   * in the sonia_msgs/WeightedObjectId file. For user simplicity, please,
+   * use the same values.
+   */
+  enum class ObjectId {
+    BUOY_ID = 0u,
+    GREEN_BUOY_ID = 1u,
+    RED_BUOY_ID = 2u,
+    PIPE_ID = 3u,
+    FENCE_ID = 4u,
+    TRAIN_ID = 5u,
+  };
 
   //==========================================================================
   // P U B L I C   C / D T O R S
 
-  ObjectMapper() ATLAS_NOEXCEPT;
-
-  ~ObjectMapper() ATLAS_NOEXCEPT;
+  WeightedObjectId() ATLAS_NOEXCEPT;
+  virtual ~WeightedObjectId() ATLAS_NOEXCEPT;
 
   //==========================================================================
   // P U B L I C   M E T H O D S
 
+  sonia_msgs::WeightedObjectId::Ptr Serialize() const ATLAS_NOEXCEPT;
+
+  void Deserialize(const sonia_msgs::WeightedObjectId::ConstPtr &obj)
+      ATLAS_NOEXCEPT;
+
  private:
-  //==========================================================================
-  // P R I V A T E   M E T H O D S
-
-  void OnSubjectNotify(
-      atlas::Subject<const WeightedObjectId::ConstPtrList &> &subject,
-      const WeightedObjectId::ConstPtrList &obj) ATLAS_NOEXCEPT override;
-
   //==========================================================================
   // P R I V A T E   M E M B E R S
 
-  DataInterpreterInterface::PtrList interpreters_;
+  WeightedObjectId::ObjectId id_;
+
+  double weight_;
 };
 
 }  // namespace proc_mapping
 
-#endif  // PROC_MAPPING_OBJECT_MAPPER_H_
+#endif  // PROC_MAPPING_INTERPRETER_WEIGHTED_OBJECT_ID_H_

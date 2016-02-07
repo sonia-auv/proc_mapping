@@ -44,5 +44,4 @@ VisionInterpreter::~VisionInterpreter() ATLAS_NOEXCEPT {}
 //------------------------------------------------------------------------------
 //
 
-
-} // namespace proc_mapping
+}  // namespace proc_mapping

@@ -32,7 +32,7 @@ namespace proc_mapping {
 
 //------------------------------------------------------------------------------
 //
-ObjectMapper::ObjectMapper() ATLAS_NOEXCEPT {}
+ObjectMapper::ObjectMapper() ATLAS_NOEXCEPT : interpreters_() {}
 
 //------------------------------------------------------------------------------
 //
@@ -43,5 +43,8 @@ ObjectMapper::~ObjectMapper() ATLAS_NOEXCEPT {}
 
 //------------------------------------------------------------------------------
 //
+void ObjectMapper::OnSubjectNotify(
+    atlas::Subject<const WeightedObjectId::ConstPtrList &> &subject,
+    const WeightedObjectId::ConstPtrList &obj) ATLAS_NOEXCEPT {}
 
-} // namespace proc_mapping
+}  // namespace proc_mapping

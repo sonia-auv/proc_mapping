@@ -39,6 +39,8 @@ class ProcMappingNode {
 
   using Ptr = std::shared_ptr<ProcMappingNode>;
   using ConstPtr = std::shared_ptr<const ProcMappingNode>;
+  using PtrList = std::vector<ProcMappingNode::Ptr>;
+  using ConstPtrList = std::vector<ProcMappingNode::ConstPtr>;
 
   //==========================================================================
   // P U B L I C   C / D T O R S
@@ -49,9 +51,8 @@ class ProcMappingNode {
 
   //==========================================================================
   // P U B L I C   M E T H O D S
-
 };
 
-} // namespace proc_mapping
+}  // namespace proc_mapping
 
-#endif //PROC_MAPPING_PROC_MAPPING_NODE_H_
+#endif  // PROC_MAPPING_PROC_MAPPING_NODE_H_

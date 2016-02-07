@@ -28,16 +28,19 @@
 #include <opencv/cv.h>
 #include <pcl_ros/point_cloud.h>
 #include <lib_atlas/macros.h>
+#include <lib_atlas/pattern/subject.h>
 
 namespace proc_mapping {
 
-class RawMap {
+class RawMap : atlas::Subject<const cv::Mat &> {
  public:
   //==========================================================================
   // T Y P E D E F   A N D   E N U M
 
   using Ptr = std::shared_ptr<RawMap>;
   using ConstPtr = std::shared_ptr<const RawMap>;
+  using PtrList = std::vector<RawMap::Ptr>;
+  using ConstPtrList = std::vector<RawMap::ConstPtr>;
 
   //==========================================================================
   // P U B L I C   C / D T O R S
@@ -49,8 +52,8 @@ class RawMap {
   //==========================================================================
   // P U B L I C   M E T H O D S
 
-  static pcl::PointCloud<pcl::PointXYZ> MatToPointXYZ(
-      const cv::Mat &m) ATLAS_NOEXCEPT;
+  static pcl::PointCloud<pcl::PointXYZ> MatToPointXYZ(const cv::Mat &m)
+      ATLAS_NOEXCEPT;
 
   static cv::Mat PointXYZToMat(
       const pcl::PointCloud<pcl::PointXYZ> &point_cloud) ATLAS_NOEXCEPT;

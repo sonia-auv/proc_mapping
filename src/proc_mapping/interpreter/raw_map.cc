@@ -1,7 +1,7 @@
 /**
- * \file	data_interpreter.cc
+ * \file	can_device.cc
  * \author	Thibaut Mattio <thibaut.mattio@gmail.com>
- * \date	07/02/2016
+ * \date	06/02/2016
  *
  * \copyright Copyright (c) 2015 S.O.N.I.A. All rights reserved.
  *
@@ -23,7 +23,7 @@
  * along with S.O.N.I.A. software. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "proc_mapping/interpreter/data_interpreter.h"
+#include "proc_mapping/interpreter/raw_map.h"
 
 namespace proc_mapping {
 
@@ -32,16 +32,50 @@ namespace proc_mapping {
 
 //------------------------------------------------------------------------------
 //
-DataInterpreter::DataInterpreter() ATLAS_NOEXCEPT {}
+RawMap::RawMap() ATLAS_NOEXCEPT {}
 
 //------------------------------------------------------------------------------
 //
-DataInterpreter::~DataInterpreter() ATLAS_NOEXCEPT {}
+RawMap::~RawMap() ATLAS_NOEXCEPT {}
 
 //==============================================================================
 // M E T H O D   S E C T I O N
 
 //------------------------------------------------------------------------------
 //
+pcl::PointCloud<pcl::PointXYZ> RawMap::MatToPointXYZ(const cv::Mat &m)
+    ATLAS_NOEXCEPT {
+  pcl::PointCloud<pcl::PointXYZ> point_cloud;
 
-} // namespace proc_mapping
+  for (int i = 0; i < m.cols; i++) {
+    pcl::PointXYZ p;
+    p.x = m.at<float>(0, i);
+    p.y = m.at<float>(1, i);
+    p.z = m.at<float>(2, i);
+    point_cloud.points.push_back(p);
+  }
+
+  point_cloud.width = static_cast<int>(point_cloud.points.size());
+  point_cloud.height = 1;
+  return point_cloud;
+}
+
+//------------------------------------------------------------------------------
+//
+cv::Mat RawMap::PointXYZToMat(const pcl::PointCloud<pcl::PointXYZ> &point_cloud)
+    ATLAS_NOEXCEPT {
+  cv::Mat OpenCVPointCloud(3, static_cast<int>(point_cloud.points.size()),
+                           CV_64FC1);
+  for (uint64_t i = 0; i < point_cloud.points.size(); i++) {
+    OpenCVPointCloud.at<double>(0, static_cast<int>(i)) =
+        point_cloud.points.at(i).x;
+    OpenCVPointCloud.at<double>(1, static_cast<int>(i)) =
+        point_cloud.points.at(i).y;
+    OpenCVPointCloud.at<double>(2, static_cast<int>(i)) =
+        point_cloud.points.at(i).z;
+  }
+
+  return OpenCVPointCloud;
+}
+
+}  // namespace proc_mapping

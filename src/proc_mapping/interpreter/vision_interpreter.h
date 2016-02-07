@@ -29,17 +29,20 @@
 #include <memory>
 #include <vector>
 #include <lib_atlas/macros.h>
+#include <sonia_msgs/WeightedObjectId.h>  // to change for ObjectFullData
 #include "proc_mapping/interpreter/data_interpreter.h"
 
 namespace proc_mapping {
 
-class VisionInterpreter : public DataInterpreter {
+class VisionInterpreter : public DataInterpreter<sonia_msgs::WeightedObjectId> {
  public:
   //==========================================================================
   // T Y P E D E F   A N D   E N U M
 
   using Ptr = std::shared_ptr<VisionInterpreter>;
   using ConstPtr = std::shared_ptr<const VisionInterpreter>;
+  using PtrList = std::vector<VisionInterpreter::Ptr>;
+  using ConstPtrList = std::vector<VisionInterpreter::ConstPtr>;
 
   //==========================================================================
   // P U B L I C   C / D T O R S
@@ -50,9 +53,8 @@ class VisionInterpreter : public DataInterpreter {
 
   //==========================================================================
   // P U B L I C   M E T H O D S
-
 };
 
-} // namespace proc_mapping
+}  // namespace proc_mapping
 
-#endif //PROC_MAPPING_INTERPRETER_VISION_INTERPRETER_H_
+#endif  // PROC_MAPPING_INTERPRETER_VISION_INTERPRETER_H_
