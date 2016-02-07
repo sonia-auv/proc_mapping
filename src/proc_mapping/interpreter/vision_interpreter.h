@@ -34,6 +34,16 @@
 
 namespace proc_mapping {
 
+/**
+ * The VisionInterpreter is a DataInterpreter for the proc_vision system.
+ * As all the processing has already be done in the proc_vision package,
+ * there is not much to do here except parsing the data and building the
+ * associated WeightedObject.
+ * Note that the VisionInterpreter is a session controller (GRASP patterns). We
+ * try not to have a lot of controller except the MainNode, but as be don't
+ * want to break the code cohesion, we will allow the DataInterpreters to
+ * receive ROS messages
+ */
 class VisionInterpreter : public DataInterpreter<sonia_msgs::WeightedObjectId> {
  public:
   //==========================================================================
