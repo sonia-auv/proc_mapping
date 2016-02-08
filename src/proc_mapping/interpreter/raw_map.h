@@ -23,6 +23,9 @@
  * along with S.O.N.I.A. software. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#ifndef PROC_MAPPING_INTERPRETER_RAW_MAP_H_
+#define PROC_MAPPING_INTERPRETER_RAW_MAP_H_
+
 #include <memory>
 #include <vector>
 #include <opencv/cv.h>
@@ -60,3 +63,5 @@ class RawMap : atlas::Subject<const cv::Mat &> {
 };
 
 }  // namespace proc_mapping
+
+#endif  // PROC_MAPPING_INTERPRETER_RAW_MAP_H_

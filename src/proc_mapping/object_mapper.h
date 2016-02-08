@@ -39,7 +39,7 @@ namespace proc_mapping {
 class ObjectMapper
     : public atlas::Observer<const WeightedObjectId::ConstPtrList &> {
  public:
-  //==========================================================================
+  //============================================================================
   // T Y P E D E F   A N D   E N U M
 
   using Ptr = std::shared_ptr<ObjectMapper>;
@@ -47,25 +47,25 @@ class ObjectMapper
   using PtrList = std::vector<ObjectMapper::Ptr>;
   using ConstPtrList = std::vector<ObjectMapper::ConstPtr>;
 
-  //==========================================================================
+  //============================================================================
   // P U B L I C   C / D T O R S
 
   ObjectMapper() ATLAS_NOEXCEPT;
 
   ~ObjectMapper() ATLAS_NOEXCEPT;
 
-  //==========================================================================
+  //============================================================================
   // P U B L I C   M E T H O D S
 
  private:
-  //==========================================================================
+  //============================================================================
   // P R I V A T E   M E T H O D S
 
   void OnSubjectNotify(
       atlas::Subject<const WeightedObjectId::ConstPtrList &> &subject,
       const WeightedObjectId::ConstPtrList &obj) ATLAS_NOEXCEPT override;
 
-  //==========================================================================
+  //============================================================================
   // P R I V A T E   M E M B E R S
 
   DataInterpreterInterface::PtrList interpreters_;

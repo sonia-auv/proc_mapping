@@ -23,8 +23,8 @@
  * along with S.O.N.I.A. software. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef PROC_MAPPING_INTERPRETER_RAW_MAP_INTERPRETER_H_H_
-#define PROC_MAPPING_INTERPRETER_RAW_MAP_INTERPRETER_H_H_
+#ifndef PROC_MAPPING_INTERPRETER_RAW_MAP_INTERPRETER_H_
+#define PROC_MAPPING_INTERPRETER_RAW_MAP_INTERPRETER_H_
 
 #include <memory>
 #include <vector>
@@ -68,4 +68,4 @@ class RawMapInterpreter : public DataInterpreter<cv::Mat>,
 
 }  // namespace proc_mapping
 
-#endif  // PROC_MAPPING_INTERPRETER_RAW_MAP_INTERPRETER_H_H_
+#endif  // PROC_MAPPING_INTERPRETER_RAW_MAP_INTERPRETER_H_

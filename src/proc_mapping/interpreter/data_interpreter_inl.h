@@ -53,8 +53,10 @@ ATLAS_ALWAYS_INLINE DataInterpreter<Tp_>::~DataInterpreter() ATLAS_NOEXCEPT {}
 //
 template <class Tp_>
 ATLAS_ALWAYS_INLINE void DataInterpreter<Tp_>::Run() {
-  while (IsRunning() && new_data_ready_) {
-    Notify(ProcessData());
+  while (IsRunning()) {
+    if(new_data_ready_) {
+      Notify(ProcessData());
+    }
   }
 }
 
@@ -80,7 +82,6 @@ ATLAS_ALWAYS_INLINE void DataInterpreter<Tp_>::SetNewData(const Tp_ &data)
 template <class Tp_>
 ATLAS_ALWAYS_INLINE bool DataInterpreter<Tp_>::IsNewDataReady() const
     ATLAS_NOEXCEPT {
-  std::lock_guard<std::mutex> guard(data_mutex_);
   return new_data_ready_;
 }
 
