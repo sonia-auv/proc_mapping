@@ -30,6 +30,7 @@
 #include <vector>
 #include <atomic>
 #include <mutex>
+#include <ros/ros.h>
 #include <lib_atlas/macros.h>
 #include "proc_mapping/interpreter/data_interpreter_interface.h"
 #include "proc_mapping/interpreter/weighted_object_id.h"
@@ -50,7 +51,7 @@ class DataInterpreter : public DataInterpreterInterface {
   //============================================================================
   // P U B L I C   C / D T O R S
 
-  DataInterpreter() ATLAS_NOEXCEPT;
+  explicit DataInterpreter(const ros::NodeHandlePtr &nh) ATLAS_NOEXCEPT;
 
   virtual ~DataInterpreter() ATLAS_NOEXCEPT;
 
@@ -96,6 +97,8 @@ class DataInterpreter : public DataInterpreterInterface {
   Tp_ last_data_;
 
   std::mutex data_mutex_;
+
+  ros::Subscriber odometry_sub_;
 };
 
 }  // namespace proc_mapping

@@ -56,7 +56,8 @@ class DataInterpreterInterface
   //============================================================================
   // P U B L I C   C / D T O R S
 
-  DataInterpreterInterface() ATLAS_NOEXCEPT {}
+  explicit DataInterpreterInterface(const ros::NodeHandlePtr &nh)
+      ATLAS_NOEXCEPT {}
 
   virtual ~DataInterpreterInterface() ATLAS_NOEXCEPT {}
 };

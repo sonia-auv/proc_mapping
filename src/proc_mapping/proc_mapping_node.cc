@@ -32,7 +32,8 @@ namespace proc_mapping {
 
 //------------------------------------------------------------------------------
 //
-ProcMappingNode::ProcMappingNode() ATLAS_NOEXCEPT {}
+ProcMappingNode::ProcMappingNode(const ros::NodeHandlePtr &nh) ATLAS_NOEXCEPT
+    : nh_(nh) {}
 
 //------------------------------------------------------------------------------
 //

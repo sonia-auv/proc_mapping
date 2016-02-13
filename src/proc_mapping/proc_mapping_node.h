@@ -29,6 +29,7 @@
 #include <memory>
 #include <vector>
 #include <lib_atlas/macros.h>
+#include <ros/node_handle.h>
 
 namespace proc_mapping {
 
@@ -45,12 +46,20 @@ class ProcMappingNode {
   //==========================================================================
   // P U B L I C   C / D T O R S
 
-  ProcMappingNode() ATLAS_NOEXCEPT;
+  explicit ProcMappingNode(const ros::NodeHandlePtr &nh) ATLAS_NOEXCEPT;
 
   ~ProcMappingNode() ATLAS_NOEXCEPT;
 
   //==========================================================================
   // P U B L I C   M E T H O D S
+
+ private:
+  //==========================================================================
+  // P R I V A T E   M E M B E R S
+
+  ros::NodeHandlePtr nh_;
+
+  ros::Publisher semantic_map_pub_;
 };
 
 }  // namespace proc_mapping

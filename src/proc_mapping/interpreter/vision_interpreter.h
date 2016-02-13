@@ -57,7 +57,7 @@ class VisionInterpreter : public DataInterpreter<sonia_msgs::WeightedObjectId> {
   //==========================================================================
   // P U B L I C   C / D T O R S
 
-  VisionInterpreter() ATLAS_NOEXCEPT;
+  explicit VisionInterpreter(const ros::NodeHandlePtr &nh) ATLAS_NOEXCEPT;
 
   virtual ~VisionInterpreter() ATLAS_NOEXCEPT;
 

@@ -37,9 +37,10 @@ namespace proc_mapping {
 //------------------------------------------------------------------------------
 //
 template <class Tp_>
-ATLAS_ALWAYS_INLINE DataInterpreter<Tp_>::DataInterpreter() ATLAS_NOEXCEPT
-    : new_data_ready_(false),
-      last_data_() {}
+ATLAS_ALWAYS_INLINE DataInterpreter<Tp_>::DataInterpreter(
+    const ros::NodeHandlePtr &nh) ATLAS_NOEXCEPT : DataInterpreterInterface(nh),
+                                                   new_data_ready_(false),
+                                                   last_data_() {}
 
 //------------------------------------------------------------------------------
 //
@@ -54,7 +55,7 @@ ATLAS_ALWAYS_INLINE DataInterpreter<Tp_>::~DataInterpreter() ATLAS_NOEXCEPT {}
 template <class Tp_>
 ATLAS_ALWAYS_INLINE void DataInterpreter<Tp_>::Run() {
   while (IsRunning()) {
-    if(new_data_ready_) {
+    if (new_data_ready_) {
       Notify(ProcessData());
     }
   }

@@ -24,12 +24,16 @@
  */
 
 #include <ros/ros.h>
+#include "proc_mapping/proc_mapping_node.h"
 
 int main(int argc, char **argv) {
   ros::init(argc, argv, "proc_mapping");
 
-  // ros::NodeHandle nh("~");
-  // TritechMicron tritech_micron(nh);
+  ros::NodeHandlePtr nh(new ros::NodeHandle("~"));
+  auto proc_mapping_node = proc_mapping::ProcMappingNode(nh);
 
-  ros::spin();
+  while (ros::ok()) {
+    ros::spinOnce();
+  }
+  return 0;
 }

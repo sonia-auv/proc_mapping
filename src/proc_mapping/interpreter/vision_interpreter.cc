@@ -32,7 +32,8 @@ namespace proc_mapping {
 
 //------------------------------------------------------------------------------
 //
-VisionInterpreter::VisionInterpreter() ATLAS_NOEXCEPT {}
+VisionInterpreter::VisionInterpreter(const ros::NodeHandlePtr &nh)
+    ATLAS_NOEXCEPT : DataInterpreter(nh) {}
 
 //------------------------------------------------------------------------------
 //
