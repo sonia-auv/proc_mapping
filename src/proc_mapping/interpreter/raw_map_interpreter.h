@@ -28,6 +28,7 @@
 
 #include <memory>
 #include <vector>
+#include <array>
 #include <opencv/cv.h>
 #include <message_filters/subscriber.h>
 #include <message_filters/synchronizer.h>
@@ -69,6 +70,22 @@ class RawMapInterpreter : public DataInterpreter<cv::Mat> {
 
   static const uint16_t FRAME_SYNC;
 
+  // The structure of our map. We use other informations than the simple size
+  // and matrix of point for the purpose of algo so we will let those
+  // variable in the structure as well.
+  struct Map {
+    cv::Mat mat;
+    uint32_t width;
+    uint32_t height;
+    // This is the resolution of the map (value in mm/pixel)
+    float res;
+    // As we want to set the origin at the center of the map, we will transpose
+    // our elements to the middle of the map when they come. This matrix is the
+    // translation in x y to the center of the map.
+    Eigen::Translation<uint32_t, 2> map_transform_;
+    uint32_t nb_added_clouds_;
+  };
+
   //==========================================================================
   // P U B L I C   C / D T O R S
 
@@ -101,31 +118,39 @@ class RawMapInterpreter : public DataInterpreter<cv::Mat> {
    * The transformation matrix will be usefull when we will register the
    * new PointCloud in the original PoinCloud message.
    */
-  Eigen::Affine3d GetTransformationMatrix(
+  Eigen::Matrix3d GetTransformationMatrix(
       const nav_msgs::Odometry::ConstPtr &odom) ATLAS_NOEXCEPT;
+
+  void SetMapParameters(const uint32_t &map_width, const uint32_t &map_height,
+                        const float &map_resolution) ATLAS_NOEXCEPT;
+
+  int ConvertToPixel(float value);
+
+  uint8_t GetInfiniteMean(uint8_t newIntensity, uint8_t currentIntensity,
+                          int numberOfHits);
 
   //==========================================================================
   // P R I V A T E   M E M B E R S
 
   ros::NodeHandlePtr nh_;
-
   PointCloud2SubPtr points2_sub_;
   OdometrySubPtr odom_sub_;
-
   PointsOdomSyncPtr sync_po_;
 
-  uint32_t nb_added_clouds_;
-
   /**
-   * We are going to store the final point_cloud here.
+   * We are going to store the final map here.
    * When the first point cloud is received, it is stored here and laters pc
    * will be registered with the odometry delta (taking the translation and
    * rotation)
    */
-  pcl::PointXYZ point_cloud_;
+  Map map_;
+  uint64_t scanline_threshold_;
 
-  Eigen::Affine3d last_odom_;
-  Eigen::Affine3d current_odom_;
+  // Infinite mean stats
+  std::vector<uint8_t> number_of_hits_;
+
+  Eigen::Matrix3d last_pose_;
+  Eigen::Matrix3d current_pose_;
 };
 
 }  // namespace proc_mapping
