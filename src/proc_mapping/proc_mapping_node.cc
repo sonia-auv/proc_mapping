@@ -1,7 +1,7 @@
 /**
- * \file	can_device.cc
+ * \file	proc_mapping_node.cc
  * \author	Thibaut Mattio <thibaut.mattio@gmail.com>
- * \date	06/02/2016
+ * \date	07/02/2016
  *
  * \copyright Copyright (c) 2015 S.O.N.I.A. All rights reserved.
  *
@@ -23,47 +23,28 @@
  * along with S.O.N.I.A. software. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "proc_mapping/raw_map.h"
+#include "proc_mapping/proc_mapping_node.h"
 
 namespace proc_mapping {
 
 //==============================================================================
-// C / D T O R   S E C T I O N
+// C / D T O R S   S E C T I O N
 
 //------------------------------------------------------------------------------
 //
-pcl::PointCloud<pcl::PointXYZ> RawMap::MatToPointXYZ(const cv::Mat &m) noexcept {
-  pcl::PointCloud<pcl::PointXYZ> point_cloud;
-
-  for (int i = 0; i < m.cols; i++) {
-    pcl::PointXYZ p;
-    p.x = m.at<float>(0, i);
-    p.y = m.at<float>(1, i);
-    p.z = m.at<float>(2, i);
-    point_cloud.points.push_back(p);
-  }
-
-  point_cloud.width = static_cast<int>(point_cloud.points.size());
-  point_cloud.height = 1;
-  return point_cloud;
-}
+ProcMappingNode::ProcMappingNode(const ros::NodeHandlePtr &nh) ATLAS_NOEXCEPT
+    : nh_(nh),
+      semantic_map_pub_(),
+      mapper_(nh_) {}
 
 //------------------------------------------------------------------------------
 //
-cv::Mat RawMap::PointXYZToMat(
-    const pcl::PointCloud<pcl::PointXYZ> &point_cloud) noexcept {
-  cv::Mat OpenCVPointCloud(3, static_cast<int>(point_cloud.points.size()),
-                           CV_64FC1);
-  for (uint64_t i = 0; i < point_cloud.points.size(); i++) {
-    OpenCVPointCloud.at<double>(0, static_cast<int>(i)) =
-        point_cloud.points.at(i).x;
-    OpenCVPointCloud.at<double>(1, static_cast<int>(i)) =
-        point_cloud.points.at(i).y;
-    OpenCVPointCloud.at<double>(2, static_cast<int>(i)) =
-        point_cloud.points.at(i).z;
-  }
+ProcMappingNode::~ProcMappingNode() ATLAS_NOEXCEPT {}
 
-  return OpenCVPointCloud;
-}
+//==============================================================================
+// M E T H O D   S E C T I O N
+
+//------------------------------------------------------------------------------
+//
 
 }  // namespace proc_mapping

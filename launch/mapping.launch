@@ -1,0 +1,7 @@
+<launch>
+  <!-- Create a proc_mapping node -->
+  <node pkg="proc_mapping" type="proc_mapping_node" name="proc_mapping_node" output="screen"/>
+
+  <!-- Load parameters for the scanline parser-->
+  <rosparam command="load" file="$(find proc_mapping)/config/proc_mapping_conf.yaml"/>
+</launch>

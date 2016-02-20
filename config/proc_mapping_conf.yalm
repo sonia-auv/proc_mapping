@@ -1,0 +1,8 @@
+
+# Informations of the subscribed topics
+topics/points_topic: "/provider_sonar/point_cloud2"
+topics/odometry: "/proc_navigation/odom"
+
+map/width: 30
+map/heigth: 30
+map/resolution: 0.125

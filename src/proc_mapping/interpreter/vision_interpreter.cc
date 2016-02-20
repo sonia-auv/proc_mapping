@@ -1,7 +1,7 @@
 /**
- * \file	matrix_inl.h
+ * \file	vision_interpreter.cc
  * \author	Thibaut Mattio <thibaut.mattio@gmail.com>
- * \date	06/02/2016
+ * \date	07/02/2016
  *
  * \copyright Copyright (c) 2015 S.O.N.I.A. All rights reserved.
  *
@@ -23,18 +23,26 @@
  * along with S.O.N.I.A. software. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <opencv/cv.h>
-#include <pcl_ros/point_cloud.h>
+#include "proc_mapping/interpreter/vision_interpreter.h"
 
 namespace proc_mapping {
 
-class RawMap {
- public:
-  static pcl::PointCloud<pcl::PointXYZ> MatToPointXYZ(
-      const cv::Mat &m) noexcept;
+//==============================================================================
+// C / D T O R S   S E C T I O N
 
-  static cv::Mat PointXYZToMat(
-      const pcl::PointCloud<pcl::PointXYZ> &point_cloud) noexcept;
-};
+//------------------------------------------------------------------------------
+//
+VisionInterpreter::VisionInterpreter(const ros::NodeHandlePtr &nh)
+    ATLAS_NOEXCEPT : DataInterpreter(nh) {}
+
+//------------------------------------------------------------------------------
+//
+VisionInterpreter::~VisionInterpreter() ATLAS_NOEXCEPT {}
+
+//==============================================================================
+// M E T H O D   S E C T I O N
+
+//------------------------------------------------------------------------------
+//
 
 }  // namespace proc_mapping
