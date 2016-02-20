@@ -65,6 +65,8 @@ class RawMap : public atlas::Subject<cv::Mat>, public atlas::Runnable {
   struct WorldCCS {
     size_t width;
     size_t height;
+    double x_0;
+    double y_0;
     pcl::PointCloud<pcl::PointXYZ> cloud;
   };
 
@@ -97,14 +99,11 @@ class RawMap : public atlas::Subject<cv::Mat>, public atlas::Runnable {
    * \param h The height of the map in world CCS (meters)
    * \param r The resolution of the pixel CCS (meter/pixel)
    */
-  void SetMapParameters(const size_t &w, const size_t &h, const double &r) ATLAS_NOEXCEPT;
+  void SetMapParameters(const size_t &w, const size_t &h,
+                        const double &r) ATLAS_NOEXCEPT;
 
-  /**
-   * Convert from the world coordinate to the pixel coordinate.
-   * When the parameters of the two CCS have been set (with SetMapParameters),
-   * we can switch from one CCS to another with this method.
-   */
-  void ConvertWorldToPixelCCS(const WorldCCS &world, PixelCCS &pixel) ATLAS_NOEXCEPT;
+  void ProcessPointCloud(const sensor_msgs::PointCloud2::ConstPtr &msg,
+                         const Eigen::Affine3f &t);
 
   //==========================================================================
   // P R I V A T E   M E M B E R S
@@ -116,7 +115,8 @@ class RawMap : public atlas::Subject<cv::Mat>, public atlas::Runnable {
   sensor_msgs::PointCloud2::ConstPtr last_pcl_;
   nav_msgs::Odometry::ConstPtr last_odom_;
 
-  // The first data of the sonar may be scrap. Keeping a threshold and starting to process data after it.
+  // The first data of the sonar may be scrap. Keeping a threshold and starting
+  // to process data after it.
   uint32_t sonar_threshold_;
   uint32_t hit_count_;
 

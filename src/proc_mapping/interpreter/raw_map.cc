@@ -41,8 +41,8 @@ RawMap::RawMap(const ros::NodeHandlePtr &nh) ATLAS_NOEXCEPT
       nh_(nh),
       points2_sub_(),
       odom_sub_(),
-sonar_threshold_(32),
-hit_count_(0) {
+      sonar_threshold_(32),
+      hit_count_(0) {
   std::string points_topic;
   std::string odometry_topic;
 
@@ -53,12 +53,13 @@ hit_count_(0) {
 
   int w, h;
   double r;
-  nh->param<int>("map/width", w, 30);
-  nh->param<int>("map/height", h, 30);
+  nh->param<int>("map/width", w, 20);
+  nh->param<int>("map/height", h, 20);
   nh->param<double>("map/resolution", r, 0.125);
   SetMapParameters(static_cast<uint32_t>(w), static_cast<uint32_t>(h), r);
 
-  points2_sub_ = nh_->subscribe(points_topic, 100, &RawMap::PointCloudCallback, this);
+  points2_sub_ =
+      nh_->subscribe(points_topic, 100, &RawMap::PointCloudCallback, this);
   odom_sub_ = nh_->subscribe(odometry_topic, 100, &RawMap::OdomCallback, this);
 
   Start();
@@ -77,17 +78,25 @@ void RawMap::PointCloudCallback(
     const sensor_msgs::PointCloud2::ConstPtr &msg_in) ATLAS_NOEXCEPT {
   last_pcl_ = msg_in;
   ++hit_count_;
-  if(hit_count_ >= sonar_threshold_) {
+  if (hit_count_ >= sonar_threshold_) {
     new_pcl_ready_ = true;
   }
 }
 
+//------------------------------------------------------------------------------
+//
 void RawMap::OdomCallback(const nav_msgs::Odometry::ConstPtr &odo_in)
     ATLAS_NOEXCEPT {
   last_odom_ = odo_in;
+  if (!first_odom_received_) {
+    world_.x_0 = last_odom_->pose.pose.position.x;
+    world_.y_0 = last_odom_->pose.pose.position.y;
+  }
   first_odom_received_ = true;
 }
 
+//------------------------------------------------------------------------------
+//
 void RawMap::Run() {
   while (IsRunning()) {
     if (new_pcl_ready_ && first_odom_received_) {
@@ -95,23 +104,22 @@ void RawMap::Run() {
       // for more details on the transformation algo.
       Eigen::Affine3f transform = Eigen::Affine3f::Identity();
 
-      // Define a translation of 2.5 meters on the x axis.
-      transform.translation() << 2.5, 0.0, 0.0;
+      // Applying odometry translation to the transformation
+      transform.translation() << last_odom_->pose.pose.position.x,
+          last_odom_->pose.pose.position.y, 0.0;
+      // We want to center the submarine, then substract the initial position to
+      // the current one.
+      transform.translation() << -world_.x_0, -world_.y_0, 0.0;
+      // Finally, let us center the origin of the coordinate system to the
+      // center of the map.
+      transform.translation() << world_.width / 2, world_.height / 2, 0.0;
+
       // The same rotation matrix as before; tetha radians arround Z axis
       transform.rotate(Eigen::AngleAxisf(
           static_cast<float>(last_odom_->pose.pose.orientation.z),
           Eigen::Vector3f::UnitZ()));
 
-      // Executing the transformation
-      pcl::PointCloud<pcl::PointXYZ> transformed_cloud;
-      pcl::PointCloud<pcl::PointXYZ> source_cloud;
-      pcl::fromROSMsg(*last_pcl_, source_cloud);
-      // You can either apply transform_1 or transform_2; they are the same
-      pcl::transformPointCloud(source_cloud, transformed_cloud, transform);
-
-      // Adding the transformed cloud to the original point cloud.
-      world_.cloud += transformed_cloud;
-      ConvertWorldToPixelCCS(world_, pixel_);
+      ProcessPointCloud(last_pcl_, transform);
       new_pcl_ready_ = false;
       Notify(pixel_.map);
     }
@@ -120,35 +128,45 @@ void RawMap::Run() {
 
 //------------------------------------------------------------------------------
 //
-void RawMap::SetMapParameters(const size_t &w, const size_t &h, const double &r) ATLAS_NOEXCEPT {
+void RawMap::SetMapParameters(const size_t &w, const size_t &h,
+                              const double &r) ATLAS_NOEXCEPT {
   world_.width = w;
   world_.height = h;
 
-  pixel_.width = static_cast<uint32_t>(w/r);
-  pixel_.height = static_cast<uint32_t>(h/r);
+  pixel_.width = static_cast<uint32_t>(w / r);
+  pixel_.height = static_cast<uint32_t>(h / r);
   pixel_.resolution = r;
 
-  cv::Size size(static_cast<uint32_t>(pixel_.width), static_cast<uint32_t>(pixel_.height));
-  pixel_.map = cv::Mat(pixel_.width, pixel_.height, CV_8UC1);
+  cv::Size size(static_cast<uint32_t>(pixel_.width),
+                static_cast<uint32_t>(pixel_.height));
+  pixel_.map = cv::Mat(static_cast<int>(pixel_.width),
+                       static_cast<int>(pixel_.height), CV_8UC1);
   pixel_.map.setTo(cv::Scalar(0));
 }
 
 //------------------------------------------------------------------------------
 //
-void RawMap::ConvertWorldToPixelCCS(const WorldCCS &world, PixelCCS &pixel) ATLAS_NOEXCEPT {
+void RawMap::ProcessPointCloud(const sensor_msgs::PointCloud2::ConstPtr &msg,
+                               const Eigen::Affine3f &t) {
   float x, y, z, intensity;
-  for(unsigned int i = 0; i < world.cloud.size() && i + 3 * sizeof(float) < world.cloud.size(); i+=last_pcl_->point_step){
-    memcpy(&x, &world.cloud[i ], sizeof(float));
-    memcpy(&y, &world.cloud[i + sizeof(float)], sizeof(float));
-    memcpy(&z, &world.cloud[i + 2*sizeof(float)], sizeof(float));
-    memcpy(&intensity, &world.cloud[i + 3*sizeof(float)], sizeof(float));
+  for (unsigned int i = sonar_threshold_;
+       i < msg->data.size() && i + 3 * sizeof(float) < msg->data.size();
+       i += msg->point_step) {
+    memcpy(&x, &msg->data[i], sizeof(float));
+    memcpy(&y, &msg->data[i + sizeof(float)], sizeof(float));
+    memcpy(&z, &msg->data[i + 2 * sizeof(float)], sizeof(float));
+    memcpy(&intensity, &msg->data[i + 3 * sizeof(float)], sizeof(float));
 
-    int u = static_cast<int>(x/pixel_.resolution);
-    int v = static_cast<int>(y/pixel_.resolution);
+    Eigen::Vector3f p_wcs(x, y, 0);
+    Eigen::Vector3f p_wcs_transformed = t * p_wcs;
+    Eigen::Vector3i p_pcs(
+        static_cast<int>(p_wcs_transformed(0) / pixel_.resolution),
+        static_cast<int>(p_wcs_transformed(1) / pixel_.resolution), 0);
 
-    pixel_.map.at<uchar>(u, v) =
-        static_cast<uchar>((static_cast<uint8_t >(255.0 * intensity) +
-                pixel_.map.at<uchar>(u, v))/2);
+    pixel_.map.at<uchar>(p_pcs(0), p_pcs(1)) =
+        static_cast<uchar>((static_cast<uint8_t>(255.0 * intensity) +
+                            pixel_.map.at<uchar>(p_pcs(0), p_pcs(1))) /
+                           2);
   }
 }
 
