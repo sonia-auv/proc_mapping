@@ -55,7 +55,7 @@ ATLAS_ALWAYS_INLINE DataInterpreter<Tp_>::~DataInterpreter() ATLAS_NOEXCEPT {}
 template <class Tp_>
 ATLAS_ALWAYS_INLINE void DataInterpreter<Tp_>::Run() {
   while (IsRunning()) {
-    if (new_data_ready_) {
+    if (IsNewDataReady()) {
       Notify(ProcessData());
     }
   }
@@ -66,8 +66,10 @@ ATLAS_ALWAYS_INLINE void DataInterpreter<Tp_>::Run() {
 template <class Tp_>
 ATLAS_ALWAYS_INLINE Tp_ &DataInterpreter<Tp_>::GetLastData() const
     ATLAS_NOEXCEPT {
+  new_data_ready_ = false;
   return last_data_;
 }
+
 //------------------------------------------------------------------------------
 //
 template <class Tp_>

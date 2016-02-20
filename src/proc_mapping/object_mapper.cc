@@ -24,6 +24,7 @@
  */
 
 #include "proc_mapping/object_mapper.h"
+#include "proc_mapping/interpreter/raw_map_interpreter.h"
 
 namespace proc_mapping {
 
@@ -32,7 +33,12 @@ namespace proc_mapping {
 
 //------------------------------------------------------------------------------
 //
-ObjectMapper::ObjectMapper() ATLAS_NOEXCEPT : interpreters_() {}
+ObjectMapper::ObjectMapper(const ros::NodeHandlePtr &nh) ATLAS_NOEXCEPT
+    : nh_(nh),
+      interpreters_() {
+  RawMapInterpreter::Ptr raw_map = std::make_shared<RawMapInterpreter>(nh);
+  interpreters_.push_back(raw_map);
+}
 
 //------------------------------------------------------------------------------
 //

@@ -30,6 +30,7 @@
 #include <vector>
 #include <lib_atlas/macros.h>
 #include <ros/node_handle.h>
+#include "proc_mapping/object_mapper.h"
 
 namespace proc_mapping {
 
@@ -58,8 +59,9 @@ class ProcMappingNode {
   // P R I V A T E   M E M B E R S
 
   ros::NodeHandlePtr nh_;
-
   ros::Publisher semantic_map_pub_;
+
+  ObjectMapper mapper_;
 };
 
 }  // namespace proc_mapping

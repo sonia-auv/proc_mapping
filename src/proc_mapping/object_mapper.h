@@ -50,7 +50,7 @@ class ObjectMapper
   //============================================================================
   // P U B L I C   C / D T O R S
 
-  ObjectMapper() ATLAS_NOEXCEPT;
+  explicit ObjectMapper(const ros::NodeHandlePtr &nh) ATLAS_NOEXCEPT;
 
   ~ObjectMapper() ATLAS_NOEXCEPT;
 
@@ -67,6 +67,8 @@ class ObjectMapper
 
   //============================================================================
   // P R I V A T E   M E M B E R S
+
+  ros::NodeHandlePtr nh_;
 
   DataInterpreterInterface::PtrList interpreters_;
 };

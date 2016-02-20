@@ -44,7 +44,18 @@ find_package(
 catkin_package(
     INCLUDE_DIRS ${proc_mapping_SRC_DIR}
     LIBRARIES
-    CATKIN_DEPENDS roscpp message_runtime std_msgs provider_dvl lib_atlas sonia_msgs provider_sonar
+    CATKIN_DEPENDS
+    roscpp
+    std_msgs
+    message_runtime
+    provider_dvl
+    sonia_msgs
+    geometry_msgs
+    sensor_msgs
+    provider_sonar
+    lib_atlas
+    pcl_ros
+    pcl_conversions
 )
 
 #===============================================================================
@@ -63,6 +74,7 @@ include_directories(
     ${lib_atlas_INCLUDE_DIRS}
     ${provider_dvl_INCLUDE_DIRS}
     ${provider_sonar_INCLUDE_DIRS}
+    ${OpenCV_INCLUDE_DIRS}
 )
 
 #==========================================================================
