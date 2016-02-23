@@ -58,17 +58,20 @@ WeightedObjectId::ConstPtrList RawMapInterpreter::ProcessData() { return {{}}; }
 //
 void RawMapInterpreter::OnSubjectNotify(atlas::Subject<cv::Mat> &subject,
                                         cv::Mat args) ATLAS_NOEXCEPT {
+
   static int image_counter = 0, image_number= 0;
   SetNewData(args);
   cv::imshow("", args);
   cv::waitKey(1);
   image_counter ++;
+
   if (image_counter == 100) {
     std::string filename = "/home/etienne/Documents/mapping_img/images/cv_mat_regular_mean_" + std::to_string(image_number) + ".png";
     cv::imwrite(filename, args);
     image_number ++;
     image_counter = 0;
   }
+
 }
 
 }  // namespace proc_mapping

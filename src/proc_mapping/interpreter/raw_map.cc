@@ -78,10 +78,7 @@ RawMap::~RawMap() ATLAS_NOEXCEPT {}
 void RawMap::PointCloudCallback(
     const sensor_msgs::PointCloud2::ConstPtr &msg_in) ATLAS_NOEXCEPT {
   last_pcl_ = msg_in;
-  ++hit_count_;
-  if (hit_count_ >= sonar_threshold_) {
-    new_pcl_ready_ = true;
-  }
+  new_pcl_ready_ = true;
 }
 
 //------------------------------------------------------------------------------
@@ -99,8 +96,8 @@ void RawMap::OdomCallback(const nav_msgs::Odometry::ConstPtr &odo_in)
   world_.sub.yaw = M_PI - yaw;
   world_.sub.pitch = pitch;
   world_.sub.roll = roll;
-  world_.sub.x = odo_in.get()->pose.pose.position.x;
-  world_.sub.y = odo_in.get()->pose.pose.position.y;
+  world_.sub.position.x = odo_in.get()->pose.pose.position.x;
+  world_.sub.position.y = odo_in.get()->pose.pose.position.y;
 }
 
 //------------------------------------------------------------------------------
@@ -108,26 +105,6 @@ void RawMap::OdomCallback(const nav_msgs::Odometry::ConstPtr &odo_in)
 void RawMap::Run() {
   while (IsRunning()) {
     if (new_pcl_ready_) {
-      /*
-      // See http://pointclouds.org/documentation/tutorials/matrix_transform.php
-      // for more details on the transformation algo.
-      Eigen::Affine3f transform = Eigen::Affine3f::Identity();
-
-      // Applying odometry translation to the transformation
-      transform.translation() << last_odom_->pose.pose.position.x,
-          last_odom_->pose.pose.position.y, 0.0;
-      // We want to center the submarine, then substract the initial position to
-      // the current one.
-      transform.translation() << -world_.x_0, -world_.y_0, 0.0;
-      // Finally, let us center the origin of the coordinate system to the
-      // center of the map.
-      transform.translation() << world_.width / 2, world_.height / 2, 0.0;
-
-      // The same rotation matrix as before; tetha radians arround Z axis
-      transform.rotate(Eigen::AngleAxisf(
-          static_cast<float>(last_odom_->pose.pose.orientation.z),
-          Eigen::Vector3f::UnitZ()));
-      */
       ProcessPointCloud(last_pcl_);
       new_pcl_ready_ = false;
       Notify(pixel_.map);
@@ -141,6 +118,8 @@ void RawMap::SetMapParameters(const size_t &w, const size_t &h,
                               const double &r) ATLAS_NOEXCEPT {
   world_.width = w;
   world_.height = h;
+  world_.sub.initialPosition.x = w / 2.0;
+  world_.sub.initialPosition.y = h / 2.0;
 
   pixel_.width = static_cast<uint32_t>(w / r);
   pixel_.height = static_cast<uint32_t>(h / r);
@@ -158,6 +137,11 @@ void RawMap::SetMapParameters(const size_t &w, const size_t &h,
 //
 void RawMap::ProcessPointCloud(const sensor_msgs::PointCloud2::ConstPtr &msg) {
   float x, y, z, intensity;
+  double yaw = world_.sub.yaw;
+  // --
+  // Computes cosinus and sinus outside of the loop.
+  double cosRotationFactor = cos(yaw);
+  double sinRotationFactor = sin(yaw);
   for (unsigned int i = sonar_threshold_;
        i < msg->data.size() && i + 3 * sizeof(float) < msg->data.size();
        i += msg->point_step) {
@@ -165,22 +149,9 @@ void RawMap::ProcessPointCloud(const sensor_msgs::PointCloud2::ConstPtr &msg) {
     memcpy(&y, &msg->data[i + sizeof(float)], sizeof(float));
     memcpy(&z, &msg->data[i + 2 * sizeof(float)], sizeof(float));
     memcpy(&intensity, &msg->data[i + 3 * sizeof(float)], sizeof(float));
-// -- TODO
 
-    /*
-    Eigen::Vector3f p_wcs(x, y, 0);
-    Eigen::Vector3f p_wcs_transformed = t * p_wcs;
-    Eigen::Vector3i p_pcs(
-        static_cast<int>(p_wcs_transformed(0) / pixel_.resolution),
-        static_cast<int>(p_wcs_transformed(1) / pixel_.resolution), 0);
-
-    UpdateMat(p_pcs(0), p_pcs(1), (static_cast<uint8_t>(255.0 * intensity)));
-     */
+    PointXY<double> p = Transform(x, y, cosRotationFactor, sinRotationFactor);
+    UpdateMat(CoordinateToPixel(p), (static_cast<uint8_t>(255.0 * intensity)));
   }
 }
-
-inline void RawMap::UpdateMat(int x, int y, uchar intensity){
-  pixel_.map.at<uchar>(x, y) = static_cast<uchar>((intensity + pixel_.map.at<uchar>(x, y)) / 2);
-}
-
 }  // namespace proc_mapping

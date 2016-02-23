@@ -61,10 +61,14 @@ class RawMap : public atlas::Subject<cv::Mat>, public atlas::Runnable {
     double resolution;
     cv::Mat map;
   };
-
+  template <typename T>
+  struct PointXY {
+    T x, y;
+  };
   struct SubMarineCS{
     double yaw, pitch, roll;
-    double x, y;
+    PointXY<double> position;
+    PointXY<double> initialPosition;
   };
 
   struct WorldCCS {
@@ -109,8 +113,9 @@ class RawMap : public atlas::Subject<cv::Mat>, public atlas::Runnable {
                         const double &r) ATLAS_NOEXCEPT;
 
   void ProcessPointCloud(const sensor_msgs::PointCloud2::ConstPtr &msg);
-  inline void UpdateMat(int x, int y, uchar intensity);
-
+  inline void UpdateMat(PointXY<int> p, uchar intensity);
+  inline PointXY<double> Transform(double x, double y, double cosRotFactor, double sinRotFactor);
+  inline PointXY<int> CoordinateToPixel(const PointXY<double> &p);
   //==========================================================================
   // P R I V A T E   M E M B E R S
 
@@ -124,6 +129,7 @@ class RawMap : public atlas::Subject<cv::Mat>, public atlas::Runnable {
   // The first data of the sonar may be scrap. Keeping a threshold and starting
   // to process data after it.
   uint32_t sonar_threshold_;
+  uint32_t scanning_threshold_;
   uint32_t hit_count_;
 
   std::atomic<bool> new_pcl_ready_;
@@ -133,6 +139,27 @@ class RawMap : public atlas::Subject<cv::Mat>, public atlas::Runnable {
 
 };
 
-}  // namespace proc_mapping
+inline RawMap::PointXY<double> RawMap::Transform(double x, double y, double cosRotFactor, double sinRotFactor){
+  PointXY<double> offset, result;
+  // - Initial position is simply to center the submarine in the middle of the map.
+  offset.x = world_.sub.position.x + world_.sub.initialPosition.x;
+  offset.y = world_.sub.position.y + world_.sub.initialPosition.y;
+  result.x = x * cosRotFactor - y * sinRotFactor + offset.x;
+  result.y = x * sinRotFactor + y * cosRotFactor + offset.y;
+  return result;
+}
+inline void RawMap::UpdateMat(PointXY<int> p, uchar intensity){
+  if(p.x < pixel_.width && p.y < pixel_.height){
+    pixel_.map.at<uchar>(p.x, p.y) = static_cast<uchar>((intensity + pixel_.map.at<uchar>(p.x, p.y)) / 2);
+  }
+}
+inline RawMap::PointXY<int> RawMap::CoordinateToPixel(const PointXY<double> &p){
+  PointXY<int> result;
+  result.x = static_cast<int>(p.x / pixel_.resolution);
+  result.y = static_cast<int>(p.y / pixel_.resolution);
+  return result;
+}
+
+}
 
 #endif  // PROC_MAPPING_INTERPRETER_RAW_MAP_H_
