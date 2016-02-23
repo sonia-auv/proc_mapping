@@ -46,16 +46,16 @@ RawMap::RawMap(const ros::NodeHandlePtr &nh) ATLAS_NOEXCEPT
   std::string points_topic;
   std::string odometry_topic;
 
-  nh->param<std::string>("topics/points_topic", points_topic,
+  nh->param<std::string>("/proc_mapping/topics/points_topic", points_topic,
                          "/Scanline_parser/point_cloud2");
-  nh->param<std::string>("topics/odometry", odometry_topic,
+  nh->param<std::string>("/proc_mapping/topics/odometry", odometry_topic,
                          "/proc_navigation/Odometry");
 
   int w, h;
   double r;
-  nh->param<int>("map/width", w, 20);
-  nh->param<int>("map/height", h, 20);
-  nh->param<double>("map/resolution", r, 0.125);
+  nh->param<int>("/proc_mapping/map/width", w, 20);
+  nh->param<int>("/proc_mapping/map/height", h, 20);
+  nh->param<double>("/proc_mapping/map/resolution", r, 0.125);
   SetMapParameters(static_cast<uint32_t>(w), static_cast<uint32_t>(h), r);
 
   points2_sub_ =
