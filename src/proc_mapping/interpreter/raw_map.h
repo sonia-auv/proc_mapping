@@ -38,7 +38,7 @@
 #include <pcl_conversions/pcl_conversions.h>
 #include <pcl/point_cloud.h>
 #include <pcl/point_types.h>
-#include <eigen3/Eigen/Eigen>
+
 
 #include <lib_atlas/macros.h>
 #include "proc_mapping/interpreter/data_interpreter.h"
@@ -65,9 +65,16 @@ class RawMap : public atlas::Subject<cv::Mat>, public atlas::Runnable {
   struct WorldCCS {
     size_t width;
     size_t height;
-    double x_0;
-    double y_0;
+    SubMarineCS sub;
     pcl::PointCloud<pcl::PointXYZ> cloud;
+  };
+
+  struct SubMarineCS{
+    double yaw;
+    double pitch;
+    double roll;
+    double x;
+    double y;
   };
 
   //==========================================================================
@@ -102,8 +109,7 @@ class RawMap : public atlas::Subject<cv::Mat>, public atlas::Runnable {
   void SetMapParameters(const size_t &w, const size_t &h,
                         const double &r) ATLAS_NOEXCEPT;
 
-  void ProcessPointCloud(const sensor_msgs::PointCloud2::ConstPtr &msg,
-                         const Eigen::Affine3f &t);
+  void ProcessPointCloud(const sensor_msgs::PointCloud2::ConstPtr &msg);
   inline void UpdateMat(int x, int y, uchar intensity);
 
   //==========================================================================

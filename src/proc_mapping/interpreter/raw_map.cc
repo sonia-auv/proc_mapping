@@ -89,18 +89,15 @@ void RawMap::PointCloudCallback(
 void RawMap::OdomCallback(const nav_msgs::Odometry::ConstPtr &odo_in)
     ATLAS_NOEXCEPT {
   last_odom_ = odo_in;
-  if (!first_odom_received_) {
-    world_.x_0 = last_odom_->pose.pose.position.x;
-    world_.y_0 = last_odom_->pose.pose.position.y;
-  }
-  first_odom_received_ = true;
+
 }
 
 //------------------------------------------------------------------------------
 //
 void RawMap::Run() {
   while (IsRunning()) {
-    if (new_pcl_ready_ && first_odom_received_) {
+    if (new_pcl_ready_) {
+      /*
       // See http://pointclouds.org/documentation/tutorials/matrix_transform.php
       // for more details on the transformation algo.
       Eigen::Affine3f transform = Eigen::Affine3f::Identity();
@@ -119,8 +116,8 @@ void RawMap::Run() {
       transform.rotate(Eigen::AngleAxisf(
           static_cast<float>(last_odom_->pose.pose.orientation.z),
           Eigen::Vector3f::UnitZ()));
-
-      ProcessPointCloud(last_pcl_, transform);
+      */
+      ProcessPointCloud(last_pcl_);
       new_pcl_ready_ = false;
       Notify(pixel_.map);
     }
@@ -148,8 +145,7 @@ void RawMap::SetMapParameters(const size_t &w, const size_t &h,
 
 //------------------------------------------------------------------------------
 //
-void RawMap::ProcessPointCloud(const sensor_msgs::PointCloud2::ConstPtr &msg,
-                               const Eigen::Affine3f &t) {
+void RawMap::ProcessPointCloud(const sensor_msgs::PointCloud2::ConstPtr &msg) {
   float x, y, z, intensity;
   for (unsigned int i = sonar_threshold_;
        i < msg->data.size() && i + 3 * sizeof(float) < msg->data.size();
@@ -158,7 +154,7 @@ void RawMap::ProcessPointCloud(const sensor_msgs::PointCloud2::ConstPtr &msg,
     memcpy(&y, &msg->data[i + sizeof(float)], sizeof(float));
     memcpy(&z, &msg->data[i + 2 * sizeof(float)], sizeof(float));
     memcpy(&intensity, &msg->data[i + 3 * sizeof(float)], sizeof(float));
-
+// -- TODO
     Eigen::Vector3f p_wcs(x, y, 0);
     Eigen::Vector3f p_wcs_transformed = t * p_wcs;
     Eigen::Vector3i p_pcs(
