@@ -38,7 +38,7 @@
 #include <pcl_conversions/pcl_conversions.h>
 #include <pcl/point_cloud.h>
 #include <pcl/point_types.h>
-
+#include <tf/transform_datatypes.h>
 
 #include <lib_atlas/macros.h>
 #include "proc_mapping/interpreter/data_interpreter.h"
@@ -62,6 +62,11 @@ class RawMap : public atlas::Subject<cv::Mat>, public atlas::Runnable {
     cv::Mat map;
   };
 
+  struct SubMarineCS{
+    double yaw, pitch, roll;
+    double x, y;
+  };
+
   struct WorldCCS {
     size_t width;
     size_t height;
@@ -69,13 +74,7 @@ class RawMap : public atlas::Subject<cv::Mat>, public atlas::Runnable {
     pcl::PointCloud<pcl::PointXYZ> cloud;
   };
 
-  struct SubMarineCS{
-    double yaw;
-    double pitch;
-    double roll;
-    double x;
-    double y;
-  };
+
 
   //==========================================================================
   // P U B L I C   C / D T O R S
@@ -120,7 +119,7 @@ class RawMap : public atlas::Subject<cv::Mat>, public atlas::Runnable {
   ros::Subscriber odom_sub_;
 
   sensor_msgs::PointCloud2::ConstPtr last_pcl_;
-  nav_msgs::Odometry::ConstPtr last_odom_;
+  //nav_msgs::Odometry::ConstPtr last_odom_;
 
   // The first data of the sonar may be scrap. Keeping a threshold and starting
   // to process data after it.
@@ -128,10 +127,10 @@ class RawMap : public atlas::Subject<cv::Mat>, public atlas::Runnable {
   uint32_t hit_count_;
 
   std::atomic<bool> new_pcl_ready_;
-  std::atomic<bool> first_odom_received_;
 
   PixelCCS pixel_;
   WorldCCS world_;
+
 };
 
 }  // namespace proc_mapping

@@ -88,8 +88,19 @@ void RawMap::PointCloudCallback(
 //
 void RawMap::OdomCallback(const nav_msgs::Odometry::ConstPtr &odo_in)
     ATLAS_NOEXCEPT {
-  last_odom_ = odo_in;
-
+  // - Generate 3x3 transformation matrix from Quaternions
+  auto orientation = &odo_in.get()->pose.pose.orientation;
+  tf::Quaternion q(orientation->x, orientation->y, orientation->z, orientation->w);
+  tf::Matrix3x3 m(q);
+  // - Get YPR from transformation Matrix
+  double roll, pitch, yaw;
+  m.getRPY(roll, pitch, yaw);
+  // - Set all odometry values that will be use in the cv::mat update thread
+  world_.sub.yaw = M_PI - yaw;
+  world_.sub.pitch = pitch;
+  world_.sub.roll = roll;
+  world_.sub.x = odo_in.get()->pose.pose.position.x;
+  world_.sub.y = odo_in.get()->pose.pose.position.y;
 }
 
 //------------------------------------------------------------------------------
@@ -155,6 +166,8 @@ void RawMap::ProcessPointCloud(const sensor_msgs::PointCloud2::ConstPtr &msg) {
     memcpy(&z, &msg->data[i + 2 * sizeof(float)], sizeof(float));
     memcpy(&intensity, &msg->data[i + 3 * sizeof(float)], sizeof(float));
 // -- TODO
+
+    /*
     Eigen::Vector3f p_wcs(x, y, 0);
     Eigen::Vector3f p_wcs_transformed = t * p_wcs;
     Eigen::Vector3i p_pcs(
@@ -162,7 +175,7 @@ void RawMap::ProcessPointCloud(const sensor_msgs::PointCloud2::ConstPtr &msg) {
         static_cast<int>(p_wcs_transformed(1) / pixel_.resolution), 0);
 
     UpdateMat(p_pcs(0), p_pcs(1), (static_cast<uint8_t>(255.0 * intensity)));
-    
+     */
   }
 }
 
