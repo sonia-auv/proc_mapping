@@ -104,6 +104,7 @@ class RawMap : public atlas::Subject<cv::Mat>, public atlas::Runnable {
 
   void ProcessPointCloud(const sensor_msgs::PointCloud2::ConstPtr &msg,
                          const Eigen::Affine3f &t);
+  inline void UpdateMat(int x, int y, uchar intensity);
 
   //==========================================================================
   // P R I V A T E   M E M B E R S

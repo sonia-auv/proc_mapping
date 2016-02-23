@@ -55,7 +55,8 @@ RawMap::RawMap(const ros::NodeHandlePtr &nh) ATLAS_NOEXCEPT
   double r;
   nh->param<int>("/proc_mapping/map/width", w, 20);
   nh->param<int>("/proc_mapping/map/height", h, 20);
-  nh->param<double>("/proc_mapping/map/resolution", r, 0.125);
+  // - MUST BE EQUAL TO SONAR's RESOLUTION
+  nh->param<double>("/proc_mapping/map/resolution", r, 0.02);
   SetMapParameters(static_cast<uint32_t>(w), static_cast<uint32_t>(h), r);
 
   points2_sub_ =
@@ -137,6 +138,7 @@ void RawMap::SetMapParameters(const size_t &w, const size_t &h,
   pixel_.height = static_cast<uint32_t>(h / r);
   pixel_.resolution = r;
 
+  // - TODO: Add resolution service request from sonar. Must match sonar's resolution.
   cv::Size size(static_cast<uint32_t>(pixel_.width),
                 static_cast<uint32_t>(pixel_.height));
   pixel_.map = cv::Mat(static_cast<int>(pixel_.width),
@@ -163,11 +165,13 @@ void RawMap::ProcessPointCloud(const sensor_msgs::PointCloud2::ConstPtr &msg,
         static_cast<int>(p_wcs_transformed(0) / pixel_.resolution),
         static_cast<int>(p_wcs_transformed(1) / pixel_.resolution), 0);
 
-    pixel_.map.at<uchar>(p_pcs(0), p_pcs(1)) =
-        static_cast<uchar>((static_cast<uint8_t>(255.0 * intensity) +
-                            pixel_.map.at<uchar>(p_pcs(0), p_pcs(1))) /
-                           2);
+    UpdateMat(p_pcs(0), p_pcs(1), (static_cast<uint8_t>(255.0 * intensity)));
+    
   }
+}
+
+inline void RawMap::UpdateMat(int x, int y, uchar intensity){
+  pixel_.map.at<uchar>(x, y) = static_cast<uchar>((intensity + pixel_.map.at<uchar>(x, y)) / 2);
 }
 
 }  // namespace proc_mapping
