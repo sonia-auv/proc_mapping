@@ -41,7 +41,7 @@ RawMap::RawMap(const ros::NodeHandlePtr &nh) ATLAS_NOEXCEPT
       nh_(nh),
       points2_sub_(),
       odom_sub_(),
-      sonar_threshold_(32),
+      point_cloud_threshold(0),
       hit_count_(0) {
   std::string points_topic;
   std::string odometry_topic;
@@ -52,12 +52,14 @@ RawMap::RawMap(const ros::NodeHandlePtr &nh) ATLAS_NOEXCEPT
                          "/proc_navigation/Odometry");
 
   int w, h;
-  double r;
-  nh->param<int>("/proc_mapping/map/width", w, 20);
-  nh->param<int>("/proc_mapping/map/height", h, 20);
+  double r, sonar_threshold;
+  nh->param<int>("/proc_mapping/map/width", w, 30);
+  nh->param<int>("/proc_mapping/map/height", h, 30);
   // - MUST BE EQUAL TO SONAR's RESOLUTION
   nh->param<double>("/proc_mapping/map/resolution", r, 0.02);
+  nh->param<double>("/proc_mapping/map/sonar_threshold", sonar_threshold, 0.5);
   SetMapParameters(static_cast<uint32_t>(w), static_cast<uint32_t>(h), r);
+  SetPointCloudThreshold(sonar_threshold, r);
 
   points2_sub_ =
       nh_->subscribe(points_topic, 100, &RawMap::PointCloudCallback, this);
@@ -111,7 +113,11 @@ void RawMap::Run() {
     }
   }
 }
-
+void RawMap::SetPointCloudThreshold(double sonar_threshold, double resolution){
+  uint32_t numberOfPoints = static_cast<uint32_t> (sonar_threshold / resolution);
+  // - TODO: Remove hard coded factor of 16. This 16 is the value in msg->point_step
+  point_cloud_threshold = 16 * numberOfPoints;
+}
 //------------------------------------------------------------------------------
 //
 void RawMap::SetMapParameters(const size_t &w, const size_t &h,
@@ -142,7 +148,8 @@ void RawMap::ProcessPointCloud(const sensor_msgs::PointCloud2::ConstPtr &msg) {
   // Computes cosinus and sinus outside of the loop.
   double cosRotationFactor = cos(yaw);
   double sinRotationFactor = sin(yaw);
-  for (unsigned int i = sonar_threshold_;
+  ROS_INFO("Sonar threshold %d", point_cloud_threshold);
+  for (unsigned int i = point_cloud_threshold;
        i < msg->data.size() && i + 3 * sizeof(float) < msg->data.size();
        i += msg->point_step) {
     memcpy(&x, &msg->data[i], sizeof(float));

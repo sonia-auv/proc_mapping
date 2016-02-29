@@ -111,7 +111,7 @@ class RawMap : public atlas::Subject<cv::Mat>, public atlas::Runnable {
    */
   void SetMapParameters(const size_t &w, const size_t &h,
                         const double &r) ATLAS_NOEXCEPT;
-
+  void SetPointCloudThreshold(double sonar_threshold, double resolution);
   void ProcessPointCloud(const sensor_msgs::PointCloud2::ConstPtr &msg);
   inline void UpdateMat(PointXY<int> p, uchar intensity);
   inline PointXY<double> Transform(double x, double y, double cosRotFactor, double sinRotFactor);
@@ -127,9 +127,8 @@ class RawMap : public atlas::Subject<cv::Mat>, public atlas::Runnable {
   //nav_msgs::Odometry::ConstPtr last_odom_;
 
   // The first data of the sonar may be scrap. Keeping a threshold and starting
-  // to process data after it.
-  uint32_t sonar_threshold_;
-  uint32_t scanning_threshold_;
+  // to process data after it. MUST BE A MULTIPLE OF 16 (sonar_threshold_ = 16 * numberOfPointsToSkip)
+  uint32_t point_cloud_threshold;
   uint32_t hit_count_;
 
   std::atomic<bool> new_pcl_ready_;
