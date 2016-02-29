@@ -132,11 +132,12 @@ void RawMap::SetMapParameters(const size_t &w, const size_t &h,
   pixel_.resolution = r;
 
   // - TODO: Add resolution service request from sonar. Must match sonar's resolution.
-  cv::Size size(static_cast<uint32_t>(pixel_.width),
-                static_cast<uint32_t>(pixel_.height));
   pixel_.map = cv::Mat(static_cast<int>(pixel_.width),
                        static_cast<int>(pixel_.height), CV_8UC1);
   pixel_.map.setTo(cv::Scalar(0));
+  // - Keeps the number of hits for each pixels
+  pixel_.number_of_hits_.resize(pixel_.width * pixel_.height, 0);
+
 }
 
 //------------------------------------------------------------------------------
@@ -148,7 +149,7 @@ void RawMap::ProcessPointCloud(const sensor_msgs::PointCloud2::ConstPtr &msg) {
   // Computes cosinus and sinus outside of the loop.
   double cosRotationFactor = cos(yaw);
   double sinRotationFactor = sin(yaw);
-  ROS_INFO("Sonar threshold %d", point_cloud_threshold);
+  
   for (unsigned int i = point_cloud_threshold;
        i < msg->data.size() && i + 3 * sizeof(float) < msg->data.size();
        i += msg->point_step) {

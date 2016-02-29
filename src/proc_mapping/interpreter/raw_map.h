@@ -60,6 +60,8 @@ class RawMap : public atlas::Subject<cv::Mat>, public atlas::Runnable {
     size_t height;
     double resolution;
     cv::Mat map;
+    // - Number of Hits per pixel
+    std::vector<uint8_t> number_of_hits_;
   };
   template <typename T>
   struct PointXY {
@@ -149,7 +151,14 @@ inline RawMap::PointXY<double> RawMap::Transform(double x, double y, double cosR
 }
 inline void RawMap::UpdateMat(PointXY<int> p, uchar intensity){
   if(p.x < pixel_.width && p.y < pixel_.height){
-    pixel_.map.at<uchar>(p.x, p.y) = static_cast<uchar>((intensity + pixel_.map.at<uchar>(p.x, p.y)) / 2);
+    // - Infinite mean
+    pixel_.number_of_hits_.at(p.x + p.y * pixel_.width) ++;
+    uint8_t n = pixel_.number_of_hits_.at(p.x + p.y * pixel_.width);
+    pixel_.map.at<uchar>(p.x, p.y) = static_cast<uchar>(intensity/n + pixel_.map.at<uchar>(p.x, p.y) * (n - 1)/ n);
+    // - Local mean
+    //pixel_.map.at<uchar>(p.x, p.y) = static_cast<uchar>((intensity + pixel_.map.at<uchar>(p.x, p.y)) / 2);
+    // - Replacement
+    //pixel_.map.at<uchar>(p.x, p.y) = intensity;
   }
 }
 inline RawMap::PointXY<int> RawMap::CoordinateToPixel(const PointXY<double> &p){
