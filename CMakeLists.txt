@@ -33,6 +33,7 @@ find_package(
     message_generation
     geometry_msgs
     sensor_msgs
+    nav_msgs
     pcl_ros
     pcl_conversions
     lib_atlas
@@ -49,6 +50,7 @@ catkin_package(
     message_runtime
     geometry_msgs
     sensor_msgs
+    nav_msgs
     pcl_ros
     pcl_conversions
     lib_atlas
