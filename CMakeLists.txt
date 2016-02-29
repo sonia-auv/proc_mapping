@@ -31,14 +31,13 @@ find_package(
     roscpp
     std_msgs
     message_generation
-    provider_dvl
-    sonia_msgs
     geometry_msgs
     sensor_msgs
-    provider_sonar
-    lib_atlas
     pcl_ros
     pcl_conversions
+    lib_atlas
+    sonia_msgs
+    provider_sonar
 )
 
 catkin_package(
@@ -48,14 +47,13 @@ catkin_package(
     roscpp
     std_msgs
     message_runtime
-    provider_dvl
-    sonia_msgs
     geometry_msgs
     sensor_msgs
-    provider_sonar
-    lib_atlas
     pcl_ros
     pcl_conversions
+    lib_atlas
+    sonia_msgs
+    provider_sonar
 )
 
 #===============================================================================
@@ -72,7 +70,6 @@ include_directories(
     ${catkin_INCLUDE_DIRS}
     ${proc_mapping_SRC_DIR}
     ${lib_atlas_INCLUDE_DIRS}
-    ${provider_dvl_INCLUDE_DIRS}
     ${provider_sonar_INCLUDE_DIRS}
     ${OpenCV_INCLUDE_DIRS}
 )
