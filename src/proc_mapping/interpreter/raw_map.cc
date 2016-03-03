@@ -58,6 +58,8 @@ RawMap::RawMap(const ros::NodeHandlePtr &nh) ATLAS_NOEXCEPT
   // - MUST BE EQUAL TO SONAR's RESOLUTION
   nh->param<double>("/proc_mapping/map/resolution", r, 0.02);
   nh->param<double>("/proc_mapping/map/sonar_threshold", sonar_threshold, 0.5);
+  nh->param<double>("/proc_mapping/map/sub_initial_x", world_.sub.initialPosition.x, 0.5);
+  nh->param<double>("/proc_mapping/map/sub_initial_y", world_.sub.initialPosition.y, 0.5);
   SetMapParameters(static_cast<uint32_t>(w), static_cast<uint32_t>(h), r);
   SetPointCloudThreshold(sonar_threshold, r);
 
@@ -124,8 +126,6 @@ void RawMap::SetMapParameters(const size_t &w, const size_t &h,
                               const double &r) ATLAS_NOEXCEPT {
   world_.width = w;
   world_.height = h;
-  world_.sub.initialPosition.x = w / 2.0;
-  world_.sub.initialPosition.y = h / 2.0;
 
   pixel_.width = static_cast<uint32_t>(w / r);
   pixel_.height = static_cast<uint32_t>(h / r);
@@ -149,7 +149,7 @@ void RawMap::ProcessPointCloud(const sensor_msgs::PointCloud2::ConstPtr &msg) {
   // Computes cosinus and sinus outside of the loop.
   double cosRotationFactor = cos(yaw);
   double sinRotationFactor = sin(yaw);
-  
+
   for (unsigned int i = point_cloud_threshold;
        i < msg->data.size() && i + 3 * sizeof(float) < msg->data.size();
        i += msg->point_step) {
