@@ -23,11 +23,11 @@
  * along with S.O.N.I.A. software. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "proc_mapping/interpreter/raw_map.h"
 #include <opencv/cv.h>
-#include <opencv2/highgui/highgui.hpp>
 #include <pcl/common/transforms.h>
 #include <tf/transform_datatypes.h>
-#include "proc_mapping/interpreter/raw_map.h"
+#include <opencv2/highgui/highgui.hpp>
 
 namespace proc_mapping {
 
@@ -89,7 +89,8 @@ void RawMap::OdomCallback(const nav_msgs::Odometry::ConstPtr &odo_in)
     ATLAS_NOEXCEPT {
   // - Generate 3x3 transformation matrix from Quaternions
   auto orientation = &odo_in.get()->pose.pose.orientation;
-  tf::Quaternion q(orientation->x, orientation->y, orientation->z, orientation->w);
+  tf::Quaternion q(orientation->x, orientation->y, orientation->z,
+                   orientation->w);
   tf::Matrix3x3 m(q);
   // - Get YPR from transformation Matrix
   double roll, pitch, yaw;
@@ -113,11 +114,16 @@ void RawMap::Run() {
     }
   }
 }
-void RawMap::SetPointCloudThreshold(double sonar_threshold, double resolution){
-  uint32_t numberOfPoints = static_cast<uint32_t> (sonar_threshold / resolution);
-  // - TODO: Remove hard coded factor of 16. This 16 is the value in msg->point_step
+
+//------------------------------------------------------------------------------
+//
+void RawMap::SetPointCloudThreshold(double sonar_threshold, double resolution) {
+  uint32_t numberOfPoints = static_cast<uint32_t>(sonar_threshold / resolution);
+  // - TODO: Remove hard coded factor of 16. This 16 is the value in
+  // msg->point_step
   point_cloud_threshold = 16 * numberOfPoints;
 }
+
 //------------------------------------------------------------------------------
 //
 void RawMap::SetMapParameters(const size_t &w, const size_t &h,
@@ -131,13 +137,13 @@ void RawMap::SetMapParameters(const size_t &w, const size_t &h,
   pixel_.height = static_cast<uint32_t>(h / r);
   pixel_.resolution = r;
 
-  // - TODO: Add resolution service request from sonar. Must match sonar's resolution.
+  // - TODO: Add resolution service request from sonar. Must match sonar's
+  // resolution.
   pixel_.map = cv::Mat(static_cast<int>(pixel_.width),
                        static_cast<int>(pixel_.height), CV_8UC1);
   pixel_.map.setTo(cv::Scalar(0));
   // - Keeps the number of hits for each pixels
   pixel_.number_of_hits_.resize(pixel_.width * pixel_.height, 0);
-
 }
 
 //------------------------------------------------------------------------------
@@ -149,7 +155,7 @@ void RawMap::ProcessPointCloud(const sensor_msgs::PointCloud2::ConstPtr &msg) {
   // Computes cosinus and sinus outside of the loop.
   double cosRotationFactor = cos(yaw);
   double sinRotationFactor = sin(yaw);
-  
+
   for (unsigned int i = point_cloud_threshold;
        i < msg->data.size() && i + 3 * sizeof(float) < msg->data.size();
        i += msg->point_step) {
@@ -162,4 +168,5 @@ void RawMap::ProcessPointCloud(const sensor_msgs::PointCloud2::ConstPtr &msg) {
     UpdateMat(CoordinateToPixel(p), (static_cast<uint8_t>(255.0 * intensity)));
   }
 }
+
 }  // namespace proc_mapping

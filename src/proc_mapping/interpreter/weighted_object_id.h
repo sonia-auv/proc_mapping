@@ -26,10 +26,10 @@
 #ifndef PROC_MAPPING_INTERPRETER_WEIGHTED_OBJECT_ID_H_
 #define PROC_MAPPING_INTERPRETER_WEIGHTED_OBJECT_ID_H_
 
+#include <lib_atlas/macros.h>
+#include <sonia_msgs/WeightedObjectId.h>
 #include <memory>
 #include <vector>
-#include <sonia_msgs/WeightedObjectId.h>
-#include <lib_atlas/macros.h>
 
 namespace proc_mapping {
 

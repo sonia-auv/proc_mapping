@@ -26,10 +26,10 @@
 #ifndef PROC_MAPPING_INTERPRETER_VISION_INTERPRETER_H_
 #define PROC_MAPPING_INTERPRETER_VISION_INTERPRETER_H_
 
-#include <memory>
-#include <vector>
 #include <lib_atlas/macros.h>
 #include <sonia_msgs/WeightedObjectId.h>  // to change for ObjectFullData
+#include <memory>
+#include <vector>
 #include "proc_mapping/interpreter/data_interpreter.h"
 
 namespace proc_mapping {

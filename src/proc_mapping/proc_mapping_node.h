@@ -26,10 +26,10 @@
 #ifndef PROC_MAPPING_PROC_MAPPING_NODE_H_
 #define PROC_MAPPING_PROC_MAPPING_NODE_H_
 
-#include <memory>
-#include <vector>
 #include <lib_atlas/macros.h>
 #include <ros/node_handle.h>
+#include <memory>
+#include <vector>
 #include "proc_mapping/object_mapper.h"
 
 namespace proc_mapping {

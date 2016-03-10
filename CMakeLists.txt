@@ -38,7 +38,6 @@ find_package(
     pcl_conversions
     lib_atlas
     sonia_msgs
-    provider_sonar
 )
 
 catkin_package(
@@ -55,7 +54,6 @@ catkin_package(
     pcl_conversions
     lib_atlas
     sonia_msgs
-    provider_sonar
 )
 
 #===============================================================================
@@ -89,3 +87,4 @@ add_dependencies(${PROJECT_NAME}_node sonia_msgs_generate_messages_cpp)
 if (CATKIN_ENABLE_TESTING AND ${CMAKE_CURRENT_SOURCE_DIR}/test)
   add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/test)
 endif ()
+

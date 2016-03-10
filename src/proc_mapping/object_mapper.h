@@ -26,13 +26,13 @@
 #ifndef PROC_MAPPING_OBJECT_MAPPER_H_
 #define PROC_MAPPING_OBJECT_MAPPER_H_
 
+#include <lib_atlas/macros.h>
+#include <lib_atlas/pattern/observer.h>
+#include <lib_atlas/pattern/subject.h>
 #include <memory>
 #include <vector>
-#include <lib_atlas/macros.h>
-#include <lib_atlas/pattern/subject.h>
-#include <lib_atlas/pattern/observer.h>
-#include "proc_mapping/interpreter/weighted_object_id.h"
 #include "proc_mapping/interpreter/data_interpreter.h"
+#include "proc_mapping/interpreter/weighted_object_id.h"
 
 namespace proc_mapping {
 

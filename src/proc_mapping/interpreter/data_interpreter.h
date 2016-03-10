@@ -26,12 +26,12 @@
 #ifndef PROC_MAPPING_INTERPRETER_DATA_INTERPRETER_H_
 #define PROC_MAPPING_INTERPRETER_DATA_INTERPRETER_H_
 
-#include <memory>
-#include <vector>
-#include <atomic>
-#include <mutex>
-#include <ros/ros.h>
 #include <lib_atlas/macros.h>
+#include <ros/ros.h>
+#include <atomic>
+#include <memory>
+#include <mutex>
+#include <vector>
 #include "proc_mapping/interpreter/data_interpreter_interface.h"
 #include "proc_mapping/interpreter/weighted_object_id.h"
 

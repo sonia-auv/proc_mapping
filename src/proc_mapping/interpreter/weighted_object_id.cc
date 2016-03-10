@@ -44,7 +44,9 @@ WeightedObjectId::~WeightedObjectId() ATLAS_NOEXCEPT {}
 //------------------------------------------------------------------------------
 //
 sonia_msgs::WeightedObjectId::Ptr WeightedObjectId::Serialize() const
-    ATLAS_NOEXCEPT {}
+    ATLAS_NOEXCEPT {
+  return nullptr;
+}
 
 //------------------------------------------------------------------------------
 //

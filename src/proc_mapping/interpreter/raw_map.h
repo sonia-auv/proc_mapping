@@ -26,19 +26,19 @@
 #ifndef PROC_MAPPING_INTERPRETER_RAW_MAP_H_
 #define PROC_MAPPING_INTERPRETER_RAW_MAP_H_
 
-#include <memory>
-#include <vector>
-#include <array>
-#include <opencv/cv.h>
 #include <message_filters/subscriber.h>
-#include <message_filters/synchronizer.h>
 #include <message_filters/sync_policies/approximate_time.h>
+#include <message_filters/synchronizer.h>
 #include <nav_msgs/Odometry.h>
-#include <sensor_msgs/PointCloud2.h>
-#include <pcl_conversions/pcl_conversions.h>
+#include <opencv/cv.h>
 #include <pcl/point_cloud.h>
 #include <pcl/point_types.h>
+#include <pcl_conversions/pcl_conversions.h>
+#include <sensor_msgs/PointCloud2.h>
 #include <tf/transform_datatypes.h>
+#include <array>
+#include <memory>
+#include <vector>
 
 #include <lib_atlas/macros.h>
 #include "proc_mapping/interpreter/data_interpreter.h"
@@ -67,7 +67,7 @@ class RawMap : public atlas::Subject<cv::Mat>, public atlas::Runnable {
   struct PointXY {
     T x, y;
   };
-  struct SubMarineCS{
+  struct SubMarineCS {
     double yaw, pitch, roll;
     PointXY<double> position;
     PointXY<double> initialPosition;
@@ -79,8 +79,6 @@ class RawMap : public atlas::Subject<cv::Mat>, public atlas::Runnable {
     SubMarineCS sub;
     pcl::PointCloud<pcl::PointXYZ> cloud;
   };
-
-
 
   //==========================================================================
   // P U B L I C   C / D T O R S
@@ -113,11 +111,18 @@ class RawMap : public atlas::Subject<cv::Mat>, public atlas::Runnable {
    */
   void SetMapParameters(const size_t &w, const size_t &h,
                         const double &r) ATLAS_NOEXCEPT;
+
   void SetPointCloudThreshold(double sonar_threshold, double resolution);
+
   void ProcessPointCloud(const sensor_msgs::PointCloud2::ConstPtr &msg);
+
   inline void UpdateMat(PointXY<int> p, uchar intensity);
-  inline PointXY<double> Transform(double x, double y, double cosRotFactor, double sinRotFactor);
+
+  inline PointXY<double> Transform(double x, double y, double cosRotFactor,
+                                   double sinRotFactor);
+
   inline PointXY<int> CoordinateToPixel(const PointXY<double> &p);
+
   //==========================================================================
   // P R I V A T E   M E M B E R S
 
@@ -126,10 +131,11 @@ class RawMap : public atlas::Subject<cv::Mat>, public atlas::Runnable {
   ros::Subscriber odom_sub_;
 
   sensor_msgs::PointCloud2::ConstPtr last_pcl_;
-  //nav_msgs::Odometry::ConstPtr last_odom_;
+  // nav_msgs::Odometry::ConstPtr last_odom_;
 
   // The first data of the sonar may be scrap. Keeping a threshold and starting
-  // to process data after it. MUST BE A MULTIPLE OF 16 (sonar_threshold_ = 16 * numberOfPointsToSkip)
+  // to process data after it. MUST BE A MULTIPLE OF 16 (sonar_threshold_ = 16 *
+  // numberOfPointsToSkip)
   uint32_t point_cloud_threshold;
   uint32_t hit_count_;
 
@@ -137,37 +143,52 @@ class RawMap : public atlas::Subject<cv::Mat>, public atlas::Runnable {
 
   PixelCCS pixel_;
   WorldCCS world_;
-
 };
 
-inline RawMap::PointXY<double> RawMap::Transform(double x, double y, double cosRotFactor, double sinRotFactor){
+//==============================================================================
+// I N L I N E   F U N C T I O N S   D E F I N I T I O N S
+
+//------------------------------------------------------------------------------
+//
+inline RawMap::PointXY<double> RawMap::Transform(double x, double y,
+                                                 double cosRotFactor,
+                                                 double sinRotFactor) {
   PointXY<double> offset, result;
-  // - Initial position is simply to center the submarine in the middle of the map.
+  // - Initial position is simply to center the submarine in the middle of the
+  // map.
   offset.x = world_.sub.position.x + world_.sub.initialPosition.x;
   offset.y = world_.sub.position.y + world_.sub.initialPosition.y;
   result.x = x * cosRotFactor - y * sinRotFactor + offset.x;
   result.y = x * sinRotFactor + y * cosRotFactor + offset.y;
   return result;
 }
-inline void RawMap::UpdateMat(PointXY<int> p, uchar intensity){
-  if(p.x < pixel_.width && p.y < pixel_.height){
+
+//------------------------------------------------------------------------------
+//
+inline void RawMap::UpdateMat(PointXY<int> p, uchar intensity) {
+  if (p.x < pixel_.width && p.y < pixel_.height) {
     // - Infinite mean
-    pixel_.number_of_hits_.at(p.x + p.y * pixel_.width) ++;
+    pixel_.number_of_hits_.at(p.x + p.y * pixel_.width)++;
     uint8_t n = pixel_.number_of_hits_.at(p.x + p.y * pixel_.width);
-    pixel_.map.at<uchar>(p.x, p.y) = static_cast<uchar>(intensity/n + pixel_.map.at<uchar>(p.x, p.y) * (n - 1)/ n);
+    pixel_.map.at<uchar>(p.x, p.y) = static_cast<uchar>(
+        intensity / n + pixel_.map.at<uchar>(p.x, p.y) * (n - 1) / n);
     // - Local mean
-    //pixel_.map.at<uchar>(p.x, p.y) = static_cast<uchar>((intensity + pixel_.map.at<uchar>(p.x, p.y)) / 2);
+    // pixel_.map.at<uchar>(p.x, p.y) = static_cast<uchar>((intensity +
+    // pixel_.map.at<uchar>(p.x, p.y)) / 2);
     // - Replacement
-    //pixel_.map.at<uchar>(p.x, p.y) = intensity;
+    // pixel_.map.at<uchar>(p.x, p.y) = intensity;
   }
 }
-inline RawMap::PointXY<int> RawMap::CoordinateToPixel(const PointXY<double> &p){
+
+//------------------------------------------------------------------------------
+//
+inline RawMap::PointXY<int> RawMap::CoordinateToPixel(
+    const PointXY<double> &p) {
   PointXY<int> result;
   result.x = static_cast<int>(p.x / pixel_.resolution);
   result.y = static_cast<int>(p.y / pixel_.resolution);
   return result;
 }
-
 }
 
 #endif  // PROC_MAPPING_INTERPRETER_RAW_MAP_H_
