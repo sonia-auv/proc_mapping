@@ -70,7 +70,6 @@ include_directories(
     ${catkin_INCLUDE_DIRS}
     ${proc_mapping_SRC_DIR}
     ${lib_atlas_INCLUDE_DIRS}
-    ${provider_sonar_INCLUDE_DIRS}
     ${OpenCV_INCLUDE_DIRS}
 )
 
