@@ -43,23 +43,23 @@
 
 namespace proc_mapping {
 
-class RawMapInterpreter : public DataInterpreter<cv::Mat>,
-                          public atlas::Observer<cv::Mat> {
+class TileInterpreter: public DataInterpreter<cv::Mat>,
+                       public atlas::Observer<cv::Mat> {
  public:
   //==========================================================================
   // T Y P E D E F   A N D   E N U M
 
-  using Ptr = std::shared_ptr<RawMapInterpreter>;
-  using ConstPtr = std::shared_ptr<const RawMapInterpreter>;
-  using PtrList = std::vector<RawMapInterpreter::Ptr>;
-  using ConstPtrList = std::vector<RawMapInterpreter::ConstPtr>;
+  using Ptr = std::shared_ptr<TileInterpreter>;
+  using ConstPtr = std::shared_ptr<const TileInterpreter>;
+  using PtrList = std::vector<TileInterpreter::Ptr>;
+  using ConstPtrList = std::vector<TileInterpreter::ConstPtr>;
 
   //==========================================================================
   // P U B L I C   C / D T O R S
 
-  explicit RawMapInterpreter(const ros::NodeHandlePtr &nh) ATLAS_NOEXCEPT;
+  explicit TileInterpreter(const ros::NodeHandlePtr &nh) ATLAS_NOEXCEPT;
 
-  virtual ~RawMapInterpreter() ATLAS_NOEXCEPT;
+  virtual ~TileInterpreter() ATLAS_NOEXCEPT;
 
   //==========================================================================
   // P U B L I C   M E T H O D S

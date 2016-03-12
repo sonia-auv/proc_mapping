@@ -5,6 +5,11 @@
 
 /proc_mapping/map/width: 30
 /proc_mapping/map/heigth: 30
+/proc_mapping/map/sub_initial_x 15.0
+/proc_mapping/map/sub_initial_y 15.0
+
+/proc_mapping/tile/number_of_scanlines 100
+
 /proc_mapping/map/resolution: 0.02
 # Distance in meters of data to eliminate (turbulence in front must be rejected from the dataset)
 /proc_mapping/map/sonar_threshold: 1.0

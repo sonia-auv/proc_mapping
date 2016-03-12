@@ -42,7 +42,7 @@ RawMap::RawMap(const ros::NodeHandlePtr &nh) ATLAS_NOEXCEPT
       points2_sub_(),
       odom_sub_(),
       point_cloud_threshold(0),
-      hit_count_(0) {
+      hit_count_(0), tile_generator_(0){
   std::string points_topic;
   std::string odometry_topic;
 
@@ -51,13 +51,18 @@ RawMap::RawMap(const ros::NodeHandlePtr &nh) ATLAS_NOEXCEPT
   nh->param<std::string>("/proc_mapping/topics/odometry", odometry_topic,
                          "/proc_navigation/Odometry");
 
-  int w, h;
+  int w, h, scanlines_per_tile;
   double r, sonar_threshold;
   nh->param<int>("/proc_mapping/map/width", w, 30);
   nh->param<int>("/proc_mapping/map/height", h, 30);
   // - MUST BE EQUAL TO SONAR's RESOLUTION
   nh->param<double>("/proc_mapping/map/resolution", r, 0.02);
   nh->param<double>("/proc_mapping/map/sonar_threshold", sonar_threshold, 0.5);
+  nh->param<double>("/proc_mapping/map/sub_initial_x", world_.sub.initialPosition.x, 0.5);
+  nh->param<double>("/proc_mapping/map/sub_initial_y", world_.sub.initialPosition.y, 0.5);
+  nh->param<int>("/proc_mapping/tile/number_of_scanlines", scanlines_per_tile, 100);
+
+  tile_generator_.SetScanlinePerTile(scanlines_per_tile);
   SetMapParameters(static_cast<uint32_t>(w), static_cast<uint32_t>(h), r);
   SetPointCloudThreshold(sonar_threshold, r);
 
@@ -110,7 +115,7 @@ void RawMap::Run() {
     if (new_pcl_ready_) {
       ProcessPointCloud(last_pcl_);
       new_pcl_ready_ = false;
-      Notify(pixel_.map);
+      //Notify(pixel_.map);
     }
   }
 }
@@ -130,8 +135,6 @@ void RawMap::SetMapParameters(const size_t &w, const size_t &h,
                               const double &r) ATLAS_NOEXCEPT {
   world_.width = w;
   world_.height = h;
-  world_.sub.initialPosition.x = w / 2.0;
-  world_.sub.initialPosition.y = h / 2.0;
 
   pixel_.width = static_cast<uint32_t>(w / r);
   pixel_.height = static_cast<uint32_t>(h / r);
@@ -155,7 +158,12 @@ void RawMap::ProcessPointCloud(const sensor_msgs::PointCloud2::ConstPtr &msg) {
   // Computes cosinus and sinus outside of the loop.
   double cosRotationFactor = cos(yaw);
   double sinRotationFactor = sin(yaw);
+    
+  // --
+  // TODO: Add sonar service for range, resolution, min, max
 
+  int last_bin_index = static_cast<int>(msg->data.size() / msg->point_step) - 1;
+    
   for (unsigned int i = point_cloud_threshold;
        i < msg->data.size() && i + 3 * sizeof(float) < msg->data.size();
        i += msg->point_step) {
@@ -164,8 +172,18 @@ void RawMap::ProcessPointCloud(const sensor_msgs::PointCloud2::ConstPtr &msg) {
     memcpy(&z, &msg->data[i + 2 * sizeof(float)], sizeof(float));
     memcpy(&intensity, &msg->data[i + 3 * sizeof(float)], sizeof(float));
 
-    PointXY<double> p = Transform(x, y, cosRotationFactor, sinRotationFactor);
-    UpdateMat(CoordinateToPixel(p), (static_cast<uint8_t>(255.0 * intensity)));
+
+    PointXY<int> bin_coordinate = CoordinateToPixel(Transform(x, y, cosRotationFactor, sinRotationFactor));
+    UpdateMat(bin_coordinate, (static_cast<uint8_t>(255.0 * intensity)));
+
+    // -- Tile Generator logic
+    if (i == point_cloud_threshold || i == last_bin_index){
+      tile_generator_.UpdateTileBoundaries(bin_coordinate);
+    }
+    if (tile_generator_.IsTileReadyForProcess()){
+      //tile_generator_.GetTile();
+    }
+
   }
 }
 

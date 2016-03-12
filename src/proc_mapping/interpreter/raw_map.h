@@ -40,8 +40,11 @@
 #include <memory>
 #include <vector>
 
+
 #include <lib_atlas/macros.h>
 #include "proc_mapping/interpreter/data_interpreter.h"
+#include "proc_mapping/interpreter/proc_mapping_types.h"
+#include "proc_mapping/interpreter/tile_generator.h"
 
 namespace proc_mapping {
 
@@ -63,10 +66,7 @@ class RawMap : public atlas::Subject<cv::Mat>, public atlas::Runnable {
     // - Number of Hits per pixel
     std::vector<uint8_t> number_of_hits_;
   };
-  template <typename T>
-  struct PointXY {
-    T x, y;
-  };
+    
   struct SubMarineCS {
     double yaw, pitch, roll;
     PointXY<double> position;
@@ -78,6 +78,11 @@ class RawMap : public atlas::Subject<cv::Mat>, public atlas::Runnable {
     size_t height;
     SubMarineCS sub;
     pcl::PointCloud<pcl::PointXYZ> cloud;
+  };
+    
+  template <typename T>
+  struct PointXY {
+      T x, y;
   };
 
   //==========================================================================
@@ -141,6 +146,8 @@ class RawMap : public atlas::Subject<cv::Mat>, public atlas::Runnable {
 
   std::atomic<bool> new_pcl_ready_;
 
+  TileGenerator tile_generator_;
+
   PixelCCS pixel_;
   WorldCCS world_;
 };
@@ -189,6 +196,7 @@ inline RawMap::PointXY<int> RawMap::CoordinateToPixel(
   result.y = static_cast<int>(p.y / pixel_.resolution);
   return result;
 }
-}
+    
+} // namespace proc_mapping
 
 #endif  // PROC_MAPPING_INTERPRETER_RAW_MAP_H_
