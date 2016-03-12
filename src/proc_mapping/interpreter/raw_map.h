@@ -39,12 +39,10 @@
 #include <array>
 #include <memory>
 #include <vector>
-
-
 #include <lib_atlas/macros.h>
-#include "proc_mapping/interpreter/data_interpreter.h"
-#include "proc_mapping/interpreter/proc_mapping_types.h"
+#include "proc_mapping/types.h"
 #include "proc_mapping/interpreter/tile_generator.h"
+#include "proc_mapping/interpreter/data_interpreter.h"
 
 namespace proc_mapping {
 
@@ -66,7 +64,7 @@ class RawMap : public atlas::Subject<cv::Mat>, public atlas::Runnable {
     // - Number of Hits per pixel
     std::vector<uint8_t> number_of_hits_;
   };
-    
+
   struct SubMarineCS {
     double yaw, pitch, roll;
     PointXY<double> position;
@@ -78,11 +76,6 @@ class RawMap : public atlas::Subject<cv::Mat>, public atlas::Runnable {
     size_t height;
     SubMarineCS sub;
     pcl::PointCloud<pcl::PointXYZ> cloud;
-  };
-    
-  template <typename T>
-  struct PointXY {
-      T x, y;
   };
 
   //==========================================================================
@@ -141,7 +134,7 @@ class RawMap : public atlas::Subject<cv::Mat>, public atlas::Runnable {
   // The first data of the sonar may be scrap. Keeping a threshold and starting
   // to process data after it. MUST BE A MULTIPLE OF 16 (sonar_threshold_ = 16 *
   // numberOfPointsToSkip)
-  uint32_t point_cloud_threshold;
+  uint32_t point_cloud_threshold_;
   uint32_t hit_count_;
 
   std::atomic<bool> new_pcl_ready_;
@@ -157,7 +150,7 @@ class RawMap : public atlas::Subject<cv::Mat>, public atlas::Runnable {
 
 //------------------------------------------------------------------------------
 //
-inline RawMap::PointXY<double> RawMap::Transform(double x, double y,
+inline PointXY<double> RawMap::Transform(double x, double y,
                                                  double cosRotFactor,
                                                  double sinRotFactor) {
   PointXY<double> offset, result;
@@ -173,7 +166,7 @@ inline RawMap::PointXY<double> RawMap::Transform(double x, double y,
 //------------------------------------------------------------------------------
 //
 inline void RawMap::UpdateMat(PointXY<int> p, uchar intensity) {
-  if (p.x < pixel_.width && p.y < pixel_.height) {
+  if (static_cast<size_t>(p.x) < pixel_.width && static_cast<size_t>(p.y) < pixel_.height) {
     // - Infinite mean
     pixel_.number_of_hits_.at(p.x + p.y * pixel_.width)++;
     uint8_t n = pixel_.number_of_hits_.at(p.x + p.y * pixel_.width);
@@ -189,14 +182,14 @@ inline void RawMap::UpdateMat(PointXY<int> p, uchar intensity) {
 
 //------------------------------------------------------------------------------
 //
-inline RawMap::PointXY<int> RawMap::CoordinateToPixel(
+inline PointXY<int> RawMap::CoordinateToPixel(
     const PointXY<double> &p) {
   PointXY<int> result;
   result.x = static_cast<int>(p.x / pixel_.resolution);
   result.y = static_cast<int>(p.y / pixel_.resolution);
   return result;
 }
-    
-} // namespace proc_mapping
+
+}  // namespace proc_mapping
 
 #endif  // PROC_MAPPING_INTERPRETER_RAW_MAP_H_

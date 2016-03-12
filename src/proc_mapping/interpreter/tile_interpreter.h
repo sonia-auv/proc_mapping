@@ -43,8 +43,8 @@
 
 namespace proc_mapping {
 
-class TileInterpreter: public DataInterpreter<cv::Mat>,
-                       public atlas::Observer<cv::Mat> {
+class TileInterpreter : public DataInterpreter<cv::Mat>,
+                        public atlas::Observer<cv::Mat> {
  public:
   //==========================================================================
   // T Y P E D E F   A N D   E N U M
@@ -70,9 +70,6 @@ class TileInterpreter: public DataInterpreter<cv::Mat>,
                        cv::Mat args) ATLAS_NOEXCEPT override;
 
  private:
-  //==========================================================================
-  // P R I V A T E   M E T H O D S
-
   //==========================================================================
   // P R I V A T E   M E M B E R S
 

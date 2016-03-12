@@ -23,12 +23,11 @@
  * along with S.O.N.I.A. software. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "proc_mapping/interpreter/raw_map_interpreter.h"
+#include "proc_mapping/interpreter/tile_interpreter.h"
 #include <opencv/cv.h>
 #include <pcl/common/transforms.h>
 #include <tf/transform_datatypes.h>
 #include <opencv2/highgui/highgui.hpp>
-#include "tile_interpreter.h"
 
 namespace proc_mapping {
 
@@ -37,10 +36,10 @@ namespace proc_mapping {
 
 //------------------------------------------------------------------------------
 //
-TileInterpreter::TileInterpreter(const ros::NodeHandlePtr &nh)
-    ATLAS_NOEXCEPT : DataInterpreter<cv::Mat>(nh),
-                     nh_(nh),
-                     map_(nh_) {
+TileInterpreter::TileInterpreter(const ros::NodeHandlePtr &nh) ATLAS_NOEXCEPT
+    : DataInterpreter<cv::Mat>(nh),
+      nh_(nh),
+      map_(nh_) {
   Observe(map_);
 }
 
@@ -59,8 +58,7 @@ WeightedObjectId::ConstPtrList TileInterpreter::ProcessData() { return {{}}; }
 //
 void TileInterpreter::OnSubjectNotify(atlas::Subject<cv::Mat> &subject,
                                       cv::Mat args) ATLAS_NOEXCEPT {
-
-  static int image_counter = 0, image_number= 0;
+  static int image_counter = 0, image_number = 0;
   SetNewData(args);
   cv::imshow("", args);
   cv::waitKey(1);
