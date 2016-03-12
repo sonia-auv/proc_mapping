@@ -69,7 +69,6 @@ install:
   # Cloning dependencies
   - git clone https://github.com/sonia-auv/lib_atlas.git -b $TRAVIS_BRANCH
   - git clone https://github.com/sonia-auv/sonia_msgs.git -b $TRAVIS_BRANCH
-  - git clone https://github.com/sonia-auv/provider_sonar.git -b $TRAVIS_BRANCH
   # Install dependencies
   - cd ~/catkin_ws/
   - rosdep install --from-paths src --ignore-src --rosdistro=${ROS_DISTRO} -y
