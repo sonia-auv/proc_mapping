@@ -27,7 +27,7 @@
 #include <opencv2/highgui/highgui.hpp>
 #include <pcl/common/transforms.h>
 #include <tf/transform_datatypes.h>
-#include "proc_mapping/interpreter/raw_map_interpreter.h"
+#include "tile_interpreter.h"
 
 namespace proc_mapping {
 
@@ -36,7 +36,7 @@ namespace proc_mapping {
 
 //------------------------------------------------------------------------------
 //
-RawMapInterpreter::RawMapInterpreter(const ros::NodeHandlePtr &nh)
+TileInterpreter::TileInterpreter(const ros::NodeHandlePtr &nh)
     ATLAS_NOEXCEPT : DataInterpreter<cv::Mat>(nh),
                      nh_(nh),
                      map_(nh_) {
@@ -45,19 +45,19 @@ RawMapInterpreter::RawMapInterpreter(const ros::NodeHandlePtr &nh)
 
 //------------------------------------------------------------------------------
 //
-RawMapInterpreter::~RawMapInterpreter() ATLAS_NOEXCEPT {}
+TileInterpreter::~TileInterpreter() ATLAS_NOEXCEPT {}
 
 //==============================================================================
 // M E T H O D   S E C T I O N
 
 //------------------------------------------------------------------------------
 //
-WeightedObjectId::ConstPtrList RawMapInterpreter::ProcessData() { return {{}}; }
+WeightedObjectId::ConstPtrList TileInterpreter::ProcessData() { return {{}}; }
 
 //------------------------------------------------------------------------------
 //
-void RawMapInterpreter::OnSubjectNotify(atlas::Subject<cv::Mat> &subject,
-                                        cv::Mat args) ATLAS_NOEXCEPT {
+void TileInterpreter::OnSubjectNotify(atlas::Subject<cv::Mat> &subject,
+                                      cv::Mat args) ATLAS_NOEXCEPT {
 
   static int image_counter = 0, image_number= 0;
   SetNewData(args);
