@@ -4,6 +4,7 @@
 
 #ifndef PROJECT_PROC_MAPPING_TYPES_H
 #define PROJECT_PROC_MAPPING_TYPES_H
+#include <opencv/cv.h>
 
 template <typename T>
 struct PointXY {

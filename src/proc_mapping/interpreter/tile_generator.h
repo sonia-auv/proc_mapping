@@ -6,8 +6,9 @@
 // This will allow easier treatment, more relevant information and faster processing.
 #ifndef PROJECT_TILE_GENERATOR_H
 #define PROJECT_TILE_GENERATOR_H
-#include "proc_mapping_types.h"
+#include "proc_mapping/interpreter/proc_mapping_types.h"
 #include <opencv/cv.h>
+
 namespace proc_mapping{
 
 class TileGenerator{
@@ -22,7 +23,7 @@ class TileGenerator{
   }
   ~TileGenerator(){}
   inline bool IsTileReadyForProcess();
-  Tile GetTile(cv::Mat raw_map_);
+  //Tile GetTile(cv::Mat raw_map_);
   void UpdateTileBoundaries(PointXY<int> bin_coordinate);
   void SetScanlinePerTile(int scanlines_per_tile){
     scanlines_per_tile_ = scanlines_per_tile;

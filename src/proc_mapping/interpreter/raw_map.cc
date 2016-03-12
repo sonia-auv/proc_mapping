@@ -114,7 +114,7 @@ void RawMap::Run() {
     if (new_pcl_ready_) {
       ProcessPointCloud(last_pcl_);
       new_pcl_ready_ = false;
-      Notify(pixel_.map);
+      //Notify(pixel_.map);
     }
   }
 }
@@ -154,9 +154,8 @@ void RawMap::ProcessPointCloud(const sensor_msgs::PointCloud2::ConstPtr &msg) {
   double sinRotationFactor = sin(yaw);
   // --
   // TODO: Add sonar service for range, resolution, min, max
-  // --
-  // TODO:
 
+  int last_bin_index = static_cast<int>(msg->data.size() / msg->point_step) - 1;
   for (unsigned int i = point_cloud_threshold;
        i < msg->data.size() && i + 3 * sizeof(float) < msg->data.size();
        i += msg->point_step) {
@@ -165,8 +164,18 @@ void RawMap::ProcessPointCloud(const sensor_msgs::PointCloud2::ConstPtr &msg) {
     memcpy(&z, &msg->data[i + 2 * sizeof(float)], sizeof(float));
     memcpy(&intensity, &msg->data[i + 3 * sizeof(float)], sizeof(float));
 
-    PointXY<double> p = Transform(x, y, cosRotationFactor, sinRotationFactor);
-    UpdateMat(CoordinateToPixel(p), (static_cast<uint8_t>(255.0 * intensity)));
+
+    PointXY<int> bin_coordinate = CoordinateToPixel(Transform(x, y, cosRotationFactor, sinRotationFactor));
+    UpdateMat(bin_coordinate, (static_cast<uint8_t>(255.0 * intensity)));
+
+    // -- Tile Generator logic
+    if (i == point_cloud_threshold || i == last_bin_index){
+      tile_generator_.UpdateTileBoundaries(bin_coordinate);
+    }
+    if (tile_generator_.IsTileReadyForProcess()){
+      //tile_generator_.GetTile();
+    }
+
   }
 }
 }  // namespace proc_mapping
