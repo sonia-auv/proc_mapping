@@ -40,8 +40,10 @@
 #include <pcl/point_types.h>
 #include <tf/transform_datatypes.h>
 
+
 #include <lib_atlas/macros.h>
 #include "proc_mapping/interpreter/data_interpreter.h"
+#include "proc_mapping/interpreter/proc_mapping_types.h"
 
 namespace proc_mapping {
 
@@ -63,10 +65,7 @@ class RawMap : public atlas::Subject<cv::Mat>, public atlas::Runnable {
     // - Number of Hits per pixel
     std::vector<uint8_t> number_of_hits_;
   };
-  template <typename T>
-  struct PointXY {
-    T x, y;
-  };
+
   struct SubMarineCS{
     double yaw, pitch, roll;
     PointXY<double> position;
@@ -140,7 +139,7 @@ class RawMap : public atlas::Subject<cv::Mat>, public atlas::Runnable {
 
 };
 
-inline RawMap::PointXY<double> RawMap::Transform(double x, double y, double cosRotFactor, double sinRotFactor){
+inline PointXY<double> RawMap::Transform(double x, double y, double cosRotFactor, double sinRotFactor){
   PointXY<double> offset, result;
   // - Initial position is simply to center the submarine in the middle of the map.
   offset.x = world_.sub.position.x + world_.sub.initialPosition.x;
@@ -161,7 +160,7 @@ inline void RawMap::UpdateMat(PointXY<int> p, uchar intensity){
     //pixel_.map.at<uchar>(p.x, p.y) = intensity;
   }
 }
-inline RawMap::PointXY<int> RawMap::CoordinateToPixel(const PointXY<double> &p){
+inline PointXY<int> RawMap::CoordinateToPixel(const PointXY<double> &p){
   PointXY<int> result;
   result.x = static_cast<int>(p.x / pixel_.resolution);
   result.y = static_cast<int>(p.y / pixel_.resolution);
