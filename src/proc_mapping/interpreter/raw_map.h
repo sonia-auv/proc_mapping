@@ -44,6 +44,7 @@
 #include <lib_atlas/macros.h>
 #include "proc_mapping/interpreter/data_interpreter.h"
 #include "proc_mapping/interpreter/proc_mapping_types.h"
+#include "proc_mapping/interpreter/tile_generator.h"
 
 namespace proc_mapping {
 
@@ -133,6 +134,8 @@ class RawMap : public atlas::Subject<cv::Mat>, public atlas::Runnable {
   uint32_t hit_count_;
 
   std::atomic<bool> new_pcl_ready_;
+
+  TileGenerator tile_generator_;
 
   PixelCCS pixel_;
   WorldCCS world_;

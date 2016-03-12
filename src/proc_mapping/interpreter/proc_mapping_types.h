@@ -10,4 +10,9 @@ struct PointXY {
   T x, y;
 };
 
+struct Tile{
+  PointXY<int> offset;
+  cv::Mat data;
+};
+
 #endif //PROJECT_PROC_MAPPING_TYPES_H
