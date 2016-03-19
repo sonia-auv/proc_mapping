@@ -2,8 +2,7 @@
 	<node name="proc_mapping_node"
 	    pkg="proc_mapping"
 	    type="proc_mapping_node"
-	    output="log"
-	    launch-prefix="gdb -ex run --args" />
+	    output="log" />
 
     <rosparam command="load"
         file="$(find proc_mapping)/config/proc_mapping_conf.yaml"/>
