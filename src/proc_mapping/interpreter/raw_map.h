@@ -143,6 +143,7 @@ class RawMap : public atlas::Subject<cv::Mat>, public atlas::Runnable {
 
   PixelCCS pixel_;
   WorldCCS world_;
+  cv::Mat displayMap;
 };
 
 //==============================================================================
@@ -168,6 +169,7 @@ inline PointXY<double> RawMap::Transform(double x, double y,
 inline void RawMap::UpdateMat(PointXY<int> p, uchar intensity) {
   if (static_cast<size_t>(p.x) < pixel_.width && static_cast<size_t>(p.y) < pixel_.height) {
     // - Infinite mean
+
     pixel_.number_of_hits_.at(p.x + p.y * pixel_.width)++;
     uint8_t n = pixel_.number_of_hits_.at(p.x + p.y * pixel_.width);
     pixel_.map.at<uchar>(p.x, p.y) = static_cast<uchar>(

@@ -54,15 +54,15 @@ RawMap::RawMap(const ros::NodeHandlePtr &nh) ATLAS_NOEXCEPT
 
   int w, h, scanlines_per_tile;
   double r, sonar_threshold;
-  nh->param<int>("/proc_mapping/map/width", w, 30);
-  nh->param<int>("/proc_mapping/map/height", h, 30);
+  nh->param<int>("/proc_mapping/map/width", w, 20);
+  nh->param<int>("/proc_mapping/map/height", h, 20);
   // - MUST BE EQUAL TO SONAR's RESOLUTION
   nh->param<double>("/proc_mapping/map/resolution", r, 0.02);
   nh->param<double>("/proc_mapping/map/sonar_threshold", sonar_threshold, 0.5);
   nh->param<double>("/proc_mapping/map/sub_initial_x",
-                    world_.sub.initialPosition.x, 0.5);
+                    world_.sub.initialPosition.x, 15);
   nh->param<double>("/proc_mapping/map/sub_initial_y",
-                    world_.sub.initialPosition.y, 0.5);
+                    world_.sub.initialPosition.y, 15);
   nh->param<int>("/proc_mapping/tile/number_of_scanlines", scanlines_per_tile,
                  100);
 
@@ -119,6 +119,20 @@ void RawMap::Run() {
     if (new_pcl_ready_) {
       ProcessPointCloud(last_pcl_);
       new_pcl_ready_ = false;
+
+
+      pixel_.map.copyTo(displayMap);
+
+
+      PointXY<int> sub_coord = CoordinateToPixel(world_.sub.position);
+      sub_coord.x = sub_coord.x + static_cast<int>(world_.sub.initialPosition.x / pixel_.resolution);
+      sub_coord.y = sub_coord.y + static_cast<int>(world_.sub.initialPosition.y / pixel_.resolution);
+      cv::Point sub(sub_coord.x, sub_coord.y);
+      ROS_INFO("%d, %d", sub.x, sub.y);
+      cv::circle(displayMap, sub, 4, CV_RGB(255, 255, 255), -1);
+
+      cv::imshow(" ", displayMap);
+      cv::waitKey(1);
       // Notify(pixel_.map);
     }
   }
@@ -149,6 +163,9 @@ void RawMap::SetMapParameters(const size_t &w, const size_t &h,
   pixel_.map = cv::Mat(static_cast<int>(pixel_.width),
                        static_cast<int>(pixel_.height), CV_8UC1);
   pixel_.map.setTo(cv::Scalar(0));
+  displayMap = cv::Mat(static_cast<int>(pixel_.width),
+                       static_cast<int>(pixel_.height), CV_8UC1);
+  displayMap.setTo(cv::Scalar(0));
   // - Keeps the number of hits for each pixels
   pixel_.number_of_hits_.resize(pixel_.width * pixel_.height, 0);
 }

@@ -58,6 +58,7 @@ WeightedObjectId::ConstPtrList TileInterpreter::ProcessData() { return {{}}; }
 //
 void TileInterpreter::OnSubjectNotify(atlas::Subject<cv::Mat> &subject,
                                       cv::Mat args) ATLAS_NOEXCEPT {
+  /*
   static int image_counter = 0, image_number = 0;
   SetNewData(args);
   cv::imshow("", args);
@@ -72,6 +73,7 @@ void TileInterpreter::OnSubjectNotify(atlas::Subject<cv::Mat> &subject,
     image_number++;
     image_counter = 0;
   }
+  */
 }
 
 }  // namespace proc_mapping
