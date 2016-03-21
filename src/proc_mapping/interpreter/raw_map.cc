@@ -43,12 +43,13 @@ RawMap::RawMap(const ros::NodeHandlePtr &nh) ATLAS_NOEXCEPT
       odom_sub_(),
       point_cloud_threshold_(0),
       hit_count_(0),
-      tile_generator_(0) {
+      tile_generator_(0),
+      new_pcl_ready_(false) {
   std::string points_topic;
   std::string odometry_topic;
 
   nh->param<std::string>("/proc_mapping/topics/points_topic", points_topic,
-                         "/Scanline_parser/point_cloud2");
+                         "/sonar_node/point_cloud2");
   nh->param<std::string>("/proc_mapping/topics/odometry", odometry_topic,
                          "/proc_navigation/Odometry");
 
@@ -116,17 +117,19 @@ void RawMap::OdomCallback(const nav_msgs::Odometry::ConstPtr &odo_in)
 //
 void RawMap::Run() {
   while (IsRunning()) {
-    if (new_pcl_ready_) {
+    if (new_pcl_ready_ and last_pcl_) {
       ProcessPointCloud(last_pcl_);
       new_pcl_ready_ = false;
 
-
       pixel_.map.copyTo(displayMap);
 
-
       PointXY<int> sub_coord = CoordinateToPixel(world_.sub.position);
-      sub_coord.x = sub_coord.x + static_cast<int>(world_.sub.initialPosition.x / pixel_.resolution);
-      sub_coord.y = sub_coord.y + static_cast<int>(world_.sub.initialPosition.y / pixel_.resolution);
+      sub_coord.x =
+          sub_coord
+              .x /*+ static_cast<int>(world_.sub.initialPosition.x / pixel_.resolution)*/;
+      sub_coord.y =
+          sub_coord
+              .y /*+ static_cast<int>(world_.sub.initialPosition.y / pixel_.resolution)*/;
       cv::Point sub(sub_coord.x, sub_coord.y);
       ROS_INFO("%d, %d", sub.x, sub.y);
       cv::circle(displayMap, sub, 4, CV_RGB(255, 255, 255), -1);
@@ -183,7 +186,8 @@ void RawMap::ProcessPointCloud(const sensor_msgs::PointCloud2::ConstPtr &msg) {
   // --
   // TODO: Add sonar service for range, resolution, min, max
 
-  uint32_t last_bin_index = static_cast<uint32_t>(msg->data.size() / msg->point_step) - 1;
+  uint32_t last_bin_index =
+      static_cast<uint32_t>(msg->data.size() / msg->point_step) - 1;
 
   for (uint32_t i = point_cloud_threshold_;
        i < msg->data.size() && i + 3 * sizeof(float) < msg->data.size();

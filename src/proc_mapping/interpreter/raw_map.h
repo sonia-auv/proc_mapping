@@ -152,8 +152,8 @@ class RawMap : public atlas::Subject<cv::Mat>, public atlas::Runnable {
 //------------------------------------------------------------------------------
 //
 inline PointXY<double> RawMap::Transform(double x, double y,
-                                                 double cosRotFactor,
-                                                 double sinRotFactor) {
+                                         double cosRotFactor,
+                                         double sinRotFactor) {
   PointXY<double> offset, result;
   // - Initial position is simply to center the submarine in the middle of the
   // map.
@@ -167,7 +167,8 @@ inline PointXY<double> RawMap::Transform(double x, double y,
 //------------------------------------------------------------------------------
 //
 inline void RawMap::UpdateMat(PointXY<int> p, uchar intensity) {
-  if (static_cast<size_t>(p.x) < pixel_.width && static_cast<size_t>(p.y) < pixel_.height) {
+  if (static_cast<size_t>(p.x) < pixel_.width &&
+      static_cast<size_t>(p.y) < pixel_.height) {
     // - Infinite mean
 
     pixel_.number_of_hits_.at(p.x + p.y * pixel_.width)++;
@@ -184,8 +185,7 @@ inline void RawMap::UpdateMat(PointXY<int> p, uchar intensity) {
 
 //------------------------------------------------------------------------------
 //
-inline PointXY<int> RawMap::CoordinateToPixel(
-    const PointXY<double> &p) {
+inline PointXY<int> RawMap::CoordinateToPixel(const PointXY<double> &p) {
   PointXY<int> result;
   result.x = static_cast<int>(p.x / pixel_.resolution);
   result.y = static_cast<int>(p.y / pixel_.resolution);
