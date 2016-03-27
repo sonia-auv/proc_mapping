@@ -56,7 +56,8 @@ class RawMap : public atlas::Subject<cv::Mat>, public atlas::Runnable {
   using PtrList = std::vector<RawMap::Ptr>;
   using ConstPtrList = std::vector<RawMap::ConstPtr>;
 
-  struct PixelCCS {
+  // Pixel Coordinate System
+  struct PixelCS {
     size_t width;
     size_t height;
     double resolution;
@@ -65,13 +66,15 @@ class RawMap : public atlas::Subject<cv::Mat>, public atlas::Runnable {
     std::vector<uint8_t> number_of_hits_;
   };
 
+  // Sub Marine Coordinate System
   struct SubMarineCS {
     double yaw, pitch, roll;
     PointXY<double> position;
     PointXY<double> initialPosition;
   };
 
-  struct WorldCCS {
+  // World Coordinate System
+  struct WorldCS {
     size_t width;
     size_t height;
     SubMarineCS sub;
@@ -141,8 +144,8 @@ class RawMap : public atlas::Subject<cv::Mat>, public atlas::Runnable {
 
   TileGenerator tile_generator_;
 
-  PixelCCS pixel_;
-  WorldCCS world_;
+  PixelCS pixel_;
+  WorldCS world_;
   cv::Mat displayMap;
 };
 
@@ -172,7 +175,7 @@ inline void RawMap::UpdateMat(PointXY<int> p, uchar intensity) {
     // - Infinite mean
 
     pixel_.number_of_hits_.at(p.x + p.y * pixel_.width)++;
-    uint8_t n = pixel_.number_of_hits_.at(p.x + p.y * pixel_.width);
+    int n = pixel_.number_of_hits_.at(p.x + p.y * pixel_.width) + 1;
     pixel_.map.at<uchar>(p.x, p.y) = static_cast<uchar>(
         intensity / n + pixel_.map.at<uchar>(p.x, p.y) * (n - 1) / n);
     // - Local mean

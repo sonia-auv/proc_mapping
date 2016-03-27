@@ -53,19 +53,25 @@ RawMap::RawMap(const ros::NodeHandlePtr &nh) ATLAS_NOEXCEPT
   nh->param<std::string>("/proc_mapping/topics/odometry", odometry_topic,
                          "/proc_navigation/Odometry");
 
-  int w, h, scanlines_per_tile;
+  int n_bin, w, h, scanlines_per_tile;
+  float range;
   double r, sonar_threshold;
+  nh->param<int>("/provider_sonar/sonar/n_bins_", n_bin, 400);
+  nh->param<float>("/provider_sonar/sonar/range_", range, 8.0);
+
   nh->param<int>("/proc_mapping/map/width", w, 20);
   nh->param<int>("/proc_mapping/map/height", h, 20);
-  // - MUST BE EQUAL TO SONAR's RESOLUTION
-  nh->param<double>("/proc_mapping/map/resolution", r, 0.02);
   nh->param<double>("/proc_mapping/map/sonar_threshold", sonar_threshold, 0.5);
   nh->param<double>("/proc_mapping/map/sub_initial_x",
-                    world_.sub.initialPosition.x, 15);
+                    world_.sub.initialPosition.x, 10);
   nh->param<double>("/proc_mapping/map/sub_initial_y",
-                    world_.sub.initialPosition.y, 15);
+                    world_.sub.initialPosition.y, 5);
   nh->param<int>("/proc_mapping/tile/number_of_scanlines", scanlines_per_tile,
                  100);
+
+  // Resolution is equal to the range of the sonar divide by the number of bin
+  // of a scanline.
+  r = range / n_bin;
 
   tile_generator_.SetScanlinePerTile(scanlines_per_tile);
   SetMapParameters(static_cast<uint32_t>(w), static_cast<uint32_t>(h), r);
@@ -125,11 +131,11 @@ void RawMap::Run() {
 
       PointXY<int> sub_coord = CoordinateToPixel(world_.sub.position);
       sub_coord.x =
-          sub_coord
-              .x /*+ static_cast<int>(world_.sub.initialPosition.x / pixel_.resolution)*/;
+          sub_coord.x +
+          static_cast<int>(world_.sub.initialPosition.x / pixel_.resolution);
       sub_coord.y =
-          sub_coord
-              .y /*+ static_cast<int>(world_.sub.initialPosition.y / pixel_.resolution)*/;
+          sub_coord.y +
+          static_cast<int>(world_.sub.initialPosition.y / pixel_.resolution);
       cv::Point sub(sub_coord.x, sub_coord.y);
       ROS_INFO("%d, %d", sub.x, sub.y);
       cv::circle(displayMap, sub, 4, CV_RGB(255, 255, 255), -1);
@@ -161,8 +167,6 @@ void RawMap::SetMapParameters(const size_t &w, const size_t &h,
   pixel_.height = static_cast<uint32_t>(h / r);
   pixel_.resolution = r;
 
-  // - TODO: Add resolution service request from sonar. Must match sonar's
-  // resolution.
   pixel_.map = cv::Mat(static_cast<int>(pixel_.width),
                        static_cast<int>(pixel_.height), CV_8UC1);
   pixel_.map.setTo(cv::Scalar(0));
@@ -176,7 +180,7 @@ void RawMap::SetMapParameters(const size_t &w, const size_t &h,
 //------------------------------------------------------------------------------
 //
 void RawMap::ProcessPointCloud(const sensor_msgs::PointCloud2::ConstPtr &msg) {
-  float x, y, z, intensity;
+  uint8_t x = 0, y = 0, z = 0, intensity = 0;
   double yaw = world_.sub.yaw;
   // --
   // Computes cosinus and sinus outside of the loop.
@@ -189,13 +193,12 @@ void RawMap::ProcessPointCloud(const sensor_msgs::PointCloud2::ConstPtr &msg) {
   uint32_t last_bin_index =
       static_cast<uint32_t>(msg->data.size() / msg->point_step) - 1;
 
-  for (uint32_t i = point_cloud_threshold_;
-       i < msg->data.size() && i + 3 * sizeof(float) < msg->data.size();
-       i += msg->point_step) {
-    memcpy(&x, &msg->data[i], sizeof(float));
-    memcpy(&y, &msg->data[i + sizeof(float)], sizeof(float));
-    memcpy(&z, &msg->data[i + 2 * sizeof(float)], sizeof(float));
-    memcpy(&intensity, &msg->data[i + 3 * sizeof(float)], sizeof(float));
+  for (uint32_t i = 0; i < msg->data.size() && i + 4 < msg->data.size();
+       i += msg->point_step / 4) {
+    memcpy(&x, &msg->data[i], sizeof(uint8_t));
+    memcpy(&y, &msg->data[i + 1], sizeof(uint8_t));
+    memcpy(&z, &msg->data[i + 2], sizeof(uint8_t));
+    memcpy(&intensity, &msg->data[i + 3], sizeof(uint8_t));
 
     PointXY<int> bin_coordinate = CoordinateToPixel(
         Transform(x, y, cosRotationFactor, sinRotationFactor));
