@@ -61,7 +61,7 @@ class RawMap : public atlas::Subject<cv::Mat>, public atlas::Runnable {
     size_t width;
     size_t height;
     double resolution;
-    cv::Mat map;
+    cv::Mat map, map_color;
     // - Number of Hits per pixel
     std::vector<uint8_t> number_of_hits_;
   };
@@ -176,8 +176,8 @@ inline void RawMap::UpdateMat(PointXY<int> p, uchar intensity) {
 
     pixel_.number_of_hits_.at(p.x + p.y * pixel_.width)++;
     int n = pixel_.number_of_hits_.at(p.x + p.y * pixel_.width) + 1;
-    pixel_.map.at<uchar>(p.x, p.y) = static_cast<uchar>(
-        intensity / n + pixel_.map.at<uchar>(p.x, p.y) * (n - 1) / n);
+    pixel_.map.at<uchar>(p.y, p.x) = static_cast<uchar>(
+        intensity / n + pixel_.map.at<uchar>(p.y, p.x) * (n - 1) / n);
     // - Local mean
     // pixel_.map.at<uchar>(p.x, p.y) = static_cast<uchar>((intensity +
     // pixel_.map.at<uchar>(p.x, p.y)) / 2);

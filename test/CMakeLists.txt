@@ -1,1 +1,0 @@
-catkin_add_gtest( raw_map_test raw_map_test.cc )

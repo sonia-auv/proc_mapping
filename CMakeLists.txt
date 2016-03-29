@@ -83,7 +83,11 @@ add_dependencies(${PROJECT_NAME}_node sonia_msgs_generate_messages_cpp)
 #==========================================================================
 # U N I T   T E S T S
 
-if (CATKIN_ENABLE_TESTING AND ${CMAKE_CURRENT_SOURCE_DIR}/test)
-  add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/test)
-endif ()
+catkin_add_gtest(raw_map_test test/raw_map_test.cc  ${proc_mapping_FILES})
+target_link_libraries(raw_map_test ${catkin_LIBRARIES} ${lib_atlas_LIBRARIES})
+
+#
+#if (CATKIN_ENABLE_TESTING AND ${CMAKE_CURRENT_SOURCE_DIR}/test)
+#  add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/test)
+#endif ()
 

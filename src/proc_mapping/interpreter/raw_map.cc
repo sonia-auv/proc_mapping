@@ -102,21 +102,25 @@ void RawMap::PointCloudCallback(
 //------------------------------------------------------------------------------
 //
 void RawMap::OdomCallback(const nav_msgs::Odometry::ConstPtr &odo_in)
-    ATLAS_NOEXCEPT {
+ATLAS_NOEXCEPT {
   // - Generate 3x3 transformation matrix from Quaternions
   auto orientation = &odo_in.get()->pose.pose.orientation;
+
   tf::Quaternion q(orientation->x, orientation->y, orientation->z,
                    orientation->w);
   tf::Matrix3x3 m(q);
   // - Get YPR from transformation Matrix
   double roll, pitch, yaw;
-  m.getRPY(roll, pitch, yaw);
+
+  //m.getEulerYPR(yaw, pitch, roll); //RPY-3.14159 -0.929219 0 XY-5 5
+  m.getRPY(roll, pitch, yaw); //RPY-3.14159 -0.929219 0
   // - Set all odometry values that will be use in the cv::mat update thread
-  world_.sub.yaw = M_PI - yaw;
-  world_.sub.pitch = pitch;
+  world_.sub.yaw = M_PI - pitch;
+  world_.sub.pitch = yaw;
   world_.sub.roll = roll;
   world_.sub.position.x = odo_in.get()->pose.pose.position.x;
   world_.sub.position.y = odo_in.get()->pose.pose.position.y;
+
 }
 
 //------------------------------------------------------------------------------
@@ -130,17 +134,18 @@ void RawMap::Run() {
       pixel_.map.copyTo(displayMap);
 
       PointXY<int> sub_coord = CoordinateToPixel(world_.sub.position);
-      sub_coord.x =
-          sub_coord.x +
-          static_cast<int>(world_.sub.initialPosition.x / pixel_.resolution);
-      sub_coord.y =
-          sub_coord.y +
-          static_cast<int>(world_.sub.initialPosition.y / pixel_.resolution);
+      sub_coord.x = sub_coord.x +
+              static_cast<int>(world_.sub.initialPosition.x / pixel_.resolution);
+      sub_coord.y = sub_coord.y +
+              static_cast<int>(world_.sub.initialPosition.y / pixel_.resolution);
       cv::Point sub(sub_coord.x, sub_coord.y);
-      ROS_INFO("%d, %d", sub.x, sub.y);
+//      ROS_INFO("%d, %d", sub.x, sub.y);
       cv::circle(displayMap, sub, 4, CV_RGB(255, 255, 255), -1);
 
+
       cv::imshow(" ", displayMap);
+      cv::imshow("color", pixel_.map_color);
+
       cv::waitKey(1);
       // Notify(pixel_.map);
     }
@@ -170,9 +175,16 @@ void RawMap::SetMapParameters(const size_t &w, const size_t &h,
   pixel_.map = cv::Mat(static_cast<int>(pixel_.width),
                        static_cast<int>(pixel_.height), CV_8UC1);
   pixel_.map.setTo(cv::Scalar(0));
+  pixel_.map_color = cv::Mat(static_cast<int>(pixel_.width),
+                       static_cast<int>(pixel_.height), CV_8UC3);
+  pixel_.map_color.setTo(cv::Scalar(0));
   displayMap = cv::Mat(static_cast<int>(pixel_.width),
                        static_cast<int>(pixel_.height), CV_8UC1);
   displayMap.setTo(cv::Scalar(0));
+  std::cout << "Map meter info: Width=" << w << " Height=" << h << std::endl;
+  std::cout << "Map pixel info: Width=" << pixel_.width << " Height= " << pixel_.height << std::endl;
+  std::cout << "Resolution in meter: " << r << std::endl;
+
   // - Keeps the number of hits for each pixels
   pixel_.number_of_hits_.resize(pixel_.width * pixel_.height, 0);
 }
@@ -180,7 +192,7 @@ void RawMap::SetMapParameters(const size_t &w, const size_t &h,
 //------------------------------------------------------------------------------
 //
 void RawMap::ProcessPointCloud(const sensor_msgs::PointCloud2::ConstPtr &msg) {
-  uint8_t x = 0, y = 0, z = 0, intensity = 0;
+  float x = 0, y = 0, z = 0, intensity = 0;
   double yaw = world_.sub.yaw;
   // --
   // Computes cosinus and sinus outside of the loop.
@@ -190,28 +202,52 @@ void RawMap::ProcessPointCloud(const sensor_msgs::PointCloud2::ConstPtr &msg) {
   // --
   // TODO: Add sonar service for range, resolution, min, max
 
-  uint32_t last_bin_index =
-      static_cast<uint32_t>(msg->data.size() / msg->point_step) - 1;
+  uint32_t last_bin_index = static_cast<uint32_t>(msg->data.size() / msg->point_step) - 1;
+//  for (size_t i = 0; i < scan_line_msg->bins.size(); ++i, coordinate_x += delta_x, coordinate_y += delta_y) {
+//    float bin_intensity = (float)(scan_line_msg->bins[i].intensity) / 255.0;
+//    memcpy(&point_cloud_msg_.data[i * point_cloud_msg_.point_step +point_cloud_msg_.fields[0].offset],
+//           &coordinate_x, sizeof(float));
+//    memcpy(&point_cloud_msg_.data[i * point_cloud_msg_.point_step + point_cloud_msg_.fields[1].offset],
+//           &coordinate_y, sizeof(float));
+//    memcpy(&point_cloud_msg_.data[i * point_cloud_msg_.point_step + point_cloud_msg_.fields[2].offset],
+//           &coordinate_z, sizeof(float));
+//    memcpy(&point_cloud_msg_.data[i * point_cloud_msg_.point_step +point_cloud_msg_.fields[3].offset],
+//
+//           &bin_intensity, sizeof(float));
+  uint32_t i = 0, max_size = msg->data.size() / msg->point_step;
+  PointXY<int> bin_coordinate;
+  for (i = 0; i < max_size; i ++ ) {
+    int step = i * msg->point_step;
+    memcpy(&x, &msg->data[step + msg->fields[0].offset], sizeof(float));
+    memcpy(&y, &msg->data[step + msg->fields[1].offset], sizeof(float));
+    memcpy(&z, &msg->data[step + msg->fields[2].offset], sizeof(float));
+    memcpy(&intensity, &msg->data[i * msg->point_step + msg->fields[3].offset], sizeof(float));
 
-  for (uint32_t i = 0; i < msg->data.size() && i + 4 < msg->data.size();
-       i += msg->point_step / 4) {
-    memcpy(&x, &msg->data[i], sizeof(uint8_t));
-    memcpy(&y, &msg->data[i + 1], sizeof(uint8_t));
-    memcpy(&z, &msg->data[i + 2], sizeof(uint8_t));
-    memcpy(&intensity, &msg->data[i + 3], sizeof(uint8_t));
+    PointXY<double> coordinate_transformed = Transform(x, y, cosRotationFactor, sinRotationFactor);
 
-    PointXY<int> bin_coordinate = CoordinateToPixel(
-        Transform(x, y, cosRotationFactor, sinRotationFactor));
-    UpdateMat(bin_coordinate, (static_cast<uint8_t>(255.0 * intensity)));
-
-    // -- Tile Generator logic
-    if (i == point_cloud_threshold_ || i == last_bin_index) {
-      tile_generator_.UpdateTileBoundaries(bin_coordinate);
+    bin_coordinate = CoordinateToPixel(coordinate_transformed);
+    if( i ==  200*msg->point_step  )
+    {
+      std::cout << "Transform data" << std::endl;
+      std::cout << "original: " << x << " " << y << std::endl;
+      std::cout << "Transformed: " << coordinate_transformed.x << " " << coordinate_transformed.y << std::endl;
+      std::cout << "To pixel: " << bin_coordinate.x << " " << bin_coordinate.y << std::endl;
     }
 
-    if (tile_generator_.IsTileReadyForProcess()) {
-      // tile_generator_.GetTile();
-    }
+
+    UpdateMat(bin_coordinate, (static_cast<uint8_t>(255.0f * intensity)));
+    cv::circle(pixel_.map_color,cv::Point(bin_coordinate.x, bin_coordinate.y), 2, CV_RGB(0,255,0), -1);
+
+  }
+
+
+  // -- Tile Generator logic
+  if (i == point_cloud_threshold_ || i == last_bin_index) {
+    tile_generator_.UpdateTileBoundaries(bin_coordinate);
+  }
+
+  if (tile_generator_.IsTileReadyForProcess()) {
+    // tile_generator_.GetTile();
   }
 }
 
