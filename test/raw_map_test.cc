@@ -34,6 +34,7 @@
 #include <geometry_msgs/Quaternion.h>
 #include "lib_atlas/maths.h"
 #include "lib_atlas/pattern/runnable.h"
+#include <eigen3/Eigen/Geometry>
 
 
 #include "proc_mapping/interpreter/raw_map.h"
@@ -52,15 +53,18 @@ class OdometryEmulator : public atlas::Runnable {
     ros::Rate loop_rate(100);
     nav_msgs::Odometry msg;
 
-    float yaw = M_PI, pitch = 0.0f, roll = 0.0f;
+    float yaw = M_PI/2, pitch = 0.0f, roll = 0.0f;
     float x = -5.0f, y = 5.0f, z = 0.0f;
-    tf::Quaternion q;
-    q.setEuler(yaw, pitch, roll);
+    Eigen::AngleAxisd rollAngle(roll, Eigen::Vector3d::UnitX());
+    Eigen::AngleAxisd pitchAngle(pitch, Eigen::Vector3d::UnitY());
+    Eigen::AngleAxisd yawAngle(yaw, Eigen::Vector3d::UnitZ());
+    Eigen::Quaterniond q = yawAngle * pitchAngle * rollAngle;
+
     geometry_msgs::Quaternion quaternion;
-    quaternion.w = q.getW();
-    quaternion.x = q.getX();
-    quaternion.y = q.getY();
-    quaternion.z = q.getZ();
+    quaternion.w = q.w();
+    quaternion.x = q.x();
+    quaternion.y = q.y();
+    quaternion.z = q.z();
 
     msg.pose.pose.orientation = quaternion;
     msg.pose.pose.position.x = x;
@@ -92,7 +96,7 @@ class SonarEmulator : public atlas::Runnable  {
     std::vector<std::pair<float, uint8_t> > intensity_bins(400);
     float bin_distance_step = 0.02f;
 
-    for (int i = 0; i < intensity_bins.size(); ++i) {
+    for (size_t i = 0; i < intensity_bins.size(); ++i) {
       intensity_bins[i].first = bin_distance_step * (float)(i + 1);
       intensity_bins[i].second = 0;
       if( i > 100 && i <150){
@@ -186,6 +190,43 @@ class SonarEmulator : public atlas::Runnable  {
  private:
   ros::Publisher publisher_;
 };
+
+TEST(EigenTest, core_test)
+{
+  float yaw, pitch, roll ;
+  for( int i = -360; i <= 360 ; i+=360/8) {
+    yaw = atlas::DegToRad((float)(i));
+    pitch = atlas::DegToRad((float)(i));
+    roll = atlas::DegToRad((float)(i));
+
+    Eigen::AngleAxisd rollAngle(roll, Eigen::Vector3d::UnitX());
+    Eigen::AngleAxisd pitchAngle(pitch, Eigen::Vector3d::UnitY());
+    Eigen::AngleAxisd yawAngle(yaw, Eigen::Vector3d::UnitZ());
+    Eigen::Matrix3d m;
+    m = yawAngle * pitchAngle * rollAngle;
+
+    Eigen::Quaterniond q(m);
+    q.normalize();
+
+    geometry_msgs::Quaternion quaternion;
+    quaternion.w = q.w();
+    quaternion.x = q.x();
+    quaternion.y = q.y();
+    quaternion.z = q.z();
+
+    Eigen::Quaterniond
+        quaterniond(quaternion.w, quaternion.x, quaternion.y, quaternion.z);
+
+    Eigen::Matrix3d mat = quaterniond.toRotationMatrix();
+
+    // - Get YPR from transformation Matrix
+    Eigen::Vector3d vec = mat.eulerAngles(0, 1, 2);
+    double roll_2 = vec.x(), pitch_2 = vec.y(), yaw_2 = vec.z();
+    std::cout << "Angle: " << i<< " Yaw: "<< yaw_2;
+    std::cout << " Pitch: " << pitch_2 <<  " roll: " << roll_2 << std::endl;
+
+  }
+}
 
 TEST(BasicMapping, core_test) {
 

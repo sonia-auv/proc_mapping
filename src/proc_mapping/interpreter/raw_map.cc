@@ -105,18 +105,16 @@ void RawMap::OdomCallback(const nav_msgs::Odometry::ConstPtr &odo_in)
 ATLAS_NOEXCEPT {
   // - Generate 3x3 transformation matrix from Quaternions
   auto orientation = &odo_in.get()->pose.pose.orientation;
+  Eigen::Quaterniond quaterniond(orientation->w, orientation->x, orientation->y, orientation->z);
 
-  tf::Quaternion q(orientation->x, orientation->y, orientation->z,
-                   orientation->w);
-  tf::Matrix3x3 m(q);
+  Eigen::Matrix3d mat = quaterniond.toRotationMatrix();
   // - Get YPR from transformation Matrix
-  double roll, pitch, yaw;
+  Eigen::Vector3d vec = mat.eulerAngles(0, 1, 2);
+  double roll = vec.x(), pitch = vec.y(), yaw = vec.z();
 
-  //m.getEulerYPR(yaw, pitch, roll); //RPY-3.14159 -0.929219 0 XY-5 5
-  m.getRPY(roll, pitch, yaw); //RPY-3.14159 -0.929219 0
   // - Set all odometry values that will be use in the cv::mat update thread
-  world_.sub.yaw = M_PI - pitch;
-  world_.sub.pitch = yaw;
+  world_.sub.yaw = M_PI - yaw;
+  world_.sub.pitch = pitch;
   world_.sub.roll = roll;
   world_.sub.position.x = odo_in.get()->pose.pose.position.x;
   world_.sub.position.y = odo_in.get()->pose.pose.position.y;

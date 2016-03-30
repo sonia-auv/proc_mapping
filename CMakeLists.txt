@@ -38,7 +38,11 @@ find_package(
     pcl_conversions
     lib_atlas
     sonia_msgs
+    eigen_conversions
 )
+
+#find_package(catkin REQUIRED cmake_modules)
+#find_package(Eigen REQUIRED)
 
 catkin_package(
     INCLUDE_DIRS ${proc_mapping_SRC_DIR}
@@ -70,6 +74,7 @@ include_directories(
     ${catkin_INCLUDE_DIRS}
     ${proc_mapping_SRC_DIR}
     ${lib_atlas_INCLUDE_DIRS}
+    ${eigen_conversions_INCLUDE_DIRS}
     ${OpenCV_INCLUDE_DIRS}
 )
 
@@ -77,7 +82,7 @@ include_directories(
 # C R E A T E   E X E C U T A B L E
 
 add_executable(${PROJECT_NAME}_node ${proc_mapping_SRC_DIR}/${PROJECT_NAME}/main.cc ${proc_mapping_FILES})
-target_link_libraries(${PROJECT_NAME}_node ${catkin_LIBRARIES} ${lib_atlas_LIBRARIES})
+target_link_libraries(${PROJECT_NAME}_node ${catkin_LIBRARIES} ${lib_atlas_LIBRARIES} )
 add_dependencies(${PROJECT_NAME}_node sonia_msgs_generate_messages_cpp)
 
 #==========================================================================
