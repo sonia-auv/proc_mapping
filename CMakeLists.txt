@@ -38,7 +38,7 @@ find_package(
     pcl_conversions
     lib_atlas
     sonia_msgs
-    eigen_conversions
+        eigen_conversions
 )
 
 #find_package(catkin REQUIRED cmake_modules)

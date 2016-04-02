@@ -29,12 +29,14 @@
 #include <opencv2/opencv.hpp>
 #include <pcl/common/transforms.h>
 #include <tf/transform_datatypes.h>
+#include <tf/transform_listener.h>
 #include "nav_msgs/Odometry.h"
 #include <sensor_msgs/PointCloud2.h>
 #include <geometry_msgs/Quaternion.h>
 #include "lib_atlas/maths.h"
 #include "lib_atlas/pattern/runnable.h"
 #include <eigen3/Eigen/Geometry>
+
 
 
 #include "proc_mapping/interpreter/raw_map.h"
@@ -53,25 +55,28 @@ class OdometryEmulator : public atlas::Runnable {
     ros::Rate loop_rate(100);
     nav_msgs::Odometry msg;
 
-    float yaw = M_PI/2, pitch = 0.0f, roll = 0.0f;
-    float x = -5.0f, y = 5.0f, z = 0.0f;
+    float yaw = 3*M_PI/2, pitch = M_PI/8, roll = M_PI/4;
+    float x = 0.0f, y = 0.0f, z = 0.0f;
     Eigen::AngleAxisd rollAngle(roll, Eigen::Vector3d::UnitX());
     Eigen::AngleAxisd pitchAngle(pitch, Eigen::Vector3d::UnitY());
     Eigen::AngleAxisd yawAngle(yaw, Eigen::Vector3d::UnitZ());
-    Eigen::Quaterniond q = yawAngle * pitchAngle * rollAngle;
 
+    Eigen::Quaterniond q = yawAngle * pitchAngle * rollAngle ;
+    q.normalize();
     geometry_msgs::Quaternion quaternion;
     quaternion.w = q.w();
     quaternion.x = q.x();
     quaternion.y = q.y();
     quaternion.z = q.z();
-
     msg.pose.pose.orientation = quaternion;
     msg.pose.pose.position.x = x;
     msg.pose.pose.position.y = y;
     msg.pose.pose.position.z = z;
 
+
     while (!MustStop()) {
+      msg.header.stamp = ros::Time::now();
+      msg.header.frame_id = "NED";
       publisher_.publish(msg);
       ros::spinOnce();
       loop_rate.sleep();
@@ -136,14 +141,14 @@ class SonarEmulator : public atlas::Runnable  {
     // 135 225
     float angle = 135;
     bool ascending = true;
-
+    point_cloud_msg_.header.frame_id = "SUB";
     while (!MustStop()) {
 
       // - Centered at 0 degree. 180 degree is the middle of the sonar scanline
       float delta_x = bin_distance_step *
-          cos(atlas::DegToRad(angle - 180.0));
+          cos(atlas::DegToRad(angle-180.0f));
       float delta_y = bin_distance_step *
-          sin(atlas::DegToRad(angle - 180.0));
+          sin(atlas::DegToRad(angle-180.0f));
 
       // - try with distance * cos (theta)
       float coordinate_x = 0;
@@ -190,43 +195,6 @@ class SonarEmulator : public atlas::Runnable  {
  private:
   ros::Publisher publisher_;
 };
-
-TEST(EigenTest, core_test)
-{
-  float yaw, pitch, roll ;
-  for( int i = -360; i <= 360 ; i+=360/8) {
-    yaw = atlas::DegToRad((float)(i));
-    pitch = atlas::DegToRad((float)(i));
-    roll = atlas::DegToRad((float)(i));
-
-    Eigen::AngleAxisd rollAngle(roll, Eigen::Vector3d::UnitX());
-    Eigen::AngleAxisd pitchAngle(pitch, Eigen::Vector3d::UnitY());
-    Eigen::AngleAxisd yawAngle(yaw, Eigen::Vector3d::UnitZ());
-    Eigen::Matrix3d m;
-    m = yawAngle * pitchAngle * rollAngle;
-
-    Eigen::Quaterniond q(m);
-    q.normalize();
-
-    geometry_msgs::Quaternion quaternion;
-    quaternion.w = q.w();
-    quaternion.x = q.x();
-    quaternion.y = q.y();
-    quaternion.z = q.z();
-
-    Eigen::Quaterniond
-        quaterniond(quaternion.w, quaternion.x, quaternion.y, quaternion.z);
-
-    Eigen::Matrix3d mat = quaterniond.toRotationMatrix();
-
-    // - Get YPR from transformation Matrix
-    Eigen::Vector3d vec = mat.eulerAngles(0, 1, 2);
-    double roll_2 = vec.x(), pitch_2 = vec.y(), yaw_2 = vec.z();
-    std::cout << "Angle: " << i<< " Yaw: "<< yaw_2;
-    std::cout << " Pitch: " << pitch_2 <<  " roll: " << roll_2 << std::endl;
-
-  }
-}
 
 TEST(BasicMapping, core_test) {
 

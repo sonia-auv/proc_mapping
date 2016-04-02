@@ -61,7 +61,7 @@ class TileGenerator {
   inline bool IsTileReadyForProcess();
 
   // Tile GetTile(cv::Mat raw_map_);
-  void UpdateTileBoundaries(PointXY<int> bin_coordinate);
+  void UpdateTileBoundaries(cv::Point2i bin_coordinate);
 
   void SetScanlinePerTile(int scanlines_per_tile) {
     scanlines_per_tile_ = scanlines_per_tile;
@@ -71,8 +71,8 @@ class TileGenerator {
   //==========================================================================
   // P R I V A T E   M E M B E R S
 
-  PointXY<int> tile_min_boundary_;
-  PointXY<int> tile_max_boundary_;
+  cv::Point2i tile_min_boundary_;
+  cv::Point2i tile_max_boundary_;
 
   int scanlines_per_tile_;
   int scanline_counter_;

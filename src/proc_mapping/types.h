@@ -28,13 +28,9 @@
 
 #include <opencv/cv.h>
 
-template <typename T>
-struct PointXY {
-  T x, y;
-};
 
 struct Tile {
-  PointXY<int> offset;
+  cv::Point2i offset;
   cv::Mat data;
 };
 

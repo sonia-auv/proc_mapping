@@ -36,8 +36,8 @@ TileGenerator::TileGenerator(int scanlines_per_tile)
     : scanlines_per_tile_(scanlines_per_tile),
       scanline_counter_(0),
       is_tile_ready_for_process_(false) {
-  tile_min_boundary_.x = 0;
-  tile_min_boundary_.y = 0;
+  tile_min_boundary_.x = 10000;
+  tile_min_boundary_.y = 10000;
   tile_max_boundary_.x = 0;
   tile_max_boundary_.y = 0;
 }
@@ -47,21 +47,17 @@ TileGenerator::TileGenerator(int scanlines_per_tile)
 
 //------------------------------------------------------------------------------
 //
-void TileGenerator::UpdateTileBoundaries(PointXY<int> bin_coordinate) {
+void TileGenerator::UpdateTileBoundaries(cv::Point2i bin_coordinate) {
+
   if (scanline_counter_ == 0) {
     tile_max_boundary_ = bin_coordinate;
-    tile_min_boundary_ = bin_coordinate;
   }
-  if (bin_coordinate.x > tile_max_boundary_.x) {
-    tile_max_boundary_.x = bin_coordinate.x;
-  } else if (bin_coordinate.x < tile_min_boundary_.x) {
-    tile_min_boundary_.x = bin_coordinate.x;
-  }
-  if (bin_coordinate.y > tile_max_boundary_.y) {
-    tile_max_boundary_.y = bin_coordinate.y;
-  } else if (bin_coordinate.y < tile_min_boundary_.y) {
-    tile_min_boundary_.y = bin_coordinate.y;
-  }
+
+  tile_max_boundary_.x = std::max(bin_coordinate.x, tile_max_boundary_.x);
+  tile_max_boundary_.y = std::max(bin_coordinate.y, tile_max_boundary_.y);
+  tile_min_boundary_.x = std::min(bin_coordinate.x, tile_min_boundary_.x);
+  tile_min_boundary_.y = std::min(bin_coordinate.y, tile_min_boundary_.y);
+
   scanline_counter_++;
   if (scanline_counter_ >= scanlines_per_tile_) {
     is_tile_ready_for_process_ = true;
