@@ -1,14 +1,9 @@
 <launch>
-	<node name="proc_mapping_node"
+	<node name="proc_mapping"
 	    pkg="proc_mapping"
 	    type="proc_mapping_node"
-	    output="log"
-	    launch-prefix="gdb -ex run --args" />
+	    output="log" />
 
     <rosparam command="load"
         file="$(find proc_mapping)/config/proc_mapping_conf.yaml"/>
-
-     <!--Load parameters for the Sonar driver -->
-     <rosparam command="load"
-        file="$(find provider_sonar)/config/sonar_configuration.yaml"/>
 </launch>
