@@ -150,8 +150,8 @@ void RawMap::Run() {
 
 //      cv::warpAffine(displayMap, displayMap, rotation_mat, displayMap.size());
 //      cv::flip(displayMap, displayMap, 0);
-      cv::imshow(" ", displayMap);
-      cv::waitKey(1);
+      //cv::imshow(" ", displayMap);
+      //cv::waitKey(1);
       // Notify(pixel_.map);
     }
   }
