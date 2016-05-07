@@ -49,9 +49,9 @@ RawMap::RawMap(const ros::NodeHandlePtr &nh) ATLAS_NOEXCEPT
   std::string odometry_topic;
 
   nh->param<std::string>("/proc_mapping/topics/points_topic", points_topic,
-                         "/sonar_node/point_cloud2");
+                         "/provider_sonar/point_cloud2");
   nh->param<std::string>("/proc_mapping/topics/odometry", odometry_topic,
-                         "/proc_navigation/Odometry");
+                         "/proc_navigation/odom");
 
   int n_bin, w, h, scanlines_per_tile;
   float range;
@@ -97,6 +97,7 @@ void RawMap::PointCloudCallback(
     const sensor_msgs::PointCloud2::ConstPtr &msg_in) ATLAS_NOEXCEPT {
   last_pcl_ = msg_in;
   new_pcl_ready_ = true;
+  ROS_INFO("PC cb");
 }
 
 //------------------------------------------------------------------------------
