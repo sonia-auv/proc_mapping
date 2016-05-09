@@ -1,5 +1,5 @@
 /**
- * \file	weighted_object_id.h
+ * \file	raw_map_interpreter.h
  * \author	Thibaut Mattio <thibaut.mattio@gmail.com>
  * \date	07/02/2016
  *
@@ -23,69 +23,62 @@
  * along with S.O.N.I.A. software. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef PROC_MAPPING_INTERPRETER_WEIGHTED_OBJECT_ID_H_
-#define PROC_MAPPING_INTERPRETER_WEIGHTED_OBJECT_ID_H_
+#ifndef PROC_MAPPING_INTERPRETER_RAW_MAP_INTERPRETER_H_
+#define PROC_MAPPING_INTERPRETER_RAW_MAP_INTERPRETER_H_
 
 #include <lib_atlas/macros.h>
-#include <sonia_msgs/WeightedObjectId.h>
+#include <message_filters/subscriber.h>
+#include <message_filters/sync_policies/approximate_time.h>
+#include <message_filters/synchronizer.h>
+#include <opencv/cv.h>
+#include <pcl/point_cloud.h>
+#include <pcl/point_types.h>
+#include <pcl_conversions/pcl_conversions.h>
+#include <array>
+#include <eigen3/Eigen/Eigen>
 #include <memory>
 #include <vector>
+#include "proc_mapping/interpreter/data_interpreter.h"
+#include "proc_mapping/raw_map.h"
 
 namespace proc_mapping {
 
-/**
- * This class is a proxy for the sonia_msgs/WeightedObjectId class.
- * This provide simple method for serializing and deserializing the object
- * into/from the ROS message.
- */
-class WeightedObjectId {
+class MapInterpreter : public DataInterpreter<cv::Mat>,
+                       public atlas::Observer<cv::Mat> {
  public:
   //==========================================================================
   // T Y P E D E F   A N D   E N U M
 
-  using Ptr = std::shared_ptr<WeightedObjectId>;
-  using ConstPtr = std::shared_ptr<const WeightedObjectId>;
-  using PtrList = std::vector<WeightedObjectId::Ptr>;
-  using ConstPtrList = std::vector<WeightedObjectId::ConstPtr>;
-
-  /**
-   * This is the id of the object.
-   * Caution with the values of the IDs. The same enum is being declared
-   * in the sonia_msgs/WeightedObjectId file. For user simplicity, please,
-   * use the same values.
-   */
-  enum class ObjectId {
-    BUOY_ID = 0u,
-    GREEN_BUOY_ID = 1u,
-    RED_BUOY_ID = 2u,
-    PIPE_ID = 3u,
-    FENCE_ID = 4u,
-    TRAIN_ID = 5u,
-  };
+  using Ptr = std::shared_ptr<MapInterpreter>;
+  using ConstPtr = std::shared_ptr<const MapInterpreter>;
+  using PtrList = std::vector<MapInterpreter::Ptr>;
+  using ConstPtrList = std::vector<MapInterpreter::ConstPtr>;
 
   //==========================================================================
   // P U B L I C   C / D T O R S
 
-  WeightedObjectId() ATLAS_NOEXCEPT;
-  virtual ~WeightedObjectId() ATLAS_NOEXCEPT;
+  explicit MapInterpreter(const ros::NodeHandlePtr &nh) noexcept;
+
+  virtual ~MapInterpreter() noexcept;
 
   //==========================================================================
   // P U B L I C   M E T H O D S
 
-  sonia_msgs::WeightedObjectId::Ptr Serialize() const ATLAS_NOEXCEPT;
-
-  void Deserialize(const sonia_msgs::WeightedObjectId::ConstPtr &obj)
-      ATLAS_NOEXCEPT;
+  /// The method will update the latest data in the DataInterpreter.
+  /// This will run the whole processing chain as the method SetNewData
+  /// start it.
+  void OnSubjectNotify(atlas::Subject<cv::Mat> &subject,
+                       cv::Mat args) noexcept override;
 
  private:
   //==========================================================================
   // P R I V A T E   M E M B E R S
 
-  WeightedObjectId::ObjectId id_;
+  ros::NodeHandlePtr nh_;
 
-  double weight_;
+  RawMap map_;
 };
 
 }  // namespace proc_mapping
 
-#endif  // PROC_MAPPING_INTERPRETER_WEIGHTED_OBJECT_ID_H_
+#endif  // PROC_MAPPING_INTERPRETER_RAW_MAP_INTERPRETER_H_

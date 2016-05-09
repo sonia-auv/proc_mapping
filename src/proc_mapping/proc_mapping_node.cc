@@ -32,14 +32,14 @@ namespace proc_mapping {
 
 //------------------------------------------------------------------------------
 //
-ProcMappingNode::ProcMappingNode(const ros::NodeHandlePtr &nh) ATLAS_NOEXCEPT
+ProcMappingNode::ProcMappingNode(const ros::NodeHandlePtr &nh) noexcept
     : nh_(nh),
-      semantic_map_pub_(),
-      mapper_(nh_) {}
+      object_pub_(),
+      raw_map_(nh_) {}
 
 //------------------------------------------------------------------------------
 //
-ProcMappingNode::~ProcMappingNode() ATLAS_NOEXCEPT {}
+ProcMappingNode::~ProcMappingNode() noexcept {}
 
 //==============================================================================
 // M E T H O D   S E C T I O N

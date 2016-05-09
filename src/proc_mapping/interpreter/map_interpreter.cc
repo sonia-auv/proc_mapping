@@ -1,5 +1,5 @@
 /**
- * \file	vision_interpreter.cc
+ * \file	raw_map_interpreter.cc
  * \author	Thibaut Mattio <thibaut.mattio@gmail.com>
  * \date	07/02/2016
  *
@@ -23,7 +23,11 @@
  * along with S.O.N.I.A. software. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "proc_mapping/interpreter/vision_interpreter.h"
+#include "proc_mapping/interpreter/map_interpreter.h"
+#include <opencv/cv.h>
+#include <pcl/common/transforms.h>
+#include <tf/transform_datatypes.h>
+#include <opencv2/highgui/highgui.hpp>
 
 namespace proc_mapping {
 
@@ -32,17 +36,25 @@ namespace proc_mapping {
 
 //------------------------------------------------------------------------------
 //
-VisionInterpreter::VisionInterpreter(const ros::NodeHandlePtr &nh)
-    ATLAS_NOEXCEPT : DataInterpreter(nh) {}
+MapInterpreter::MapInterpreter(const ros::NodeHandlePtr &nh) noexcept
+    : DataInterpreter<cv::Mat>(nh),
+      nh_(nh),
+      map_(nh_) {
+  Observe(map_);
+}
 
 //------------------------------------------------------------------------------
 //
-VisionInterpreter::~VisionInterpreter() ATLAS_NOEXCEPT {}
+MapInterpreter::~MapInterpreter() noexcept {}
 
 //==============================================================================
 // M E T H O D   S E C T I O N
 
 //------------------------------------------------------------------------------
 //
+void MapInterpreter::OnSubjectNotify(atlas::Subject<cv::Mat> &subject,
+                                     cv::Mat args) noexcept {
+  SetNewData(args);
+}
 
 }  // namespace proc_mapping

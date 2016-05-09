@@ -32,10 +32,39 @@
 #include <memory>
 #include <mutex>
 #include <vector>
-#include "proc_mapping/interpreter/data_interpreter_interface.h"
-#include "proc_mapping/interpreter/weighted_object_id.h"
+#include <sonia_msgs/MapObject.h>
+#include <lib_atlas/pattern/subject.h>
+#include <lib_atlas/pattern/runnable.h>
+#include "proc_mapping/proc_unit/proc_unit.h"
 
 namespace proc_mapping {
+
+/**
+ * This is a simple interface for the DataInterpreter so we are able to store
+ * pointers of it.
+ * We especially need this in the ObjectMapper object that agregate this a
+ * list of DataInterpreter.
+ */
+class DataInterpreterInterface
+    : public atlas::Subject<std::vector<sonia_msgs::MapObject::Ptr>>,
+      public atlas::Runnable {
+ public:
+  //============================================================================
+  // T Y P E D E F   A N D   E N U M
+
+  using Ptr = std::shared_ptr<DataInterpreterInterface>;
+  using ConstPtr = std::shared_ptr<const DataInterpreterInterface>;
+  using PtrList = std::vector<DataInterpreterInterface::Ptr>;
+  using ConstPtrList = std::vector<DataInterpreterInterface::ConstPtr>;
+
+  //============================================================================
+  // P U B L I C   C / D T O R S
+
+  explicit DataInterpreterInterface(const ros::NodeHandlePtr &nh)
+  noexcept {};
+
+  virtual ~DataInterpreterInterface() = default;
+};
 
 /**
  * A DataInterpreter is an object that subscribe to a source of information (
@@ -51,12 +80,9 @@ class DataInterpreter : public DataInterpreterInterface {
   //============================================================================
   // P U B L I C   C / D T O R S
 
-  explicit DataInterpreter(const ros::NodeHandlePtr &nh) ATLAS_NOEXCEPT;
+  explicit DataInterpreter(const ros::NodeHandlePtr &nh) noexcept;
 
-  virtual ~DataInterpreter() ATLAS_NOEXCEPT;
-
-  //============================================================================
-  // P U B L I C   M E T H O D S
+  virtual ~DataInterpreter() noexcept;
 
  protected:
   //============================================================================
@@ -68,7 +94,7 @@ class DataInterpreter : public DataInterpreterInterface {
    * set by the specific DataInterpreter, this method is called and a
    * notification will be sent to observers (particulary ObjectMapper)
    */
-  virtual WeightedObjectId::ConstPtrList ProcessData() = 0;
+  virtual std::vector<sonia_msgs::MapObject::Ptr> ProcessData() noexcept;
 
   /**
    * The Run method is being override to allow the user to abstract the
@@ -77,17 +103,17 @@ class DataInterpreter : public DataInterpreterInterface {
    */
   void Run() override;
 
-  Tp_ &GetLastData() const ATLAS_NOEXCEPT;
+  Tp_ &GetLastData() noexcept;
 
-  void SetNewData(const Tp_ &data) ATLAS_NOEXCEPT;
+  void SetNewData(const Tp_ &data) noexcept;
 
-  bool IsNewDataReady() const ATLAS_NOEXCEPT;
+  bool IsNewDataReady() const noexcept;
 
  private:
   //============================================================================
   // P R O T E C T E D   M E M B E R S
 
-  std::atomic<bool> new_data_ready_;
+  bool new_data_ready_;
 
   /**
    * Cannot use std::atomic here because it requieres to be nothrow constructor
@@ -96,9 +122,12 @@ class DataInterpreter : public DataInterpreterInterface {
    */
   Tp_ last_data_;
 
-  std::mutex data_mutex_;
+  mutable std::mutex data_mutex_;
 
-  ros::Subscriber odometry_sub_;
+  /**
+   * List of the processing unit that will sort
+   */
+  typename ProcUnit<Tp_>::PtrList proc_units_;
 };
 
 }  // namespace proc_mapping

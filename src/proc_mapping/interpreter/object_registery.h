@@ -1,7 +1,7 @@
 /**
- * \file	proc_mapping_node.h
+ * \file	object_registery.h
  * \author	Thibaut Mattio <thibaut.mattio@gmail.com>
- * \date	07/02/2016
+ * \date	09/05/2016
  *
  * \copyright Copyright (c) 2015 S.O.N.I.A. All rights reserved.
  *
@@ -23,47 +23,52 @@
  * along with S.O.N.I.A. software. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef PROC_MAPPING_PROC_MAPPING_NODE_H_
-#define PROC_MAPPING_PROC_MAPPING_NODE_H_
+#ifndef PROC_MAPPING_OBJECT_REGISTERY_H
+#define PROC_MAPPING_OBJECT_REGISTERY_H
 
-#include <lib_atlas/macros.h>
-#include <ros/node_handle.h>
-#include <memory>
-#include <vector>
-#include "proc_mapping/raw_map.h"
+#include <sonia_msgs/MapObject.h>
 
 namespace proc_mapping {
 
-class ProcMappingNode {
+class ObjectRegistery {
  public:
   //==========================================================================
   // T Y P E D E F   A N D   E N U M
 
-  using Ptr = std::shared_ptr<ProcMappingNode>;
-  using ConstPtr = std::shared_ptr<const ProcMappingNode>;
-  using PtrList = std::vector<ProcMappingNode::Ptr>;
-  using ConstPtrList = std::vector<ProcMappingNode::ConstPtr>;
+  using MapObject = sonia_msgs::MapObject::Ptr;
 
-  //==========================================================================
-  // P U B L I C   C / D T O R S
+  ObjectRegistery(ObjectRegistery const&) = delete;
+  void operator=(ObjectRegistery const&)  = delete;
 
-  explicit ProcMappingNode(const ros::NodeHandlePtr &nh) noexcept;
-
-  ~ProcMappingNode();
+  static ObjectRegistery& GetInstance()
+  {
+    static ObjectRegistery instance;
+    return instance;
+  }
 
   //==========================================================================
   // P U B L I C   M E T H O D S
 
+  void AddObject(const MapObject &obj) noexcept;
+
+  void DeleteObject(const MapObject &obj) noexcept;
+  void DeleteObject(const MapObject *obj) noexcept;
+
+  const std::vector<MapObject> &GetAllMapObject() const noexcept;
+
+  void ClearRegistery() noexcept;
+
  private:
+  // As a Singleton, we want the object itself only to be able to create an
+  // instance of itself.
+  ObjectRegistery() = default;
+
   //==========================================================================
   // P R I V A T E   M E M B E R S
 
-  ros::NodeHandlePtr nh_;
-  ros::Publisher object_pub_;
-
-  RawMap raw_map_;
+  std::vector<MapObject> objects_;
 };
 
-}  // namespace proc_mapping
+} // namespace proc_mapping
 
-#endif  // PROC_MAPPING_PROC_MAPPING_NODE_H_
+#endif //PROC_MAPPING_OBJECT_REGISTERY_H

@@ -27,6 +27,8 @@
 #error This file may only be included data_interpreter.h
 #endif  // PROC_MAPPING_INTERPRETER_DATA_INTERPRETER_H_
 
+#include <opencv2/opencv.hpp>
+#include "proc_mapping/interpreter/object_registery.h"
 #include "proc_mapping/interpreter/data_interpreter.h"
 
 namespace proc_mapping {
@@ -37,15 +39,15 @@ namespace proc_mapping {
 //------------------------------------------------------------------------------
 //
 template <class Tp_>
-ATLAS_ALWAYS_INLINE DataInterpreter<Tp_>::DataInterpreter(
-    const ros::NodeHandlePtr &nh) ATLAS_NOEXCEPT : DataInterpreterInterface(nh),
+inline DataInterpreter<Tp_>::DataInterpreter(
+    const ros::NodeHandlePtr &nh) noexcept : DataInterpreterInterface(nh),
                                                    new_data_ready_(false),
                                                    last_data_() {}
 
 //------------------------------------------------------------------------------
 //
 template <class Tp_>
-ATLAS_ALWAYS_INLINE DataInterpreter<Tp_>::~DataInterpreter() ATLAS_NOEXCEPT {}
+inline DataInterpreter<Tp_>::~DataInterpreter() noexcept {}
 
 //==============================================================================
 // M E T H O D   S E C T I O N
@@ -53,7 +55,7 @@ ATLAS_ALWAYS_INLINE DataInterpreter<Tp_>::~DataInterpreter() ATLAS_NOEXCEPT {}
 //------------------------------------------------------------------------------
 //
 template <class Tp_>
-ATLAS_ALWAYS_INLINE void DataInterpreter<Tp_>::Run() {
+inline void DataInterpreter<Tp_>::Run() {
   while (IsRunning()) {
     if (IsNewDataReady()) {
       Notify(ProcessData());
@@ -64,8 +66,9 @@ ATLAS_ALWAYS_INLINE void DataInterpreter<Tp_>::Run() {
 //------------------------------------------------------------------------------
 //
 template <class Tp_>
-ATLAS_ALWAYS_INLINE Tp_ &DataInterpreter<Tp_>::GetLastData() const
-    ATLAS_NOEXCEPT {
+inline Tp_ &DataInterpreter<Tp_>::GetLastData()
+    noexcept {
+  std::lock_guard<std::mutex> guard(data_mutex_);
   new_data_ready_ = false;
   return last_data_;
 }
@@ -73,8 +76,8 @@ ATLAS_ALWAYS_INLINE Tp_ &DataInterpreter<Tp_>::GetLastData() const
 //------------------------------------------------------------------------------
 //
 template <class Tp_>
-ATLAS_ALWAYS_INLINE void DataInterpreter<Tp_>::SetNewData(const Tp_ &data)
-    ATLAS_NOEXCEPT {
+inline void DataInterpreter<Tp_>::SetNewData(const Tp_ &data)
+    noexcept {
   std::lock_guard<std::mutex> guard(data_mutex_);
   last_data_ = data;
   new_data_ready_ = true;
@@ -83,9 +86,23 @@ ATLAS_ALWAYS_INLINE void DataInterpreter<Tp_>::SetNewData(const Tp_ &data)
 //------------------------------------------------------------------------------
 //
 template <class Tp_>
-ATLAS_ALWAYS_INLINE bool DataInterpreter<Tp_>::IsNewDataReady() const
-    ATLAS_NOEXCEPT {
+inline bool DataInterpreter<Tp_>::IsNewDataReady() const
+    noexcept {
+  std::lock_guard<std::mutex> guard(data_mutex_);
   return new_data_ready_;
+}
+
+//------------------------------------------------------------------------------
+//
+template <class Tp_>
+inline std::vector<sonia_msgs::MapObject::Ptr> DataInterpreter<Tp_>::ProcessData() noexcept {
+  Tp_ data;
+  for(const auto &proc_unit : proc_units_) {
+    data = proc_unit->ProcessData(data);
+  }
+  auto objects = ObjectRegistery::GetInstance().GetAllMapObject();
+  ObjectRegistery::GetInstance().ClearRegistery();
+  return std::move(objects);
 }
 
 }  // namespace proc_mapping

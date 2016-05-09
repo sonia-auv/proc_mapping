@@ -26,23 +26,17 @@
 #ifndef PROC_MAPPING_INTERPRETER_RAW_MAP_H_
 #define PROC_MAPPING_INTERPRETER_RAW_MAP_H_
 
+#include <lib_atlas/macros.h>
+#include <nav_msgs/Odometry.h>
+#include <opencv/cv.h>
+#include <pcl/point_cloud.h>
+#include <pcl/point_types.h>
+#include <pcl_conversions/pcl_conversions.h>
+#include <sensor_msgs/PointCloud2.h>
 #include <array>
+#include <eigen3/Eigen/Geometry>
 #include <memory>
 #include <vector>
-
-#include <opencv/cv.h>
-
-#include <sensor_msgs/PointCloud2.h>
-#include <pcl/point_types.h>
-#include <nav_msgs/Odometry.h>
-#include <eigen3/Eigen/Geometry>
-#include <pcl/point_cloud.h>
-#include <pcl_conversions/pcl_conversions.h>
-
-#include <lib_atlas/macros.h>
-
-#include "proc_mapping/types.h"
-#include "proc_mapping/interpreter/tile_generator.h"
 #include "proc_mapping/interpreter/data_interpreter.h"
 
 namespace proc_mapping {
@@ -59,10 +53,11 @@ class RawMap : public atlas::Subject<cv::Mat>, public atlas::Runnable {
 
   // Pixel Coordinate System
   struct PixelCS {
-    size_t width;
-    size_t height;
+    // Cannot use size_t because of the compatibility with opencv...
+    int width;
+    int height;
+    double m_to_pixel;
     double pixel_to_m;
-    float m_to_pixel;
     cv::Mat map, map_color;
     // - Number of Hits per pixel
     std::vector<uint8_t> number_of_hits_;
@@ -72,25 +67,24 @@ class RawMap : public atlas::Subject<cv::Mat>, public atlas::Runnable {
   struct SubMarineCS {
     Eigen::Transform<double, 3, Eigen::Affine> affine;
     Eigen::Matrix3d rotation;
-    double yaw, pitch, roll;
-    cv::Point2f position;
-    cv::Point2f initialPosition;
+    double yaw;
+    double pitch;
+    double roll;
+    cv::Point2d position;
+    cv::Point2d initial_position;
   };
 
-  // World Coordinate System
   struct WorldCS {
-    size_t width;
-    size_t height;
-    SubMarineCS sub;
-    pcl::PointCloud<pcl::PointXYZ> cloud;
+    double width;
+    double height;
   };
 
   //==========================================================================
   // P U B L I C   C / D T O R S
 
-  explicit RawMap(const ros::NodeHandlePtr &nh) ATLAS_NOEXCEPT;
+  explicit RawMap(const ros::NodeHandlePtr &nh) noexcept;
 
-  virtual ~RawMap() ATLAS_NOEXCEPT;
+  virtual ~RawMap() = default;
 
   //==========================================================================
   // P U B L I C   M E T H O D S
@@ -102,9 +96,9 @@ class RawMap : public atlas::Subject<cv::Mat>, public atlas::Runnable {
   // P R I V A T E   M E T H O D S
 
   void PointCloudCallback(const sensor_msgs::PointCloud2::ConstPtr &msg_in)
-      ATLAS_NOEXCEPT;
+      noexcept;
 
-  void OdomCallback(const nav_msgs::Odometry::ConstPtr &odo_in) ATLAS_NOEXCEPT;
+  void OdomCallback(const nav_msgs::Odometry::ConstPtr &odo_in) noexcept;
 
   /**
    * Set the parameters of the coordinate systems. These parameters are going
@@ -115,15 +109,17 @@ class RawMap : public atlas::Subject<cv::Mat>, public atlas::Runnable {
    * \param r The pixel_to_m of the pixel CCS (meter/pixel)
    */
   void SetMapParameters(const size_t &w, const size_t &h,
-                        const double &r) ATLAS_NOEXCEPT;
+                        const double &r) noexcept;
 
   void SetPointCloudThreshold(double sonar_threshold, double resolution);
 
   void ProcessPointCloud(const sensor_msgs::PointCloud2::ConstPtr &msg);
 
-  inline void UpdateMat(cv::Point2f p, uchar intensity);
+  void UpdateMat(const cv::Point2d &p, const uchar &intensity);
 
-  inline cv::Point2d CoordinateToPixel(const cv::Point2f &p);
+  cv::Point2d CoordinateToPixel(const cv::Point2d &p);
+
+  bool IsMapReadyForProcess();
 
   //==========================================================================
   // P R I V A T E   M E M B E R S
@@ -132,51 +128,26 @@ class RawMap : public atlas::Subject<cv::Mat>, public atlas::Runnable {
   ros::Subscriber points2_sub_;
   ros::Subscriber odom_sub_;
 
-
   // The first data of the sonar may be scrap. Keeping a threshold and starting
   // to process data after it. MUST BE A MULTIPLE OF 16 (sonar_threshold_ = 16 *
   // numberOfPointsToSkip)
   uint32_t point_cloud_threshold_;
   uint32_t hit_count_;
 
-  TileGenerator tile_generator_;
-
   std::atomic<bool> new_pcl_ready_;
 
   sensor_msgs::PointCloud2::ConstPtr last_pcl_;
 
   PixelCS pixel_;
+  SubMarineCS sub_;
   WorldCS world_;
   cv::Mat displayMap;
+
+  int scanlines_per_tile_;
+  int scanline_counter_;
+
+  bool is_tile_ready_for_process_;
 };
-
-//==============================================================================
-// I N L I N E   F U N C T I O N S   D E F I N I T I O N S
-
-//------------------------------------------------------------------------------
-//
-inline void RawMap::UpdateMat(cv::Point2f p, uchar intensity) {
-  if (static_cast<size_t>(p.x) < pixel_.width &&
-      static_cast<size_t>(p.y) < pixel_.height) {
-    // - Infinite mean
-
-    pixel_.number_of_hits_.at(p.x + p.y * pixel_.width)++;
-    int n = pixel_.number_of_hits_.at(p.x + p.y * pixel_.width) + 1;
-    pixel_.map.at<uchar>(p.y, p.x) = static_cast<uchar>(
-        intensity / n + pixel_.map.at<uchar>(p.y, p.x) * (n - 1) / n);
-    // - Local mean
-    // pixel_.map.at<uchar>(p.x, p.y) = static_cast<uchar>((intensity +
-    // pixel_.map.at<uchar>(p.x, p.y)) / 2);
-    // - Replacement
-    // pixel_.map.at<uchar>(p.x, p.y) = intensity;
-  }
-}
-
-//------------------------------------------------------------------------------
-//
-inline cv::Point2d RawMap::CoordinateToPixel(const cv::Point2f &p) {
-  return p * pixel_.m_to_pixel;
-}
 
 }  // namespace proc_mapping
 

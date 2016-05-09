@@ -1,7 +1,7 @@
 /**
- * \file	raw_map_interpreter.cc
+ * \file	object_registery.cc
  * \author	Thibaut Mattio <thibaut.mattio@gmail.com>
- * \date	07/02/2016
+ * \date	09/05/2016
  *
  * \copyright Copyright (c) 2015 S.O.N.I.A. All rights reserved.
  *
@@ -23,57 +23,57 @@
  * along with S.O.N.I.A. software. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "proc_mapping/interpreter/tile_interpreter.h"
-#include <opencv/cv.h>
-#include <pcl/common/transforms.h>
-#include <tf/transform_datatypes.h>
-#include <opencv2/highgui/highgui.hpp>
+#include "object_registery.h"
 
 namespace proc_mapping {
-
-//==============================================================================
-// C / D T O R S   S E C T I O N
-
-//------------------------------------------------------------------------------
-//
-TileInterpreter::TileInterpreter(const ros::NodeHandlePtr &nh) ATLAS_NOEXCEPT
-    : DataInterpreter<cv::Mat>(nh),
-      nh_(nh),
-      map_(nh_) {
-  Observe(map_);
-}
-
-//------------------------------------------------------------------------------
-//
-TileInterpreter::~TileInterpreter() ATLAS_NOEXCEPT {}
 
 //==============================================================================
 // M E T H O D   S E C T I O N
 
 //------------------------------------------------------------------------------
 //
-WeightedObjectId::ConstPtrList TileInterpreter::ProcessData() { return {{}}; }
+void ObjectRegistery::AddObject(const MapObject &obj) noexcept {
+  objects_.push_back(obj);
+}
 
 //------------------------------------------------------------------------------
 //
-void TileInterpreter::OnSubjectNotify(atlas::Subject<cv::Mat> &subject,
-                                      cv::Mat args) ATLAS_NOEXCEPT {
-  /*
-  static int image_counter = 0, image_number = 0;
-  SetNewData(args);
-  cv::imshow("", args);
-  cv::waitKey(1);
-  image_counter++;
+void ObjectRegistery::DeleteObject(const MapObject &obj) noexcept {
+  auto find_cond = [&obj](const MapObject &item)
+  {
+    return &item == &obj;
+  };
 
-  if (image_counter == 100) {
-    std::string filename =
-        "/home/etienne/Documents/mapping_img/images/cv_mat_regular_mean_" +
-        std::to_string(image_number) + ".png";
-    cv::imwrite(filename, args);
-    image_number++;
-    image_counter = 0;
+  auto it = std::find_if(objects_.begin(), objects_.end(), find_cond);
+  if(it != objects_.end()) {
+    objects_.erase(it);
   }
-  */
 }
 
-}  // namespace proc_mapping
+//------------------------------------------------------------------------------
+//
+void ObjectRegistery::DeleteObject(const MapObject *obj) noexcept {
+  auto find_cond = [&obj](const MapObject &item)
+  {
+    return &item == obj;
+  };
+
+  auto it = std::find_if(objects_.begin(), objects_.end(), find_cond);
+  if(it != objects_.end()) {
+    objects_.erase(it);
+  }
+}
+
+//------------------------------------------------------------------------------
+//
+const std::vector<ObjectRegistery::MapObject> &ObjectRegistery::GetAllMapObject() const noexcept {
+  return objects_;
+}
+
+//------------------------------------------------------------------------------
+//
+void ObjectRegistery::ClearRegistery() noexcept {
+  objects_.clear();
+}
+
+} // namespace proc_mapping

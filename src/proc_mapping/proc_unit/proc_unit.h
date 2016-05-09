@@ -1,7 +1,7 @@
 /**
- * \file	proc_mapping_node.h
+ * \file	proc_unit.h
  * \author	Thibaut Mattio <thibaut.mattio@gmail.com>
- * \date	07/02/2016
+ * \date	09/05/2016
  *
  * \copyright Copyright (c) 2015 S.O.N.I.A. All rights reserved.
  *
@@ -23,47 +23,43 @@
  * along with S.O.N.I.A. software. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef PROC_MAPPING_PROC_MAPPING_NODE_H_
-#define PROC_MAPPING_PROC_MAPPING_NODE_H_
-
-#include <lib_atlas/macros.h>
-#include <ros/node_handle.h>
-#include <memory>
-#include <vector>
-#include "proc_mapping/raw_map.h"
+#ifndef PROC_MAPPING_PROC_UNIT_H
+#define PROC_MAPPING_PROC_UNIT_H
 
 namespace proc_mapping {
 
-class ProcMappingNode {
+/**
+ * Implementing the ProcUnit as a template because the DataInterpreter will
+ * use a templated type for the data to process.
+ * For now there is only cv::Mat, but later there will be the VisionTargets.
+ * This is a workaround to stay compatible, but a good implementation would
+ * allow us to connect an output to a different one depending on the type
+ * (e.g. not the same input/output types)
+ */
+template<class Tp_>
+class ProcUnit {
  public:
   //==========================================================================
   // T Y P E D E F   A N D   E N U M
 
-  using Ptr = std::shared_ptr<ProcMappingNode>;
-  using ConstPtr = std::shared_ptr<const ProcMappingNode>;
-  using PtrList = std::vector<ProcMappingNode::Ptr>;
-  using ConstPtrList = std::vector<ProcMappingNode::ConstPtr>;
+  using Ptr = std::unique_ptr<ProcUnit>;
+  using ConstPtr = std::unique_ptr<const ProcUnit>;
+  using PtrList = std::vector<ProcUnit::Ptr>;
+  using ConstPtrList = std::vector<ProcUnit::ConstPtr>;
 
   //==========================================================================
   // P U B L I C   C / D T O R S
 
-  explicit ProcMappingNode(const ros::NodeHandlePtr &nh) noexcept;
+  ProcUnit() noexcept {};
 
-  ~ProcMappingNode();
+  virtual ~ProcUnit() = default;
 
   //==========================================================================
   // P U B L I C   M E T H O D S
 
- private:
-  //==========================================================================
-  // P R I V A T E   M E M B E R S
-
-  ros::NodeHandlePtr nh_;
-  ros::Publisher object_pub_;
-
-  RawMap raw_map_;
+  virtual Tp_ ProcessData(const Tp_ &input) = 0;
 };
 
-}  // namespace proc_mapping
+} // namespace proc_mapping
 
-#endif  // PROC_MAPPING_PROC_MAPPING_NODE_H_
+#endif  // PROC_MAPPING_PROC_UNIT_H
