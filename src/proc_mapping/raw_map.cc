@@ -44,8 +44,10 @@ RawMap::RawMap(const ros::NodeHandlePtr &nh)
       hit_count_(0),
       new_pcl_ready_(false),
       last_pcl_(nullptr),
-      scanlines_per_tile_(0),
-      is_map_ready_for_process_(false) {
+      scanlines_for_process_(0),
+      scanline_counter_(0),
+      is_map_ready_for_process_(false),
+      is_first_odom_(true) {
   std::string point_cloud_topic;
   std::string odometry_topic;
 
@@ -65,11 +67,7 @@ RawMap::RawMap(const ros::NodeHandlePtr &nh)
   nh->param<int>("/proc_mapping/map/width", w, 30);
   nh->param<int>("/proc_mapping/map/height", h, 30);
   nh->param<double>("/proc_mapping/map/sonar_threshold", sonar_threshold, 1.0);
-  nh->param<double>("/proc_mapping/map/sub_initial_x", sub_.initial_position.x,
-                    15.0);
-  nh->param<double>("/proc_mapping/map/sub_initial_y", sub_.initial_position.y,
-                    15.0);
-  nh->param<int>("/proc_mapping/tile/number_of_scanlines", scanlines_per_tile_,
+  nh->param<int>("/proc_mapping/tile/number_of_scanlines", scanlines_for_process_,
                  10);
 
   // Resolution is equal to the range of the sonar divide by the number of bin
@@ -99,6 +97,12 @@ void RawMap::PointCloudCallback(
 //------------------------------------------------------------------------------
 //
 void RawMap::OdomCallback(const nav_msgs::Odometry::ConstPtr &odo_in) {
+  if(is_first_odom_) {
+    sub_.initial_position.x = odo_in.get()->pose.pose.position.x;
+    sub_.initial_position.y = odo_in.get()->pose.pose.position.y;
+    is_first_odom_ = false;
+  }
+
   // - Generate 3x3 transformation matrix from Quaternions
   auto orientation = &odo_in.get()->pose.pose.orientation;
   Eigen::Quaterniond quaterniond(orientation->w, orientation->x, orientation->y,
@@ -122,18 +126,10 @@ void RawMap::OdomCallback(const nav_msgs::Odometry::ConstPtr &odo_in) {
 //------------------------------------------------------------------------------
 //
 void RawMap::Run() {
-  cv::Point2d initial_position_offset{
-      sub_.initial_position.x * pixel_.m_to_pixel,
-      sub_.initial_position.y * pixel_.m_to_pixel};
-
   while (IsRunning()) {
     if (new_pcl_ready_ && last_pcl_) {
       ProcessPointCloud(last_pcl_);
       new_pcl_ready_ = false;
-
-      cv::Point2d sub_coord = CoordinateToPixel(sub_.position);
-      sub_coord += (cv::Point2d{sub_.initial_position.x * pixel_.m_to_pixel,
-                                sub_.initial_position.y * pixel_.m_to_pixel});
 
       if (IsMapReadyForProcess()) {
         Notify(pixel_.map);
@@ -163,10 +159,6 @@ void RawMap::SetMapParameters(const size_t &w, const size_t &h,
 
   pixel_.map = cv::Mat(pixel_.width, pixel_.height, CV_8UC1);
   pixel_.map.setTo(cv::Scalar(0));
-  pixel_.map_color = cv::Mat(pixel_.width, pixel_.height, CV_8UC3);
-  pixel_.map_color.setTo(cv::Scalar(0));
-  displayMap = cv::Mat(pixel_.width, pixel_.height, CV_8UC1);
-  displayMap.setTo(cv::Scalar(0));
   std::cout << "Map meter info: Width=" << w << " Height=" << h << std::endl;
   std::cout << "Map pixel info: Width=" << pixel_.width
             << " Height= " << pixel_.height << std::endl;
@@ -186,7 +178,8 @@ void RawMap::ProcessPointCloud(const sensor_msgs::PointCloud2::ConstPtr &msg) {
   uint32_t i = 0,
            max_size = static_cast<uint32_t>(msg->data.size() / msg->point_step);
   cv::Point2i bin_coordinate;
-  cv::Point2d offset_sub = sub_.position + sub_.initial_position;
+
+  auto sub_position = sub_.position - sub_.initial_position + GetPositionOffset();
 
   intensity_map.resize(max_size - point_cloud_threshold_);
   coordinate_map.resize(max_size - point_cloud_threshold_);
@@ -205,7 +198,7 @@ void RawMap::ProcessPointCloud(const sensor_msgs::PointCloud2::ConstPtr &msg) {
     out = sub_.rotation * in;
 
     cv::Point2d coordinate_transformed =
-        cv::Point2d(in.x(), in.y()) + offset_sub;
+        cv::Point2d(in.x(), in.y()) + sub_position;
 
     bin_coordinate = CoordinateToPixel(coordinate_transformed);
 
@@ -230,7 +223,7 @@ void RawMap::ProcessPointCloud(const sensor_msgs::PointCloud2::ConstPtr &msg) {
   }
 
   scanline_counter_++;
-  if (scanline_counter_ >= scanlines_per_tile_) {
+  if (scanline_counter_ >= scanlines_for_process_) {
     is_map_ready_for_process_ = true;
     scanline_counter_ = 0;
   }
@@ -261,5 +254,11 @@ cv::Point2d RawMap::CoordinateToPixel(const cv::Point2d &p) {
 //------------------------------------------------------------------------------
 //
 bool RawMap::IsMapReadyForProcess() { return is_map_ready_for_process_; }
+
+//------------------------------------------------------------------------------
+//
+cv::Point2d RawMap::GetPositionOffset() const {
+  return {world_.width/2, world_.height/2};
+}
 
 }  // namespace proc_mapping

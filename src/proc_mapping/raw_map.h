@@ -58,7 +58,7 @@ class RawMap : public atlas::Subject<cv::Mat>, public atlas::Runnable {
     int height;
     double m_to_pixel;
     double pixel_to_m;
-    cv::Mat map, map_color;
+    cv::Mat map;
     // - Number of Hits per pixel
     std::vector<uint8_t> number_of_hits_;
   };
@@ -117,6 +117,10 @@ class RawMap : public atlas::Subject<cv::Mat>, public atlas::Runnable {
 
   cv::Point2d CoordinateToPixel(const cv::Point2d &p);
 
+  /// We want the submarine to be in the center of the raw map.
+  /// Thus, we are going to offset it by the half of the map size.
+  cv::Point2d GetPositionOffset() const;
+
   bool IsMapReadyForProcess();
 
   //==========================================================================
@@ -126,9 +130,8 @@ class RawMap : public atlas::Subject<cv::Mat>, public atlas::Runnable {
   ros::Subscriber points2_sub_;
   ros::Subscriber odom_sub_;
 
-  // The first data of the sonar may be scrap. Keeping a threshold and starting
-  // to process data after it. MUST BE A MULTIPLE OF 16 (sonar_threshold_ = 16 *
-  // numberOfPointsToSkip)
+  /// The first data of the sonar may be scrap. Keeping a threshold and starting
+  /// to process data after it
   uint32_t point_cloud_threshold_;
   uint32_t hit_count_;
 
@@ -136,15 +139,24 @@ class RawMap : public atlas::Subject<cv::Mat>, public atlas::Runnable {
 
   sensor_msgs::PointCloud2::ConstPtr last_pcl_;
 
+  /// There is a few transformation involved here. We are going to store the
+  /// Coordinate system as well as the informations for changing the
+  /// referential.
   PixelCS pixel_;
   SubMarineCS sub_;
   WorldCS world_;
-  cv::Mat displayMap;
 
-  int scanlines_per_tile_;
+  /// As we don't want to process the map every scanline, we set a counter of
+  /// scan line and increment it. When the scanline_counter hits the wanted
+  /// value, we set the map to be ready to process and it is sent to the map
+  /// interpreter for processing.
+  bool is_map_ready_for_process_;
+  int scanlines_for_process_;
   int scanline_counter_;
 
-  bool is_map_ready_for_process_;
+  /// Flag that states if the first odometry message has already been received.
+  /// It is used to calculate the initial position of the submarine.
+  bool is_first_odom_;
 };
 
 }  // namespace proc_mapping
