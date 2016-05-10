@@ -32,14 +32,14 @@ namespace proc_mapping {
 
 //------------------------------------------------------------------------------
 //
-ProcMappingNode::ProcMappingNode(const ros::NodeHandlePtr &nh) noexcept
-    : nh_(nh),
-      object_pub_(),
-      raw_map_(nh_) {}
+ProcMappingNode::ProcMappingNode(const ros::NodeHandlePtr &nh)
+    : nh_(nh), object_pub_(), raw_map_(nh_), map_interpreter_(nh_) {
+  map_interpreter_.Observe(raw_map_);
+}
 
 //------------------------------------------------------------------------------
 //
-ProcMappingNode::~ProcMappingNode() noexcept {}
+ProcMappingNode::~ProcMappingNode() {}
 
 //==============================================================================
 // M E T H O D   S E C T I O N

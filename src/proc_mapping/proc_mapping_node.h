@@ -30,6 +30,7 @@
 #include <ros/node_handle.h>
 #include <memory>
 #include <vector>
+#include "proc_mapping/interpreter/map_interpreter.h"
 #include "proc_mapping/raw_map.h"
 
 namespace proc_mapping {
@@ -47,7 +48,7 @@ class ProcMappingNode {
   //==========================================================================
   // P U B L I C   C / D T O R S
 
-  explicit ProcMappingNode(const ros::NodeHandlePtr &nh) noexcept;
+  explicit ProcMappingNode(const ros::NodeHandlePtr &nh);
 
   ~ProcMappingNode();
 
@@ -62,6 +63,7 @@ class ProcMappingNode {
   ros::Publisher object_pub_;
 
   RawMap raw_map_;
+  MapInterpreter map_interpreter_;
 };
 
 }  // namespace proc_mapping

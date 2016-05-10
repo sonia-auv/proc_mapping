@@ -82,7 +82,7 @@ class RawMap : public atlas::Subject<cv::Mat>, public atlas::Runnable {
   //==========================================================================
   // P U B L I C   C / D T O R S
 
-  explicit RawMap(const ros::NodeHandlePtr &nh) noexcept;
+  explicit RawMap(const ros::NodeHandlePtr &nh);
 
   virtual ~RawMap() = default;
 
@@ -95,10 +95,9 @@ class RawMap : public atlas::Subject<cv::Mat>, public atlas::Runnable {
   //==========================================================================
   // P R I V A T E   M E T H O D S
 
-  void PointCloudCallback(const sensor_msgs::PointCloud2::ConstPtr &msg_in)
-      noexcept;
+  void PointCloudCallback(const sensor_msgs::PointCloud2::ConstPtr &msg_in);
 
-  void OdomCallback(const nav_msgs::Odometry::ConstPtr &odo_in) noexcept;
+  void OdomCallback(const nav_msgs::Odometry::ConstPtr &odo_in);
 
   /**
    * Set the parameters of the coordinate systems. These parameters are going
@@ -108,14 +107,13 @@ class RawMap : public atlas::Subject<cv::Mat>, public atlas::Runnable {
    * \param h The height of the map in world CCS (meters)
    * \param r The pixel_to_m of the pixel CCS (meter/pixel)
    */
-  void SetMapParameters(const size_t &w, const size_t &h,
-                        const double &r) noexcept;
+  void SetMapParameters(const size_t &w, const size_t &h, const double &r);
 
   void SetPointCloudThreshold(double sonar_threshold, double resolution);
 
   void ProcessPointCloud(const sensor_msgs::PointCloud2::ConstPtr &msg);
 
-  void UpdateMat(const cv::Point2d &p, const uchar &intensity);
+  void UpdateMat(const cv::Point2d &p, const uint8_t &intensity);
 
   cv::Point2d CoordinateToPixel(const cv::Point2d &p);
 
@@ -146,7 +144,7 @@ class RawMap : public atlas::Subject<cv::Mat>, public atlas::Runnable {
   int scanlines_per_tile_;
   int scanline_counter_;
 
-  bool is_tile_ready_for_process_;
+  bool is_map_ready_for_process_;
 };
 
 }  // namespace proc_mapping

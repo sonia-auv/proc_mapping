@@ -37,11 +37,10 @@ class ObjectRegistery {
 
   using MapObject = sonia_msgs::MapObject::Ptr;
 
-  ObjectRegistery(ObjectRegistery const&) = delete;
-  void operator=(ObjectRegistery const&)  = delete;
+  ObjectRegistery(ObjectRegistery const &) = delete;
+  void operator=(ObjectRegistery const &) = delete;
 
-  static ObjectRegistery& GetInstance()
-  {
+  static ObjectRegistery &GetInstance() {
     static ObjectRegistery instance;
     return instance;
   }
@@ -49,14 +48,14 @@ class ObjectRegistery {
   //==========================================================================
   // P U B L I C   M E T H O D S
 
-  void AddObject(const MapObject &obj) noexcept;
+  void AddObject(const MapObject &obj);
 
-  void DeleteObject(const MapObject &obj) noexcept;
-  void DeleteObject(const MapObject *obj) noexcept;
+  void DeleteObject(const MapObject &obj);
+  void DeleteObject(const MapObject *obj);
 
-  const std::vector<MapObject> &GetAllMapObject() const noexcept;
+  const std::vector<MapObject> &GetAllMapObject() const;
 
-  void ClearRegistery() noexcept;
+  void ClearRegistery();
 
  private:
   // As a Singleton, we want the object itself only to be able to create an
@@ -69,6 +68,6 @@ class ObjectRegistery {
   std::vector<MapObject> objects_;
 };
 
-} // namespace proc_mapping
+}  // namespace proc_mapping
 
-#endif //PROC_MAPPING_OBJECT_REGISTERY_H
+#endif  // PROC_MAPPING_OBJECT_REGISTERY_H

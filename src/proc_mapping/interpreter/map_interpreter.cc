@@ -24,10 +24,8 @@
  */
 
 #include "proc_mapping/interpreter/map_interpreter.h"
-#include <opencv/cv.h>
-#include <pcl/common/transforms.h>
 #include <tf/transform_datatypes.h>
-#include <opencv2/highgui/highgui.hpp>
+#include "proc_mapping/proc_unit/pattern_detection.h"
 
 namespace proc_mapping {
 
@@ -36,16 +34,15 @@ namespace proc_mapping {
 
 //------------------------------------------------------------------------------
 //
-MapInterpreter::MapInterpreter(const ros::NodeHandlePtr &nh) noexcept
-    : DataInterpreter<cv::Mat>(nh),
-      nh_(nh),
-      map_(nh_) {
-  Observe(map_);
+MapInterpreter::MapInterpreter(const ros::NodeHandlePtr &nh)
+    : DataInterpreter<cv::Mat>(nh), nh_(nh) {
+  ProcUnit<cv::Mat>::Ptr pu{new PatternDetection};
+  AddProcUnit(std::move(pu));
 }
 
 //------------------------------------------------------------------------------
 //
-MapInterpreter::~MapInterpreter() noexcept {}
+MapInterpreter::~MapInterpreter() {}
 
 //==============================================================================
 // M E T H O D   S E C T I O N
@@ -53,7 +50,7 @@ MapInterpreter::~MapInterpreter() noexcept {}
 //------------------------------------------------------------------------------
 //
 void MapInterpreter::OnSubjectNotify(atlas::Subject<cv::Mat> &subject,
-                                     cv::Mat args) noexcept {
+                                     cv::Mat args) {
   SetNewData(args);
 }
 

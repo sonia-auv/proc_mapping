@@ -27,14 +27,14 @@
 #define PROC_MAPPING_INTERPRETER_DATA_INTERPRETER_H_
 
 #include <lib_atlas/macros.h>
+#include <lib_atlas/pattern/runnable.h>
+#include <lib_atlas/pattern/subject.h>
 #include <ros/ros.h>
+#include <sonia_msgs/MapObject.h>
 #include <atomic>
 #include <memory>
 #include <mutex>
 #include <vector>
-#include <sonia_msgs/MapObject.h>
-#include <lib_atlas/pattern/subject.h>
-#include <lib_atlas/pattern/runnable.h>
 #include "proc_mapping/proc_unit/proc_unit.h"
 
 namespace proc_mapping {
@@ -60,8 +60,7 @@ class DataInterpreterInterface
   //============================================================================
   // P U B L I C   C / D T O R S
 
-  explicit DataInterpreterInterface(const ros::NodeHandlePtr &nh)
-  noexcept {};
+  explicit DataInterpreterInterface(const ros::NodeHandlePtr &nh){};
 
   virtual ~DataInterpreterInterface() = default;
 };
@@ -80,9 +79,9 @@ class DataInterpreter : public DataInterpreterInterface {
   //============================================================================
   // P U B L I C   C / D T O R S
 
-  explicit DataInterpreter(const ros::NodeHandlePtr &nh) noexcept;
+  explicit DataInterpreter(const ros::NodeHandlePtr &nh);
 
-  virtual ~DataInterpreter() noexcept;
+  virtual ~DataInterpreter();
 
  protected:
   //============================================================================
@@ -94,7 +93,7 @@ class DataInterpreter : public DataInterpreterInterface {
    * set by the specific DataInterpreter, this method is called and a
    * notification will be sent to observers (particulary ObjectMapper)
    */
-  virtual std::vector<sonia_msgs::MapObject::Ptr> ProcessData() noexcept;
+  virtual std::vector<sonia_msgs::MapObject::Ptr> ProcessData();
 
   /**
    * The Run method is being override to allow the user to abstract the
@@ -103,11 +102,13 @@ class DataInterpreter : public DataInterpreterInterface {
    */
   void Run() override;
 
-  Tp_ &GetLastData() noexcept;
+  Tp_ &GetLastData();
 
-  void SetNewData(const Tp_ &data) noexcept;
+  void SetNewData(const Tp_ &data);
 
-  bool IsNewDataReady() const noexcept;
+  void AddProcUnit(const typename ProcUnit<Tp_>::Ptr &proc_unit);
+
+  bool IsNewDataReady() const;
 
  private:
   //============================================================================

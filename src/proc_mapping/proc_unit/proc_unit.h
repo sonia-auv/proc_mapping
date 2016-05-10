@@ -26,6 +26,8 @@
 #ifndef PROC_MAPPING_PROC_UNIT_H
 #define PROC_MAPPING_PROC_UNIT_H
 
+#include <memory.h>
+
 namespace proc_mapping {
 
 /**
@@ -36,30 +38,30 @@ namespace proc_mapping {
  * allow us to connect an output to a different one depending on the type
  * (e.g. not the same input/output types)
  */
-template<class Tp_>
+template <class Tp_>
 class ProcUnit {
  public:
   //==========================================================================
   // T Y P E D E F   A N D   E N U M
 
-  using Ptr = std::unique_ptr<ProcUnit>;
-  using ConstPtr = std::unique_ptr<const ProcUnit>;
+  using Ptr = std::shared_ptr<ProcUnit>;
+  using ConstPtr = std::shared_ptr<const ProcUnit>;
   using PtrList = std::vector<ProcUnit::Ptr>;
   using ConstPtrList = std::vector<ProcUnit::ConstPtr>;
 
   //==========================================================================
   // P U B L I C   C / D T O R S
 
-  ProcUnit() noexcept {};
+  ProcUnit(){};
 
   virtual ~ProcUnit() = default;
 
   //==========================================================================
   // P U B L I C   M E T H O D S
 
-  virtual Tp_ ProcessData(const Tp_ &input) = 0;
+  virtual void ProcessData(Tp_ &input) = 0;
 };
 
-} // namespace proc_mapping
+}  // namespace proc_mapping
 
 #endif  // PROC_MAPPING_PROC_UNIT_H

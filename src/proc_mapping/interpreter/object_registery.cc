@@ -32,48 +32,41 @@ namespace proc_mapping {
 
 //------------------------------------------------------------------------------
 //
-void ObjectRegistery::AddObject(const MapObject &obj) noexcept {
+void ObjectRegistery::AddObject(const MapObject &obj) {
   objects_.push_back(obj);
 }
 
 //------------------------------------------------------------------------------
 //
-void ObjectRegistery::DeleteObject(const MapObject &obj) noexcept {
-  auto find_cond = [&obj](const MapObject &item)
-  {
-    return &item == &obj;
-  };
+void ObjectRegistery::DeleteObject(const MapObject &obj) {
+  auto find_cond = [&obj](const MapObject &item) { return &item == &obj; };
 
   auto it = std::find_if(objects_.begin(), objects_.end(), find_cond);
-  if(it != objects_.end()) {
+  if (it != objects_.end()) {
     objects_.erase(it);
   }
 }
 
 //------------------------------------------------------------------------------
 //
-void ObjectRegistery::DeleteObject(const MapObject *obj) noexcept {
-  auto find_cond = [&obj](const MapObject &item)
-  {
-    return &item == obj;
-  };
+void ObjectRegistery::DeleteObject(const MapObject *obj) {
+  auto find_cond = [&obj](const MapObject &item) { return &item == obj; };
 
   auto it = std::find_if(objects_.begin(), objects_.end(), find_cond);
-  if(it != objects_.end()) {
+  if (it != objects_.end()) {
     objects_.erase(it);
   }
 }
 
 //------------------------------------------------------------------------------
 //
-const std::vector<ObjectRegistery::MapObject> &ObjectRegistery::GetAllMapObject() const noexcept {
+const std::vector<ObjectRegistery::MapObject>
+    &ObjectRegistery::GetAllMapObject() const {
   return objects_;
 }
 
 //------------------------------------------------------------------------------
 //
-void ObjectRegistery::ClearRegistery() noexcept {
-  objects_.clear();
-}
+void ObjectRegistery::ClearRegistery() { objects_.clear(); }
 
-} // namespace proc_mapping
+}  // namespace proc_mapping

@@ -57,9 +57,9 @@ class MapInterpreter : public DataInterpreter<cv::Mat>,
   //==========================================================================
   // P U B L I C   C / D T O R S
 
-  explicit MapInterpreter(const ros::NodeHandlePtr &nh) noexcept;
+  explicit MapInterpreter(const ros::NodeHandlePtr &nh);
 
-  virtual ~MapInterpreter() noexcept;
+  virtual ~MapInterpreter();
 
   //==========================================================================
   // P U B L I C   M E T H O D S
@@ -67,16 +67,13 @@ class MapInterpreter : public DataInterpreter<cv::Mat>,
   /// The method will update the latest data in the DataInterpreter.
   /// This will run the whole processing chain as the method SetNewData
   /// start it.
-  void OnSubjectNotify(atlas::Subject<cv::Mat> &subject,
-                       cv::Mat args) noexcept override;
+  void OnSubjectNotify(atlas::Subject<cv::Mat> &subject, cv::Mat args) override;
 
  private:
   //==========================================================================
   // P R I V A T E   M E M B E R S
 
   ros::NodeHandlePtr nh_;
-
-  RawMap map_;
 };
 
 }  // namespace proc_mapping
