@@ -51,7 +51,9 @@ MapInterpreter::~MapInterpreter() {}
 //
 void MapInterpreter::OnSubjectNotify(atlas::Subject<cv::Mat> &subject,
                                      cv::Mat args) {
-  SetNewData(args);
+  cv::Mat new_data;
+  args.copyTo(new_data);
+  SetNewData(new_data);
 }
 
 }  // namespace proc_mapping

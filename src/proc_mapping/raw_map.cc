@@ -54,11 +54,13 @@ RawMap::RawMap(const ros::NodeHandlePtr &nh)
   nh->param<std::string>("/proc_mapping/topics/odometry", odometry_topic,
                          "/proc_navigation/odometry");
 
-  int n_bin, w, h;
-  float range;
-  double r, sonar_threshold;
+  int n_bin = 0;
+  int w = 0;
+  int h = 0;
+  double range = 0.;
+  double sonar_threshold = 0.;
   nh->param<int>("/provider_sonar/sonar/n_bins_", n_bin, 400);
-  nh->param<float>("/provider_sonar/sonar/range_", range, 10.0);
+  nh->param<double>("/provider_sonar/sonar/range_", range, 10.0);
 
   nh->param<int>("/proc_mapping/map/width", w, 30);
   nh->param<int>("/proc_mapping/map/height", h, 30);
@@ -68,11 +70,11 @@ RawMap::RawMap(const ros::NodeHandlePtr &nh)
   nh->param<double>("/proc_mapping/map/sub_initial_y", sub_.initial_position.y,
                     15.0);
   nh->param<int>("/proc_mapping/tile/number_of_scanlines", scanlines_per_tile_,
-                 1);
+                 10);
 
   // Resolution is equal to the range of the sonar divide by the number of bin
   // of a scanline.
-  r = range / n_bin;
+  double r = range / n_bin;
 
   SetMapParameters(static_cast<uint32_t>(w), static_cast<uint32_t>(h), r);
   SetPointCloudThreshold(sonar_threshold, r);
@@ -120,8 +122,9 @@ void RawMap::OdomCallback(const nav_msgs::Odometry::ConstPtr &odo_in) {
 //------------------------------------------------------------------------------
 //
 void RawMap::Run() {
-  cv::Point2d initial_position_offset =
-      sub_.initial_position * pixel_.m_to_pixel;
+  cv::Point2d initial_position_offset{
+      sub_.initial_position.x * pixel_.m_to_pixel,
+      sub_.initial_position.y * pixel_.m_to_pixel};
 
   while (IsRunning()) {
     if (new_pcl_ready_ && last_pcl_) {
@@ -129,7 +132,8 @@ void RawMap::Run() {
       new_pcl_ready_ = false;
 
       cv::Point2d sub_coord = CoordinateToPixel(sub_.position);
-      sub_coord += (sub_.initial_position * pixel_.m_to_pixel);
+      sub_coord += (cv::Point2d{sub_.initial_position.x * pixel_.m_to_pixel,
+                                sub_.initial_position.y * pixel_.m_to_pixel});
 
       if (IsMapReadyForProcess()) {
         Notify(pixel_.map);
@@ -142,8 +146,7 @@ void RawMap::Run() {
 //------------------------------------------------------------------------------
 //
 void RawMap::SetPointCloudThreshold(double sonar_threshold, double resolution) {
-  uint32_t numberOfPoints = static_cast<uint32_t>(sonar_threshold / resolution);
-  point_cloud_threshold_ = numberOfPoints;
+  point_cloud_threshold_ = static_cast<uint32_t>(sonar_threshold / resolution);
 }
 
 //------------------------------------------------------------------------------
@@ -180,12 +183,10 @@ void RawMap::ProcessPointCloud(const sensor_msgs::PointCloud2::ConstPtr &msg) {
   std::vector<uint8_t> intensity_map;
   std::vector<cv::Point2i> coordinate_map;
 
-  uint32_t last_bin_index =
-      static_cast<uint32_t>(msg->data.size() / msg->point_step) - 1;
   uint32_t i = 0,
            max_size = static_cast<uint32_t>(msg->data.size() / msg->point_step);
   cv::Point2i bin_coordinate;
-  cv::Point2f offset_sub = sub_.position + sub_.initial_position;
+  cv::Point2d offset_sub = sub_.position + sub_.initial_position;
 
   intensity_map.resize(max_size - point_cloud_threshold_);
   coordinate_map.resize(max_size - point_cloud_threshold_);
@@ -203,8 +204,8 @@ void RawMap::ProcessPointCloud(const sensor_msgs::PointCloud2::ConstPtr &msg) {
     Eigen::Vector3d in(x, y, z), out;
     out = sub_.rotation * in;
 
-    cv::Point2f coordinate_transformed =
-        cv::Point2f(in.x(), in.y()) + offset_sub;
+    cv::Point2d coordinate_transformed =
+        cv::Point2d(in.x(), in.y()) + offset_sub;
 
     bin_coordinate = CoordinateToPixel(coordinate_transformed);
 
@@ -224,8 +225,8 @@ void RawMap::ProcessPointCloud(const sensor_msgs::PointCloud2::ConstPtr &msg) {
     }
   }
 
-  for (int i = 0; i < intensity_map.size(); i++) {
-    UpdateMat(coordinate_map[i], intensity_map[i]);
+  for (size_t j = 0; j < intensity_map.size(); j++) {
+    UpdateMat(coordinate_map[j], intensity_map[j]);
   }
 
   scanline_counter_++;
