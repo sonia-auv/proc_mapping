@@ -36,10 +36,8 @@
 #include "lib_atlas/maths.h"
 #include "lib_atlas/pattern/runnable.h"
 #include <eigen3/Eigen/Geometry>
-
-
-
-#include "proc_mapping/interpreter/raw_map.h"
+#include <proc_mapping/proc_mapping_node.h>
+#include "proc_mapping/raw_map.h"
 
 static const std::string node_prefix("proc_mapping");
 
@@ -47,39 +45,47 @@ class OdometryEmulator : public atlas::Runnable {
  public:
   explicit OdometryEmulator() {
     ros::NodeHandle n("proc_navigation");
-    publisher_ = n.advertise<nav_msgs::Odometry>("Odometry", 100);
+    publisher_ = n.advertise<nav_msgs::Odometry>("odom", 100);
   }
 
   void Run() override
   {
     ros::Rate loop_rate(100);
-    nav_msgs::Odometry msg;
 
-    float yaw = 3*M_PI/2, pitch = M_PI/8, roll = M_PI/4;
+    double yaw = 3*M_PI/2, pitch = M_PI/8, roll = M_PI/4;
     float x = 0.0f, y = 0.0f, z = 0.0f;
-    Eigen::AngleAxisd rollAngle(roll, Eigen::Vector3d::UnitX());
-    Eigen::AngleAxisd pitchAngle(pitch, Eigen::Vector3d::UnitY());
-    Eigen::AngleAxisd yawAngle(yaw, Eigen::Vector3d::UnitZ());
-
-    Eigen::Quaterniond q = yawAngle * pitchAngle * rollAngle ;
-    q.normalize();
-    geometry_msgs::Quaternion quaternion;
-    quaternion.w = q.w();
-    quaternion.x = q.x();
-    quaternion.y = q.y();
-    quaternion.z = q.z();
-    msg.pose.pose.orientation = quaternion;
-    msg.pose.pose.position.x = x;
-    msg.pose.pose.position.y = y;
-    msg.pose.pose.position.z = z;
-
 
     while (!MustStop()) {
+      Eigen::AngleAxisd rollAngle(roll, Eigen::Vector3d::UnitX());
+      Eigen::AngleAxisd pitchAngle(pitch, Eigen::Vector3d::UnitY());
+      Eigen::AngleAxisd yawAngle(yaw, Eigen::Vector3d::UnitZ());
+
+      Eigen::Quaterniond q = yawAngle * pitchAngle * rollAngle ;
+      q.normalize();
+      geometry_msgs::Quaternion quaternion;
+      quaternion.w = q.w();
+      quaternion.x = q.x();
+      quaternion.y = q.y();
+      quaternion.z = q.z();
+      nav_msgs::Odometry msg;
+      msg.pose.pose.orientation = quaternion;
+      msg.pose.pose.position.x = x;
+      msg.pose.pose.position.y = y;
+      msg.pose.pose.position.z = z;
+
       msg.header.stamp = ros::Time::now();
       msg.header.frame_id = "NED";
       publisher_.publish(msg);
       ros::spinOnce();
       loop_rate.sleep();
+
+      // Increasing the values to see the changes.
+      yaw += 0.1;
+      pitch += 0.1;
+      roll += 0.1;
+      x -= 0.01;
+      y += 0.01;
+      z += 0.01;
     }
   }
 
@@ -90,7 +96,7 @@ class OdometryEmulator : public atlas::Runnable {
 class SonarEmulator : public atlas::Runnable  {
  public:
   explicit SonarEmulator() {
-    ros::NodeHandle n("sonar_node");
+    ros::NodeHandle n("provider_sonar");
     publisher_ = n.advertise<sensor_msgs::PointCloud2>("point_cloud2", 100);
   }
 
@@ -203,7 +209,7 @@ TEST(BasicMapping, core_test) {
   sonarEmulator.Start();
   odometryEmulator.Start();
   ros::NodeHandlePtr nh(new ros::NodeHandle(node_prefix.c_str()));
-  proc_mapping::RawMap rawMap(nh);
+  proc_mapping::ProcMappingNode node(nh);
 
   while(ros::ok())
   {
