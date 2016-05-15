@@ -36,7 +36,7 @@ namespace proc_mapping {
 //
 MapInterpreter::MapInterpreter(const ros::NodeHandlePtr &nh)
     : DataInterpreter<cv::Mat>(nh), nh_(nh) {
-  ProcUnit<cv::Mat>::Ptr pu{new PatternDetection};
+  ProcUnit<cv::Mat>::Ptr pu{new PatternDetection(nh_)};
   AddProcUnit(std::move(pu));
 }
 

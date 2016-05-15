@@ -38,11 +38,14 @@ find_package(
     pcl_conversions
     lib_atlas
     sonia_msgs
-        eigen_conversions
+    eigen_conversions
 )
 
 #find_package(catkin REQUIRED cmake_modules)
 #find_package(Eigen REQUIRED)
+
+#===============================================================================
+# G E N E R A T E   M E S S A G E S   &   S E R V I C E S
 
 catkin_package(
     INCLUDE_DIRS ${proc_mapping_SRC_DIR}

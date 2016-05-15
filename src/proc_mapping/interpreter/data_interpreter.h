@@ -112,7 +112,7 @@ class DataInterpreter : public DataInterpreterInterface {
 
  private:
   //============================================================================
-  // P R O T E C T E D   M E M B E R S
+  // P R I V A T E   M E M B E R S
 
   bool new_data_ready_;
 
