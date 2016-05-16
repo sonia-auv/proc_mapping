@@ -41,12 +41,11 @@ RawMap::RawMap(const ros::NodeHandlePtr &nh)
       points2_sub_(),
       odom_sub_(),
       point_cloud_threshold_(0),
-      hit_count_(0),
       new_pcl_ready_(false),
       last_pcl_(nullptr),
+      is_map_ready_for_process_(false),
       scanlines_for_process_(0),
       scanline_counter_(0),
-      is_map_ready_for_process_(false),
       is_first_odom_(true) {
   std::string point_cloud_topic;
   std::string odometry_topic;
