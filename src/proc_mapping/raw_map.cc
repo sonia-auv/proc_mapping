@@ -66,8 +66,8 @@ RawMap::RawMap(const ros::NodeHandlePtr &nh)
   nh->param<int>("/proc_mapping/map/width", w, 30);
   nh->param<int>("/proc_mapping/map/height", h, 30);
   nh->param<double>("/proc_mapping/map/sonar_threshold", sonar_threshold, 1.0);
-  nh->param<int>("/proc_mapping/tile/number_of_scanlines", scanlines_for_process_,
-                 10);
+  nh->param<int>("/proc_mapping/tile/number_of_scanlines",
+                 scanlines_for_process_, 10);
 
   // Resolution is equal to the range of the sonar divide by the number of bin
   // of a scanline.
@@ -96,7 +96,7 @@ void RawMap::PointCloudCallback(
 //------------------------------------------------------------------------------
 //
 void RawMap::OdomCallback(const nav_msgs::Odometry::ConstPtr &odo_in) {
-  if(is_first_odom_) {
+  if (is_first_odom_) {
     sub_.initial_position.x = odo_in.get()->pose.pose.position.x;
     sub_.initial_position.y = odo_in.get()->pose.pose.position.y;
     is_first_odom_ = false;
@@ -178,7 +178,8 @@ void RawMap::ProcessPointCloud(const sensor_msgs::PointCloud2::ConstPtr &msg) {
            max_size = static_cast<uint32_t>(msg->data.size() / msg->point_step);
   cv::Point2i bin_coordinate;
 
-  auto sub_position = sub_.position - sub_.initial_position + GetPositionOffset();
+  auto sub_position =
+      sub_.position - sub_.initial_position + GetPositionOffset();
 
   intensity_map.resize(max_size - point_cloud_threshold_);
   coordinate_map.resize(max_size - point_cloud_threshold_);
@@ -257,7 +258,7 @@ bool RawMap::IsMapReadyForProcess() { return is_map_ready_for_process_; }
 //------------------------------------------------------------------------------
 //
 cv::Point2d RawMap::GetPositionOffset() const {
-  return {world_.width/2, world_.height/2};
+  return {world_.width / 2, world_.height / 2};
 }
 
 }  // namespace proc_mapping
