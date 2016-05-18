@@ -113,9 +113,9 @@ class RawMap : public atlas::Subject<cv::Mat>, public atlas::Runnable {
 
   void ProcessPointCloud(const sensor_msgs::PointCloud2::ConstPtr &msg);
 
-  void UpdateMat(const cv::Point2d &p, const uint8_t &intensity);
+  void UpdateMat(const cv::Point2i &p, const uint8_t &intensity);
 
-  cv::Point2d CoordinateToPixel(const cv::Point2d &p);
+  cv::Point2i CoordinateToPixel(const cv::Point2d &p);
 
   /// We want the submarine to be in the center of the raw map.
   /// Thus, we are going to offset it by the half of the map size.

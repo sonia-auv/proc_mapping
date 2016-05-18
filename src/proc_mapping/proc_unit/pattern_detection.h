@@ -73,8 +73,6 @@ class PatternDetection : public ProcUnit<cv::Mat> {
 //    cv::rectangle(buoy_template, cv::Point2i(16, 0), cv::Point2i(24, 40),
 //                  cv::Scalar(255), CV_FILLED);
 
-
-
     // Create the result matrix
     int result_cols = input.cols;
     int result_rows = input.rows;
@@ -93,7 +91,7 @@ class PatternDetection : public ProcUnit<cv::Mat> {
 
     minMaxLoc(result, &minVal, &maxVal, &minLoc, &maxLoc, cv::Mat());
 
-    if (maxVal >= 0.8) {
+    if (maxVal >= 0.3) {
       matchLoc = maxLoc;
 
       /// Show me what you got
@@ -108,13 +106,13 @@ class PatternDetection : public ProcUnit<cv::Mat> {
   }
 
  private:
-//==========================================================================
-// P R I V A T E   M E M B E R S
+ //==========================================================================
+ // P R I V A T E   M E M B E R S
 
   ros::NodeHandlePtr nh_;
   ros::ServiceServer template_server_;
 
-  std::string obstacle_template_path_ = "/root/Workspaces/ros_sonia_ws/src/proc_mapping/template/buoy_template.png";
+  std::string obstacle_template_path_ = "/root/Workspaces/ros_sonia_ws/src/proc_mapping/template/buoy_template2.png";
 
 };
 

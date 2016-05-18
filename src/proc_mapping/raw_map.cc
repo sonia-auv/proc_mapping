@@ -54,7 +54,7 @@ RawMap::RawMap(const ros::NodeHandlePtr &nh)
   nh->param<std::string>("/proc_mapping/topics/point_cloud2", point_cloud_topic,
                          "/provider_sonar/point_cloud2");
   nh->param<std::string>("/proc_mapping/topics/odometry", odometry_topic,
-                         "/proc_navigation/odometry");
+                         "/proc_navigation/odom");
 
   int n_bin = 0;
   int w = 0;
@@ -103,13 +103,17 @@ void RawMap::OdomCallback(const nav_msgs::Odometry::ConstPtr &odo_in) {
     is_first_odom_ = false;
   }
 
-  // - Generate 3x3 transformation matrix from Quaternions
+  //  Generate 3x3 transformation matrix from Quaternions
   auto orientation = &odo_in.get()->pose.pose.orientation;
   Eigen::Quaterniond quaterniond(orientation->w, orientation->x, orientation->y,
                                  orientation->z);
+  //  The quaternion is required to be normalized, otherwise the result is
+  //  undefined.
+  quaterniond.normalized();
+
   Eigen::Matrix3d rotation;
   rotation = quaterniond.toRotationMatrix();
-  // - Set all odometry values that will be use in the cv::mat update thread
+  //  Set all odometry values that will be use in the cv::mat update thread
   Eigen::Vector3d euler_vec = rotation.eulerAngles(0, 1, 2);
   double roll = euler_vec.x();
   double pitch = euler_vec.y();
@@ -127,13 +131,15 @@ void RawMap::OdomCallback(const nav_msgs::Odometry::ConstPtr &odo_in) {
 //
 void RawMap::Run() {
   while (IsRunning()) {
-    if (new_pcl_ready_ && last_pcl_) {
-      ProcessPointCloud(last_pcl_);
-      new_pcl_ready_ = false;
+    if (is_first_odom_ == false) {
+      if (new_pcl_ready_ && last_pcl_) {
+        ProcessPointCloud(last_pcl_);
+        new_pcl_ready_ = false;
 
-      if (IsMapReadyForProcess()) {
-        Notify(pixel_.map);
-        is_map_ready_for_process_ = false;
+        if (IsMapReadyForProcess()) {
+          Notify(pixel_.map);
+          is_map_ready_for_process_ = false;
+        }
       }
     }
   }
@@ -164,13 +170,14 @@ void RawMap::SetMapParameters(const size_t &w, const size_t &h,
             << " Height= " << pixel_.height << std::endl;
   std::cout << "Resolution in meter: " << r << std::endl;
 
-  // - Keeps the number of hits for each pixels
+  //  Keeps the number of hits for each pixels
   pixel_.number_of_hits_.resize(pixel_.width * pixel_.height, 0);
 }
 
 //------------------------------------------------------------------------------
 //
 void RawMap::ProcessPointCloud(const sensor_msgs::PointCloud2::ConstPtr &msg) {
+  bool debug = false;
   float x = 0, y = 0, z = 0, intensity = 0;
   std::vector<uint8_t> intensity_map;
   std::vector<cv::Point2i> coordinate_map;
@@ -179,47 +186,70 @@ void RawMap::ProcessPointCloud(const sensor_msgs::PointCloud2::ConstPtr &msg) {
            max_size = static_cast<uint32_t>(msg->data.size() / msg->point_step);
   cv::Point2i bin_coordinate;
 
-  auto sub_position = sub_.position - sub_.initial_position + GetPositionOffset();
+  cv::Point2d sub_position = sub_.position + GetPositionOffset();
 
-  intensity_map.resize(max_size - point_cloud_threshold_);
-  coordinate_map.resize(max_size - point_cloud_threshold_);
+  double scanline_length = 10;
 
-  uint8_t number_of_bin = 0;
+  cv::Point2d heading(cos(sub_.yaw) * scanline_length, sin(sub_.yaw) * scanline_length);
+
+  heading += GetPositionOffset();
+
+  heading = CoordinateToPixel(heading);
+
+  cv::Point2d left_limit(cos(sub_.yaw - 0.785398) * scanline_length, sin(sub_.yaw - 0.785398) * scanline_length);
+  cv::Point2d rigth_limit(cos(sub_.yaw + 0.785398) * scanline_length, sin(sub_.yaw + 0.785398) * scanline_length);
+
+  left_limit += GetPositionOffset();
+  rigth_limit += GetPositionOffset();
+
+  left_limit = CoordinateToPixel(left_limit);
+  rigth_limit = CoordinateToPixel(rigth_limit);
+
+  intensity_map.resize(max_size);
+  coordinate_map.resize(max_size);
 
   for (i = 0; i < max_size; i++) {
     int step = i * msg->point_step;
     memcpy(&x, &msg->data[step + msg->fields[0].offset], sizeof(float));
     memcpy(&y, &msg->data[step + msg->fields[1].offset], sizeof(float));
     memcpy(&z, &msg->data[step + msg->fields[2].offset], sizeof(float));
-    memcpy(&intensity, &msg->data[i * msg->point_step + msg->fields[3].offset],
-           sizeof(float));
+    memcpy(&intensity, &msg->data[step + msg->fields[3].offset], sizeof(float));
 
-    Eigen::Vector3d in(x, y, z), out;
+    Eigen::Vector3d in(x, -1 * y, z), out;
+
     out = sub_.rotation * in;
-
-    cv::Point2d coordinate_transformed =
-        cv::Point2d(in.x(), in.y()) + sub_position;
-
+    cv::Point2d out_point(out.x(),out.y());
+    cv::Point2d coordinate_transformed(out_point + sub_position);
     bin_coordinate = CoordinateToPixel(coordinate_transformed);
 
+    bin_coordinate.y = (pixel_.width/2) - bin_coordinate.y + (pixel_.width/2);
+
     uint8_t threat_intensity = static_cast<uint8_t>(255.0f * intensity);
-    if (threat_intensity > 5) {
-      threat_intensity += 200;
-      number_of_bin++;
-    }
 
     if (i > point_cloud_threshold_) {
-      if (number_of_bin < 15) {
-        intensity_map[i - point_cloud_threshold_] = threat_intensity;
-      } else {
-        intensity_map[i - point_cloud_threshold_] = 0;
-      }
-      coordinate_map[i - point_cloud_threshold_] = bin_coordinate;
+      intensity_map[i] = threat_intensity;
+      coordinate_map[i] = bin_coordinate;
     }
   }
 
-  for (size_t j = 0; j < intensity_map.size(); j++) {
+  for (size_t j = 0; j < intensity_map.size() - 1; j++) {
     UpdateMat(coordinate_map[j], intensity_map[j]);
+  }
+
+  if (debug) {
+  cv::Mat sub_heading(pixel_.width, pixel_.height, CV_8UC1);
+  cv::line(pixel_.map, cv::Point2d(pixel_.width/2, pixel_.height/2), cv::Point2d(pixel_.width/2, 0), cv::Scalar::all(255));
+  cv::line(pixel_.map, cv::Point2d(pixel_.width/2, pixel_.height/2), cv::Point2d(pixel_.height, pixel_.height/2), cv::Scalar::all(255));
+
+  cv::Point2d sub = CoordinateToPixel(sub_position);
+  sub.y = (pixel_.width/2) - sub.y + (pixel_.width/2);
+
+  cv::circle(sub_heading, sub, 2, cv::Scalar::all(255), -1);
+  cv::circle(pixel_.map, sub, 2, cv::Scalar::all(255), -1);
+  cv::line(sub_heading, sub, heading, cv::Scalar::all(255));
+  cv::line(sub_heading, sub, left_limit, cv::Scalar::all(100));
+  cv::line(sub_heading, sub, rigth_limit, cv::Scalar::all(100));
+  cv::imshow("heading", sub_heading);
   }
 
   scanline_counter_++;
@@ -231,23 +261,20 @@ void RawMap::ProcessPointCloud(const sensor_msgs::PointCloud2::ConstPtr &msg) {
 
 //------------------------------------------------------------------------------
 //
-void RawMap::UpdateMat(const cv::Point2d &p, const uint8_t &intensity) {
-  if (static_cast<int>(p.x) < pixel_.width &&
-      static_cast<int>(p.y) < pixel_.height) {
+void RawMap::UpdateMat(const cv::Point2i &p, const uint8_t &intensity) {
+  if (p.x < pixel_.width && p.y < pixel_.height) {
     // - Infinite mean
-    pixel_.number_of_hits_.at((unsigned long)(p.x + p.y * pixel_.width))++;
-    int n =
-        pixel_.number_of_hits_.at((unsigned long)(p.x + p.y * pixel_.width)) +
-        1;
-    pixel_.map.at<uint8_t>((int)p.y, (int)p.x) = static_cast<uint8_t>(
-        intensity / n +
-        pixel_.map.at<uint8_t>((int)p.y, (int)p.x) * (n - 1) / n);
+    int position = p.x + p.y * pixel_.width;
+    pixel_.number_of_hits_.at(static_cast<unsigned long>(position))++;
+    int n = pixel_.number_of_hits_.at(static_cast<unsigned long>(position)) + 1;
+    pixel_.map.at<uint8_t>(p.y, p.x) = static_cast<uint8_t>(intensity
+        / n + pixel_.map.at<uint8_t>(p.y, p.x) * (n - 1) / n);
   }
 }
 
 //------------------------------------------------------------------------------
 //
-cv::Point2d RawMap::CoordinateToPixel(const cv::Point2d &p) {
+cv::Point2i RawMap::CoordinateToPixel(const cv::Point2d &p) {
   return p * pixel_.m_to_pixel;
 }
 
