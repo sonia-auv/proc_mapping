@@ -108,7 +108,7 @@ DataInterpreter<Tp_>::ProcessData() {
   }
   auto objects = ObjectRegistery::GetInstance().GetAllMapObject();
   ObjectRegistery::GetInstance().ClearRegistery();
-  return std::move(objects);
+  return objects;
 }
 
 }  // namespace proc_mapping

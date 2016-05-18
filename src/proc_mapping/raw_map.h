@@ -133,7 +133,6 @@ class RawMap : public atlas::Subject<cv::Mat>, public atlas::Runnable {
   /// The first data of the sonar may be scrap. Keeping a threshold and starting
   /// to process data after it
   uint32_t point_cloud_threshold_;
-  uint32_t hit_count_;
 
   std::atomic<bool> new_pcl_ready_;
 

@@ -41,12 +41,11 @@ RawMap::RawMap(const ros::NodeHandlePtr &nh)
       points2_sub_(),
       odom_sub_(),
       point_cloud_threshold_(0),
-      hit_count_(0),
       new_pcl_ready_(false),
       last_pcl_(nullptr),
+      is_map_ready_for_process_(false),
       scanlines_for_process_(0),
       scanline_counter_(0),
-      is_map_ready_for_process_(false),
       is_first_odom_(true) {
   std::string point_cloud_topic;
   std::string odometry_topic;
@@ -67,8 +66,8 @@ RawMap::RawMap(const ros::NodeHandlePtr &nh)
   nh->param<int>("/proc_mapping/map/width", w, 30);
   nh->param<int>("/proc_mapping/map/height", h, 30);
   nh->param<double>("/proc_mapping/map/sonar_threshold", sonar_threshold, 1.0);
-  nh->param<int>("/proc_mapping/tile/number_of_scanlines", scanlines_for_process_,
-                 10);
+  nh->param<int>("/proc_mapping/tile/number_of_scanlines",
+                 scanlines_for_process_, 10);
 
   // Resolution is equal to the range of the sonar divide by the number of bin
   // of a scanline.
@@ -97,7 +96,7 @@ void RawMap::PointCloudCallback(
 //------------------------------------------------------------------------------
 //
 void RawMap::OdomCallback(const nav_msgs::Odometry::ConstPtr &odo_in) {
-  if(is_first_odom_) {
+  if (is_first_odom_) {
     sub_.initial_position.x = odo_in.get()->pose.pose.position.x;
     sub_.initial_position.y = odo_in.get()->pose.pose.position.y;
     is_first_odom_ = false;
@@ -186,13 +185,14 @@ void RawMap::ProcessPointCloud(const sensor_msgs::PointCloud2::ConstPtr &msg) {
            max_size = static_cast<uint32_t>(msg->data.size() / msg->point_step);
   cv::Point2i bin_coordinate;
 
-  cv::Point2d sub_position = sub_.position + GetPositionOffset();
-
   double scanline_length = 10;
 
   cv::Point2d heading(cos(sub_.yaw) * scanline_length, sin(sub_.yaw) * scanline_length);
 
   heading += GetPositionOffset();
+
+  auto sub_position =
+      sub_.position - sub_.initial_position + GetPositionOffset();
 
   heading = CoordinateToPixel(heading);
 
@@ -285,7 +285,7 @@ bool RawMap::IsMapReadyForProcess() { return is_map_ready_for_process_; }
 //------------------------------------------------------------------------------
 //
 cv::Point2d RawMap::GetPositionOffset() const {
-  return {world_.width/2, world_.height/2};
+  return {world_.width / 2, world_.height / 2};
 }
 
 }  // namespace proc_mapping
