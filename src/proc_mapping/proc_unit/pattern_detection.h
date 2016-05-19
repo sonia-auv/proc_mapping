@@ -70,8 +70,8 @@ class PatternDetection : public ProcUnit<cv::Mat> {
                                CV_LOAD_IMAGE_GRAYSCALE);
 //    buoy_template.create(40, 40, CV_8UC1);
 //    buoy_template.setTo(cv::Scalar(0));
-//    cv::rectangle(buoy_template, cv::Point2i(16, 0), cv::Point2i(24, 40),
-//                  cv::Scalar(255), CV_FILLED);
+//    cv::circle(buoy_template, cv::Point2i(20, 20), 15,
+//                  cv::Scalar(255));
 
     // Create the result matrix
     int result_cols = input.cols;
@@ -89,18 +89,20 @@ class PatternDetection : public ProcUnit<cv::Mat> {
     cv::Point maxLoc;
     cv::Point matchLoc;
 
-    minMaxLoc(result, &minVal, &maxVal, &minLoc, &maxLoc, cv::Mat());
+//    for (int k = 0; k <= 3; k++) {
+      minMaxLoc(result, &minVal, &maxVal, &minLoc, &maxLoc, cv::Mat());
+//      result.at<double>(minLoc.x,minLoc.y)= 1.0;
 
-    if (maxVal >= 0.3) {
-      matchLoc = maxLoc;
+      if (maxVal >= 0.4) {
+        matchLoc = maxLoc;
 
-      /// Show me what you got
-      rectangle(input, matchLoc, cv::Point(matchLoc.x + buoy_template.cols,
-                                           matchLoc.y + buoy_template.rows),
-                cv::Scalar::all(255), 2, 8, 0);
-    }
-
-    cv::imshow("display Map", input);
+        /// Show me what you got
+        rectangle(input, matchLoc, cv::Point(matchLoc.x + buoy_template.cols,
+                                             matchLoc.y + buoy_template.rows),
+                  cv::Scalar::all(255), 2, 8, 0);
+      }
+//    }
+    cv::imshow("Pattern Detection Map", input);
     cv::imshow("buoy", buoy_template);
     cv::waitKey(1);
   }
@@ -112,7 +114,7 @@ class PatternDetection : public ProcUnit<cv::Mat> {
   ros::NodeHandlePtr nh_;
   ros::ServiceServer template_server_;
 
-  std::string obstacle_template_path_ = "/root/Workspaces/ros_sonia_ws/src/proc_mapping/template/buoy_template2.png";
+  std::string obstacle_template_path_ = "/root/Workspaces/ros_sonia_ws/src/proc_mapping/template/buoy_template.png";
 
 };
 

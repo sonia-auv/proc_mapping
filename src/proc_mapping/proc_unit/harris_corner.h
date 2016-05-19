@@ -53,7 +53,7 @@ class HarrisCorner : public ProcUnit<cv::Mat> {
 
   virtual void ProcessData(cv::Mat &input) override {
     cv::Mat dst, dst_norm, dst_norm_scaled;
-    dst = cv::Mat::zeros(displayMap.size(), CV_32FC1);
+    dst = cv::Mat::zeros(input.size(), CV_32FC1);
 
     /// Detector parameters
     int blockSize = 2;
@@ -61,25 +61,22 @@ class HarrisCorner : public ProcUnit<cv::Mat> {
     double k = 0.04;
 
     /// Detecting corners
-    cornerHarris(displayMap, dst, blockSize, apertureSize, k,
-                 cv::BORDER_DEFAULT);
+    cv::cornerHarris(input, dst, blockSize, apertureSize, k, cv::BORDER_DEFAULT);
 
     /// Normalizing
-    normalize(dst, dst_norm, 0, 255, cv::NORM_MINMAX, CV_32FC1, cv::Mat());
-    convertScaleAbs(dst_norm, dst_norm_scaled);
+    cv::normalize(dst, dst_norm, 0, 255, cv::NORM_MINMAX, CV_32FC1, cv::Mat());
+    cv::convertScaleAbs(dst_norm, dst_norm_scaled);
 
     /// Drawing a circle around corners
     for (int j = 0; j < dst_norm.rows; j++) {
       for (int i = 0; i < dst_norm.cols; i++) {
-        pixel_.number_of_hits_POI_.at(j + i * pixel_.width)++;
         if ((int)dst_norm.at<float>(j, i) > 240) {
-          circle(displayMap, cv::Point(i, j), 5, cv::Scalar(255), 2, 8, 0);
-          int n = pixel_.number_of_hits_POI_.at(j + i * pixel_.width) + 1;
-          pixel_.map_poi.at<uint8_t>(j, i) = static_cast<uint8_t>(
-              255 / n + pixel_.map_poi.at<uint8_t>(j, i) * (n - 1) / n);
+          cv::circle(input, cv::Point(i, j), 5, cv::Scalar(255), 2, 8, 0);
         }
       }
     }
+
+    cv::imshow("Harris Corner", input);
   }
 };
 

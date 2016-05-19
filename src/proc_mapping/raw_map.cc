@@ -63,8 +63,8 @@ RawMap::RawMap(const ros::NodeHandlePtr &nh)
   nh->param<int>("/provider_sonar/sonar/n_bins_", n_bin, 400);
   nh->param<double>("/provider_sonar/sonar/range_", range, 10.0);
 
-  nh->param<int>("/proc_mapping/map/width", w, 30);
-  nh->param<int>("/proc_mapping/map/height", h, 30);
+  nh->param<int>("/proc_mapping/map/width", w, 20);
+  nh->param<int>("/proc_mapping/map/height", h, 20);
   nh->param<double>("/proc_mapping/map/sonar_threshold", sonar_threshold, 1.0);
   nh->param<int>("/proc_mapping/tile/number_of_scanlines",
                  scanlines_for_process_, 10);
@@ -191,8 +191,7 @@ void RawMap::ProcessPointCloud(const sensor_msgs::PointCloud2::ConstPtr &msg) {
 
   heading += GetPositionOffset();
 
-  auto sub_position =
-      sub_.position - sub_.initial_position + GetPositionOffset();
+  cv::Point2d sub_position = sub_.position + GetPositionOffset();
 
   heading = CoordinateToPixel(heading);
 
@@ -225,6 +224,10 @@ void RawMap::ProcessPointCloud(const sensor_msgs::PointCloud2::ConstPtr &msg) {
     bin_coordinate.y = (pixel_.width/2) - bin_coordinate.y + (pixel_.width/2);
 
     uint8_t threat_intensity = static_cast<uint8_t>(255.0f * intensity);
+
+    if (threat_intensity > 5) {
+      threat_intensity += 100;
+    }
 
     if (i > point_cloud_threshold_) {
       intensity_map[i] = threat_intensity;

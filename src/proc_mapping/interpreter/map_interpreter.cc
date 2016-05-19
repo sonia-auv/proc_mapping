@@ -25,7 +25,9 @@
 
 #include "proc_mapping/interpreter/map_interpreter.h"
 #include <tf/transform_datatypes.h>
+#include <proc_mapping/proc_unit/harris_corner.h>
 #include "proc_mapping/proc_unit/pattern_detection.h"
+#include "proc_mapping/proc_unit/means_denoising.h"
 
 namespace proc_mapping {
 
@@ -36,6 +38,8 @@ namespace proc_mapping {
 //
 MapInterpreter::MapInterpreter(const ros::NodeHandlePtr &nh)
     : DataInterpreter<cv::Mat>(nh), nh_(nh) {
+//  ProcUnit<cv::Mat>::Ptr uu{new MeansDenoising()};
+//  AddProcUnit(std::move(uu));
   ProcUnit<cv::Mat>::Ptr pu{new PatternDetection(nh_)};
   AddProcUnit(std::move(pu));
 }
