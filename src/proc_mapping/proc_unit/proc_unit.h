@@ -38,7 +38,7 @@ namespace proc_mapping {
  * allow us to connect an output to a different one depending on the type
  * (e.g. not the same input/output types)
  */
-template <class Tp_, class Up_ = std::string>
+template <class Tp_>
 class ProcUnit {
  public:
   //==========================================================================
