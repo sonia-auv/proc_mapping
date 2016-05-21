@@ -187,7 +187,8 @@ void RawMap::ProcessPointCloud(const sensor_msgs::PointCloud2::ConstPtr &msg) {
 
   double scanline_length = 10;
 
-  cv::Point2d heading(cos(sub_.yaw) * scanline_length, sin(sub_.yaw) * scanline_length);
+  cv::Point2d heading(cos(sub_.yaw) * scanline_length,
+                      sin(sub_.yaw) * scanline_length);
 
   heading += GetPositionOffset();
 
@@ -195,8 +196,10 @@ void RawMap::ProcessPointCloud(const sensor_msgs::PointCloud2::ConstPtr &msg) {
 
   heading = CoordinateToPixel(heading);
 
-  cv::Point2d left_limit(cos(sub_.yaw - 0.785398) * scanline_length, sin(sub_.yaw - 0.785398) * scanline_length);
-  cv::Point2d rigth_limit(cos(sub_.yaw + 0.785398) * scanline_length, sin(sub_.yaw + 0.785398) * scanline_length);
+  cv::Point2d left_limit(cos(sub_.yaw - 0.785398) * scanline_length,
+                         sin(sub_.yaw - 0.785398) * scanline_length);
+  cv::Point2d rigth_limit(cos(sub_.yaw + 0.785398) * scanline_length,
+                          sin(sub_.yaw + 0.785398) * scanline_length);
 
   left_limit += GetPositionOffset();
   rigth_limit += GetPositionOffset();
@@ -217,11 +220,12 @@ void RawMap::ProcessPointCloud(const sensor_msgs::PointCloud2::ConstPtr &msg) {
     Eigen::Vector3d in(x, -1 * y, z), out;
 
     out = sub_.rotation * in;
-    cv::Point2d out_point(out.x(),out.y());
+    cv::Point2d out_point(out.x(), out.y());
     cv::Point2d coordinate_transformed(out_point + sub_position);
     bin_coordinate = CoordinateToPixel(coordinate_transformed);
 
-    bin_coordinate.y = (pixel_.width/2) - bin_coordinate.y + (pixel_.width/2);
+    bin_coordinate.y =
+        (pixel_.width / 2) - bin_coordinate.y + (pixel_.width / 2);
 
     uint8_t threat_intensity = static_cast<uint8_t>(255.0f * intensity);
 
@@ -240,19 +244,22 @@ void RawMap::ProcessPointCloud(const sensor_msgs::PointCloud2::ConstPtr &msg) {
   }
 
   if (debug) {
-  cv::Mat sub_heading(pixel_.width, pixel_.height, CV_8UC1);
-  cv::line(pixel_.map, cv::Point2d(pixel_.width/2, pixel_.height/2), cv::Point2d(pixel_.width/2, 0), cv::Scalar::all(255));
-  cv::line(pixel_.map, cv::Point2d(pixel_.width/2, pixel_.height/2), cv::Point2d(pixel_.height, pixel_.height/2), cv::Scalar::all(255));
+    cv::Mat sub_heading(pixel_.width, pixel_.height, CV_8UC1);
+    cv::line(pixel_.map, cv::Point2d(pixel_.width / 2, pixel_.height / 2),
+             cv::Point2d(pixel_.width / 2, 0), cv::Scalar::all(255));
+    cv::line(pixel_.map, cv::Point2d(pixel_.width / 2, pixel_.height / 2),
+             cv::Point2d(pixel_.height, pixel_.height / 2),
+             cv::Scalar::all(255));
 
-  cv::Point2d sub = CoordinateToPixel(sub_position);
-  sub.y = (pixel_.width/2) - sub.y + (pixel_.width/2);
+    cv::Point2d sub = CoordinateToPixel(sub_position);
+    sub.y = (pixel_.width / 2) - sub.y + (pixel_.width / 2);
 
-  cv::circle(sub_heading, sub, 2, cv::Scalar::all(255), -1);
-  cv::circle(pixel_.map, sub, 2, cv::Scalar::all(255), -1);
-  cv::line(sub_heading, sub, heading, cv::Scalar::all(255));
-  cv::line(sub_heading, sub, left_limit, cv::Scalar::all(100));
-  cv::line(sub_heading, sub, rigth_limit, cv::Scalar::all(100));
-  cv::imshow("heading", sub_heading);
+    cv::circle(sub_heading, sub, 2, cv::Scalar::all(255), -1);
+    cv::circle(pixel_.map, sub, 2, cv::Scalar::all(255), -1);
+    cv::line(sub_heading, sub, heading, cv::Scalar::all(255));
+    cv::line(sub_heading, sub, left_limit, cv::Scalar::all(100));
+    cv::line(sub_heading, sub, rigth_limit, cv::Scalar::all(100));
+    cv::imshow("heading", sub_heading);
   }
 
   scanline_counter_++;
@@ -270,8 +277,8 @@ void RawMap::UpdateMat(const cv::Point2i &p, const uint8_t &intensity) {
     int position = p.x + p.y * pixel_.width;
     pixel_.number_of_hits_.at(static_cast<unsigned long>(position))++;
     int n = pixel_.number_of_hits_.at(static_cast<unsigned long>(position)) + 1;
-    pixel_.map.at<uint8_t>(p.y, p.x) = static_cast<uint8_t>(intensity
-        / n + pixel_.map.at<uint8_t>(p.y, p.x) * (n - 1) / n);
+    pixel_.map.at<uint8_t>(p.y, p.x) = static_cast<uint8_t>(
+        intensity / n + pixel_.map.at<uint8_t>(p.y, p.x) * (n - 1) / n);
   }
 }
 

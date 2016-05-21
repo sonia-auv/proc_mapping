@@ -47,14 +47,14 @@ class MeansDenoising : public ProcUnit<cv::Mat> {
   //==========================================================================
   // P U B L I C   C / D T O R S
 
-  MeansDenoising() { };
+  MeansDenoising(){};
 
   virtual ~MeansDenoising() = default;
 
   //==========================================================================
   // P U B L I C   M E T H O D S
 
-/// Global Variables
+  /// Global Variables
   int DELAY_CAPTION = 1500;
   int DELAY_BLUR = 100;
   int MAX_KERNEL_LENGTH = 10;
@@ -66,33 +66,33 @@ class MeansDenoising : public ProcUnit<cv::Mat> {
   int kernel_size = 5;
   int const max_kernel_size = 10;
 
-  Mat src; Mat dst;
+  Mat src;
+  Mat dst;
   Mat detected_edges;
 
   virtual void ProcessData(cv::Mat &input) override {
+    //    /// Load the source image
+    //    src = input;
+    //
+    //    dst = src.clone();
+    //    dst = Mat::zeros( src.size(), src.type() );
+    //
+    //    for ( int i = 1; i < MAX_KERNEL_LENGTH; i = i + 2 )
+    //    { GaussianBlur( input, input, Size( i, i ), 10, 0 ); }
+    //    createTrackbar( "Min Threshold:", "Edge Map", &lowThreshold,
+    //    max_lowThreshold);
+    //    createTrackbar( "Kernel size", "Edge Map", &kernel_size,
+    //    max_kernel_size);
+    //    createTrackbar( "ration", "Edge Map", &ratio, max_ratio);
+    //
+    //    Canny( input, input, lowThreshold, lowThreshold*ratio, kernel_size );
 
-//    /// Load the source image
-//    src = input;
-//
-//    dst = src.clone();
-//    dst = Mat::zeros( src.size(), src.type() );
-//
-//    for ( int i = 1; i < MAX_KERNEL_LENGTH; i = i + 2 )
-//    { GaussianBlur( input, input, Size( i, i ), 10, 0 ); }
-//    createTrackbar( "Min Threshold:", "Edge Map", &lowThreshold, max_lowThreshold);
-//    createTrackbar( "Kernel size", "Edge Map", &kernel_size, max_kernel_size);
-//    createTrackbar( "ration", "Edge Map", &ratio, max_ratio);
-//
-//    Canny( input, input, lowThreshold, lowThreshold*ratio, kernel_size );
+    //    imshow("Edge Map", input);
 
-//    imshow("Edge Map", input);
-
-//    imshow("TAMERE", dst);
-
+    //    imshow("TAMERE", dst);
   }
-
 };
 
 }  // namespace proc_mapping
 
-#endif //PROC_MAPPING_MEANS_DENOISING_H
+#endif  // PROC_MAPPING_MEANS_DENOISING_H

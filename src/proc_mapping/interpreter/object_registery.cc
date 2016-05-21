@@ -28,18 +28,28 @@
 namespace proc_mapping {
 
 //==============================================================================
+// C / D T O R S   S E C T I O N
+
+//------------------------------------------------------------------------------
+//
+ObjectRegistery::ObjectRegistery() : objects_({}), object_mutex_() {}
+
+//==============================================================================
 // M E T H O D   S E C T I O N
 
 //------------------------------------------------------------------------------
 //
-void ObjectRegistery::AddObject(const MapObject &obj) {
+void ObjectRegistery::AddObject(const MapObjectPtr &obj) {
+  std::lock_guard<std::mutex> guard(object_mutex_);
   objects_.push_back(obj);
 }
 
 //------------------------------------------------------------------------------
 //
-void ObjectRegistery::DeleteObject(const MapObject &obj) {
-  auto find_cond = [&obj](const MapObject &item) { return &item == &obj; };
+void ObjectRegistery::DeleteObject(const MapObjectPtr &obj) {
+  std::lock_guard<std::mutex> guard(object_mutex_);
+  auto find_cond = [&obj](const MapObjectPtr &item) { return &(*item) ==
+      &(*obj); };
 
   auto it = std::find_if(objects_.begin(), objects_.end(), find_cond);
   if (it != objects_.end()) {
@@ -49,24 +59,17 @@ void ObjectRegistery::DeleteObject(const MapObject &obj) {
 
 //------------------------------------------------------------------------------
 //
-void ObjectRegistery::DeleteObject(const MapObject *obj) {
-  auto find_cond = [&obj](const MapObject &item) { return &item == obj; };
-
-  auto it = std::find_if(objects_.begin(), objects_.end(), find_cond);
-  if (it != objects_.end()) {
-    objects_.erase(it);
-  }
-}
-
-//------------------------------------------------------------------------------
-//
-const std::vector<ObjectRegistery::MapObject>
+const ObjectRegistery::MapObjectPtrList
     &ObjectRegistery::GetAllMapObject() const {
+  std::lock_guard<std::mutex> guard(object_mutex_);
   return objects_;
 }
 
 //------------------------------------------------------------------------------
 //
-void ObjectRegistery::ClearRegistery() { objects_.clear(); }
+void ObjectRegistery::ClearRegistery() {
+  std::lock_guard<std::mutex> guard(object_mutex_);
+  objects_.clear();
+}
 
 }  // namespace proc_mapping

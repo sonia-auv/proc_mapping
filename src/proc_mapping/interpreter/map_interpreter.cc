@@ -24,10 +24,10 @@
  */
 
 #include "proc_mapping/interpreter/map_interpreter.h"
-#include <tf/transform_datatypes.h>
 #include <proc_mapping/proc_unit/harris_corner.h>
-#include "proc_mapping/proc_unit/pattern_detection.h"
+#include <tf/transform_datatypes.h>
 #include "proc_mapping/proc_unit/means_denoising.h"
+#include "proc_mapping/proc_unit/pattern_detection.h"
 
 namespace proc_mapping {
 
@@ -37,9 +37,11 @@ namespace proc_mapping {
 //------------------------------------------------------------------------------
 //
 MapInterpreter::MapInterpreter(const ros::NodeHandlePtr &nh)
-    : DataInterpreter<cv::Mat>(nh), nh_(nh) {
-//  ProcUnit<cv::Mat>::Ptr uu{new MeansDenoising()};
-//  AddProcUnit(std::move(uu));
+    : DataInterpreter<cv::Mat>(nh), nh_(nh), raw_map_(nh_) {
+  Observe(raw_map_);
+
+  //  ProcUnit<cv::Mat>::Ptr uu{new MeansDenoising()};
+  //  AddProcUnit(std::move(uu));
   ProcUnit<cv::Mat>::Ptr pu{new PatternDetection(nh_)};
   AddProcUnit(std::move(pu));
 }
@@ -55,9 +57,24 @@ MapInterpreter::~MapInterpreter() {}
 //
 void MapInterpreter::OnSubjectNotify(atlas::Subject<cv::Mat> &subject,
                                      cv::Mat args) {
+  /// We want to recreate a new map everytime so the processed map does not
+  /// interfer with the real one.
   cv::Mat new_data;
   args.copyTo(new_data);
   SetNewData(new_data);
+  ProcessData();
+}
+
+//------------------------------------------------------------------------------
+//
+std::vector<std::shared_ptr<sonia_msgs::MapObject>>
+    MapInterpreter::GetMapObjects() const {
+  auto map_objects = ObjectRegistery::GetInstance().GetAllMapObject();
+  ObjectRegistery::GetInstance().ClearRegistery();
+  std::vector<std::shared_ptr<sonia_msgs::MapObject>> map_obj_msgs;
+  for (const auto & object : map_objects) {
+    raw_map_.
+  }
 }
 
 }  // namespace proc_mapping

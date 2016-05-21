@@ -31,9 +31,7 @@ int main(int argc, char **argv) {
 
   ros::NodeHandlePtr nh(new ros::NodeHandle("~"));
   proc_mapping::ProcMappingNode proc_mapping_node{nh};
+  proc_mapping_node.Spin();
 
-  while (ros::ok()) {
-    ros::spinOnce();
-  }
   return 0;
 }

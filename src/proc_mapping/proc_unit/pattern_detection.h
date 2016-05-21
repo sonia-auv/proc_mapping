@@ -26,9 +26,13 @@
 #ifndef PROC_MAPPING_PATTERN_DETECTION_H
 #define PROC_MAPPING_PATTERN_DETECTION_H
 
+#include <lib_atlas/config.h>
+#include <lib_atlas/macros.h>
 #include <opencv/cv.h>
-#include "proc_mapping/proc_unit/proc_unit.h"
 #include <sonia_msgs/ObstacleTemplate.h>
+#include "proc_mapping/interpreter/object_registery.h"
+#include "proc_mapping/proc_unit/proc_unit.h"
+#include <memory>
 
 namespace proc_mapping {
 
@@ -45,11 +49,13 @@ class PatternDetection : public ProcUnit<cv::Mat> {
   //==========================================================================
   // P U B L I C   C / D T O R S
 
-  PatternDetection(const ros::NodeHandlePtr &nh) : nh_(nh) {
-    template_server_ =
-        nh_->advertiseService("obstacle_template",
-                              &PatternDetection::ObstacleTemplate, this);
-  };
+  PatternDetection(const ros::NodeHandlePtr &nh)
+      : ProcUnit(), nh_(nh), template_server_(), obstacle_template_path_() {
+    template_server_ = nh_->advertiseService(
+        "obstacle_template", &PatternDetection::ObstacleTemplate, this);
+    obstacle_template_path_ =
+        atlas::kWorkspaceRoot + "/src/proc_mapping/template/buoy_template.png";
+  }
 
   virtual ~PatternDetection() = default;
 
@@ -66,12 +72,12 @@ class PatternDetection : public ProcUnit<cv::Mat> {
     cv::Mat result;
 
     cv::Mat buoy_template;
-    buoy_template = cv::imread(obstacle_template_path_,
-                               CV_LOAD_IMAGE_GRAYSCALE);
-//    buoy_template.create(40, 40, CV_8UC1);
-//    buoy_template.setTo(cv::Scalar(0));
-//    cv::circle(buoy_template, cv::Point2i(20, 20), 15,
-//                  cv::Scalar(255));
+    buoy_template =
+        cv::imread(obstacle_template_path_, CV_LOAD_IMAGE_GRAYSCALE);
+    //    buoy_template.create(40, 40, CV_8UC1);
+    //    buoy_template.setTo(cv::Scalar(0));
+    //    cv::circle(buoy_template, cv::Point2i(20, 20), 15,
+    //                  cv::Scalar(255));
 
     // Create the result matrix
     int result_cols = input.cols;
@@ -89,33 +95,40 @@ class PatternDetection : public ProcUnit<cv::Mat> {
     cv::Point maxLoc;
     cv::Point matchLoc;
 
-//    for (int k = 0; k <= 3; k++) {
-      minMaxLoc(result, &minVal, &maxVal, &minLoc, &maxLoc, cv::Mat());
-//      result.at<double>(minLoc.x,minLoc.y)= 1.0;
+    //    for (int k = 0; k <= 3; k++) {
+    minMaxLoc(result, &minVal, &maxVal, &minLoc, &maxLoc, cv::Mat());
+    //      result.at<double>(minLoc.x,minLoc.y)= 1.0;
 
-      if (maxVal >= 0.4) {
-        matchLoc = maxLoc;
+    if (maxVal >= 0.2) {
+      matchLoc = maxLoc;
 
-        /// Show me what you got
-        rectangle(input, matchLoc, cv::Point(matchLoc.x + buoy_template.cols,
-                                             matchLoc.y + buoy_template.rows),
-                  cv::Scalar::all(255), 2, 8, 0);
-      }
+      // Adding the object to the registry.
+      auto map_object = std::make_shared<sonia_msgs::MapObject>();
+      map_object->pose.position.x = matchLoc.x;
+      map_object->pose.position.y = matchLoc.y;
+      ObjectRegistery::GetInstance().AddObject(map_object);
+
+      /// Show me what you got
+      rectangle(input, matchLoc, cv::Point(matchLoc.x + buoy_template.cols,
+                                           matchLoc.y + buoy_template.rows),
+                cv::Scalar::all(255), 2, 8, 0);
+    }
 //    }
+#ifndef OS_DARWIN
     cv::imshow("Pattern Detection Map", input);
     cv::imshow("buoy", buoy_template);
-    cv::waitKey(1);
+    cv::waitKey(0);
+#endif
   }
 
  private:
- //==========================================================================
- // P R I V A T E   M E M B E R S
+  //==========================================================================
+  // P R I V A T E   M E M B E R S
 
   ros::NodeHandlePtr nh_;
   ros::ServiceServer template_server_;
 
-  std::string obstacle_template_path_ = "/root/Workspaces/ros_sonia_ws/src/proc_mapping/template/buoy_template.png";
-
+  std::string obstacle_template_path_;
 };
 
 }  // namespace proc_mapping

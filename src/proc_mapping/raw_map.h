@@ -89,6 +89,9 @@ class RawMap : public atlas::Subject<cv::Mat>, public atlas::Runnable {
   //==========================================================================
   // P U B L I C   M E T H O D S
 
+  /// We have a separate thread for it because we want to sync the odometry
+  /// with the point cloud. We simply check the flags for new data and
+  /// run the processing when needed.
   void Run() override;
 
  private:

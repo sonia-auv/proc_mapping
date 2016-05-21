@@ -40,9 +40,7 @@ namespace proc_mapping {
 //
 template <class Tp_>
 inline DataInterpreter<Tp_>::DataInterpreter(const ros::NodeHandlePtr &nh)
-    : DataInterpreterInterface(nh), new_data_ready_(false), last_data_() {
-  Start();
-}
+    : DataInterpreterInterface(nh), new_data_ready_(false), last_data_() {}
 
 //------------------------------------------------------------------------------
 //
@@ -51,17 +49,6 @@ inline DataInterpreter<Tp_>::~DataInterpreter() {}
 
 //==============================================================================
 // M E T H O D   S E C T I O N
-
-//------------------------------------------------------------------------------
-//
-template <class Tp_>
-inline void DataInterpreter<Tp_>::Run() {
-  while (IsRunning()) {
-    if (IsNewDataReady()) {
-      Notify(ProcessData());
-    }
-  }
-}
 
 //------------------------------------------------------------------------------
 //
@@ -100,15 +87,19 @@ inline void DataInterpreter<Tp_>::AddProcUnit(
 //------------------------------------------------------------------------------
 //
 template <class Tp_>
-inline std::vector<sonia_msgs::MapObject::Ptr>
-DataInterpreter<Tp_>::ProcessData() {
+inline void DataInterpreter<Tp_>::ProcessData() {
   auto data = GetLastData();
   for (const auto &proc_unit : proc_units_) {
     proc_unit->ProcessData(data);
   }
-  auto objects = ObjectRegistery::GetInstance().GetAllMapObject();
-  ObjectRegistery::GetInstance().ClearRegistery();
-  return objects;
+}
+
+//------------------------------------------------------------------------------
+//
+template <class Tp_>
+void DataInterpreter<Tp_>::OnSubjectNotify(atlas::Subject<Tp_> &subject,
+                                           Tp_ args) {
+  ProcessData();
 }
 
 }  // namespace proc_mapping

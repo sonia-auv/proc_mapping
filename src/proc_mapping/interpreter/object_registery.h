@@ -27,6 +27,7 @@
 #define PROC_MAPPING_OBJECT_REGISTERY_H
 
 #include <sonia_msgs/MapObject.h>
+#include <opencv>
 
 namespace proc_mapping {
 
@@ -35,10 +36,17 @@ class ObjectRegistery {
   //==========================================================================
   // T Y P E D E F   A N D   E N U M
 
-  using MapObject = sonia_msgs::MapObject::Ptr;
+  using MapObject = cv::Point2d;
+  using MapObjectPtr = std::shared_ptr<MapObject>;
+  using MapObjectPtrList = std::vector<MapObjectPtr>;
 
+  // Deleting the copy ctor for the Singleton pattern compliance.
+  // Deleting move ctor as well, we have a mutex here anyway.
   ObjectRegistery(ObjectRegistery const &) = delete;
+  ObjectRegistery(ObjectRegistery &&) = delete;
+
   void operator=(ObjectRegistery const &) = delete;
+  void operator=(ObjectRegistery &&) = delete;
 
   static ObjectRegistery &GetInstance() {
     static ObjectRegistery instance;
@@ -48,24 +56,27 @@ class ObjectRegistery {
   //==========================================================================
   // P U B L I C   M E T H O D S
 
-  void AddObject(const MapObject &obj);
+  void AddObject(const MapObjectPtr &obj);
+  void DeleteObject(const MapObjectPtr &obj);
 
-  void DeleteObject(const MapObject &obj);
-  void DeleteObject(const MapObject *obj);
-
-  const std::vector<MapObject> &GetAllMapObject() const;
+  const MapObjectPtrList &GetAllMapObject() const;
 
   void ClearRegistery();
 
  private:
   // As a Singleton, we want the object itself only to be able to create an
   // instance of itself.
-  ObjectRegistery() = default;
+  ObjectRegistery();
 
   //==========================================================================
   // P R I V A T E   M E M B E R S
 
-  std::vector<MapObject> objects_;
+  MapObjectPtrList objects_;
+
+  /// We access the registry from the main thread as well as the processing
+  /// thread (when we receive a scanline or an odometry). Thus, we must
+  /// sync the access to the MapObjects.
+  mutable std::mutex object_mutex_;
 };
 
 }  // namespace proc_mapping

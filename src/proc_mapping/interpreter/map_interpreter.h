@@ -43,8 +43,7 @@
 
 namespace proc_mapping {
 
-class MapInterpreter : public DataInterpreter<cv::Mat>,
-                       public atlas::Observer<cv::Mat> {
+class MapInterpreter : public DataInterpreter<cv::Mat> {
  public:
   //==========================================================================
   // T Y P E D E F   A N D   E N U M
@@ -69,11 +68,15 @@ class MapInterpreter : public DataInterpreter<cv::Mat>,
   /// start it.
   void OnSubjectNotify(atlas::Subject<cv::Mat> &subject, cv::Mat args) override;
 
+  std::vector<std::shared_ptr<sonia_msgs::MapObject>> GetMapObjects() const;
+
  private:
   //==========================================================================
   // P R I V A T E   M E M B E R S
 
   ros::NodeHandlePtr nh_;
+
+  RawMap raw_map_;
 };
 
 }  // namespace proc_mapping

@@ -45,9 +45,7 @@ namespace proc_mapping {
  * We especially need this in the ObjectMapper object that agregate this a
  * list of DataInterpreter.
  */
-class DataInterpreterInterface
-    : public atlas::Subject<std::vector<sonia_msgs::MapObject::Ptr>>,
-      public atlas::Runnable {
+class DataInterpreterInterface {
  public:
   //============================================================================
   // T Y P E D E F   A N D   E N U M
@@ -60,7 +58,7 @@ class DataInterpreterInterface
   //============================================================================
   // P U B L I C   C / D T O R S
 
-  explicit DataInterpreterInterface(const ros::NodeHandlePtr &nh){};
+  explicit DataInterpreterInterface(const ros::NodeHandlePtr &nh) {}
 
   virtual ~DataInterpreterInterface() = default;
 };
@@ -74,7 +72,8 @@ class DataInterpreterInterface
  * See DataInterpreterInterface for public interface informations.
  */
 template <class Tp_>
-class DataInterpreter : public DataInterpreterInterface {
+class DataInterpreter : public DataInterpreterInterface,
+                        public atlas::Observer<Tp_> {
  public:
   //============================================================================
   // P U B L I C   C / D T O R S
@@ -87,20 +86,15 @@ class DataInterpreter : public DataInterpreterInterface {
   //============================================================================
   // P R O T E C T E D   M E T H O D S
 
+  void OnSubjectNotify(atlas::Subject<Tp_> &subject, Tp_ args) override;
+
   /**
    * This is the most important method of the DataInterpreter as it is the one
    * that will return the WeightedObjects. When a new data is ready (should) be
    * set by the specific DataInterpreter, this method is called and a
    * notification will be sent to observers (particulary ObjectMapper)
    */
-  virtual std::vector<sonia_msgs::MapObject::Ptr> ProcessData();
-
-  /**
-   * The Run method is being override to allow the user to abstract the
-   * managment of new data. The processing of the data will begin when a new
-   * data is being set in the DataInterpreter.
-   */
-  void Run() override;
+  virtual void ProcessData();
 
   Tp_ &GetLastData();
 

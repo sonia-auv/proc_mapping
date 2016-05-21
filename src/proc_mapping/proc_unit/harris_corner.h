@@ -27,6 +27,7 @@
 #define PROC_MAPPING_HARRIS_CORNER_H
 
 #include <opencv/cv.h>
+#include <vector>
 #include "proc_mapping/proc_unit/proc_unit.h"
 
 namespace proc_mapping {
@@ -44,7 +45,7 @@ class HarrisCorner : public ProcUnit<cv::Mat> {
   //==========================================================================
   // P U B L I C   C / D T O R S
 
-  HarrisCorner(){};
+  HarrisCorner() = default;
 
   virtual ~HarrisCorner() = default;
 
@@ -61,7 +62,8 @@ class HarrisCorner : public ProcUnit<cv::Mat> {
     double k = 0.04;
 
     /// Detecting corners
-    cv::cornerHarris(input, dst, blockSize, apertureSize, k, cv::BORDER_DEFAULT);
+    cv::cornerHarris(input, dst, blockSize, apertureSize, k,
+                     cv::BORDER_DEFAULT);
 
     /// Normalizing
     cv::normalize(dst, dst_norm, 0, 255, cv::NORM_MINMAX, CV_32FC1, cv::Mat());

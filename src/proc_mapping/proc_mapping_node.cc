@@ -24,6 +24,9 @@
  */
 
 #include "proc_mapping/proc_mapping_node.h"
+#include <ros/ros.h>
+#include <sonia_msgs/MapObject.h>
+#include "proc_mapping/interpreter/object_registery.h"
 
 namespace proc_mapping {
 
@@ -33,8 +36,9 @@ namespace proc_mapping {
 //------------------------------------------------------------------------------
 //
 ProcMappingNode::ProcMappingNode(const ros::NodeHandlePtr &nh)
-    : nh_(nh), object_pub_(), raw_map_(nh_), map_interpreter_(nh_) {
-  map_interpreter_.Observe(raw_map_);
+    : nh_(nh), object_pub_(), map_interpreter_(nh_) {
+  object_pub_ = nh_->advertise<sonia_msgs::MapObject>("/proc_mapping/objects",
+                                                    100);
 }
 
 //------------------------------------------------------------------------------
@@ -46,5 +50,16 @@ ProcMappingNode::~ProcMappingNode() {}
 
 //------------------------------------------------------------------------------
 //
+void ProcMappingNode::Spin() {
+  while (ros::ok()) {
+    auto map_objects = map_interpreter_.GetMapObjects();
+
+    for (const auto &obj : map_objects) {
+      object_pub_.publish(*obj);
+    }
+
+    ros::spinOnce();
+  }
+}
 
 }  // namespace proc_mapping
