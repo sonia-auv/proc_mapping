@@ -53,14 +53,13 @@ class RawMap : public atlas::Subject<cv::Mat>, public atlas::Runnable {
 
   // Pixel Coordinate System
   struct PixelCS {
-    // Cannot use size_t because of the compatibility with opencv...
+    // Cannot use size_t because of the compatibility with opencv
     int width;
     int height;
     double m_to_pixel;
     double pixel_to_m;
     cv::Mat map;
-    // - Number of Hits per pixel
-    std::vector<uint8_t> number_of_hits_;
+    std::vector<uint8_t> number_of_hits_; //  Number of Hits per pixel
   };
 
   // Sub Marine Coordinate System
@@ -104,20 +103,41 @@ class RawMap : public atlas::Subject<cv::Mat>, public atlas::Runnable {
 
   /**
    * Set the parameters of the coordinate systems. These parameters are going
-   * to be used when converting from XY CCS to UV CCS.
+   * to be used when converting from XY CS to UV CS.
    *
-   * \param w The width of the map in world CCS (meters)
-   * \param h The height of the map in world CCS (meters)
-   * \param r The pixel_to_m of the pixel CCS (meter/pixel)
+   * \param w The width of the map in world CS (meters)
+   * \param h The height of the map in world CS (meters)
+   * \param r The pixel_to_m of the pixel CS (meter/pixel)
    */
   void SetMapParameters(const size_t &w, const size_t &h, const double &r);
 
-  void SetPointCloudThreshold(double sonar_threshold, double resolution);
+  /**
+   * Set the point cloud threshold to subtract the front sonar noise.
+   *
+   * \param sonar_threshold The sonar threshold in meters
+   */
+  void SetPointCloudThreshold(double sonar_threshold);
 
+  /**
+   * Received and treat point cloud data and update the world map
+   *
+   * \param msg The point cloud message from the provider_sonar
+   */
   void ProcessPointCloud(const sensor_msgs::PointCloud2::ConstPtr &msg);
 
+  /**
+   * Update world map and apllying an infinite mean.
+   *
+   * \param p The position x,y in the map
+   * \param intensity The intensity of the point
+   */
   void UpdateMat(const cv::Point2i &p, const uint8_t &intensity);
 
+  /**
+   * Transform the point from meter reference to pixel reference
+   *
+   * \param p The point to transform
+   */
   cv::Point2i CoordinateToPixel(const cv::Point2d &p);
 
   /// We want the submarine to be in the center of the raw map.
@@ -136,6 +156,7 @@ class RawMap : public atlas::Subject<cv::Mat>, public atlas::Runnable {
   /// The first data of the sonar may be scrap. Keeping a threshold and starting
   /// to process data after it
   uint32_t point_cloud_threshold_;
+  double sonar_range_;
 
   std::atomic<bool> new_pcl_ready_;
 

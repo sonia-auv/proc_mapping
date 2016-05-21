@@ -23,8 +23,8 @@
  * along with S.O.N.I.A. software. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef PROC_MAPPING_MEANS_DENOISING_H
-#define PROC_MAPPING_MEANS_DENOISING_H
+#ifndef PROC_MAPPING_GAUSSIAN_BLUR_H
+#define PROC_MAPPING_GAUSSIAN_BLUR_H
 
 #include <opencv/cv.h>
 #include "proc_mapping/proc_unit/proc_unit.h"
@@ -34,65 +34,32 @@ namespace proc_mapping {
 using namespace std;
 using namespace cv;
 
-class MeansDenoising : public ProcUnit<cv::Mat> {
+class GaussianBlur : public ProcUnit<cv::Mat> {
  public:
   //==========================================================================
   // T Y P E D E F   A N D   E N U M
 
-  using Ptr = std::shared_ptr<MeansDenoising>;
-  using ConstPtr = std::shared_ptr<const MeansDenoising>;
-  using PtrList = std::vector<MeansDenoising::Ptr>;
-  using ConstPtrList = std::vector<MeansDenoising::ConstPtr>;
+  using Ptr = std::shared_ptr<GaussianBlur>;
+  using ConstPtr = std::shared_ptr<const GaussianBlur>;
+  using PtrList = std::vector<GaussianBlur::Ptr>;
+  using ConstPtrList = std::vector<GaussianBlur::ConstPtr>;
 
   //==========================================================================
   // P U B L I C   C / D T O R S
 
-  MeansDenoising(){};
+  GaussianBlur() { };
 
-  virtual ~MeansDenoising() = default;
+  virtual ~GaussianBlur() = default;
 
   //==========================================================================
   // P U B L I C   M E T H O D S
 
-  /// Global Variables
-  int DELAY_CAPTION = 1500;
-  int DELAY_BLUR = 100;
-  int MAX_KERNEL_LENGTH = 10;
-  int edgeThresh = 1;
-  int lowThreshold = 40;
-  int const max_lowThreshold = 100;
-  int ratio = 2;
-  int const max_ratio = 10;
-  int kernel_size = 5;
-  int const max_kernel_size = 10;
-
-  Mat src;
-  Mat dst;
-  Mat detected_edges;
-
   virtual void ProcessData(cv::Mat &input) override {
-    //    /// Load the source image
-    //    src = input;
-    //
-    //    dst = src.clone();
-    //    dst = Mat::zeros( src.size(), src.type() );
-    //
-    //    for ( int i = 1; i < MAX_KERNEL_LENGTH; i = i + 2 )
-    //    { GaussianBlur( input, input, Size( i, i ), 10, 0 ); }
-    //    createTrackbar( "Min Threshold:", "Edge Map", &lowThreshold,
-    //    max_lowThreshold);
-    //    createTrackbar( "Kernel size", "Edge Map", &kernel_size,
-    //    max_kernel_size);
-    //    createTrackbar( "ration", "Edge Map", &ratio, max_ratio);
-    //
-    //    Canny( input, input, lowThreshold, lowThreshold*ratio, kernel_size );
 
-    //    imshow("Edge Map", input);
-
-    //    imshow("TAMERE", dst);
   }
 };
 
 }  // namespace proc_mapping
 
-#endif  // PROC_MAPPING_MEANS_DENOISING_H
+#endif //PROC_MAPPING_GAUSSIAN_BLUR_H
+

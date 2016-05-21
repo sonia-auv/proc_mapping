@@ -1,5 +1,6 @@
 /**
  * \file	pattern_detection.h
+ * \author	Francis Masse <francis.masse05@gmail.com>
  * \author	Thibaut Mattio <thibaut.mattio@gmail.com>
  * \date	09/05/2016
  *
@@ -62,6 +63,7 @@ class PatternDetection : public ProcUnit<cv::Mat> {
   //==========================================================================
   // P U B L I C   M E T H O D S
 
+  // Method use to change the obstacle template path
   bool ObstacleTemplate(sonia_msgs::ObstacleTemplate::Request &req,
                         sonia_msgs::ObstacleTemplate::Response &resp) {
     obstacle_template_path_ = req.obstacle_template;
@@ -70,14 +72,10 @@ class PatternDetection : public ProcUnit<cv::Mat> {
 
   virtual void ProcessData(cv::Mat &input) override {
     cv::Mat result;
-
     cv::Mat buoy_template;
-    buoy_template =
-        cv::imread(obstacle_template_path_, CV_LOAD_IMAGE_GRAYSCALE);
-    //    buoy_template.create(40, 40, CV_8UC1);
-    //    buoy_template.setTo(cv::Scalar(0));
-    //    cv::circle(buoy_template, cv::Point2i(20, 20), 15,
-    //                  cv::Scalar(255));
+
+    // Load obtacle template
+    buoy_template = cv::imread(obstacle_template_path_, CV_LOAD_IMAGE_GRAYSCALE);
 
     // Create the result matrix
     int result_cols = input.cols;
@@ -85,7 +83,7 @@ class PatternDetection : public ProcUnit<cv::Mat> {
 
     result.create(result_rows, result_cols, CV_32FC1);
 
-    // Do the Matching and Normalize
+    // Do the Matching
     matchTemplate(input, buoy_template, result, CV_TM_CCORR_NORMED);
 
     /// Localizing the best match with minMaxLoc
@@ -95,29 +93,22 @@ class PatternDetection : public ProcUnit<cv::Mat> {
     cv::Point maxLoc;
     cv::Point matchLoc;
 
-    //    for (int k = 0; k <= 3; k++) {
     minMaxLoc(result, &minVal, &maxVal, &minLoc, &maxLoc, cv::Mat());
-    //      result.at<double>(minLoc.x,minLoc.y)= 1.0;
 
-    if (maxVal >= 0.2) {
+    // Set the matching percentage
+    if (maxVal >= 0.4) {
       matchLoc = maxLoc;
 
-      // Adding the object to the registry.
-      auto map_object = std::make_shared<sonia_msgs::MapObject>();
-      map_object->pose.position.x = matchLoc.x;
-      map_object->pose.position.y = matchLoc.y;
-      ObjectRegistery::GetInstance().AddObject(map_object);
-
-      /// Show me what you got
+      //  Draw a rectangle at the matching location
       rectangle(input, matchLoc, cv::Point(matchLoc.x + buoy_template.cols,
                                            matchLoc.y + buoy_template.rows),
                 cv::Scalar::all(255), 2, 8, 0);
     }
-//    }
+      
 #ifndef OS_DARWIN
-    cv::imshow("Pattern Detection Map", input);
-    cv::imshow("buoy", buoy_template);
-    cv::waitKey(0);
+      cv::imshow("Pattern Detection Map", input);
+      cv::imshow("buoy", buoy_template);
+      cv::waitKey(0);
 #endif
   }
 

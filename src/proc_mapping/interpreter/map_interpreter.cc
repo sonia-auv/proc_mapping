@@ -24,10 +24,11 @@
  */
 
 #include "proc_mapping/interpreter/map_interpreter.h"
-#include <proc_mapping/proc_unit/harris_corner.h>
 #include <tf/transform_datatypes.h>
-#include "proc_mapping/proc_unit/means_denoising.h"
-#include "proc_mapping/proc_unit/pattern_detection.h"
+#include "proc_mapping/proc_unit/gaussian_blur.h"
+#include "proc_mapping/proc_unit/threshold.h"
+#include "proc_mapping/proc_unit/dilate.h"
+#include "proc_mapping/proc_unit/blob_detector.h"
 
 namespace proc_mapping {
 
@@ -37,13 +38,16 @@ namespace proc_mapping {
 //------------------------------------------------------------------------------
 //
 MapInterpreter::MapInterpreter(const ros::NodeHandlePtr &nh)
-    : DataInterpreter<cv::Mat>(nh), nh_(nh), raw_map_(nh_) {
-  Observe(raw_map_);
-
-  //  ProcUnit<cv::Mat>::Ptr uu{new MeansDenoising()};
-  //  AddProcUnit(std::move(uu));
-  ProcUnit<cv::Mat>::Ptr pu{new PatternDetection(nh_)};
-  AddProcUnit(std::move(pu));
+        : DataInterpreter<cv::Mat>(nh), nh_(nh), raw_map_(nh_) {
+            Observe(raw_map_);
+  ProcUnit<cv::Mat>::Ptr pu1{new GaussianBlur()};
+  AddProcUnit(std::move(pu1));
+  ProcUnit<cv::Mat>::Ptr pu2{new Threshold()};
+  AddProcUnit(std::move(pu2));
+  ProcUnit<cv::Mat>::Ptr pu3{new Dilate()};
+  AddProcUnit(std::move(pu3));
+  ProcUnit<cv::Mat>::Ptr pu4{new BlobDetector()};
+  AddProcUnit(std::move(pu4));
 }
 
 //------------------------------------------------------------------------------
