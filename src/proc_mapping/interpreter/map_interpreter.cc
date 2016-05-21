@@ -29,6 +29,7 @@
 #include "proc_mapping/proc_unit/threshold.h"
 #include "proc_mapping/proc_unit/dilate.h"
 #include "proc_mapping/proc_unit/blob_detector.h"
+#include "proc_mapping/proc_unit/pattern_detection.h"
 
 namespace proc_mapping {
 
@@ -48,6 +49,13 @@ MapInterpreter::MapInterpreter(const ros::NodeHandlePtr &nh)
   AddProcUnit(std::move(pu3));
   ProcUnit<cv::Mat>::Ptr pu4{new BlobDetector()};
   AddProcUnit(std::move(pu4));
+
+
+  // This is not a proc unit that is going to be used, but let's keep it
+  // for demo purpose for now, we will delete it once every thing works with
+  // the other algos.
+  ProcUnit<cv::Mat>::Ptr test_pu{new PatternDetection(nh)};
+  AddProcUnit(std::move(test_pu));
 }
 
 //------------------------------------------------------------------------------
@@ -77,8 +85,14 @@ std::vector<std::shared_ptr<sonia_msgs::MapObject>>
   ObjectRegistery::GetInstance().ClearRegistery();
   std::vector<std::shared_ptr<sonia_msgs::MapObject>> map_obj_msgs;
   for (const auto & object : map_objects) {
-    raw_map_.
+    auto msg = std::make_shared<sonia_msgs::MapObject>();
+    auto world_point = raw_map_.PixelToWorldCoordinates(object);
+    msg->pose.position.x = world_point.x;
+    msg->pose.position.y = world_point.y;
+    /// Casting to rvalue, we loose the variable at the end of scope.
+    map_obj_msgs.push_back(std::move(msg));
   }
+  return map_obj_msgs;
 }
 
 }  // namespace proc_mapping

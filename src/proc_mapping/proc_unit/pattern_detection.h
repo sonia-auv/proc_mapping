@@ -30,6 +30,7 @@
 #include <lib_atlas/config.h>
 #include <lib_atlas/macros.h>
 #include <opencv/cv.h>
+#include <ros/ros.h>
 #include <sonia_msgs/ObstacleTemplate.h>
 #include "proc_mapping/interpreter/object_registery.h"
 #include "proc_mapping/proc_unit/proc_unit.h"
@@ -96,15 +97,15 @@ class PatternDetection : public ProcUnit<cv::Mat> {
     minMaxLoc(result, &minVal, &maxVal, &minLoc, &maxLoc, cv::Mat());
 
     // Set the matching percentage
-    if (maxVal >= 0.4) {
+    if (maxVal >= 0.2) {
       matchLoc = maxLoc;
+      ObjectRegistery::GetInstance().AddObject(matchLoc);
 
       //  Draw a rectangle at the matching location
       rectangle(input, matchLoc, cv::Point(matchLoc.x + buoy_template.cols,
                                            matchLoc.y + buoy_template.rows),
                 cv::Scalar::all(255), 2, 8, 0);
     }
-      
 #ifndef OS_DARWIN
       cv::imshow("Pattern Detection Map", input);
       cv::imshow("buoy", buoy_template);

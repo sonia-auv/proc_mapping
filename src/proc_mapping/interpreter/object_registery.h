@@ -27,7 +27,7 @@
 #define PROC_MAPPING_OBJECT_REGISTERY_H
 
 #include <sonia_msgs/MapObject.h>
-#include <opencv>
+#include <opencv/cv.h>
 
 namespace proc_mapping {
 
@@ -36,9 +36,8 @@ class ObjectRegistery {
   //==========================================================================
   // T Y P E D E F   A N D   E N U M
 
-  using MapObject = cv::Point2d;
-  using MapObjectPtr = std::shared_ptr<MapObject>;
-  using MapObjectPtrList = std::vector<MapObjectPtr>;
+  using MapObject = cv::Point2i;
+  using MapObjectList = std::vector<MapObject>;
 
   // Deleting the copy ctor for the Singleton pattern compliance.
   // Deleting move ctor as well, we have a mutex here anyway.
@@ -56,10 +55,10 @@ class ObjectRegistery {
   //==========================================================================
   // P U B L I C   M E T H O D S
 
-  void AddObject(const MapObjectPtr &obj);
-  void DeleteObject(const MapObjectPtr &obj);
+  void AddObject(MapObject &obj);
+  void DeleteObject(const MapObject &obj);
 
-  const MapObjectPtrList &GetAllMapObject() const;
+  const MapObjectList &GetAllMapObject() const;
 
   void ClearRegistery();
 
@@ -71,7 +70,7 @@ class ObjectRegistery {
   //==========================================================================
   // P R I V A T E   M E M B E R S
 
-  MapObjectPtrList objects_;
+  MapObjectList objects_;
 
   /// We access the registry from the main thread as well as the processing
   /// thread (when we receive a scanline or an odometry). Thus, we must

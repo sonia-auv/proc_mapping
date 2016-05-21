@@ -52,9 +52,7 @@ ProcMappingNode::~ProcMappingNode() {}
 //
 void ProcMappingNode::Spin() {
   while (ros::ok()) {
-    auto map_objects = map_interpreter_.GetMapObjects();
-
-    for (const auto &obj : map_objects) {
+    for (const auto &obj : map_interpreter_.GetMapObjects()) {
       object_pub_.publish(*obj);
     }
 

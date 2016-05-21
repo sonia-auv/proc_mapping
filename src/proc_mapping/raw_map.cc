@@ -207,7 +207,7 @@ void RawMap::ProcessPointCloud(const sensor_msgs::PointCloud2::ConstPtr &msg) {
 
     // Adding the sub_position to position the point cloud in the world map.
     cv::Point2d coordinate_transformed(cv::Point2d(out.x(),out.y()) + sub_position);
-    bin_coordinate = CoordinateToPixel(coordinate_transformed);
+    bin_coordinate = WorldToPixelCoordinates(coordinate_transformed);
 
     // Invert the y axe value to fit in opencv Mat coodinate
     bin_coordinate.y = (pixel_.width/2) - bin_coordinate.y + (pixel_.width/2);
@@ -229,17 +229,17 @@ void RawMap::ProcessPointCloud(const sensor_msgs::PointCloud2::ConstPtr &msg) {
     cv::Point2d heading(cos(sub_.yaw) * sonar_range_,
                         sin(sub_.yaw) * sonar_range_);
     heading += GetPositionOffset();
-    heading = CoordinateToPixel(heading);
+    heading = WorldToPixelCoordinates(heading);
 
     cv::Point2d left_limit(cos(sub_.yaw - 0.785398) * sonar_range_,
                            sin(sub_.yaw - 0.785398) * sonar_range_);
     left_limit += GetPositionOffset();
-    left_limit = CoordinateToPixel(left_limit);
+    left_limit = WorldToPixelCoordinates(left_limit);
 
     cv::Point2d rigth_limit(cos(sub_.yaw + 0.785398) * sonar_range_,
                             sin(sub_.yaw + 0.785398) * sonar_range_);
     rigth_limit += GetPositionOffset();
-    rigth_limit = CoordinateToPixel(rigth_limit);
+    rigth_limit = WorldToPixelCoordinates(rigth_limit);
 
     cv::Mat debug_mat(pixel_.width, pixel_.height, CV_8UC1);
     cv::line(pixel_.map, cv::Point2d(pixel_.width/2, pixel_.height/2),
@@ -247,7 +247,7 @@ void RawMap::ProcessPointCloud(const sensor_msgs::PointCloud2::ConstPtr &msg) {
     cv::line(pixel_.map, cv::Point2d(pixel_.width/2, pixel_.height/2),
              cv::Point2d(pixel_.height, pixel_.height/2), cv::Scalar::all(255));
 
-    cv::Point2d sub = CoordinateToPixel(sub_position);
+    cv::Point2d sub = WorldToPixelCoordinates(sub_position);
     sub.y = (pixel_.width/2) - sub.y + (pixel_.width/2);
 
     cv::circle(debug_mat, sub, 2, cv::Scalar::all(255), -1);
@@ -281,8 +281,21 @@ void RawMap::UpdateMat(const cv::Point2i &p, const uint8_t &intensity) {
 
 //------------------------------------------------------------------------------
 //
-cv::Point2i RawMap::CoordinateToPixel(const cv::Point2d &p) {
+cv::Point2i RawMap::WorldToPixelCoordinates(const cv::Point2d &p) const
+noexcept {
   return p * pixel_.m_to_pixel;
+}
+
+//------------------------------------------------------------------------------
+//
+cv::Point2d RawMap::PixelToWorldCoordinates(const cv::Point2i &p) const
+noexcept {
+  // The operator/ does not exist for Point2i, we must assign members one by
+  // one.
+  cv::Point2d world_point;
+  world_point.x = static_cast<double>(p.x)/pixel_.m_to_pixel;
+  world_point.y = static_cast<double>(p.y)/pixel_.m_to_pixel;
+  return world_point;
 }
 
 //------------------------------------------------------------------------------

@@ -93,6 +93,15 @@ class RawMap : public atlas::Subject<cv::Mat>, public atlas::Runnable {
   /// run the processing when needed.
   void Run() override;
 
+  /// Converting a point from the world Coordinate System to the pixel CS.
+  /// In order to do this, we will use the m_to_pixel ratio from the PixelCS
+  /// struct.
+  cv::Point2i WorldToPixelCoordinates(const cv::Point2d &p) const noexcept;
+
+  /// Converting a pixel point to the world Coordinate system.
+  /// Apply the opposite convetion that WorldToPixelCoordinates does.
+  cv::Point2d PixelToWorldCoordinates(const cv::Point2i &p) const noexcept;
+
  private:
   //==========================================================================
   // P R I V A T E   M E T H O D S
@@ -132,13 +141,6 @@ class RawMap : public atlas::Subject<cv::Mat>, public atlas::Runnable {
    * \param intensity The intensity of the point
    */
   void UpdateMat(const cv::Point2i &p, const uint8_t &intensity);
-
-  /**
-   * Transform the point from meter reference to pixel reference
-   *
-   * \param p The point to transform
-   */
-  cv::Point2i CoordinateToPixel(const cv::Point2d &p);
 
   /// We want the submarine to be in the center of the raw map.
   /// Thus, we are going to offset it by the half of the map size.
