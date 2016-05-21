@@ -69,12 +69,14 @@ RawMap::RawMap(const ros::NodeHandlePtr &nh)
   nh->param<int>("/proc_mapping/tile/number_of_scanlines",
                  scanlines_for_process_, 10);
 
+  sonar_range_ = range; // This member is used for debug purpose
+
   // Resolution is equal to the range of the sonar divide by the number of bin
   // of a scanline.
   double r = range / n_bin;
 
   SetMapParameters(static_cast<uint32_t>(w), static_cast<uint32_t>(h), r);
-  SetPointCloudThreshold(sonar_threshold, r);
+  SetPointCloudThreshold(sonar_threshold);
 
   points2_sub_ =
       nh_->subscribe(point_cloud_topic, 100, &RawMap::PointCloudCallback, this);
@@ -146,8 +148,9 @@ void RawMap::Run() {
 
 //------------------------------------------------------------------------------
 //
-void RawMap::SetPointCloudThreshold(double sonar_threshold, double resolution) {
-  point_cloud_threshold_ = static_cast<uint32_t>(sonar_threshold / resolution);
+void RawMap::SetPointCloudThreshold(double sonar_threshold) {
+  point_cloud_threshold_ =
+      static_cast<uint32_t>(sonar_threshold * pixel_.m_to_pixel);
 }
 
 //------------------------------------------------------------------------------
@@ -181,80 +184,81 @@ void RawMap::ProcessPointCloud(const sensor_msgs::PointCloud2::ConstPtr &msg) {
   std::vector<uint8_t> intensity_map;
   std::vector<cv::Point2i> coordinate_map;
 
-  uint32_t i = 0,
-           max_size = static_cast<uint32_t>(msg->data.size() / msg->point_step);
+  uint32_t max_size = static_cast<uint32_t>(msg->data.size() / msg->point_step);
   cv::Point2i bin_coordinate;
-
-  double scanline_length = 10;
-
-  cv::Point2d heading(cos(sub_.yaw) * scanline_length, sin(sub_.yaw) * scanline_length);
-
-  heading += GetPositionOffset();
-
   cv::Point2d sub_position = sub_.position + GetPositionOffset();
-
-  heading = CoordinateToPixel(heading);
-
-  cv::Point2d left_limit(cos(sub_.yaw - 0.785398) * scanline_length, sin(sub_.yaw - 0.785398) * scanline_length);
-  cv::Point2d rigth_limit(cos(sub_.yaw + 0.785398) * scanline_length, sin(sub_.yaw + 0.785398) * scanline_length);
-
-  left_limit += GetPositionOffset();
-  rigth_limit += GetPositionOffset();
-
-  left_limit = CoordinateToPixel(left_limit);
-  rigth_limit = CoordinateToPixel(rigth_limit);
 
   intensity_map.resize(max_size);
   coordinate_map.resize(max_size);
 
-  for (i = 0; i < max_size; i++) {
+  // Extract the point cloud data and store it in coordinate and intensity map
+  for (int i = 0; i < max_size; i++) {
     int step = i * msg->point_step;
     memcpy(&x, &msg->data[step + msg->fields[0].offset], sizeof(float));
     memcpy(&y, &msg->data[step + msg->fields[1].offset], sizeof(float));
     memcpy(&z, &msg->data[step + msg->fields[2].offset], sizeof(float));
     memcpy(&intensity, &msg->data[step + msg->fields[3].offset], sizeof(float));
 
+    // Create Vector3 and inverting the y axe
     Eigen::Vector3d in(x, -1 * y, z), out;
 
+    // Apply the rotation matrix to the input Vector3
     out = sub_.rotation * in;
-    cv::Point2d out_point(out.x(),out.y());
-    cv::Point2d coordinate_transformed(out_point + sub_position);
+
+    // Adding the sub_position to position the point cloud in the world map.
+    cv::Point2d coordinate_transformed(cv::Point2d(out.x(),out.y()) + sub_position);
     bin_coordinate = CoordinateToPixel(coordinate_transformed);
 
+    // Invert the y axe value to fit in opencv Mat coodinate
     bin_coordinate.y = (pixel_.width/2) - bin_coordinate.y + (pixel_.width/2);
 
-    uint8_t threat_intensity = static_cast<uint8_t>(255.0f * intensity);
-
-    if (threat_intensity > 5) {
-      threat_intensity += 100;
-    }
-
+    // Filling the two maps without thresholded data
     if (i > point_cloud_threshold_) {
-      intensity_map[i] = threat_intensity;
+      intensity_map[i] = static_cast<uint8_t>(255.0f * intensity);
       coordinate_map[i] = bin_coordinate;
     }
   }
 
+  // Update the world Mat
   for (size_t j = 0; j < intensity_map.size() - 1; j++) {
     UpdateMat(coordinate_map[j], intensity_map[j]);
   }
 
   if (debug) {
-  cv::Mat sub_heading(pixel_.width, pixel_.height, CV_8UC1);
-  cv::line(pixel_.map, cv::Point2d(pixel_.width/2, pixel_.height/2), cv::Point2d(pixel_.width/2, 0), cv::Scalar::all(255));
-  cv::line(pixel_.map, cv::Point2d(pixel_.width/2, pixel_.height/2), cv::Point2d(pixel_.height, pixel_.height/2), cv::Scalar::all(255));
+    // Create sub heading, sonar_scan left and rigth limit
+    cv::Point2d heading(cos(sub_.yaw) * sonar_range_,
+                        sin(sub_.yaw) * sonar_range_);
+    heading += GetPositionOffset();
+    heading = CoordinateToPixel(heading);
 
-  cv::Point2d sub = CoordinateToPixel(sub_position);
-  sub.y = (pixel_.width/2) - sub.y + (pixel_.width/2);
+    cv::Point2d left_limit(cos(sub_.yaw - 0.785398) * sonar_range_,
+                           sin(sub_.yaw - 0.785398) * sonar_range_);
+    left_limit += GetPositionOffset();
+    left_limit = CoordinateToPixel(left_limit);
 
-  cv::circle(sub_heading, sub, 2, cv::Scalar::all(255), -1);
-  cv::circle(pixel_.map, sub, 2, cv::Scalar::all(255), -1);
-  cv::line(sub_heading, sub, heading, cv::Scalar::all(255));
-  cv::line(sub_heading, sub, left_limit, cv::Scalar::all(100));
-  cv::line(sub_heading, sub, rigth_limit, cv::Scalar::all(100));
-  cv::imshow("heading", sub_heading);
+    cv::Point2d rigth_limit(cos(sub_.yaw + 0.785398) * sonar_range_,
+                            sin(sub_.yaw + 0.785398) * sonar_range_);
+    rigth_limit += GetPositionOffset();
+    rigth_limit = CoordinateToPixel(rigth_limit);
+
+    cv::Mat debug_mat(pixel_.width, pixel_.height, CV_8UC1);
+    cv::line(pixel_.map, cv::Point2d(pixel_.width/2, pixel_.height/2),
+             cv::Point2d(pixel_.width/2, 0), cv::Scalar::all(255));
+    cv::line(pixel_.map, cv::Point2d(pixel_.width/2, pixel_.height/2),
+             cv::Point2d(pixel_.height, pixel_.height/2), cv::Scalar::all(255));
+
+    cv::Point2d sub = CoordinateToPixel(sub_position);
+    sub.y = (pixel_.width/2) - sub.y + (pixel_.width/2);
+
+    cv::circle(debug_mat, sub, 2, cv::Scalar::all(255), -1);
+    cv::circle(pixel_.map, sub, 2, cv::Scalar::all(255), -1);
+    cv::line(debug_mat, sub, heading, cv::Scalar::all(255));
+    cv::line(debug_mat, sub, left_limit, cv::Scalar::all(100));
+    cv::line(debug_mat, sub, rigth_limit, cv::Scalar::all(100));
+    cv::imshow("Debug", debug_mat);
   }
 
+  // Send a command when enough scanline is arrived
   scanline_counter_++;
   if (scanline_counter_ >= scanlines_for_process_) {
     is_map_ready_for_process_ = true;
@@ -266,7 +270,7 @@ void RawMap::ProcessPointCloud(const sensor_msgs::PointCloud2::ConstPtr &msg) {
 //
 void RawMap::UpdateMat(const cv::Point2i &p, const uint8_t &intensity) {
   if (p.x < pixel_.width && p.y < pixel_.height) {
-    // - Infinite mean
+    //  Infinite mean
     int position = p.x + p.y * pixel_.width;
     pixel_.number_of_hits_.at(static_cast<unsigned long>(position))++;
     int n = pixel_.number_of_hits_.at(static_cast<unsigned long>(position)) + 1;
