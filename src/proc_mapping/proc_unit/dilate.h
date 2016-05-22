@@ -52,8 +52,16 @@ class Dilate : public ProcUnit<cv::Mat> {
   // P U B L I C   M E T H O D S
 
   virtual void ProcessData(cv::Mat &input) override {
-
+    cv::Size size = cv::Size(kernelSize_x, kernerSize_y);
+    cv::Mat kernel_ = cv::getStructuringElement(kernelType, size, anchor_);
+    cv::dilate(input, input, kernel_, anchor_, iteration);
   }
+ private:
+  const cv::Point anchor_= cv::Point(-1, -1);
+  int iteration = 1;
+  int kernelSize_x = 3;
+  int kernerSize_y = 3;
+  int kernelType = 0;
 
 };
 

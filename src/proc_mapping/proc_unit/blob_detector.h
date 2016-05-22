@@ -44,7 +44,27 @@ class BlobDetector : public ProcUnit<cv::Mat> {
   //==========================================================================
   // P U B L I C   C / D T O R S
 
-  BlobDetector() { };
+  BlobDetector() {
+    params.minThreshold = 0;
+    params.maxThreshold = 255;
+    // Filter by Area.
+    params.filterByArea = true;
+    params.minArea = 400;
+    params.maxArea = 800;
+//// Filter by Circularity
+//  params.filterByCircularity = true;
+//  params.minCircularity = 0.00001;
+//  params.maxCircularity = 0.5;
+    params.filterByColor = false;
+// Filter by Convexity
+    params.filterByConvexity = false;
+    params.minConvexity = 0.1;
+    params.maxConvexity = 0.8;
+// Filter by Inertia
+    params.filterByInertia = false;
+    params.minInertiaRatio = 0;
+    params.maxInertiaRatio = 0.5;
+  };
 
   virtual ~BlobDetector() = default;
 
@@ -53,10 +73,23 @@ class BlobDetector : public ProcUnit<cv::Mat> {
 
   virtual void ProcessData(cv::Mat &input) override {
 
+    cv::SimpleBlobDetector detector(params);
+    std::vector<KeyPoint> keyPoints;
+    detector.detect(input, keyPoints);
+    //ROS_INFO()
+    cv::Mat output;
+    cv::drawKeypoints(input, keyPoints, output, cv::Scalar(0,0,255), cv::DrawMatchesFlags::DRAW_RICH_KEYPOINTS);
+    cv::imshow("test", output);
+    cv::waitKey(1);
+    /*
+    for(auto const& keyPoint:keyPoints){
+      ROS_INFO("x: %f, y: %f", keyPoint.pt.x, keyPoint.pt.y);
+    }
+    */
   }
-
+ private:
+  cv::SimpleBlobDetector::Params params;
 };
-
 }  // namespace proc_mapping
 
 #endif //PROC_MAPPING_BLOB_DETECTOR_H

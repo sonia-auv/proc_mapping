@@ -55,9 +55,11 @@ class GaussianBlur : public ProcUnit<cv::Mat> {
   // P U B L I C   M E T H O D S
 
   virtual void ProcessData(cv::Mat &input) override {
-
-
+    cv::Size2i kernel_(kernelSize*2+1,kernelSize*2+1) ;
+    cv::GaussianBlur(input, input, kernel_, 0, 0);
   }
+ private:
+  int kernelSize = 3;
 };
 
 }  // namespace proc_mapping

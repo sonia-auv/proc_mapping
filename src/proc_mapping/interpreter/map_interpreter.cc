@@ -50,12 +50,13 @@ MapInterpreter::MapInterpreter(const ros::NodeHandlePtr &nh)
   ProcUnit<cv::Mat>::Ptr pu4{new BlobDetector()};
   AddProcUnit(std::move(pu4));
 
-
+/*
   // This is not a proc unit that is going to be used, but let's keep it
   // for demo purpose for now, we will delete it once every thing works with
   // the other algos.
   ProcUnit<cv::Mat>::Ptr test_pu{new PatternDetection(nh)};
   AddProcUnit(std::move(test_pu));
+   */
 }
 
 //------------------------------------------------------------------------------

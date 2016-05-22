@@ -26,6 +26,9 @@
 #ifndef PROC_MAPPING_THRESHOLD_H
 #define PROC_MAPPING_THRESHOLD_H
 
+#include <opencv/cv.h>
+#include "proc_mapping/proc_unit/proc_unit.h"
+
 namespace proc_mapping {
 
 using namespace std;
@@ -52,7 +55,7 @@ class Threshold : public ProcUnit<cv::Mat> {
   // P U B L I C   M E T H O D S
 
   virtual void ProcessData(cv::Mat &input) override {
-
+    cv::threshold(input, input, 0, 255, CV_THRESH_OTSU);
   }
 
 };
