@@ -45,6 +45,7 @@ class Dilate : public ProcUnit<cv::Mat> {
   // P U B L I C   C / D T O R S
 
   Dilate() { };
+  Dilate(int kernelSize_x, int kernerSize_y):kernelSize_x(kernelSize_x), kernerSize_y(kernerSize_y){};
 
   virtual ~Dilate() = default;
 
@@ -59,9 +60,9 @@ class Dilate : public ProcUnit<cv::Mat> {
  private:
   const cv::Point anchor_= cv::Point(-1, -1);
   int iteration = 1;
-  int kernelSize_x = 3;
-  int kernerSize_y = 3;
-  int kernelType = 0;
+  int kernelSize_x = 0;
+  int kernerSize_y = 0;
+  int kernelType = cv::MORPH_RECT;
 
 };
 

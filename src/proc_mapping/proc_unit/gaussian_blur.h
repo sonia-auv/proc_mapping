@@ -48,6 +48,7 @@ class GaussianBlur : public ProcUnit<cv::Mat> {
   // P U B L I C   C / D T O R S
 
   GaussianBlur() { };
+  GaussianBlur(int kernelSize):kernelSize(kernelSize){};
 
   virtual ~GaussianBlur() = default;
 
@@ -59,7 +60,7 @@ class GaussianBlur : public ProcUnit<cv::Mat> {
     cv::GaussianBlur(input, input, kernel_, 0, 0);
   }
  private:
-  int kernelSize = 3;
+  int kernelSize = 0;
 };
 
 }  // namespace proc_mapping

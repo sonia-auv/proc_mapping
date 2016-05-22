@@ -32,7 +32,20 @@
 #include "proc_mapping/proc_unit/pattern_detection.h"
 
 namespace proc_mapping {
-
+// - Blurr params
+int gaussian_kernelSize = 5;
+// - Dilate params
+int dilate_kernelSize_x = 5;
+int dilate_kernelSize_y = 5;
+// - Blob detector params
+int blob_minArea = 30;
+int blob_maxArea = 300;
+bool blob_filterByConvexity = false;
+double blob_minConvexity = 0.1;
+double blob_maxConvexity = 0.8;
+bool blob_filterByInertia = false;
+double blob_minInertiaRatio = 0;
+double blob_maxInertiaRatio = 0.5;
 //==============================================================================
 // C / D T O R S   S E C T I O N
 
@@ -41,13 +54,15 @@ namespace proc_mapping {
 MapInterpreter::MapInterpreter(const ros::NodeHandlePtr &nh)
         : DataInterpreter<cv::Mat>(nh), nh_(nh), raw_map_(nh_) {
             Observe(raw_map_);
-  ProcUnit<cv::Mat>::Ptr pu1{new GaussianBlur()};
+  ProcUnit<cv::Mat>::Ptr pu1{new GaussianBlur(gaussian_kernelSize)};
   AddProcUnit(std::move(pu1));
   ProcUnit<cv::Mat>::Ptr pu2{new Threshold()};
   AddProcUnit(std::move(pu2));
-  ProcUnit<cv::Mat>::Ptr pu3{new Dilate()};
+  ProcUnit<cv::Mat>::Ptr pu3{new Dilate(dilate_kernelSize_x, dilate_kernelSize_y)};
   AddProcUnit(std::move(pu3));
-  ProcUnit<cv::Mat>::Ptr pu4{new BlobDetector()};
+  ProcUnit<cv::Mat>::Ptr pu4{new BlobDetector(blob_minArea, blob_maxArea, blob_filterByConvexity,
+                                              blob_minConvexity, blob_maxConvexity, blob_filterByInertia,
+                                              blob_minInertiaRatio, blob_maxInertiaRatio)};
   AddProcUnit(std::move(pu4));
 
 /*
@@ -99,5 +114,6 @@ std::vector<std::shared_ptr<sonia_msgs::MapObject>>
   }
   return map_obj_msgs;
 }
+
 
 }  // namespace proc_mapping

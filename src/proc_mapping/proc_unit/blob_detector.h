@@ -49,8 +49,8 @@ class BlobDetector : public ProcUnit<cv::Mat> {
     params.maxThreshold = 255;
     // Filter by Area.
     params.filterByArea = true;
-    params.minArea = 400;
-    params.maxArea = 800;
+    params.minArea = 30;
+    params.maxArea = 300;
 //// Filter by Circularity
 //  params.filterByCircularity = true;
 //  params.minCircularity = 0.00001;
@@ -66,6 +66,29 @@ class BlobDetector : public ProcUnit<cv::Mat> {
     params.maxInertiaRatio = 0.5;
   };
 
+  BlobDetector(int minArea, int maxArea,
+               bool filterByConvexity, double minConvexity, double maxConvexity,
+               bool filterByInertia, double minInertiaRatio, double maxInertiaRatio){
+    params.minThreshold = 0;
+    params.maxThreshold = 255;
+    // Filter by Area.
+    params.filterByArea = true;
+    params.minArea = minArea;
+    params.maxArea = maxArea;
+//// Filter by Circularity
+//  params.filterByCircularity = true;
+//  params.minCircularity = 0.00001;
+//  params.maxCircularity = 0.5;
+    params.filterByColor = false;
+// Filter by Convexity
+    params.filterByConvexity = filterByConvexity;
+    params.minConvexity = minConvexity;
+    params.maxConvexity = maxConvexity;
+// Filter by Inertia
+    params.filterByInertia = filterByInertia;
+    params.minInertiaRatio = minInertiaRatio;
+    params.maxInertiaRatio = maxInertiaRatio;
+  }
   virtual ~BlobDetector() = default;
 
   //==========================================================================
@@ -76,16 +99,11 @@ class BlobDetector : public ProcUnit<cv::Mat> {
     cv::SimpleBlobDetector detector(params);
     std::vector<KeyPoint> keyPoints;
     detector.detect(input, keyPoints);
-    //ROS_INFO()
+
     cv::Mat output;
     cv::drawKeypoints(input, keyPoints, output, cv::Scalar(0,0,255), cv::DrawMatchesFlags::DRAW_RICH_KEYPOINTS);
     cv::imshow("test", output);
     cv::waitKey(1);
-    /*
-    for(auto const& keyPoint:keyPoints){
-      ROS_INFO("x: %f, y: %f", keyPoint.pt.x, keyPoint.pt.y);
-    }
-    */
   }
  private:
   cv::SimpleBlobDetector::Params params;
