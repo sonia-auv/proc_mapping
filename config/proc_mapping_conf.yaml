@@ -2,10 +2,10 @@
 /proc_mapping/topics/points_topic: "/provider_sonar/point_cloud2"
 /proc_mapping/topics/odometry: "/proc_navigation/odom"
 
-/proc_mapping/map/width: 30
-/proc_mapping/map/heigth: 30
-/proc_mapping/map/sub_initial_x: 15.0
-/proc_mapping/map/sub_initial_y: 15.0
+/proc_mapping/map/width: 20
+/proc_mapping/map/heigth: 20
+/proc_mapping/map/origin_x: 10.0
+/proc_mapping/map/origin_y: 10.0
 
 /proc_mapping/tile/number_of_scanlines: 10
 

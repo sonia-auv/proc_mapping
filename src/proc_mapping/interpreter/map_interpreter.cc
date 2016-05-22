@@ -86,9 +86,13 @@ std::vector<std::shared_ptr<sonia_msgs::MapObject>>
   std::vector<std::shared_ptr<sonia_msgs::MapObject>> map_obj_msgs;
   for (const auto & object : map_objects) {
     auto msg = std::make_shared<sonia_msgs::MapObject>();
-    auto world_point = raw_map_.PixelToWorldCoordinates(object);
-    msg->pose.position.x = world_point.x;
-    msg->pose.position.y = world_point.y;
+    cv::Point2d offset = raw_map_.GetPositionOffset();
+    cv::Point2i object_coordinate(object.pose.x, object.pose.y);
+    auto world_point = raw_map_.PixelToWorldCoordinates(object_coordinate);
+    msg->name = object.name;
+    msg->pose.x = world_point.x - offset.x;
+    msg->pose.y = world_point.y - offset.y;
+    msg->pose.theta = raw_map_.GetSubMarineYaw();
     /// Casting to rvalue, we loose the variable at the end of scope.
     map_obj_msgs.push_back(std::move(msg));
   }

@@ -28,6 +28,7 @@
 
 #include <sonia_msgs/MapObject.h>
 #include <opencv/cv.h>
+#include <mutex>
 
 namespace proc_mapping {
 
@@ -36,7 +37,7 @@ class ObjectRegistery {
   //==========================================================================
   // T Y P E D E F   A N D   E N U M
 
-  using MapObject = cv::Point2i;
+  using MapObject = sonia_msgs::MapObject;
   using MapObjectList = std::vector<MapObject>;
 
   // Deleting the copy ctor for the Singleton pattern compliance.

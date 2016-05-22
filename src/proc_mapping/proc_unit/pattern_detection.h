@@ -32,6 +32,7 @@
 #include <opencv/cv.h>
 #include <ros/ros.h>
 #include <sonia_msgs/ObstacleTemplate.h>
+#include <sonia_msgs/MapObject.h>
 #include "proc_mapping/interpreter/object_registery.h"
 #include "proc_mapping/proc_unit/proc_unit.h"
 #include <memory>
@@ -56,7 +57,7 @@ class PatternDetection : public ProcUnit<cv::Mat> {
     template_server_ = nh_->advertiseService(
         "obstacle_template", &PatternDetection::ObstacleTemplate, this);
     obstacle_template_path_ =
-        atlas::kWorkspaceRoot + "/src/proc_mapping/template/buoy_template.png";
+        atlas::kWorkspaceRoot + "/src/proc_mapping/template/buoy_template2.png";
   }
 
   virtual ~PatternDetection() = default;
@@ -99,17 +100,23 @@ class PatternDetection : public ProcUnit<cv::Mat> {
     // Set the matching percentage
     if (maxVal >= 0.2) {
       matchLoc = maxLoc;
-      ObjectRegistery::GetInstance().AddObject(matchLoc);
+      sonia_msgs::MapObject obj;
+      obj.name = "Buoy";
+      obj.pose.x = matchLoc.x;
+      obj.pose.y = matchLoc.y;
+
+      ObjectRegistery::GetInstance().AddObject(obj);
 
       //  Draw a rectangle at the matching location
       rectangle(input, matchLoc, cv::Point(matchLoc.x + buoy_template.cols,
                                            matchLoc.y + buoy_template.rows),
                 cv::Scalar::all(255), 2, 8, 0);
     }
+
 #ifndef OS_DARWIN
       cv::imshow("Pattern Detection Map", input);
       cv::imshow("buoy", buoy_template);
-      cv::waitKey(0);
+      cv::waitKey(1);
 #endif
   }
 

@@ -76,6 +76,7 @@ class RawMap : public atlas::Subject<cv::Mat>, public atlas::Runnable {
   struct WorldCS {
     double width;
     double height;
+    cv::Point2d origin;
   };
 
   //==========================================================================
@@ -101,6 +102,14 @@ class RawMap : public atlas::Subject<cv::Mat>, public atlas::Runnable {
   /// Converting a pixel point to the world Coordinate system.
   /// Apply the opposite convetion that WorldToPixelCoordinates does.
   cv::Point2d PixelToWorldCoordinates(const cv::Point2i &p) const noexcept;
+
+  double GetSubMarineYaw() const noexcept;
+
+  cv::Point2d GetSubMarinePosition() const noexcept;
+
+  /// We want the submarine to be in the center of the raw map.
+  /// Thus, we are going to offset it by the half of the map size.
+  cv::Point2d GetPositionOffset() const;
 
  private:
   //==========================================================================
@@ -141,10 +150,6 @@ class RawMap : public atlas::Subject<cv::Mat>, public atlas::Runnable {
    * \param intensity The intensity of the point
    */
   void UpdateMat(const cv::Point2i &p, const uint8_t &intensity);
-
-  /// We want the submarine to be in the center of the raw map.
-  /// Thus, we are going to offset it by the half of the map size.
-  cv::Point2d GetPositionOffset() const;
 
   bool IsMapReadyForProcess();
 

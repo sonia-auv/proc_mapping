@@ -65,6 +65,8 @@ RawMap::RawMap(const ros::NodeHandlePtr &nh)
 
   nh->param<int>("/proc_mapping/map/width", w, 20);
   nh->param<int>("/proc_mapping/map/height", h, 20);
+  nh->param<double>("/proc_mapping/map/origin_x", world_.origin.x, 10.0);
+  nh->param<double>("/proc_mapping/map/origin_y", world_.origin.y, 10.0);
   nh->param<double>("/proc_mapping/map/sonar_threshold", sonar_threshold, 1.0);
   nh->param<int>("/proc_mapping/tile/number_of_scanlines",
                  scanlines_for_process_, 10);
@@ -192,7 +194,7 @@ void RawMap::ProcessPointCloud(const sensor_msgs::PointCloud2::ConstPtr &msg) {
   coordinate_map.resize(max_size);
 
   // Extract the point cloud data and store it in coordinate and intensity map
-  for (int i = 0; i < max_size; i++) {
+  for (uint32_t i = 0; i < max_size; i++) {
     int step = i * msg->point_step;
     memcpy(&x, &msg->data[step + msg->fields[0].offset], sizeof(float));
     memcpy(&y, &msg->data[step + msg->fields[1].offset], sizeof(float));
@@ -305,7 +307,19 @@ bool RawMap::IsMapReadyForProcess() { return is_map_ready_for_process_; }
 //------------------------------------------------------------------------------
 //
 cv::Point2d RawMap::GetPositionOffset() const {
-  return {world_.width / 2, world_.height / 2};
+  return world_.origin;
+}
+
+//------------------------------------------------------------------------------
+//
+double RawMap::GetSubMarineYaw() const noexcept {
+  return sub_.yaw;
+}
+
+//------------------------------------------------------------------------------
+//
+cv::Point2d RawMap::GetSubMarinePosition() const noexcept {
+  return sub_.position;
 }
 
 }  // namespace proc_mapping
