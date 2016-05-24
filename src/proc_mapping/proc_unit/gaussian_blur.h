@@ -34,6 +34,9 @@ namespace proc_mapping {
 using namespace std;
 using namespace cv;
 
+const int kernel_size_max = 32;
+int kernel_size = 5;
+
 class GaussianBlur : public ProcUnit<cv::Mat> {
  public:
   //==========================================================================
@@ -48,7 +51,7 @@ class GaussianBlur : public ProcUnit<cv::Mat> {
   // P U B L I C   C / D T O R S
 
   GaussianBlur() { };
-  GaussianBlur(int kernelSize):kernelSize(kernelSize){};
+  GaussianBlur(bool debug) : debug(debug) {};
 
   virtual ~GaussianBlur() = default;
 
@@ -56,11 +59,16 @@ class GaussianBlur : public ProcUnit<cv::Mat> {
   // P U B L I C   M E T H O D S
 
   virtual void ProcessData(cv::Mat &input) override {
-    cv::Size2i kernel_(kernelSize*2+1,kernelSize*2+1) ;
-    cv::GaussianBlur(input, input, kernel_, 0, 0);
+    cv::createTrackbar("Kernel Size", "Gaussian Blur", &kernel_size, kernel_size_max);
+    cv::Size2i kernel(kernel_size * 2 + 1,kernel_size * 2 + 1) ;
+    cv::GaussianBlur(input, input, kernel, 0, 0);
+    if (debug) {
+      cv::imshow("Gaussian Blur", input);
+      cv::waitKey(1);
+    }
   }
  private:
-  int kernelSize = 0;
+  bool debug = false;
 };
 
 }  // namespace proc_mapping

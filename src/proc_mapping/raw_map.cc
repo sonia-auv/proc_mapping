@@ -65,8 +65,8 @@ RawMap::RawMap(const ros::NodeHandlePtr &nh)
 
   nh->param<int>("/proc_mapping/map/width", w, 20);
   nh->param<int>("/proc_mapping/map/height", h, 20);
-  nh->param<double>("/proc_mapping/map/origin_x", world_.origin.x, 10.0);
-  nh->param<double>("/proc_mapping/map/origin_y", world_.origin.y, 10.0);
+  nh->param<double>("/proc_mapping/map/origin_x", world_.origin.x, 15.0);
+  nh->param<double>("/proc_mapping/map/origin_y", world_.origin.y, 15.0);
   nh->param<double>("/proc_mapping/map/sonar_threshold", sonar_threshold, 1.0);
   nh->param<int>("/proc_mapping/tile/number_of_scanlines",
                  scanlines_for_process_, 10);
@@ -214,8 +214,14 @@ void RawMap::ProcessPointCloud(const sensor_msgs::PointCloud2::ConstPtr &msg) {
     // Invert the y axe value to fit in opencv Mat coodinate
     bin_coordinate.y = (pixel_.width/2) - bin_coordinate.y + (pixel_.width/2);
 
+//    uint8_t threat_intensity = static_cast<uint8_t>(255.0f * intensity);
+//    if (threat_intensity > 10) {
+//      threat_intensity = 255;
+//    }
+
     // Filling the two maps without thresholded data
     if (i > point_cloud_threshold_) {
+//      intensity_map[i] = threat_intensity;
       intensity_map[i] = static_cast<uint8_t>(255.0f * intensity);
       coordinate_map[i] = bin_coordinate;
     }
@@ -225,6 +231,9 @@ void RawMap::ProcessPointCloud(const sensor_msgs::PointCloud2::ConstPtr &msg) {
   for (size_t j = 0; j < intensity_map.size() - 1; j++) {
     UpdateMat(coordinate_map[j], intensity_map[j]);
   }
+
+  cv::imshow("Original", pixel_.map);
+  cv::waitKey(1);
 
   if (debug) {
     // Create sub heading, sonar_scan left and rigth limit

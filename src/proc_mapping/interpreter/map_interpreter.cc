@@ -32,20 +32,7 @@
 #include "proc_mapping/proc_unit/pattern_detection.h"
 
 namespace proc_mapping {
-// - Blurr params
-int gaussian_kernelSize = 5;
-// - Dilate params
-int dilate_kernelSize_x = 5;
-int dilate_kernelSize_y = 5;
-// - Blob detector params
-int blob_minArea = 30;
-int blob_maxArea = 300;
-bool blob_filterByConvexity = false;
-double blob_minConvexity = 0.1;
-double blob_maxConvexity = 0.8;
-bool blob_filterByInertia = false;
-double blob_minInertiaRatio = 0;
-double blob_maxInertiaRatio = 0.5;
+
 //==============================================================================
 // C / D T O R S   S E C T I O N
 
@@ -54,24 +41,20 @@ double blob_maxInertiaRatio = 0.5;
 MapInterpreter::MapInterpreter(const ros::NodeHandlePtr &nh)
         : DataInterpreter<cv::Mat>(nh), nh_(nh), raw_map_(nh_) {
             Observe(raw_map_);
-  ProcUnit<cv::Mat>::Ptr pu1{new GaussianBlur(gaussian_kernelSize)};
+  ProcUnit<cv::Mat>::Ptr pu1{new GaussianBlur(true)};
   AddProcUnit(std::move(pu1));
-  ProcUnit<cv::Mat>::Ptr pu2{new Threshold()};
+  ProcUnit<cv::Mat>::Ptr pu2{new Threshold(true)};
   AddProcUnit(std::move(pu2));
-  ProcUnit<cv::Mat>::Ptr pu3{new Dilate(dilate_kernelSize_x, dilate_kernelSize_y)};
+  ProcUnit<cv::Mat>::Ptr pu3{new Dilate(true)};
   AddProcUnit(std::move(pu3));
-  ProcUnit<cv::Mat>::Ptr pu4{new BlobDetector(blob_minArea, blob_maxArea, blob_filterByConvexity,
-                                              blob_minConvexity, blob_maxConvexity, blob_filterByInertia,
-                                              blob_minInertiaRatio, blob_maxInertiaRatio)};
+  ProcUnit<cv::Mat>::Ptr pu4{new BlobDetector(true)};
   AddProcUnit(std::move(pu4));
 
-/*
   // This is not a proc unit that is going to be used, but let's keep it
   // for demo purpose for now, we will delete it once every thing works with
   // the other algos.
-  ProcUnit<cv::Mat>::Ptr test_pu{new PatternDetection(nh)};
-  AddProcUnit(std::move(test_pu));
-   */
+//  ProcUnit<cv::Mat>::Ptr test_pu{new PatternDetection(nh)};
+//  AddProcUnit(std::move(test_pu));
 }
 
 //------------------------------------------------------------------------------
@@ -103,7 +86,7 @@ std::vector<std::shared_ptr<sonia_msgs::MapObject>>
   for (const auto & object : map_objects) {
     auto msg = std::make_shared<sonia_msgs::MapObject>();
     cv::Point2d offset = raw_map_.GetPositionOffset();
-    cv::Point2i object_coordinate(object.pose.x, object.pose.y);
+    cv::Point2d object_coordinate(object.pose.x, object.pose.y);
     auto world_point = raw_map_.PixelToWorldCoordinates(object_coordinate);
     msg->name = object.name;
     msg->pose.x = world_point.x - offset.x;

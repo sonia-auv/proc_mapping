@@ -31,6 +31,15 @@ namespace proc_mapping {
 using namespace std;
 using namespace cv;
 
+int minArea = 30;
+const int maxArea = 300;
+bool filterByConvexity = false;
+int minConvexity = 1;
+const int maxConvexity = 8;
+bool filterByInertia = false;
+int minInertiaRatio = 0;
+const int maxInertiaRatio = 5;
+
 class BlobDetector : public ProcUnit<cv::Mat> {
  public:
   //==========================================================================
@@ -66,9 +75,19 @@ class BlobDetector : public ProcUnit<cv::Mat> {
     params.maxInertiaRatio = 0.5;
   };
 
-  BlobDetector(int minArea, int maxArea,
-               bool filterByConvexity, double minConvexity, double maxConvexity,
-               bool filterByInertia, double minInertiaRatio, double maxInertiaRatio){
+  BlobDetector(bool debug) : debug(debug) {  }
+  virtual ~BlobDetector() = default;
+
+  //==========================================================================
+  // P U B L I C   M E T H O D S
+
+  virtual void ProcessData(cv::Mat &input) override {
+    cv::createTrackbar("Area", "Blob Detector", &minArea, maxArea);
+    cv::createTrackbar("Convexity", "Blob Detector",
+                       &minConvexity, maxConvexity);
+    cv::createTrackbar("Inertia Ratio", "Blob Detector",
+                       &minInertiaRatio, maxInertiaRatio);
+
     params.minThreshold = 0;
     params.maxThreshold = 255;
     // Filter by Area.
@@ -82,19 +101,12 @@ class BlobDetector : public ProcUnit<cv::Mat> {
     params.filterByColor = false;
 // Filter by Convexity
     params.filterByConvexity = filterByConvexity;
-    params.minConvexity = minConvexity;
-    params.maxConvexity = maxConvexity;
+    params.minConvexity = minConvexity / 10;
+    params.maxConvexity = maxConvexity / 10;
 // Filter by Inertia
     params.filterByInertia = filterByInertia;
-    params.minInertiaRatio = minInertiaRatio;
-    params.maxInertiaRatio = maxInertiaRatio;
-  }
-  virtual ~BlobDetector() = default;
-
-  //==========================================================================
-  // P U B L I C   M E T H O D S
-
-  virtual void ProcessData(cv::Mat &input) override {
+    params.minInertiaRatio = minInertiaRatio / 10;
+    params.maxInertiaRatio = maxInertiaRatio / 10;
 
     cv::SimpleBlobDetector detector(params);
     std::vector<KeyPoint> keyPoints;
@@ -102,11 +114,14 @@ class BlobDetector : public ProcUnit<cv::Mat> {
 
     cv::Mat output;
     cv::drawKeypoints(input, keyPoints, output, cv::Scalar(0,0,255), cv::DrawMatchesFlags::DRAW_RICH_KEYPOINTS);
-    cv::imshow("test", output);
-    cv::waitKey(1);
+    if (debug) {
+      cv::imshow("Blob Detector", output);
+      cv::waitKey(1);
+    }
   }
  private:
   cv::SimpleBlobDetector::Params params;
+  bool debug = false;
 };
 }  // namespace proc_mapping
 

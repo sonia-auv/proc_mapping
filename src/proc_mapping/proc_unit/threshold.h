@@ -34,6 +34,9 @@ namespace proc_mapping {
 using namespace std;
 using namespace cv;
 
+const int thresh_value_max = 255;
+int thresh_value = 0;
+
 class Threshold : public ProcUnit<cv::Mat> {
  public:
   //==========================================================================
@@ -47,7 +50,7 @@ class Threshold : public ProcUnit<cv::Mat> {
   //==========================================================================
   // P U B L I C   C / D T O R S
 
-  Threshold() { };
+  Threshold(bool debug) : debug(debug) { };
 
   virtual ~Threshold() = default;
 
@@ -55,8 +58,16 @@ class Threshold : public ProcUnit<cv::Mat> {
   // P U B L I C   M E T H O D S
 
   virtual void ProcessData(cv::Mat &input) override {
-    cv::threshold(input, input, 0, 255, CV_THRESH_OTSU);
+    cv::createTrackbar("Thresh Value", "Threshold", &thresh_value, thresh_value_max);
+    cv::threshold(input, input, thresh_value, 255, CV_THRESH_OTSU);
+    if (debug) {
+      cv::imshow("Threshold", input);
+      cv::waitKey(1);
+    }
   }
+
+ private:
+  bool debug = false;
 
 };
 
