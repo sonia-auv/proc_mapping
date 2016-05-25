@@ -25,7 +25,7 @@
 
 #include "proc_mapping/interpreter/map_interpreter.h"
 #include <tf/transform_datatypes.h>
-#include "proc_mapping/proc_unit/gaussian_blur.h"
+#include "proc_mapping/proc_unit/blur.h"
 #include "proc_mapping/proc_unit/threshold.h"
 #include "proc_mapping/proc_unit/dilate.h"
 #include "proc_mapping/proc_unit/blob_detector.h"
@@ -41,9 +41,9 @@ namespace proc_mapping {
 MapInterpreter::MapInterpreter(const ros::NodeHandlePtr &nh)
         : DataInterpreter<cv::Mat>(nh), nh_(nh), raw_map_(nh_) {
             Observe(raw_map_);
-  ProcUnit<cv::Mat>::Ptr pu1{new GaussianBlur(true)};
+  ProcUnit<cv::Mat>::Ptr pu1{new Blur(3, true)};
   AddProcUnit(std::move(pu1));
-  ProcUnit<cv::Mat>::Ptr pu2{new Threshold(true)};
+  ProcUnit<cv::Mat>::Ptr pu2{new Threshold(8, true)};
   AddProcUnit(std::move(pu2));
   ProcUnit<cv::Mat>::Ptr pu3{new Dilate(true)};
   AddProcUnit(std::move(pu3));

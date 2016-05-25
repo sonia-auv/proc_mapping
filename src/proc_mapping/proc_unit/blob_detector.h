@@ -113,7 +113,8 @@ class BlobDetector : public ProcUnit<cv::Mat> {
     detector.detect(input, keyPoints);
 
     cv::Mat output;
-    cv::drawKeypoints(input, keyPoints, output, cv::Scalar(0,0,255), cv::DrawMatchesFlags::DRAW_RICH_KEYPOINTS);
+    cv::drawKeypoints(input, keyPoints, output, cv::Scalar(0,0,255),
+                      cv::DrawMatchesFlags::DRAW_RICH_KEYPOINTS);
     if (debug) {
       cv::imshow("Blob Detector", output);
       cv::waitKey(1);

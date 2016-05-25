@@ -50,7 +50,8 @@ class Threshold : public ProcUnit<cv::Mat> {
   //==========================================================================
   // P U B L I C   C / D T O R S
 
-  Threshold(bool debug) : debug(debug) { };
+  Threshold(int threshold_type, bool debug) : threshold_type(threshold_type),
+                                              debug(debug) { };
 
   virtual ~Threshold() = default;
 
@@ -59,7 +60,13 @@ class Threshold : public ProcUnit<cv::Mat> {
 
   virtual void ProcessData(cv::Mat &input) override {
     cv::createTrackbar("Thresh Value", "Threshold", &thresh_value, thresh_value_max);
-    cv::threshold(input, input, thresh_value, 255, CV_THRESH_OTSU);
+    if ((threshold_type == 0) | (threshold_type == 1) | (threshold_type == 2) |
+        (threshold_type == 3) | (threshold_type == 4) | (threshold_type == 7) |
+        (threshold_type == 8)) {
+      cv::threshold(input, input, thresh_value, 255, threshold_type);
+    } else {
+      ROS_ERROR("Threshold type is undefined");
+    }
     if (debug) {
       cv::imshow("Threshold", input);
       cv::waitKey(1);
@@ -68,7 +75,16 @@ class Threshold : public ProcUnit<cv::Mat> {
 
  private:
   bool debug = false;
-
+  /*
+   * 0: Binary
+   * 1: Binary Inverted
+   * 2: Threshold Truncated
+   * 3: Threshold to Zero
+   * 4: Threshold to Zero Inverted
+   * 7: Threshold Mask
+   * 8: Threshold OTSU
+   */
+  int threshold_type = 8;
 };
 
 }  // namespace proc_mapping

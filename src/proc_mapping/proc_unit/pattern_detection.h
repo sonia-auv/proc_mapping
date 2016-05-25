@@ -73,45 +73,45 @@ class PatternDetection : public ProcUnit<cv::Mat> {
   }
 
   virtual void ProcessData(cv::Mat &input) override {
-//    cv::Mat result;
-//    cv::Mat buoy_template;
-//
-//    // Load obtacle template
-//    buoy_template = cv::imread(obstacle_template_path_, CV_LOAD_IMAGE_GRAYSCALE);
-//
-//    // Create the result matrix
-//    int result_cols = input.cols;
-//    int result_rows = input.rows;
-//
-//    result.create(result_rows, result_cols, CV_32FC1);
-//
-//    // Do the Matching
-//    matchTemplate(input, buoy_template, result, CV_TM_CCORR_NORMED);
-//
-//    /// Localizing the best match with minMaxLoc
-//    double minVal;
-//    double maxVal;
-//    cv::Point minLoc;
-//    cv::Point maxLoc;
-//    cv::Point matchLoc;
-//
-//    minMaxLoc(result, &minVal, &maxVal, &minLoc, &maxLoc, cv::Mat());
-//
-//    // Set the matching percentage
-//    if (maxVal >= 0.2) {
-//      matchLoc = maxLoc;
-//      sonia_msgs::MapObject obj;
-//      obj.name = "Buoy";
-//      obj.pose.x = matchLoc.x;
-//      obj.pose.y = matchLoc.y;
-//
-//      ObjectRegistery::GetInstance().AddObject(obj);
-//
-//      //  Draw a rectangle at the matching location
-//      rectangle(input, matchLoc, cv::Point(matchLoc.x + buoy_template.cols,
-//                                           matchLoc.y + buoy_template.rows),
-//                cv::Scalar::all(255), 2, 8, 0);
-//    }
+    cv::Mat result;
+    cv::Mat buoy_template;
+
+    // Load obtacle template
+    buoy_template = cv::imread(obstacle_template_path_, CV_LOAD_IMAGE_GRAYSCALE);
+
+    // Create the result matrix
+    int result_cols = input.cols;
+    int result_rows = input.rows;
+
+    result.create(result_rows, result_cols, CV_32FC1);
+
+    // Do the Matching
+    matchTemplate(input, buoy_template, result, CV_TM_CCORR_NORMED);
+
+    /// Localizing the best match with minMaxLoc
+    double minVal;
+    double maxVal;
+    cv::Point minLoc;
+    cv::Point maxLoc;
+    cv::Point matchLoc;
+
+    minMaxLoc(result, &minVal, &maxVal, &minLoc, &maxLoc, cv::Mat());
+
+    // Set the matching percentage
+    if (maxVal >= 0.2) {
+      matchLoc = maxLoc;
+      sonia_msgs::MapObject obj;
+      obj.name = "Buoy";
+      obj.pose.x = matchLoc.x;
+      obj.pose.y = matchLoc.y;
+
+      ObjectRegistery::GetInstance().AddObject(obj);
+
+      //  Draw a rectangle at the matching location
+      rectangle(input, matchLoc, cv::Point(matchLoc.x + buoy_template.cols,
+                                           matchLoc.y + buoy_template.rows),
+                cv::Scalar::all(255), 2, 8, 0);
+    }
 
 #ifndef OS_DARWIN
       cv::imshow("Pattern Detection Map", input);

@@ -214,15 +214,15 @@ void RawMap::ProcessPointCloud(const sensor_msgs::PointCloud2::ConstPtr &msg) {
     // Invert the y axe value to fit in opencv Mat coodinate
     bin_coordinate.y = (pixel_.width/2) - bin_coordinate.y + (pixel_.width/2);
 
-//    uint8_t threat_intensity = static_cast<uint8_t>(255.0f * intensity);
-//    if (threat_intensity > 10) {
-//      threat_intensity = 255;
-//    }
+    uint8_t threat_intensity = static_cast<uint8_t>(255.0f * intensity);
+    if (threat_intensity > 10) {
+      threat_intensity = 255;
+    }
 
     // Filling the two maps without thresholded data
     if (i > point_cloud_threshold_) {
-//      intensity_map[i] = threat_intensity;
-      intensity_map[i] = static_cast<uint8_t>(255.0f * intensity);
+      intensity_map[i] = threat_intensity;
+//      intensity_map[i] = static_cast<uint8_t>(255.0f * intensity);
       coordinate_map[i] = bin_coordinate;
     }
   }
@@ -315,20 +315,14 @@ bool RawMap::IsMapReadyForProcess() { return is_map_ready_for_process_; }
 
 //------------------------------------------------------------------------------
 //
-cv::Point2d RawMap::GetPositionOffset() const {
-  return world_.origin;
-}
+cv::Point2d RawMap::GetPositionOffset() const { return world_.origin; }
 
 //------------------------------------------------------------------------------
 //
-double RawMap::GetSubMarineYaw() const noexcept {
-  return sub_.yaw;
-}
+double RawMap::GetSubMarineYaw() const noexcept { return sub_.yaw; }
 
 //------------------------------------------------------------------------------
 //
-cv::Point2d RawMap::GetSubMarinePosition() const noexcept {
-  return sub_.position;
-}
+cv::Point2d RawMap::GetSubMarinePosition() const noexcept { return sub_.position; }
 
 }  // namespace proc_mapping
