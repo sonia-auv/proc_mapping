@@ -30,6 +30,7 @@
 #include "proc_mapping/proc_unit/dilate.h"
 #include "proc_mapping/proc_unit/blob_detector.h"
 #include "proc_mapping/proc_unit/pattern_detection.h"
+#include "proc_mapping/proc_unit/histogram.h"
 
 namespace proc_mapping {
 
@@ -39,17 +40,18 @@ namespace proc_mapping {
 //------------------------------------------------------------------------------
 //
 MapInterpreter::MapInterpreter(const ros::NodeHandlePtr &nh)
-        : DataInterpreter<cv::Mat>(nh), nh_(nh), raw_map_(nh_) {
-            Observe(raw_map_);
-  ProcUnit<cv::Mat>::Ptr pu1{new Blur(3, true)};
+    : DataInterpreter<cv::Mat>(nh), nh_(nh), raw_map_(nh_) {
+  Observe(raw_map_);
+  ProcUnit<cv::Mat>::Ptr pu1{new Blur(1, true)};
   AddProcUnit(std::move(pu1));
-  ProcUnit<cv::Mat>::Ptr pu2{new Threshold(8, true)};
+  ProcUnit<cv::Mat>::Ptr pu_hist{new Histogram()};
+  AddProcUnit(std::move(pu_hist));
+  ProcUnit<cv::Mat>::Ptr pu2{new Threshold(0, true)};
   AddProcUnit(std::move(pu2));
-  ProcUnit<cv::Mat>::Ptr pu3{new Dilate(true)};
-  AddProcUnit(std::move(pu3));
-  ProcUnit<cv::Mat>::Ptr pu4{new BlobDetector(true)};
-  AddProcUnit(std::move(pu4));
-
+//  ProcUnit<cv::Mat>::Ptr pu3{new Dilate(true)};
+//  AddProcUnit(std::move(pu3));
+//  ProcUnit<cv::Mat>::Ptr pu4{new BlobDetector(true)};
+//  AddProcUnit(std::move(pu4));
   // This is not a proc unit that is going to be used, but let's keep it
   // for demo purpose for now, we will delete it once every thing works with
   // the other algos.
@@ -79,7 +81,7 @@ void MapInterpreter::OnSubjectNotify(atlas::Subject<cv::Mat> &subject,
 //------------------------------------------------------------------------------
 //
 std::vector<std::shared_ptr<sonia_msgs::MapObject>>
-    MapInterpreter::GetMapObjects() const {
+MapInterpreter::GetMapObjects() const {
   auto map_objects = ObjectRegistery::GetInstance().GetAllMapObject();
   ObjectRegistery::GetInstance().ClearRegistery();
   std::vector<std::shared_ptr<sonia_msgs::MapObject>> map_obj_msgs;

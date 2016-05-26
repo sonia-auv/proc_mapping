@@ -28,15 +28,12 @@
 
 namespace proc_mapping {
 
-using namespace std;
-using namespace cv;
-
 int minArea = 30;
 const int maxArea = 300;
-bool filterByConvexity = false;
+bool filterByConvexity = true;
 int minConvexity = 1;
 const int maxConvexity = 8;
-bool filterByInertia = false;
+bool filterByInertia = true;
 int minInertiaRatio = 0;
 const int maxInertiaRatio = 5;
 
@@ -109,7 +106,7 @@ class BlobDetector : public ProcUnit<cv::Mat> {
     params.maxInertiaRatio = maxInertiaRatio / 10;
 
     cv::SimpleBlobDetector detector(params);
-    std::vector<KeyPoint> keyPoints;
+    std::vector<cv::KeyPoint> keyPoints;
     detector.detect(input, keyPoints);
 
     cv::Mat output;

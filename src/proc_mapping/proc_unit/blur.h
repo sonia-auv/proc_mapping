@@ -31,9 +31,6 @@
 
 namespace proc_mapping {
 
-using namespace std;
-using namespace cv;
-
 const int kernel_size_max = 15;
 int kernel_size = 5;
 

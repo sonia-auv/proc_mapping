@@ -33,9 +33,6 @@ const int kernel_size_y_max = 32;
 int kernel_size_x = 5;
 int kernel_size_y = 5;
 
-using namespace std;
-using namespace cv;
-
 class Dilate : public ProcUnit<cv::Mat> {
  public:
   //==========================================================================

@@ -31,9 +31,6 @@
 
 namespace proc_mapping {
 
-using namespace std;
-using namespace cv;
-
 const int thresh_value_max = 255;
 int thresh_value = 0;
 
