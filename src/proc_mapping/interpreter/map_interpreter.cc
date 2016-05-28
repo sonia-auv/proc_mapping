@@ -50,7 +50,7 @@ MapInterpreter::MapInterpreter(const ros::NodeHandlePtr &nh)
   AddProcUnit(std::move(pu2));
   ProcUnit<cv::Mat>::Ptr pu3{new Dilate(true)};
   AddProcUnit(std::move(pu3));
-  ProcUnit<cv::Mat>::Ptr pu4{new BlobDetector(true)};
+  ProcUnit<cv::Mat>::Ptr pu4{new BlobDetector(nh, true)};
   AddProcUnit(std::move(pu4));
   // This is not a proc unit that is going to be used, but let's keep it
   // for demo purpose for now, we will delete it once every thing works with
@@ -91,6 +91,7 @@ MapInterpreter::GetMapObjects() const {
     cv::Point2d object_coordinate(object.pose.x, object.pose.y);
     auto world_point = raw_map_.PixelToWorldCoordinates(object_coordinate);
     msg->name = object.name;
+    msg->size = object.size;
     msg->pose.x = world_point.x - offset.x;
     msg->pose.y = world_point.y - offset.y;
     msg->pose.theta = raw_map_.GetSubMarineYaw();

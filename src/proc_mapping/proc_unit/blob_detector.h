@@ -26,6 +26,13 @@
 #ifndef PROC_MAPPING_BLOB_DETECTOR_H
 #define PROC_MAPPING_BLOB_DETECTOR_H
 
+#include <opencv/cv.h>
+#include <ros/ros.h>
+#include <sonia_msgs/ObstacleTemplate.h>
+#include "proc_mapping/interpreter/object_registery.h"
+#include "proc_mapping/proc_unit/proc_unit.h"
+#include <memory>
+
 namespace proc_mapping {
 
 int filter_area_off = 1;
@@ -62,11 +69,22 @@ class BlobDetector : public ProcUnit<cv::Mat> {
 
   BlobDetector() { };
 
-  BlobDetector(bool debug) : debug_(debug) {  }
+  BlobDetector(const ros::NodeHandlePtr &nh, bool debug)
+      : nh_(nh), debug_(debug) {
+    obstacle_server_ = nh_->advertiseService(
+        "obstacle", &BlobDetector::ObstacleTemplate, this);
+  }
   virtual ~BlobDetector() = default;
 
   //==========================================================================
   // P U B L I C   M E T H O D S
+
+  // Method use to change the obstacle template
+  bool ObstacleTemplate(sonia_msgs::ObstacleTemplate::Request &req,
+                        sonia_msgs::ObstacleTemplate::Response &resp) {
+    obstacle_ = req.obstacle_template;
+    return true;
+  }
 
   virtual void ProcessData(cv::Mat &input) override {
     cv::createTrackbar("area filter", "Blob Detector", &filter_area_off, filter_area_on);
@@ -75,34 +93,39 @@ class BlobDetector : public ProcUnit<cv::Mat> {
     cv::createTrackbar("convexity filter", "Blob Detector", &filter_convexity_off, filter_convexity_on);
     cv::createTrackbar("min convexity", "Blob Detector", &min_convexity, min_convexity_max);
     cv::createTrackbar("max convexity", "Blob Detector", &max_convexity, max_convexity_max);
-    cv::createTrackbar("inertia filter", "Blob Detector", &filter_inertial_off, filter_inertial_on);
-    cv::createTrackbar("min inertia", "Blob Detector", &min_inertia_ratio, min_inertia_ratio_max);
-    cv::createTrackbar("max inertia", "Blob Detector", &max_inertia_ratio, max_inertia_ratio_max);
+//    cv::createTrackbar("inertia filter", "Blob Detector", &filter_inertial_off, filter_inertial_on);
+//    cv::createTrackbar("min inertia", "Blob Detector", &min_inertia_ratio, min_inertia_ratio_max);
+//    cv::createTrackbar("max inertia", "Blob Detector", &max_inertia_ratio, max_inertia_ratio_max);
 
-    params_.minThreshold = 0;
-    params_.maxThreshold = 255;
-    // Filter by Area.
-    params_.filterByArea = filter_area_off;
-    params_.minArea = min_area;
-    params_.maxArea = max_area;
+    if (obstacle_.compare("buoy") == 0) {
+      params_.filterByArea = true;
+      params_.minArea = 378;
+      params_.maxArea = 526;
+    } else {
+      params_.minThreshold = 0;
+      params_.maxThreshold = 255;
+      // Filter by Area.
+      params_.filterByArea = filter_area_off;
+      params_.minArea = min_area;
+      params_.maxArea = max_area;
 //// Filter by Circularity
-    params_.filterByCircularity = false;
-    params_.filterByColor = false;
+      params_.filterByCircularity = false;
+      params_.filterByColor = false;
 // Filter by Convexity
-    params_.filterByConvexity = filter_convexity_off;
-    params_.minConvexity = min_convexity / 10;
-    params_.maxConvexity = max_convexity / 10;
+      params_.filterByConvexity = filter_convexity_off;
+      params_.minConvexity = min_convexity / 10;
+      params_.maxConvexity = max_convexity / 10;
 // Filter by Inertia
-    params_.filterByInertia = filter_inertial_off;
-    params_.minInertiaRatio = min_inertia_ratio / 10;
-    params_.maxInertiaRatio = max_inertia_ratio / 10;
-
+      params_.filterByInertia = filter_inertial_off;
+      params_.minInertiaRatio = min_inertia_ratio / 10;
+      params_.maxInertiaRatio = max_inertia_ratio / 10;
+    }
     cv::SimpleBlobDetector detector(params_);
     std::vector<cv::KeyPoint> keyPoints;
     detector.detect(input, keyPoints);
 
     if (keyPoints.size() > 1) {
-      for (int i = 0; i < keyPoints.size(); i++) {
+      for (size_t i = 0; i < keyPoints.size(); i++) {
         float distance_x = (keyPoints[i].pt.x - keyPoints[i+1].pt.x);
         distance_x /= 40;
         float distance_y = keyPoints[i].pt.y - keyPoints[i+1].pt.y;
@@ -110,9 +133,10 @@ class BlobDetector : public ProcUnit<cv::Mat> {
         double distance_buoy =
             sqrt((distance_x * distance_x) + (distance_y * distance_y));
 
-        if (distance_buoy > 1.0f and distance_buoy < 2.60f) {
+        if (distance_buoy > 1.0f and distance_buoy < 2.6f) {
           sonia_msgs::MapObject obj;
           obj.name = "Buoy";
+          obj.size = keyPoints[i].size;
           obj.pose.x = keyPoints[i].pt.x;
           obj.pose.y = keyPoints[i].pt.y;
 
@@ -157,6 +181,13 @@ class BlobDetector : public ProcUnit<cv::Mat> {
     }
   }
  private:
+  //==========================================================================
+  // P R I V A T E   M E M B E R S
+
+  ros::NodeHandlePtr nh_;
+  ros::ServiceServer obstacle_server_;
+
+  std::string obstacle_;
   cv::SimpleBlobDetector::Params params_;
   bool debug_ = false;
 };

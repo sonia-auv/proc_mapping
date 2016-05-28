@@ -208,22 +208,29 @@ void RawMap::ProcessPointCloud(const sensor_msgs::PointCloud2::ConstPtr &msg) {
     out = sub_.rotation * in;
 
     // Adding the sub_position to position the point cloud in the world map.
-    cv::Point2d coordinate_transformed(cv::Point2d(out.x(),out.y()) + sub_position);
+    cv::Point2d
+        coordinate_transformed(cv::Point2d(out.x(), out.y()) + sub_position);
     bin_coordinate = WorldToPixelCoordinates(coordinate_transformed);
 
-    // Invert the y axe value to fit in opencv Mat coodinate
-    bin_coordinate.y = (pixel_.width/2) - bin_coordinate.y + (pixel_.width/2);
+    // Check if bin_coordinate are in the map boundary
+    if ((bin_coordinate.x < pixel_.width and bin_coordinate.x > 0) and
+        (bin_coordinate.y < pixel_.height and bin_coordinate.y > 0)) {
+
+      // Invert the y axe value to fit in opencv Mat coodinate
+      bin_coordinate.y =
+          (pixel_.width / 2) - bin_coordinate.y + (pixel_.width / 2);
 
 //    uint8_t threat_intensity = static_cast<uint8_t>(255.0f * intensity);
 //    if (threat_intensity > 10) {
 //      threat_intensity = 255;
 //    }
 
-    // Filling the two maps without thresholded data
-    if (i > point_cloud_threshold_) {
+      // Filling the two maps without thresholded data
+      if (i > point_cloud_threshold_) {
 //      intensity_map[i] = threat_intensity;
-      intensity_map[i] = static_cast<uint8_t>(255.0f * intensity);
-      coordinate_map[i] = bin_coordinate;
+        intensity_map[i] = static_cast<uint8_t>(255.0f * intensity);
+        coordinate_map[i] = bin_coordinate;
+      }
     }
   }
 
@@ -231,6 +238,8 @@ void RawMap::ProcessPointCloud(const sensor_msgs::PointCloud2::ConstPtr &msg) {
   for (size_t j = 0; j < intensity_map.size() - 1; j++) {
     UpdateMat(coordinate_map[j], intensity_map[j]);
   }
+  cv::Point2d sub = WorldToPixelCoordinates(sub_position);
+  sub.y = (pixel_.width/2) - sub.y + (pixel_.width/2);
 
   cv::imshow("Original", pixel_.map);
   cv::waitKey(1);
