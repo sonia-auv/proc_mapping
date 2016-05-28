@@ -35,7 +35,7 @@ class Histogram : public ProcUnit<cv::Mat> {
 
   virtual void ProcessData(cv::Mat &input) override {
     int hist_size = 256;
-    float range[] = {0, 256};
+    float range[] = {0, 255};
     const float *hist_range = {range};
 
     cv::Mat hist;
