@@ -101,6 +101,26 @@ class BlobDetector : public ProcUnit<cv::Mat> {
     std::vector<cv::KeyPoint> keyPoints;
     detector.detect(input, keyPoints);
 
+    if (keyPoints.size() > 1) {
+      for (int i = 0; i < keyPoints.size(); i++) {
+        float distance_x = (keyPoints[i].pt.x - keyPoints[i+1].pt.x);
+        distance_x /= 40;
+        float distance_y = keyPoints[i].pt.y - keyPoints[i+1].pt.y;
+        distance_y /= 40;
+        double distance_buoy =
+            sqrt((distance_x * distance_x) + (distance_y * distance_y));
+
+        if (distance_buoy > 1.0f and distance_buoy < 2.60f) {
+          sonia_msgs::MapObject obj;
+          obj.name = "Buoy";
+          obj.pose.x = keyPoints[i].pt.x;
+          obj.pose.y = keyPoints[i].pt.y;
+
+          ObjectRegistery::GetInstance().AddObject(obj);
+        }
+      }
+    }
+
 //    // The fact that we are pushing mutliple obj seems to kill the process
 //    if (!keyPoints.empty()) {
 //      for (size_t i = 0; i < keyPoints.size(); ++i) {
