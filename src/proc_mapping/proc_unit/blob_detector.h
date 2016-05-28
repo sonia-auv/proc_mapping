@@ -28,14 +28,24 @@
 
 namespace proc_mapping {
 
-int minArea = 30;
-const int maxArea = 300;
-bool filterByConvexity = true;
-int minConvexity = 1;
-const int maxConvexity = 8;
-bool filterByInertia = true;
-int minInertiaRatio = 0;
-const int maxInertiaRatio = 5;
+int filter_area_off = 1;
+const int filter_area_on = 1;
+int min_area = 0;
+const int min_area_max = 3000;
+int max_area = 0;
+const int max_area_max = 3000;
+int filter_convexity_off = 0;
+const int filter_convexity_on = 1;
+int min_convexity = 0;
+const int min_convexity_max = 10;
+int max_convexity = 0;
+const int max_convexity_max = 10;
+int filter_inertial_off = 0;
+const int filter_inertial_on = 1;
+int min_inertia_ratio = 0;
+const int min_inertia_ratio_max = 10;
+int max_inertia_ratio = 0;
+const int max_inertia_ratio_max = 10;
 
 class BlobDetector : public ProcUnit<cv::Mat> {
  public:
@@ -50,76 +60,85 @@ class BlobDetector : public ProcUnit<cv::Mat> {
   //==========================================================================
   // P U B L I C   C / D T O R S
 
-  BlobDetector() {
-    params.minThreshold = 0;
-    params.maxThreshold = 255;
-    // Filter by Area.
-    params.filterByArea = true;
-    params.minArea = 30;
-    params.maxArea = 300;
-//// Filter by Circularity
-//  params.filterByCircularity = true;
-//  params.minCircularity = 0.00001;
-//  params.maxCircularity = 0.5;
-    params.filterByColor = false;
-// Filter by Convexity
-    params.filterByConvexity = false;
-    params.minConvexity = 0.1;
-    params.maxConvexity = 0.8;
-// Filter by Inertia
-    params.filterByInertia = false;
-    params.minInertiaRatio = 0;
-    params.maxInertiaRatio = 0.5;
-  };
+  BlobDetector() { };
 
-  BlobDetector(bool debug) : debug(debug) {  }
+  BlobDetector(bool debug) : debug_(debug) {  }
   virtual ~BlobDetector() = default;
 
   //==========================================================================
   // P U B L I C   M E T H O D S
 
   virtual void ProcessData(cv::Mat &input) override {
-    cv::createTrackbar("Area", "Blob Detector", &minArea, maxArea);
-    cv::createTrackbar("Convexity", "Blob Detector",
-                       &minConvexity, maxConvexity);
-    cv::createTrackbar("Inertia Ratio", "Blob Detector",
-                       &minInertiaRatio, maxInertiaRatio);
+    cv::createTrackbar("area filter", "Blob Detector", &filter_area_off, filter_area_on);
+    cv::createTrackbar("min area", "Blob Detector", &min_area, min_area_max);
+    cv::createTrackbar("max area", "Blob Detector", &max_area, max_area_max);
+    cv::createTrackbar("convexity filter", "Blob Detector", &filter_convexity_off, filter_convexity_on);
+    cv::createTrackbar("min convexity", "Blob Detector", &min_convexity, min_convexity_max);
+    cv::createTrackbar("max convexity", "Blob Detector", &max_convexity, max_convexity_max);
+    cv::createTrackbar("inertia filter", "Blob Detector", &filter_inertial_off, filter_inertial_on);
+    cv::createTrackbar("min inertia", "Blob Detector", &min_inertia_ratio, min_inertia_ratio_max);
+    cv::createTrackbar("max inertia", "Blob Detector", &max_inertia_ratio, max_inertia_ratio_max);
 
-    params.minThreshold = 0;
-    params.maxThreshold = 255;
+    params_.minThreshold = 0;
+    params_.maxThreshold = 255;
     // Filter by Area.
-    params.filterByArea = true;
-    params.minArea = minArea;
-    params.maxArea = maxArea;
+    params_.filterByArea = filter_area_off;
+    params_.minArea = min_area;
+    params_.maxArea = max_area;
 //// Filter by Circularity
-//  params.filterByCircularity = true;
-//  params.minCircularity = 0.00001;
-//  params.maxCircularity = 0.5;
-    params.filterByColor = false;
+    params_.filterByCircularity = false;
+    params_.filterByColor = false;
 // Filter by Convexity
-    params.filterByConvexity = filterByConvexity;
-    params.minConvexity = minConvexity / 10;
-    params.maxConvexity = maxConvexity / 10;
+    params_.filterByConvexity = filter_convexity_off;
+    params_.minConvexity = min_convexity / 10;
+    params_.maxConvexity = max_convexity / 10;
 // Filter by Inertia
-    params.filterByInertia = filterByInertia;
-    params.minInertiaRatio = minInertiaRatio / 10;
-    params.maxInertiaRatio = maxInertiaRatio / 10;
+    params_.filterByInertia = filter_inertial_off;
+    params_.minInertiaRatio = min_inertia_ratio / 10;
+    params_.maxInertiaRatio = max_inertia_ratio / 10;
 
-    cv::SimpleBlobDetector detector(params);
+    cv::SimpleBlobDetector detector(params_);
     std::vector<cv::KeyPoint> keyPoints;
     detector.detect(input, keyPoints);
 
-    cv::Mat output;
-    cv::drawKeypoints(input, keyPoints, output, cv::Scalar(0,0,255),
-                      cv::DrawMatchesFlags::DRAW_RICH_KEYPOINTS);
-    if (debug) {
+//    // The fact that we are pushing mutliple obj seems to kill the process
+//    if (!keyPoints.empty()) {
+//      for (size_t i = 0; i < keyPoints.size(); ++i) {
+//        sonia_msgs::MapObject obj;
+//        obj.name = "Buoy [" + std::to_string(i) + "]";
+//        obj.pose.x = keyPoints[i].pt.x;
+//        obj.pose.y = keyPoints[i].pt.y;
+//
+//        ObjectRegistery::GetInstance().AddObject(obj);
+//      }
+//    }
+
+//    // Simple for loop to print keypoint descriptor
+//    if (!keyPoints.empty()) {
+//      for(int i = 0; i < keyPoints.size(); ++i) {
+//        std::cout << "Keypoint[" << i << "]: " << std::endl <<
+//            "x= " << keyPoints[i].pt.x << " y= " << keyPoints[i].pt.y
+//            << std::endl <<
+//            "size= " << keyPoints[i].size << std::endl <<
+//            "angle= " << keyPoints[i].angle << std::endl <<
+//            "class_id= " << keyPoints[i].class_id << std::endl <<
+//            "response= " << keyPoints[i].response << std::endl <<
+//            "octave= " << keyPoints[i].octave << std::endl;
+//      }
+//    }
+
+    if (debug_) {
+      cv::Mat output;
+      cv::drawKeypoints(input, keyPoints, output, cv::Scalar(0,0,255),
+                        cv::DrawMatchesFlags::DRAW_RICH_KEYPOINTS);
+
       cv::imshow("Blob Detector", output);
       cv::waitKey(1);
     }
   }
  private:
-  cv::SimpleBlobDetector::Params params;
-  bool debug = false;
+  cv::SimpleBlobDetector::Params params_;
+  bool debug_ = false;
 };
 }  // namespace proc_mapping
 

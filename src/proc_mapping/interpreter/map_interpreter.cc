@@ -44,14 +44,14 @@ MapInterpreter::MapInterpreter(const ros::NodeHandlePtr &nh)
   Observe(raw_map_);
   ProcUnit<cv::Mat>::Ptr pu1{new Blur(1, true)};
   AddProcUnit(std::move(pu1));
-  ProcUnit<cv::Mat>::Ptr pu_hist{new Histogram()};
-  AddProcUnit(std::move(pu_hist));
+//  ProcUnit<cv::Mat>::Ptr pu_hist{new Histogram()};
+//  AddProcUnit(std::move(pu_hist));
   ProcUnit<cv::Mat>::Ptr pu2{new Threshold(0, true)};
   AddProcUnit(std::move(pu2));
-//  ProcUnit<cv::Mat>::Ptr pu3{new Dilate(true)};
-//  AddProcUnit(std::move(pu3));
-//  ProcUnit<cv::Mat>::Ptr pu4{new BlobDetector(true)};
-//  AddProcUnit(std::move(pu4));
+  ProcUnit<cv::Mat>::Ptr pu3{new Dilate(true)};
+  AddProcUnit(std::move(pu3));
+  ProcUnit<cv::Mat>::Ptr pu4{new BlobDetector(true)};
+  AddProcUnit(std::move(pu4));
   // This is not a proc unit that is going to be used, but let's keep it
   // for demo purpose for now, we will delete it once every thing works with
   // the other algos.
