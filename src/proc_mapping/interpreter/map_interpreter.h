@@ -68,7 +68,7 @@ class MapInterpreter : public DataInterpreter<cv::Mat> {
   /// start it.
   void OnSubjectNotify(atlas::Subject<cv::Mat> &subject, cv::Mat args) override;
 
-  std::vector<std::shared_ptr<sonia_msgs::MapObject>> GetMapObjects() const;
+  std::vector<sonia_msgs::MapObject> GetMapObjects() const;
 
  private:
   //==========================================================================

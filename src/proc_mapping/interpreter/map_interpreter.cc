@@ -42,13 +42,13 @@ namespace proc_mapping {
 MapInterpreter::MapInterpreter(const ros::NodeHandlePtr &nh)
     : DataInterpreter<cv::Mat>(nh), nh_(nh), raw_map_(nh_) {
   Observe(raw_map_);
-  ProcUnit<cv::Mat>::Ptr pu1{new Blur(1, true)};
+  ProcUnit<cv::Mat>::Ptr pu1{new Blur(1, false)};
   AddProcUnit(std::move(pu1));
 //  ProcUnit<cv::Mat>::Ptr pu_hist{new Histogram()};
 //  AddProcUnit(std::move(pu_hist));
-  ProcUnit<cv::Mat>::Ptr pu2{new Threshold(0, true)};
+  ProcUnit<cv::Mat>::Ptr pu2{new Threshold(0, false)};
   AddProcUnit(std::move(pu2));
-  ProcUnit<cv::Mat>::Ptr pu3{new Dilate(true)};
+  ProcUnit<cv::Mat>::Ptr pu3{new Dilate(false)};
   AddProcUnit(std::move(pu3));
   ProcUnit<cv::Mat>::Ptr pu4{new BlobDetector(nh, true)};
   AddProcUnit(std::move(pu4));
@@ -80,23 +80,23 @@ void MapInterpreter::OnSubjectNotify(atlas::Subject<cv::Mat> &subject,
 
 //------------------------------------------------------------------------------
 //
-std::vector<std::shared_ptr<sonia_msgs::MapObject>>
+std::vector<sonia_msgs::MapObject>
 MapInterpreter::GetMapObjects() const {
   auto map_objects = ObjectRegistery::GetInstance().GetAllMapObject();
   ObjectRegistery::GetInstance().ClearRegistery();
-  std::vector<std::shared_ptr<sonia_msgs::MapObject>> map_obj_msgs;
+  std::vector<sonia_msgs::MapObject> map_obj_msgs;
   for (const auto & object : map_objects) {
-    auto msg = std::make_shared<sonia_msgs::MapObject>();
+    sonia_msgs::MapObject msg;
     cv::Point2d offset = raw_map_.GetPositionOffset();
     cv::Point2d object_coordinate(object.pose.x, object.pose.y);
     auto world_point = raw_map_.PixelToWorldCoordinates(object_coordinate);
-    msg->name = object.name;
-    msg->size = object.size;
-    msg->pose.x = world_point.x - offset.x;
-    msg->pose.y = world_point.y - offset.y;
-    msg->pose.theta = raw_map_.GetSubMarineYaw();
+    msg.name = object.name;
+    msg.size = object.size;
+    msg.pose.x = world_point.x - offset.x;
+    msg.pose.y = world_point.y - offset.y;
+    msg.pose.theta = raw_map_.GetSubMarineYaw();
     /// Casting to rvalue, we loose the variable at the end of scope.
-    map_obj_msgs.push_back(std::move(msg));
+    map_obj_msgs.push_back(msg);
   }
   return map_obj_msgs;
 }

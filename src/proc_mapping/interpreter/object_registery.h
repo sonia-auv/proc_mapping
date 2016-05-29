@@ -59,7 +59,7 @@ class ObjectRegistery {
   void AddObject(MapObject &obj);
   void DeleteObject(const MapObject &obj);
 
-  const MapObjectList &GetAllMapObject() const;
+  const MapObjectList GetAllMapObject() const;
 
   void ClearRegistery();
 

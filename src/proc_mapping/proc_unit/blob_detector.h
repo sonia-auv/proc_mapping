@@ -41,6 +41,12 @@ int min_area = 0;
 const int min_area_max = 3000;
 int max_area = 0;
 const int max_area_max = 3000;
+int filter_circularity_off = 0;
+const int filter_circularity_on = 1;
+int min_circularity = 0;
+const int min_circularity_max = 100;
+int max_circularity = 0;
+const int max_circularity_max = 100;
 int filter_convexity_off = 0;
 const int filter_convexity_on = 1;
 int min_convexity = 0;
@@ -90,9 +96,12 @@ class BlobDetector : public ProcUnit<cv::Mat> {
     cv::createTrackbar("area filter", "Blob Detector", &filter_area_off, filter_area_on);
     cv::createTrackbar("min area", "Blob Detector", &min_area, min_area_max);
     cv::createTrackbar("max area", "Blob Detector", &max_area, max_area_max);
-    cv::createTrackbar("convexity filter", "Blob Detector", &filter_convexity_off, filter_convexity_on);
-    cv::createTrackbar("min convexity", "Blob Detector", &min_convexity, min_convexity_max);
-    cv::createTrackbar("max convexity", "Blob Detector", &max_convexity, max_convexity_max);
+    cv::createTrackbar("circularity filter", "Blob Detector", &filter_circularity_off, filter_circularity_on);
+    cv::createTrackbar("min circularity", "Blob Detector", &min_circularity, min_circularity_max);
+    cv::createTrackbar("max circularity", "Blob Detector", &max_circularity, max_circularity_max);
+//    cv::createTrackbar("convexity filter", "Blob Detector", &filter_convexity_off, filter_convexity_on);
+//    cv::createTrackbar("min convexity", "Blob Detector", &min_convexity, min_convexity_max);
+//    cv::createTrackbar("max convexity", "Blob Detector", &max_convexity, max_convexity_max);
 //    cv::createTrackbar("inertia filter", "Blob Detector", &filter_inertial_off, filter_inertial_on);
 //    cv::createTrackbar("min inertia", "Blob Detector", &min_inertia_ratio, min_inertia_ratio_max);
 //    cv::createTrackbar("max inertia", "Blob Detector", &max_inertia_ratio, max_inertia_ratio_max);
@@ -109,7 +118,9 @@ class BlobDetector : public ProcUnit<cv::Mat> {
       params_.minArea = min_area;
       params_.maxArea = max_area;
 //// Filter by Circularity
-      params_.filterByCircularity = false;
+      params_.filterByCircularity = filter_circularity_off;
+      params_.minCircularity = min_circularity / 100;
+      params_.maxCircularity = max_circularity / 100;
       params_.filterByColor = false;
 // Filter by Convexity
       params_.filterByConvexity = filter_convexity_off;

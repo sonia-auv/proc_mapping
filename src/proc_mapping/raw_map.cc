@@ -238,8 +238,10 @@ void RawMap::ProcessPointCloud(const sensor_msgs::PointCloud2::ConstPtr &msg) {
   for (size_t j = 0; j < intensity_map.size() - 1; j++) {
     UpdateMat(coordinate_map[j], intensity_map[j]);
   }
-  cv::Point2d sub = WorldToPixelCoordinates(sub_position);
-  sub.y = (pixel_.width/2) - sub.y + (pixel_.width/2);
+//  cv::Point2d sub = WorldToPixelCoordinates(sub_position);
+//  sub.y = (pixel_.width/2) - sub.y + (pixel_.width/2);
+//
+//  cv::circle(pixel_.map, sub, 2, cv::Scalar::all(255), -1);
 
   cv::imshow("Original", pixel_.map);
   cv::waitKey(1);

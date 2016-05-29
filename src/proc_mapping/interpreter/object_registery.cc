@@ -60,7 +60,7 @@ void ObjectRegistery::DeleteObject(const MapObject &obj) {
 //------------------------------------------------------------------------------
 //
 const ObjectRegistery::MapObjectList
-    &ObjectRegistery::GetAllMapObject() const {
+    ObjectRegistery::GetAllMapObject() const {
   std::lock_guard<std::mutex> guard(object_mutex_);
   return objects_;
 }
