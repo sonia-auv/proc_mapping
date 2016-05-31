@@ -70,6 +70,12 @@ class BlobDetector : public ProcUnit<cv::Mat> {
   using PtrList = std::vector<BlobDetector::Ptr>;
   using ConstPtrList = std::vector<BlobDetector::ConstPtr>;
 
+  struct Keypoint {
+    cv::KeyPoint trigged_keypoint;
+    cv::Rect bounding_box;
+    bool is_object_send;
+  };
+
   //==========================================================================
   // P U B L I C   C / D T O R S
 
@@ -96,9 +102,9 @@ class BlobDetector : public ProcUnit<cv::Mat> {
     cv::createTrackbar("area filter", "Blob Detector", &filter_area_off, filter_area_on);
     cv::createTrackbar("min area", "Blob Detector", &min_area, min_area_max);
     cv::createTrackbar("max area", "Blob Detector", &max_area, max_area_max);
-    cv::createTrackbar("circularity filter", "Blob Detector", &filter_circularity_off, filter_circularity_on);
-    cv::createTrackbar("min circularity", "Blob Detector", &min_circularity, min_circularity_max);
-    cv::createTrackbar("max circularity", "Blob Detector", &max_circularity, max_circularity_max);
+//    cv::createTrackbar("circularity filter", "Blob Detector", &filter_circularity_off, filter_circularity_on);
+//    cv::createTrackbar("min circularity", "Blob Detector", &min_circularity, min_circularity_max);
+//    cv::createTrackbar("max circularity", "Blob Detector", &max_circularity, max_circularity_max);
 //    cv::createTrackbar("convexity filter", "Blob Detector", &filter_convexity_off, filter_convexity_on);
 //    cv::createTrackbar("min convexity", "Blob Detector", &min_convexity, min_convexity_max);
 //    cv::createTrackbar("max convexity", "Blob Detector", &max_convexity, max_convexity_max);
@@ -134,24 +140,67 @@ class BlobDetector : public ProcUnit<cv::Mat> {
     cv::SimpleBlobDetector detector(params_);
     std::vector<cv::KeyPoint> keyPoints;
     detector.detect(input, keyPoints);
+    static std::vector<Keypoint> trigged_keypoints;
+    static bool is_first = true;
+
+//    for (int i = 0; i < keyPoints.size(); ++i) {
+//      cv::putText(input, std::to_string(i), keyPoints[i].pt,
+//                  cv::FONT_HERSHEY_SCRIPT_SIMPLEX, 1, cv::Scalar(255));
+//    }
 
     if (keyPoints.size() > 1) {
       for (size_t i = 0; i < keyPoints.size(); i++) {
-        float distance_x = (keyPoints[i].pt.x - keyPoints[i+1].pt.x);
-        distance_x /= 40;
-        float distance_y = keyPoints[i].pt.y - keyPoints[i+1].pt.y;
-        distance_y /= 40;
-        double distance_buoy =
-            sqrt((distance_x * distance_x) + (distance_y * distance_y));
+        float distance_x_minus = (keyPoints[i].pt.x - keyPoints[i+1].pt.x) / 40;
+        float distance_y_minus = (keyPoints[i].pt.y - keyPoints[i+1].pt.y) / 40;
+        double distance_keypoint_minus =
+            sqrt((distance_x_minus * distance_x_minus) +
+                (distance_y_minus * distance_y_minus));
 
-        if (distance_buoy > 1.0f and distance_buoy < 2.6f) {
-          sonia_msgs::MapObject obj;
-          obj.name = "Buoy";
-          obj.size = keyPoints[i].size;
-          obj.pose.x = keyPoints[i].pt.x;
-          obj.pose.y = keyPoints[i].pt.y;
+        float distance_x_plus = (keyPoints[i].pt.x - keyPoints[i-1].pt.x) / 40;
+        float distance_y_plus = (keyPoints[i].pt.y - keyPoints[i-1].pt.y) / 40;
+        double distance_keypoint_plus =
+            sqrt((distance_x_plus * distance_x_plus) +
+                (distance_y_plus * distance_y_plus));
 
-          ObjectRegistery::GetInstance().AddObject(obj);
+        if ((distance_keypoint_minus > 1.0f and distance_keypoint_minus < 2.6f) or
+            (distance_keypoint_plus > 1.0f and distance_keypoint_plus < 2.6f))   {
+          bool is_already_trigged = false;
+
+          for (uint32_t k = 0; k < trigged_keypoints.size(); ++k) {
+            if (keyPoints[i].pt.inside(trigged_keypoints.at(k).bounding_box)) {
+              is_already_trigged = true;
+            }
+          }
+
+          if (!is_already_trigged) {
+            Keypoint trigged_keypoint;
+            trigged_keypoint.trigged_keypoint = keyPoints[i];
+            std::vector<cv::Point> rect;
+            rect.push_back(cv::Point2d(keyPoints[i].pt.x + 20,
+                                       keyPoints[i].pt.y + 20));
+            rect.push_back(cv::Point2d(keyPoints[i].pt.x + 20,
+                                       keyPoints[i].pt.y - 20));
+            rect.push_back(cv::Point2d(keyPoints[i].pt.x - 20,
+                                       keyPoints[i].pt.y + 20));
+            rect.push_back(cv::Point2d(keyPoints[i].pt.x - 20,
+                                       keyPoints[i].pt.y - 20));
+            trigged_keypoint.bounding_box = cv::boundingRect(rect);
+            trigged_keypoint.is_object_send = false;
+            trigged_keypoints.push_back(trigged_keypoint);
+          }
+
+          for (uint32_t k = 0; k < trigged_keypoints.size(); ++k) {
+            if (!trigged_keypoints.at(k).is_object_send) {
+              sonia_msgs::MapObject obj;
+              obj.name = "Buoy [" + std::to_string(k) + "]";
+              obj.size = trigged_keypoints.at(k).trigged_keypoint.size;
+              obj.pose.x = trigged_keypoints.at(k).trigged_keypoint.pt.x;
+              obj.pose.y = trigged_keypoints.at(k).trigged_keypoint.pt.y;
+
+              ObjectRegistery::GetInstance().AddObject(obj);
+              trigged_keypoints.at(k).is_object_send = true;
+            }
+          }
         }
       }
     }
@@ -192,8 +241,8 @@ class BlobDetector : public ProcUnit<cv::Mat> {
     }
   }
  private:
-  //==========================================================================
-  // P R I V A T E   M E M B E R S
+//==========================================================================
+// P R I V A T E   M E M B E R S
 
   ros::NodeHandlePtr nh_;
   ros::ServiceServer obstacle_server_;

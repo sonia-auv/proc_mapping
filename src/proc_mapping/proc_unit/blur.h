@@ -48,7 +48,8 @@ class Blur : public ProcUnit<cv::Mat> {
   // P U B L I C   C / D T O R S
 
   Blur() { };
-  Blur(int blur_type, bool debug) : blur_type(blur_type), debug(debug) {};
+  Blur(int blur_type = 1, bool debug = false) :
+      blur_type(blur_type), debug(debug) {};
 
   virtual ~Blur() = default;
 
@@ -86,14 +87,14 @@ class Blur : public ProcUnit<cv::Mat> {
     }
   }
  private:
-  bool debug = false;
   /*
-   * 0: Homogeneous Blur
-   * 1: Gaussian Blur
-   * 2: Median Blur
-   * 3: Bilateral Blur
-   */
-  int blur_type = 0;
+ * 0: Homogeneous Blur
+ * 1: Gaussian Blur
+ * 2: Median Blur
+ * 3: Bilateral Blur
+ */
+  int blur_type;
+  bool debug;
 };
 
 }  // namespace proc_mapping
