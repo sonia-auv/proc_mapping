@@ -47,8 +47,8 @@ class Threshold : public ProcUnit<cv::Mat> {
   //==========================================================================
   // P U B L I C   C / D T O R S
 
-  Threshold(int threshold_type = 8, bool debug = false) :
-      threshold_type(threshold_type), debug(debug) { };
+  Threshold(int threshold_type = 8, bool debug = false)
+      : threshold_type(threshold_type), debug(debug){};
 
   virtual ~Threshold() = default;
 
@@ -56,7 +56,8 @@ class Threshold : public ProcUnit<cv::Mat> {
   // P U B L I C   M E T H O D S
 
   virtual void ProcessData(cv::Mat &input) override {
-    cv::createTrackbar("Thresh Value", "Threshold", &thresh_value, thresh_value_max);
+    cv::createTrackbar("Thresh Value", "Threshold", &thresh_value,
+                       thresh_value_max);
     if ((threshold_type == 0) | (threshold_type == 1) | (threshold_type == 2) |
         (threshold_type == 3) | (threshold_type == 4) | (threshold_type == 7) |
         (threshold_type == 8)) {
@@ -86,4 +87,4 @@ class Threshold : public ProcUnit<cv::Mat> {
 
 }  // namespace proc_mapping
 
-#endif //PROC_MAPPING_THRESHOLD_H
+#endif  // PROC_MAPPING_THRESHOLD_H

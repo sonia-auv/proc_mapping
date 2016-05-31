@@ -45,7 +45,7 @@ namespace proc_mapping {
  * We especially need this in the ObjectMapper object that agregate this a
  * list of DataInterpreter.
  */
-class DataInterpreterInterface {
+class DataInterpreterInterface : public atlas::Subject<> {
  public:
   //============================================================================
   // T Y P E D E F   A N D   E N U M
@@ -73,7 +73,7 @@ class DataInterpreterInterface {
  */
 template <class Tp_>
 class DataInterpreter : public DataInterpreterInterface,
-                        public atlas::Observer<Tp_> {
+                        public atlas::Observer<cv::Mat> {
  public:
   //============================================================================
   // P U B L I C   C / D T O R S

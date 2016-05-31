@@ -46,9 +46,8 @@ class Dilate : public ProcUnit<cv::Mat> {
   //==========================================================================
   // P U B L I C   C / D T O R S
 
-  Dilate() { };
-  Dilate(bool debug):
-      debug(debug) {};
+  Dilate(){};
+  Dilate(bool debug) : debug(debug){};
 
   virtual ~Dilate() = default;
 
@@ -56,8 +55,10 @@ class Dilate : public ProcUnit<cv::Mat> {
   // P U B L I C   M E T H O D S
 
   virtual void ProcessData(cv::Mat &input) override {
-    cv::createTrackbar("Kernel Size X", "Dilate", &kernel_size_x, kernel_size_x_max);
-    cv::createTrackbar("Kernel Size Y", "Dilate", &kernel_size_y, kernel_size_y_max);
+    cv::createTrackbar("Kernel Size X", "Dilate", &kernel_size_x,
+                       kernel_size_x_max);
+    cv::createTrackbar("Kernel Size Y", "Dilate", &kernel_size_y,
+                       kernel_size_y_max);
     cv::Size size = cv::Size(kernel_size_x, kernel_size_y);
     cv::Mat kernel_ = cv::getStructuringElement(kernelType, size, anchor_);
     cv::dilate(input, input, kernel_, anchor_, iteration);
@@ -66,14 +67,14 @@ class Dilate : public ProcUnit<cv::Mat> {
       cv::waitKey(1);
     }
   }
+
  private:
-  const cv::Point anchor_= cv::Point(-1, -1);
+  const cv::Point anchor_ = cv::Point(-1, -1);
   int iteration = 1;
   int kernelType = cv::MORPH_RECT;
   bool debug = false;
-
 };
 
 }  // namespace proc_mapping
 
-#endif //PROC_MAPPING_DILATE_H
+#endif  // PROC_MAPPING_DILATE_H

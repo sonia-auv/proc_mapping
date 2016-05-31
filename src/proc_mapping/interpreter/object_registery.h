@@ -26,8 +26,8 @@
 #ifndef PROC_MAPPING_OBJECT_REGISTERY_H
 #define PROC_MAPPING_OBJECT_REGISTERY_H
 
-#include <sonia_msgs/MapObject.h>
 #include <opencv/cv.h>
+#include <sonia_msgs/MapObject.h>
 #include <mutex>
 
 namespace proc_mapping {
@@ -37,7 +37,7 @@ class ObjectRegistery {
   //==========================================================================
   // T Y P E D E F   A N D   E N U M
 
-  using MapObject = sonia_msgs::MapObject;
+  using MapObject = cv::KeyPoint;
   using MapObjectList = std::vector<MapObject>;
 
   // Deleting the copy ctor for the Singleton pattern compliance.

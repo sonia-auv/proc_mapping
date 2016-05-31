@@ -47,9 +47,9 @@ class Blur : public ProcUnit<cv::Mat> {
   //==========================================================================
   // P U B L I C   C / D T O R S
 
-  Blur() { };
-  Blur(int blur_type = 1, bool debug = false) :
-      blur_type(blur_type), debug(debug) {};
+  Blur(){};
+  Blur(int blur_type = 1, bool debug = false)
+      : blur_type(blur_type), debug(debug){};
 
   virtual ~Blur() = default;
 
@@ -59,7 +59,7 @@ class Blur : public ProcUnit<cv::Mat> {
   virtual void ProcessData(cv::Mat &input) override {
     cv::createTrackbar("Kernel Size", "Blur", &kernel_size, kernel_size_max);
     // To keep the kernel size odd, multiply by 2 and add 1
-    cv::Size2i kernel(kernel_size * 2 + 1,kernel_size * 2 + 1) ;
+    cv::Size2i kernel(kernel_size * 2 + 1, kernel_size * 2 + 1);
     // Bilateral Filter need another Mat to do algorithm
     cv::Mat dst = input.clone();
     if (blur_type == 0) {
@@ -70,8 +70,7 @@ class Blur : public ProcUnit<cv::Mat> {
       cv::medianBlur(input, input, kernel_size * 2 + 1);
     } else if (blur_type == 3) {
       cv::bilateralFilter(input, dst, kernel_size * 2 + 1,
-                          (kernel_size * 2 + 1) * 2,
-                          (kernel_size * 2 + 1) / 2);
+                          (kernel_size * 2 + 1) * 2, (kernel_size * 2 + 1) / 2);
       input = dst;
     } else {
       ROS_ERROR("Blur Type is undefined");
@@ -86,6 +85,7 @@ class Blur : public ProcUnit<cv::Mat> {
       }
     }
   }
+
  private:
   /*
  * 0: Homogeneous Blur
@@ -99,5 +99,4 @@ class Blur : public ProcUnit<cv::Mat> {
 
 }  // namespace proc_mapping
 
-#endif //PROC_MAPPING_BLUR_H
-
+#endif  // PROC_MAPPING_BLUR_H

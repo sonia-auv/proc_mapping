@@ -10,8 +10,8 @@
 
 namespace proc_mapping {
 
-//const int thresh_value_max = 255;
-//int thresh_value = 0;
+// const int thresh_value_max = 255;
+// int thresh_value = 0;
 
 class Histogram : public ProcUnit<cv::Mat> {
  public:
@@ -26,7 +26,7 @@ class Histogram : public ProcUnit<cv::Mat> {
   //==========================================================================
   // P U B L I C   C / D T O R S
 
-  Histogram() { };
+  Histogram(){};
 
   virtual ~Histogram() = default;
 
@@ -45,27 +45,28 @@ class Histogram : public ProcUnit<cv::Mat> {
 
     int hist_w = 1024;
     int hist_h = 400;
-    int bin_w = cvRound(static_cast<double>(hist_w/hist_size));
+    int bin_w = cvRound(static_cast<double>(hist_w / hist_size));
 
     cv::Mat hist_image(hist_h, hist_w, CV_8UC1, cv::Scalar(0));
 
-    for(int i = 1; i < hist_size; i++) {
+    for (int i = 1; i < hist_size; i++) {
       cv::line(hist_image, cv::Point(bin_w * (i - 1),
-           hist_h - cvRound(hist.at<float>(i - 1))), cv::Point(bin_w * (i),
-           hist_h - cvRound(hist.at<float>(i))), cv::Scalar(255), 2, 8, 0);
+                                     hist_h - cvRound(hist.at<float>(i - 1))),
+               cv::Point(bin_w * (i), hist_h - cvRound(hist.at<float>(i))),
+               cv::Scalar(255), 2, 8, 0);
     }
 
-    float thresh = (static_cast<float>(thresh_value) / static_cast<float>(thresh_value_max));
+    float thresh = (static_cast<float>(thresh_value) /
+                    static_cast<float>(thresh_value_max));
 
     cv::line(hist_image, cv::Point(hist_w * thresh, 0),
-             cv::Point(hist_w * thresh, hist_h),
-             cv::Scalar(255));
+             cv::Point(hist_w * thresh, hist_h), cv::Scalar(255));
 
-      cv::imshow("Histogram", hist_image);
-      cv::waitKey(1);
+    cv::imshow("Histogram", hist_image);
+    cv::waitKey(1);
   }
 };
 
 }  // namespace proc_mapping
 
-#endif //PROC_MAPPING_HISTOGRAM_H
+#endif  // PROC_MAPPING_HISTOGRAM_H

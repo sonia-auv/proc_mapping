@@ -68,15 +68,11 @@ class MapInterpreter : public DataInterpreter<cv::Mat> {
   /// start it.
   void OnSubjectNotify(atlas::Subject<cv::Mat> &subject, cv::Mat args) override;
 
-  std::vector<sonia_msgs::MapObject> GetMapObjects() const;
-
  private:
   //==========================================================================
   // P R I V A T E   M E M B E R S
 
   ros::NodeHandlePtr nh_;
-
-  RawMap raw_map_;
 };
 
 }  // namespace proc_mapping

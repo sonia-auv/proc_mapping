@@ -36,9 +36,15 @@ namespace proc_mapping {
 //------------------------------------------------------------------------------
 //
 ProcMappingNode::ProcMappingNode(const ros::NodeHandlePtr &nh)
-    : nh_(nh), object_pub_(), map_interpreter_(nh_) {
-  object_pub_ = nh_->advertise<sonia_msgs::MapObject>("/proc_mapping/objects",
-                                                    100);
+    : nh_(nh),
+      object_pub_(),
+      raw_map_(nh_),
+      map_interpreter_(nh_),
+      semantic_map_(std::shared_ptr<RawMap>(&raw_map_)) {
+  object_pub_ =
+      nh_->advertise<sonia_msgs::MapObject>("/proc_mapping/objects", 100);
+
+  raw_map_.Attach(map_interpreter_);
 }
 
 //------------------------------------------------------------------------------
@@ -52,9 +58,10 @@ ProcMappingNode::~ProcMappingNode() {}
 //
 void ProcMappingNode::Spin() {
   while (ros::ok()) {
-    auto test = map_interpreter_.GetMapObjects();
-    for (const auto &obj : test) {
-      object_pub_.publish(obj);
+    if (semantic_map_.IsNewDataAvailable()) {
+      for (const auto &obj : semantic_map_.GetMapObjects()) {
+        object_pub_.publish(obj);
+      }
     }
 
     ros::spinOnce();

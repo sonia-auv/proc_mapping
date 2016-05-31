@@ -25,12 +25,12 @@
 
 #include "proc_mapping/interpreter/map_interpreter.h"
 #include <tf/transform_datatypes.h>
-#include "proc_mapping/proc_unit/blur.h"
-#include "proc_mapping/proc_unit/threshold.h"
-#include "proc_mapping/proc_unit/dilate.h"
 #include "proc_mapping/proc_unit/blob_detector.h"
-#include "proc_mapping/proc_unit/pattern_detection.h"
+#include "proc_mapping/proc_unit/blur.h"
+#include "proc_mapping/proc_unit/dilate.h"
 #include "proc_mapping/proc_unit/histogram.h"
+#include "proc_mapping/proc_unit/pattern_detection.h"
+#include "proc_mapping/proc_unit/threshold.h"
 
 namespace proc_mapping {
 
@@ -40,12 +40,11 @@ namespace proc_mapping {
 //------------------------------------------------------------------------------
 //
 MapInterpreter::MapInterpreter(const ros::NodeHandlePtr &nh)
-    : DataInterpreter<cv::Mat>(nh), nh_(nh), raw_map_(nh_) {
-  Observe(raw_map_);
+    : DataInterpreter<cv::Mat>(nh), nh_(nh) {
   ProcUnit<cv::Mat>::Ptr pu1{new Blur(1, false)};
   AddProcUnit(std::move(pu1));
-//  ProcUnit<cv::Mat>::Ptr pu_hist{new Histogram()};
-//  AddProcUnit(std::move(pu_hist));
+  //  ProcUnit<cv::Mat>::Ptr pu_hist{new Histogram()};
+  //  AddProcUnit(std::move(pu_hist));
   ProcUnit<cv::Mat>::Ptr pu2{new Threshold(0, false)};
   AddProcUnit(std::move(pu2));
   ProcUnit<cv::Mat>::Ptr pu3{new Dilate(false)};
@@ -55,8 +54,8 @@ MapInterpreter::MapInterpreter(const ros::NodeHandlePtr &nh)
   // This is not a proc unit that is going to be used, but let's keep it
   // for demo purpose for now, we will delete it once every thing works with
   // the other algos.
-//  ProcUnit<cv::Mat>::Ptr test_pu{new PatternDetection(nh)};
-//  AddProcUnit(std::move(test_pu));
+  //  ProcUnit<cv::Mat>::Ptr test_pu{new PatternDetection(nh)};
+  //  AddProcUnit(std::move(test_pu));
 }
 
 //------------------------------------------------------------------------------
@@ -76,30 +75,9 @@ void MapInterpreter::OnSubjectNotify(atlas::Subject<cv::Mat> &subject,
   args.copyTo(new_data);
   SetNewData(new_data);
   ProcessData();
-}
 
-//------------------------------------------------------------------------------
-//
-std::vector<sonia_msgs::MapObject>
-MapInterpreter::GetMapObjects() const {
-  auto map_objects = ObjectRegistery::GetInstance().GetAllMapObject();
-  ObjectRegistery::GetInstance().ClearRegistery();
-  std::vector<sonia_msgs::MapObject> map_obj_msgs;
-  for (const auto & object : map_objects) {
-    sonia_msgs::MapObject msg;
-    cv::Point2d offset = raw_map_.GetPositionOffset();
-    cv::Point2d object_coordinate(object.pose.x, object.pose.y);
-    auto world_point = raw_map_.PixelToWorldCoordinates(object_coordinate);
-    msg.name = object.name;
-    msg.size = object.size;
-    msg.pose.x = world_point.x - offset.x;
-    msg.pose.y = world_point.y - offset.y;
-    msg.pose.theta = raw_map_.GetSubMarineYaw();
-    /// Casting to rvalue, we loose the variable at the end of scope.
-    map_obj_msgs.push_back(msg);
-  }
-  return map_obj_msgs;
+  // Notify potential observers that we just added new objects in the registery.
+  Notify();
 }
-
 
 }  // namespace proc_mapping

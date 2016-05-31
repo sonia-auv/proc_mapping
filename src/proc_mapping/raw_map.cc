@@ -71,7 +71,7 @@ RawMap::RawMap(const ros::NodeHandlePtr &nh)
   nh->param<int>("/proc_mapping/tile/number_of_scanlines",
                  scanlines_for_process_, 10);
 
-  sonar_range_ = range; // This member is used for debug purpose
+  sonar_range_ = range;  // This member is used for debug purpose
 
   // Resolution is equal to the range of the sonar divide by the number of bin
   // of a scanline.
@@ -208,26 +208,25 @@ void RawMap::ProcessPointCloud(const sensor_msgs::PointCloud2::ConstPtr &msg) {
     out = sub_.rotation * in;
 
     // Adding the sub_position to position the point cloud in the world map.
-    cv::Point2d
-        coordinate_transformed(cv::Point2d(out.x(), out.y()) + sub_position);
+    cv::Point2d coordinate_transformed(cv::Point2d(out.x(), out.y()) +
+                                       sub_position);
     bin_coordinate = WorldToPixelCoordinates(coordinate_transformed);
 
     // Check if bin_coordinate are in the map boundary
     if ((bin_coordinate.x < pixel_.width and bin_coordinate.x > 0) and
         (bin_coordinate.y < pixel_.height and bin_coordinate.y > 0)) {
-
       // Invert the y axe value to fit in opencv Mat coodinate
       bin_coordinate.y =
           (pixel_.width / 2) - bin_coordinate.y + (pixel_.width / 2);
 
-//    uint8_t threat_intensity = static_cast<uint8_t>(255.0f * intensity);
-//    if (threat_intensity > 10) {
-//      threat_intensity = 255;
-//    }
+      //    uint8_t threat_intensity = static_cast<uint8_t>(255.0f * intensity);
+      //    if (threat_intensity > 10) {
+      //      threat_intensity = 255;
+      //    }
 
       // Filling the two maps without thresholded data
       if (i > point_cloud_threshold_) {
-//      intensity_map[i] = threat_intensity;
+        //      intensity_map[i] = threat_intensity;
         intensity_map[i] = static_cast<uint8_t>(255.0f * intensity);
         coordinate_map[i] = bin_coordinate;
       }
@@ -238,10 +237,10 @@ void RawMap::ProcessPointCloud(const sensor_msgs::PointCloud2::ConstPtr &msg) {
   for (size_t j = 0; j < intensity_map.size() - 1; j++) {
     UpdateMat(coordinate_map[j], intensity_map[j]);
   }
-//  cv::Point2d sub = WorldToPixelCoordinates(sub_position);
-//  sub.y = (pixel_.width/2) - sub.y + (pixel_.width/2);
-//
-//  cv::circle(pixel_.map, sub, 2, cv::Scalar::all(255), -1);
+  //  cv::Point2d sub = WorldToPixelCoordinates(sub_position);
+  //  sub.y = (pixel_.width/2) - sub.y + (pixel_.width/2);
+  //
+  //  cv::circle(pixel_.map, sub, 2, cv::Scalar::all(255), -1);
 
   cv::imshow("Original", pixel_.map);
   cv::waitKey(1);
@@ -264,13 +263,14 @@ void RawMap::ProcessPointCloud(const sensor_msgs::PointCloud2::ConstPtr &msg) {
     rigth_limit = WorldToPixelCoordinates(rigth_limit);
 
     cv::Mat debug_mat(pixel_.width, pixel_.height, CV_8UC1);
-    cv::line(pixel_.map, cv::Point2d(pixel_.width/2, pixel_.height/2),
-             cv::Point2d(pixel_.width/2, 0), cv::Scalar::all(255));
-    cv::line(pixel_.map, cv::Point2d(pixel_.width/2, pixel_.height/2),
-             cv::Point2d(pixel_.height, pixel_.height/2), cv::Scalar::all(255));
+    cv::line(pixel_.map, cv::Point2d(pixel_.width / 2, pixel_.height / 2),
+             cv::Point2d(pixel_.width / 2, 0), cv::Scalar::all(255));
+    cv::line(pixel_.map, cv::Point2d(pixel_.width / 2, pixel_.height / 2),
+             cv::Point2d(pixel_.height, pixel_.height / 2),
+             cv::Scalar::all(255));
 
     cv::Point2d sub = WorldToPixelCoordinates(sub_position);
-    sub.y = (pixel_.width/2) - sub.y + (pixel_.width/2);
+    sub.y = (pixel_.width / 2) - sub.y + (pixel_.width / 2);
 
     cv::circle(debug_mat, sub, 2, cv::Scalar::all(255), -1);
     cv::circle(pixel_.map, sub, 2, cv::Scalar::all(255), -1);
@@ -304,19 +304,19 @@ void RawMap::UpdateMat(const cv::Point2i &p, const uint8_t &intensity) {
 //------------------------------------------------------------------------------
 //
 cv::Point2i RawMap::WorldToPixelCoordinates(const cv::Point2d &p) const
-noexcept {
+    noexcept {
   return p * pixel_.m_to_pixel;
 }
 
 //------------------------------------------------------------------------------
 //
 cv::Point2d RawMap::PixelToWorldCoordinates(const cv::Point2i &p) const
-noexcept {
+    noexcept {
   // The operator/ does not exist for Point2i, we must assign members one by
   // one.
   cv::Point2d world_point;
-  world_point.x = static_cast<double>(p.x)/pixel_.m_to_pixel;
-  world_point.y = static_cast<double>(p.y)/pixel_.m_to_pixel;
+  world_point.x = static_cast<double>(p.x) / pixel_.m_to_pixel;
+  world_point.y = static_cast<double>(p.y) / pixel_.m_to_pixel;
   return world_point;
 }
 
@@ -334,6 +334,8 @@ double RawMap::GetSubMarineYaw() const noexcept { return sub_.yaw; }
 
 //------------------------------------------------------------------------------
 //
-cv::Point2d RawMap::GetSubMarinePosition() const noexcept { return sub_.position; }
+cv::Point2d RawMap::GetSubMarinePosition() const noexcept {
+  return sub_.position;
+}
 
 }  // namespace proc_mapping

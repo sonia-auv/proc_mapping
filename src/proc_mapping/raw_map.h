@@ -59,7 +59,7 @@ class RawMap : public atlas::Subject<cv::Mat>, public atlas::Runnable {
     double m_to_pixel;
     double pixel_to_m;
     cv::Mat map;
-    std::vector<uint8_t> number_of_hits_; //  Number of Hits per pixel
+    std::vector<uint8_t> number_of_hits_;  //  Number of Hits per pixel
   };
 
   // Sub Marine Coordinate System

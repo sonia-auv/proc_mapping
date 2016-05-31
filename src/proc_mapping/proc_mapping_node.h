@@ -32,6 +32,7 @@
 #include <vector>
 #include "proc_mapping/interpreter/map_interpreter.h"
 #include "proc_mapping/raw_map.h"
+#include "proc_mapping/semantic_map.h"
 
 namespace proc_mapping {
 
@@ -64,7 +65,9 @@ class ProcMappingNode {
   ros::NodeHandlePtr nh_;
   ros::Publisher object_pub_;
 
+  RawMap raw_map_;
   MapInterpreter map_interpreter_;
+  SemanticMap semantic_map_;
 };
 
 }  // namespace proc_mapping
