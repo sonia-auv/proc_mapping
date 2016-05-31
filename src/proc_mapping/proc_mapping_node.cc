@@ -45,6 +45,7 @@ ProcMappingNode::ProcMappingNode(const ros::NodeHandlePtr &nh)
       nh_->advertise<sonia_msgs::MapObject>("/proc_mapping/objects", 100);
 
   raw_map_.Attach(map_interpreter_);
+  map_interpreter_.Attach(semantic_map_);
 }
 
 //------------------------------------------------------------------------------

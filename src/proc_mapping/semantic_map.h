@@ -84,16 +84,19 @@ class SemanticMap : public atlas::Observer<> {
   /// line of functions anyway.
   void GetMetaDataForBuoys(std::vector<cv::KeyPoint> &&);
 
+  double GetDistanceBewteenKeypoint(cv::Point2d p1, cv::Point2d p2);
+
   //==========================================================================
   // P R I V A T E   M E M B E R S
 
   RawMap::Ptr raw_map_;
-
+  std::vector<Keypoint> trigged_keypoints_;
   std::vector<MapObjectsType> map_objects_;
 
   DetectionMode mode_;
 
   bool new_objects_available_;
+  mutable std::mutex object_mutex_;
 };
 
 }  // namespace proc_mapping

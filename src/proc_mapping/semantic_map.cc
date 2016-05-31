@@ -36,7 +36,7 @@ namespace proc_mapping {
 SemanticMap::SemanticMap(const RawMap::Ptr &raw_map)
     : raw_map_(raw_map),
       map_objects_({}),
-      mode_(DetectionMode::NO_MODE),
+      mode_(DetectionMode::BUOYS),
       new_objects_available_(false){};
 
 //------------------------------------------------------------------------------
@@ -60,7 +60,6 @@ void SemanticMap::OnSubjectNotify(atlas::Subject<> &) {
       break;
     case DetectionMode::NO_MODE:
       ROS_WARN("There is no execution mode set for the semantic map.");
-      // Todo : Impl the algo for the fence detection from keyPoints
       break;
   }
 }
@@ -68,32 +67,19 @@ void SemanticMap::OnSubjectNotify(atlas::Subject<> &) {
 //------------------------------------------------------------------------------
 //
 void SemanticMap::GetMetaDataForBuoys(std::vector<cv::KeyPoint> &&map_objects) {
-  static std::vector<Keypoint> trigged_keypoints;
-  static bool is_first = true;
-
+  std::lock_guard<std::mutex> guard(object_mutex_);
   if (map_objects.size() > 1) {
     for (size_t i = 0; i < map_objects.size(); i++) {
-      float distance_x_minus =
-          (map_objects[i].pt.x - map_objects[i + 1].pt.x) / 40;
-      float distance_y_minus =
-          (map_objects[i].pt.y - map_objects[i + 1].pt.y) / 40;
-      double distance_keypoint_minus =
-          sqrt((distance_x_minus * distance_x_minus) +
-               (distance_y_minus * distance_y_minus));
-
-      float distance_x_plus =
-          (map_objects[i].pt.x - map_objects[i - 1].pt.x) / 40;
-      float distance_y_plus =
-          (map_objects[i].pt.y - map_objects[i - 1].pt.y) / 40;
-      double distance_keypoint_plus = sqrt((distance_x_plus * distance_x_plus) +
-                                           (distance_y_plus * distance_y_plus));
-
-      if ((distance_keypoint_minus > 1.0f and distance_keypoint_minus < 2.6f) or
-          (distance_keypoint_plus > 1.0f and distance_keypoint_plus < 2.6f)) {
+      double distance_to_right_blob =
+          GetDistanceBewteenKeypoint(map_objects[i].pt, map_objects[i + 1].pt);
+      double distance_to_left_blob =
+          GetDistanceBewteenKeypoint(map_objects[i].pt, map_objects[i - 1].pt);
+      if ((distance_to_right_blob > 1.0f and distance_to_right_blob < 1.6f) or
+          (distance_to_left_blob > 1.0f and distance_to_left_blob < 1.6f)) {
         bool is_already_trigged = false;
 
-        for (uint32_t k = 0; k < trigged_keypoints.size(); ++k) {
-          if (map_objects[i].pt.inside(trigged_keypoints.at(k).bounding_box)) {
+        for (uint32_t k = 0; k < trigged_keypoints_.size(); ++k) {
+          if (map_objects[i].pt.inside(trigged_keypoints_.at(k).bounding_box)) {
             is_already_trigged = true;
           }
         }
@@ -112,21 +98,21 @@ void SemanticMap::GetMetaDataForBuoys(std::vector<cv::KeyPoint> &&map_objects) {
               cv::Point2d(map_objects[i].pt.x - 20, map_objects[i].pt.y - 20));
           trigged_keypoint.bounding_box = cv::boundingRect(rect);
           trigged_keypoint.is_object_send = false;
-          trigged_keypoints.push_back(trigged_keypoint);
+          trigged_keypoints_.push_back(trigged_keypoint);
         }
 
-        for (uint32_t k = 0; k < trigged_keypoints.size(); ++k) {
-          if (!trigged_keypoints.at(k).is_object_send) {
+        for (uint32_t k = 0; k < trigged_keypoints_.size(); ++k) {
+          if (!trigged_keypoints_.at(k).is_object_send) {
             sonia_msgs::MapObject obj;
 
             cv::Point2d offset = raw_map_->GetPositionOffset();
             auto world_point = raw_map_->PixelToWorldCoordinates(
-                trigged_keypoints.at(k).trigged_keypoint.pt);
+                trigged_keypoints_.at(k).trigged_keypoint.pt);
             obj.name = "Buoy [" + std::to_string(k) + "]";
-            obj.size = trigged_keypoints.at(k).trigged_keypoint.size;
+            obj.size = trigged_keypoints_.at(k).trigged_keypoint.size;
             obj.pose.x = world_point.x - offset.x;
             obj.pose.y = world_point.y - offset.y;
-            trigged_keypoints.at(k).is_object_send = true;
+            trigged_keypoints_.at(k).is_object_send = true;
 
             // Finally adding the object to the semantic map
             map_objects_.push_back(std::move(obj));
@@ -138,15 +124,26 @@ void SemanticMap::GetMetaDataForBuoys(std::vector<cv::KeyPoint> &&map_objects) {
   }
 }
 
+double SemanticMap::GetDistanceBewteenKeypoint(cv::Point2d p1, cv::Point2d p2) {
+  // Change 40 for raw_map_.pixel_.m_to_pixel
+  double delta_x = (p1.x - p2.x) / 40;
+  double delta_y = (p1.y - p2.y) / 40;
+  return sqrt((delta_x * delta_x) + (delta_y * delta_y));
+}
+
 //------------------------------------------------------------------------------
 //
 const std::vector<SemanticMap::MapObjectsType> &SemanticMap::GetMapObjects() {
+  std::lock_guard<std::mutex> guard(object_mutex_);
   new_objects_available_ = false;
   return map_objects_;
 }
 
 //------------------------------------------------------------------------------
 //
-bool SemanticMap::IsNewDataAvailable() const { return new_objects_available_; }
+bool SemanticMap::IsNewDataAvailable() const {
+  std::lock_guard<std::mutex> guard(object_mutex_);
+  return new_objects_available_;
+}
 
 }  // namespace proc_mapping
