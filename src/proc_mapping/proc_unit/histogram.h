@@ -56,11 +56,11 @@ class Histogram : public ProcUnit<cv::Mat> {
                cv::Scalar(255), 2, 8, 0);
     }
 
-    float thresh = (static_cast<float>(thresh_value) /
-                    static_cast<float>(thresh_value_max));
-
-    cv::line(hist_image, cv::Point(hist_w * thresh, 0),
-             cv::Point(hist_w * thresh, hist_h), cv::Scalar(255));
+//    float thresh = (static_cast<float>(thresh_value) /
+//                    static_cast<float>(thresh_value_max));
+//
+//    cv::line(hist_image, cv::Point(hist_w * thresh, 0),
+//             cv::Point(hist_w * thresh, hist_h), cv::Scalar(255));
 
     cv::imshow("Histogram", hist_image);
     cv::waitKey(1);
