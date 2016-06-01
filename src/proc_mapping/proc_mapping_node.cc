@@ -46,6 +46,9 @@ ProcMappingNode::ProcMappingNode(const ros::NodeHandlePtr &nh)
 
   raw_map_.Attach(map_interpreter_);
   map_interpreter_.Attach(semantic_map_);
+
+  map_ = cv::Mat(800, 800, CV_8UC1);
+  map_.setTo(cv::Scalar(0));
 }
 
 //------------------------------------------------------------------------------
@@ -59,11 +62,33 @@ ProcMappingNode::~ProcMappingNode() {}
 //
 void ProcMappingNode::Spin() {
   while (ros::ok()) {
+    cv::Point2d offset = raw_map_.GetPositionOffset();
+
     if (semantic_map_.IsNewDataAvailable()) {
       for (const auto &obj : semantic_map_.GetMapObjects()) {
         object_pub_.publish(obj);
+        cv::Point2d object(obj.pose.x, obj.pose.y);
+        object += offset;
+        object = raw_map_.WorldToPixelCoordinates(object);
+        cv::circle(map_, object, 10, cv::Scalar(255), -1);
       }
     }
+
+    cv::Point2d sub = raw_map_.GetSubMarinePosition();
+    sub += offset;
+    cv::line(map_, cv::Point2d(800 / 2, 800 / 2),
+             cv::Point2d(800 / 2, 0), cv::Scalar(255));
+    cv::line(map_, cv::Point2d(800 / 2, 800 / 2),
+             cv::Point2d(800, 800 / 2),
+             cv::Scalar(255));
+    sub = raw_map_.WorldToPixelCoordinates(sub);
+    sub.y = (800 / 2) - sub.y + (800 / 2);
+
+    cv::circle(map_, sub, 5, cv::Scalar(255), -1);
+    cv::imshow("Semantic Map", map_);
+    cv::circle(map_, sub, 5, cv::Scalar(0), -1);
+
+    cv::waitKey(1);
 
     ros::spinOnce();
   }

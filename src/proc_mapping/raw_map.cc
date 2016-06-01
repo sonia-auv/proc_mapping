@@ -242,8 +242,8 @@ void RawMap::ProcessPointCloud(const sensor_msgs::PointCloud2::ConstPtr &msg) {
   //
   //  cv::circle(pixel_.map, sub, 2, cv::Scalar::all(255), -1);
 
-  cv::imshow("Original", pixel_.map);
-  cv::waitKey(1);
+//  cv::imshow("Original", pixel_.map);
+//  cv::waitKey(1);
 
   if (debug) {
     // Create sub heading, sonar_scan left and rigth limit

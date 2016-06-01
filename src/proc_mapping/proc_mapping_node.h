@@ -68,6 +68,7 @@ class ProcMappingNode {
   RawMap raw_map_;
   MapInterpreter map_interpreter_;
   SemanticMap semantic_map_;
+  cv::Mat map_;
 };
 
 }  // namespace proc_mapping

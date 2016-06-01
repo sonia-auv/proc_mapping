@@ -74,6 +74,7 @@ void SemanticMap::GetMetaDataForBuoys(std::vector<cv::KeyPoint> &&map_objects) {
           GetDistanceBewteenKeypoint(map_objects[i].pt, map_objects[i + 1].pt);
       double distance_to_left_blob =
           GetDistanceBewteenKeypoint(map_objects[i].pt, map_objects[i - 1].pt);
+
       if ((distance_to_right_blob > 1.0f and distance_to_right_blob < 1.6f) or
           (distance_to_left_blob > 1.0f and distance_to_left_blob < 1.6f)) {
         bool is_already_trigged = false;
@@ -87,16 +88,7 @@ void SemanticMap::GetMetaDataForBuoys(std::vector<cv::KeyPoint> &&map_objects) {
         if (!is_already_trigged) {
           Keypoint trigged_keypoint;
           trigged_keypoint.trigged_keypoint = map_objects[i];
-          std::vector<cv::Point> rect;
-          rect.push_back(
-              cv::Point2d(map_objects[i].pt.x + 20, map_objects[i].pt.y + 20));
-          rect.push_back(
-              cv::Point2d(map_objects[i].pt.x + 20, map_objects[i].pt.y - 20));
-          rect.push_back(
-              cv::Point2d(map_objects[i].pt.x - 20, map_objects[i].pt.y + 20));
-          rect.push_back(
-              cv::Point2d(map_objects[i].pt.x - 20, map_objects[i].pt.y - 20));
-          trigged_keypoint.bounding_box = cv::boundingRect(rect);
+          trigged_keypoint.bounding_box = SetBoundingBox(map_objects[i].pt, 20);
           trigged_keypoint.is_object_send = false;
           trigged_keypoints_.push_back(trigged_keypoint);
         }
@@ -106,7 +98,7 @@ void SemanticMap::GetMetaDataForBuoys(std::vector<cv::KeyPoint> &&map_objects) {
             sonia_msgs::MapObject obj;
 
             cv::Point2d offset = raw_map_->GetPositionOffset();
-            auto world_point = raw_map_->PixelToWorldCoordinates(
+            cv::Point2d world_point = raw_map_->PixelToWorldCoordinates(
                 trigged_keypoints_.at(k).trigged_keypoint.pt);
             obj.name = "Buoy [" + std::to_string(k) + "]";
             obj.size = trigged_keypoints_.at(k).trigged_keypoint.size;
@@ -124,11 +116,25 @@ void SemanticMap::GetMetaDataForBuoys(std::vector<cv::KeyPoint> &&map_objects) {
   }
 }
 
+//------------------------------------------------------------------------------
+//
 double SemanticMap::GetDistanceBewteenKeypoint(cv::Point2d p1, cv::Point2d p2) {
-  // Change 40 for raw_map_.pixel_.m_to_pixel
-  double delta_x = (p1.x - p2.x) / 40;
-  double delta_y = (p1.y - p2.y) / 40;
+  cv::Point2d world_p1 = raw_map_->PixelToWorldCoordinates(p1);
+  cv::Point2d world_p2 = raw_map_->PixelToWorldCoordinates(p2);
+  double delta_x = (world_p1.x - world_p2.x);
+  double delta_y = (world_p1.y - world_p2.y);
   return sqrt((delta_x * delta_x) + (delta_y * delta_y));
+}
+
+//------------------------------------------------------------------------------
+//
+cv::Rect SemanticMap::SetBoundingBox(cv::Point2d keypoint, int box_size) {
+  std::vector<cv::Point> rect;
+  rect.push_back(cv::Point2d(keypoint.x + box_size, keypoint.y + box_size));
+  rect.push_back(cv::Point2d(keypoint.x + box_size, keypoint.y - box_size));
+  rect.push_back(cv::Point2d(keypoint.x - box_size, keypoint.y + box_size));
+  rect.push_back(cv::Point2d(keypoint.x - box_size, keypoint.y - box_size));
+  return cv::boundingRect(rect);
 }
 
 //------------------------------------------------------------------------------

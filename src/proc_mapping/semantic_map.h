@@ -85,6 +85,7 @@ class SemanticMap : public atlas::Observer<> {
   void GetMetaDataForBuoys(std::vector<cv::KeyPoint> &&);
 
   double GetDistanceBewteenKeypoint(cv::Point2d p1, cv::Point2d p2);
+  cv::Rect SetBoundingBox(cv::Point2d keypoint, int box_size);
 
   //==========================================================================
   // P R I V A T E   M E M B E R S
