@@ -116,7 +116,6 @@ class BlobDetector : public ProcUnit<cv::Mat> {
       params_.filterByArea = true;
       params_.minArea = 350;
       params_.maxArea = 526;
-      params_.filterByArea = false;
       params_.filterByCircularity = false;
       params_.filterByColor = false;
       params_.filterByConvexity = false;

@@ -102,14 +102,16 @@ bool ProcMappingNode::ChangeProcTreeCallback(
   } else {
     map_interpreter_.SetDetectionMode(DetectionMode::NONE);
   }
-  return false;
+  return true;
 }
 
 //------------------------------------------------------------------------------
 //
 void ProcMappingNode::Spin() {
   while (ros::ok()) {
+  #ifdef DEBUG
     cv::Point2d offset = raw_map_.GetPositionOffset();
+  #endif
 
     if (semantic_map_.IsNewDataAvailable()) {
       sonia_msgs::SemanticMap map_msg;
