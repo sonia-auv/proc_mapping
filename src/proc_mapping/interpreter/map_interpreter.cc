@@ -25,6 +25,7 @@
 
 #include "proc_mapping/interpreter/map_interpreter.h"
 #include <tf/transform_datatypes.h>
+#include <ros/console.h>
 
 namespace proc_mapping {
 
@@ -38,6 +39,7 @@ MapInterpreter::MapInterpreter(const ros::NodeHandlePtr &nh,
     : DataInterpreter<cv::Mat>(nh, proc_trees_file_name),
       mode_(DetectionMode::NONE) {
   SetDetectionMode(mode_);
+  InstanciateProcTrees(proc_trees_file_name + ".yaml");
 }
 
 //------------------------------------------------------------------------------
@@ -66,7 +68,7 @@ void MapInterpreter::OnSubjectNotify(atlas::Subject<cv::Mat> &subject,
 //
 void MapInterpreter::SetDetectionMode(const DetectionMode &mode) {
   if (mode == DetectionMode::BUOYS) {
-    SetCurrentProcTree("buoy");
+    SetCurrentProcTree("buoys");
   } else if (mode == DetectionMode::FENCE) {
     SetCurrentProcTree("fence");
   } else {
@@ -75,6 +77,39 @@ void MapInterpreter::SetDetectionMode(const DetectionMode &mode) {
     return;
   }
   mode_ = mode;
+}
+
+//------------------------------------------------------------------------------
+//
+void MapInterpreter::InstanciateProcTrees(
+    const std::string &proc_tree_file_name) {
+  YAML::Node node = YAML::LoadFile(kProcTreesFilePath + proc_tree_file_name);
+
+  std::string default_pt{""};
+  if (node["default"]) {
+    default_pt = node["default"].as<std::string>();
+  }
+
+  if (node["proc_trees"]) {
+    auto proc_trees = node["proc_trees"];
+    assert(proc_trees.Type() == YAML::NodeType::Sequence);
+
+    for (std::size_t i = 0; i < proc_trees.size(); i++) {
+      auto proc_tree = std::make_shared<ProcTree<cv::Mat>>(proc_trees[i], nh_);
+      all_proc_trees_.push_back(proc_tree);
+      if (!default_pt.empty() &&
+          default_pt == proc_trees[i]["name"].as<std::string>()) {
+        if(default_pt == "buoys") {
+          SetDetectionMode(DetectionMode::BUOYS);
+        } else if (default_pt == "fence"){
+          SetDetectionMode(DetectionMode::FENCE);
+        } else {
+          ROS_ERROR("Trying to set default proc tree: There is no proc tree "
+                        "with this name");
+        }
+      }
+    }
+  }
 }
 
 }  // namespace proc_mapping

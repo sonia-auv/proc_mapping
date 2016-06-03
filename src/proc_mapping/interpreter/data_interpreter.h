@@ -75,6 +75,8 @@ class DataInterpreter : public atlas::Observer<Tp_> {
 
   void OnSubjectNotify(atlas::Subject<Tp_> &subject, Tp_ args) override;
 
+  virtual void InstanciateProcTrees(const std::string &proc_tree_file_name);
+
   /**
    * This is the most important method of the DataInterpreter as it is the one
    * that will return the WeightedObjects. When a new data is ready (should) be
@@ -97,17 +99,12 @@ class DataInterpreter : public atlas::Observer<Tp_> {
 
   ros::NodeHandlePtr nh_;
 
- private:
-  //============================================================================
-  // P R I V A T E   M E T H O D S
-
-  void InstanciateProcTrees(const std::string &proc_tree_file_name);
-
-  //============================================================================
-  // P R I V A T E   M E M B E R S
-
   ProcTreeTypeList all_proc_trees_;
   ProcTreeType current_proc_tree_;
+
+ private:
+  //============================================================================
+  // P R I V A T E   M E M B E R S
 
   bool new_data_ready_;
 

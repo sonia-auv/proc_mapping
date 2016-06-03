@@ -66,15 +66,22 @@ class MapInterpreter : public DataInterpreter<cv::Mat>,
 
   void SetDetectionMode(const DetectionMode &mode);
 
+ protected:
   //==========================================================================
-  // P U B L I C   M E T H O D S
+  // P R O T E C T E D   M E T H O D S
 
   /// The method will update the latest data in the DataInterpreter.
   /// This will run the whole processing chain as the method SetNewData
   /// start it.
   void OnSubjectNotify(atlas::Subject<cv::Mat> &subject, cv::Mat args) override;
 
+  virtual void InstanciateProcTrees(const std::string &proc_tree_file_name)
+  override;
+
  private:
+  //==========================================================================
+  // P R I V A T E   M E M B E R S
+
   DetectionMode mode_;
 };
 

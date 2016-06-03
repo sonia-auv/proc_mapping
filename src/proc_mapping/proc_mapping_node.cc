@@ -43,7 +43,7 @@ ProcMappingNode::ProcMappingNode(const ros::NodeHandlePtr &nh)
       map_interpreter_(nh_, "proc_trees"),
       semantic_map_(std::shared_ptr<RawMap>(&raw_map_)) {
   map_pub_ =
-      nh_->advertise<sonia_msgs::MapObject>("/proc_mapping/objects", 100);
+      nh_->advertise<sonia_msgs::SemanticMap>("/proc_mapping/map", 100);
 
   reset_odom_sub_ =
       nh_->subscribe("/proc_navigation/reset_odometry", 100,
@@ -138,9 +138,9 @@ void ProcMappingNode::Spin() {
     cv::circle(map_, sub, 5, cv::Scalar(255), -1);
     cv::imshow("Semantic Map", map_);
     cv::circle(map_, sub, 5, cv::Scalar(0), -1);
-#endif
 
     cv::waitKey(1);
+#endif
 
     ros::spinOnce();
   }

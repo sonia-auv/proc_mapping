@@ -111,9 +111,16 @@ class BlobDetector : public ProcUnit<cv::Mat> {
     //    max_inertia_ratio_max);
 
     if (target_ == 0) {
+      params_.minThreshold = 0;
+      params_.maxThreshold = 255;
       params_.filterByArea = true;
-      params_.minArea = 200;
+      params_.minArea = 350;
       params_.maxArea = 526;
+      params_.filterByArea = false;
+      params_.filterByCircularity = false;
+      params_.filterByColor = false;
+      params_.filterByConvexity = false;
+      params_.filterByInertia = false;
     } else {
       params_.minThreshold = 0;
       params_.maxThreshold = 255;
