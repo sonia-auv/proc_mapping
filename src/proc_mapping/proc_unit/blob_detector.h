@@ -28,7 +28,7 @@
 
 #include <opencv/cv.h>
 #include <ros/ros.h>
-#include <sonia_msgs/ObstacleTemplate.h>
+#include <sonia_msgs/Target.h>
 #include <memory>
 #include "proc_mapping/interpreter/object_registery.h"
 #include "proc_mapping/proc_unit/proc_unit.h"
@@ -73,24 +73,12 @@ class BlobDetector : public ProcUnit<cv::Mat> {
   //==========================================================================
   // P U B L I C   C / D T O R S
 
-  BlobDetector(){};
-
-  BlobDetector(const ros::NodeHandlePtr &nh, bool debug)
-      : nh_(nh), debug_(debug) {
-    obstacle_server_ = nh_->advertiseService(
-        "obstacle", &BlobDetector::ObstacleTemplate, this);
-  }
+  BlobDetector(uint8_t target = 0, bool debug = false)
+      : target_(target), debug_(debug) { }
   virtual ~BlobDetector() = default;
 
   //==========================================================================
   // P U B L I C   M E T H O D S
-
-  // Method use to change the obstacle template
-  bool ObstacleTemplate(sonia_msgs::ObstacleTemplate::Request &req,
-                        sonia_msgs::ObstacleTemplate::Response &resp) {
-    obstacle_ = req.obstacle_template;
-    return true;
-  }
 
   virtual void ProcessData(cv::Mat &input) override {
     cv::createTrackbar("area filter", "Blob Detector", &filter_area_off,
@@ -116,9 +104,9 @@ class BlobDetector : public ProcUnit<cv::Mat> {
     //    cv::createTrackbar("max inertia", "Blob Detector", &max_inertia_ratio,
     //    max_inertia_ratio_max);
 
-    if (obstacle_.compare("buoy") == 0) {
+    if (target_ == 0) {
       params_.filterByArea = true;
-      params_.minArea = 378;
+      params_.minArea = 200;
       params_.maxArea = 526;
     } else {
       params_.minThreshold = 0;
@@ -149,44 +137,13 @@ class BlobDetector : public ProcUnit<cv::Mat> {
       ObjectRegistery::GetInstance().AddObject(key_point);
     }
 
-    //    for (int i = 0; i < keyPoints.size(); ++i) {
-    //      cv::putText(input, std::to_string(i), keyPoints[i].pt,
-    //                  cv::FONT_HERSHEY_SCRIPT_SIMPLEX, 1, cv::Scalar(255));
-    //    }
-
-    //    // The fact that we are pushing mutliple obj seems to kill the process
-    //    if (!keyPoints.empty()) {
-    //      for (size_t i = 0; i < keyPoints.size(); ++i) {
-    //        sonia_msgs::MapObject obj;
-    //        obj.name = "Buoy [" + std::to_string(i) + "]";
-    //        obj.pose.x = keyPoints[i].pt.x;
-    //        obj.pose.y = keyPoints[i].pt.y;
-    //
-    //        ObjectRegistery::GetInstance().AddObject(obj);
-    //      }
-    //    }
-
-    //    // Simple for loop to print keypoint descriptor
-    //    if (!keyPoints.empty()) {
-    //      for(int i = 0; i < keyPoints.size(); ++i) {
-    //        std::cout << "Keypoint[" << i << "]: " << std::endl <<
-    //            "x= " << keyPoints[i].pt.x << " y= " << keyPoints[i].pt.y
-    //            << std::endl <<
-    //            "size= " << keyPoints[i].size << std::endl <<
-    //            "angle= " << keyPoints[i].angle << std::endl <<
-    //            "class_id= " << keyPoints[i].class_id << std::endl <<
-    //            "response= " << keyPoints[i].response << std::endl <<
-    //            "octave= " << keyPoints[i].octave << std::endl;
-    //      }
-    //    }
-
     if (debug_) {
       cv::Mat output;
       cv::drawKeypoints(input, keyPoints, output, cv::Scalar(0, 0, 255),
                         cv::DrawMatchesFlags::DRAW_RICH_KEYPOINTS);
 
-//      cv::imshow("Blob Detector", output);
-//      cv::waitKey(1);
+      cv::imshow("Blob Detector", output);
+      cv::waitKey(1);
     }
   }
 
@@ -194,12 +151,9 @@ class BlobDetector : public ProcUnit<cv::Mat> {
   //==========================================================================
   // P R I V A T E   M E M B E R S
 
-  ros::NodeHandlePtr nh_;
-  ros::ServiceServer obstacle_server_;
-
-  std::string obstacle_;
+  uint8_t target_;
+  bool debug_;
   cv::SimpleBlobDetector::Params params_;
-  bool debug_ = false;
 };
 }  // namespace proc_mapping
 

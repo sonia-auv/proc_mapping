@@ -41,21 +41,14 @@ namespace proc_mapping {
 //
 MapInterpreter::MapInterpreter(const ros::NodeHandlePtr &nh)
     : DataInterpreter<cv::Mat>(nh), nh_(nh) {
-  ProcUnit<cv::Mat>::Ptr pu1{new Blur(1, false)};
+  ProcUnit<cv::Mat>::Ptr pu1{new Blur()};
   AddProcUnit(std::move(pu1));
-  //  ProcUnit<cv::Mat>::Ptr pu_hist{new Histogram()};
-  //  AddProcUnit(std::move(pu_hist));
-  ProcUnit<cv::Mat>::Ptr pu2{new Threshold(0, false)};
+  ProcUnit<cv::Mat>::Ptr pu2{new Threshold()};
   AddProcUnit(std::move(pu2));
-  ProcUnit<cv::Mat>::Ptr pu3{new Dilate(false)};
+  ProcUnit<cv::Mat>::Ptr pu3{new Dilate()};
   AddProcUnit(std::move(pu3));
-  ProcUnit<cv::Mat>::Ptr pu4{new BlobDetector(nh, true)};
+  ProcUnit<cv::Mat>::Ptr pu4{new BlobDetector(0, true)};
   AddProcUnit(std::move(pu4));
-  // This is not a proc unit that is going to be used, but let's keep it
-  // for demo purpose for now, we will delete it once every thing works with
-  // the other algos.
-  //  ProcUnit<cv::Mat>::Ptr test_pu{new PatternDetection(nh)};
-  //  AddProcUnit(std::move(test_pu));
 }
 
 //------------------------------------------------------------------------------

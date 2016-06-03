@@ -46,8 +46,7 @@ class Dilate : public ProcUnit<cv::Mat> {
   //==========================================================================
   // P U B L I C   C / D T O R S
 
-  Dilate(){};
-  Dilate(bool debug) : debug(debug){};
+  Dilate(bool debug = false) : debug_(debug){};
 
   virtual ~Dilate() = default;
 
@@ -62,17 +61,17 @@ class Dilate : public ProcUnit<cv::Mat> {
     cv::Size size = cv::Size(kernel_size_x, kernel_size_y);
     cv::Mat kernel_ = cv::getStructuringElement(kernelType, size, anchor_);
     cv::dilate(input, input, kernel_, anchor_, iteration);
-    if (debug) {
+    if (debug_) {
       cv::imshow("Dilate", input);
       cv::waitKey(1);
     }
   }
 
  private:
+  bool debug_;
   const cv::Point anchor_ = cv::Point(-1, -1);
   int iteration = 1;
   int kernelType = cv::MORPH_RECT;
-  bool debug = false;
 };
 
 }  // namespace proc_mapping

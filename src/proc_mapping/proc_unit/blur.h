@@ -47,7 +47,6 @@ class Blur : public ProcUnit<cv::Mat> {
   //==========================================================================
   // P U B L I C   C / D T O R S
 
-  Blur(){};
   Blur(int blur_type = 1, bool debug = false)
       : blur_type(blur_type), debug(debug){};
 
