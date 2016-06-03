@@ -336,4 +336,10 @@ cv::Point2d RawMap::GetSubMarinePosition() const noexcept {
   return sub_.position;
 }
 
+//------------------------------------------------------------------------------
+//
+void RawMap::ResetPosition() {
+  // Todo: Implement the Reset of the map.
+}
+
 }  // namespace proc_mapping

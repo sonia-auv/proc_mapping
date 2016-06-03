@@ -73,7 +73,8 @@ ProcMappingNode::~ProcMappingNode() {}
 //
 void ProcMappingNode::ResetOdometryCallback(
     const sonia_msgs::ResetOdometry::ConstPtr &msg) {
-  // Todo: Implement the logic for resetting the map;
+  semantic_map_.ClearMapObjects();
+  raw_map_.ResetPosition();
 }
 
 //------------------------------------------------------------------------------

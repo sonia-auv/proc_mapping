@@ -112,6 +112,8 @@ class RawMap : public atlas::Subject<cv::Mat>, public atlas::Runnable {
   /// Thus, we are going to offset it by the half of the map size.
   cv::Point2d GetPositionOffset() const;
 
+  void ResetPosition();
+
  private:
   //==========================================================================
   // P R I V A T E   M E T H O D S

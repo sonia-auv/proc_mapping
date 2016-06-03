@@ -150,4 +150,12 @@ bool SemanticMap::IsNewDataAvailable() const {
   return new_objects_available_;
 }
 
+//------------------------------------------------------------------------------
+//
+void SemanticMap::ClearMapObjects() {
+  std::lock_guard<std::mutex> guard(object_mutex_);
+  map_objects_.clear();
+  new_objects_available_ = true;
+}
+
 }  // namespace proc_mapping
