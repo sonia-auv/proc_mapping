@@ -37,11 +37,20 @@ namespace proc_mapping {
 ProcMappingNode::ProcMappingNode(const ros::NodeHandlePtr &nh)
     : nh_(nh),
       map_pub_(),
+      reset_odom_sub_(),
+      send_map_srv_(),
       raw_map_(nh_),
       map_interpreter_(nh_, "proc_trees"),
       semantic_map_(std::shared_ptr<RawMap>(&raw_map_)) {
   map_pub_ =
       nh_->advertise<sonia_msgs::MapObject>("/proc_mapping/objects", 100);
+
+  reset_odom_sub_ = nh_->subscribe("/proc_navigation/reset_odometry", 100,
+                                   &ProcMappingNode::ResetOdometryCallback,
+                                   this);
+  send_map_srv_ = nh_->advertiseService("send_map",
+                                        &ProcMappingNode::SendMapCallback,
+                                        this);
 
   raw_map_.Attach(map_interpreter_);
   map_interpreter_.Attach(semantic_map_);
@@ -58,6 +67,25 @@ ProcMappingNode::~ProcMappingNode() {}
 
 //==============================================================================
 // M E T H O D   S E C T I O N
+
+//------------------------------------------------------------------------------
+//
+void ProcMappingNode::ResetOdometryCallback(const
+                                            sonia_msgs::ResetOdometry::ConstPtr& msg) {
+  // Todo: Implement the logic for resetting the map;
+}
+
+//------------------------------------------------------------------------------
+//
+bool ProcMappingNode::SendMapCallback(sonia_msgs::SendSemanticMap::Request &req,
+                     sonia_msgs::SendSemanticMap::Response &res) {
+  sonia_msgs::SemanticMap map_msg;
+  for (const auto &obj : semantic_map_.GetMapObjects()) {
+    map_msg.objects.push_back(obj);
+  }
+  map_pub_.publish(map_msg);
+  return true;
+}
 
 //------------------------------------------------------------------------------
 //

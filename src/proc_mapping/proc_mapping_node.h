@@ -30,6 +30,8 @@
 #include <ros/node_handle.h>
 #include <memory>
 #include <vector>
+#include <sonia_msgs/ResetOdometry.h>
+#include <sonia_msgs/SendSemanticMap.h>
 #include "proc_mapping/config.h"
 #include "proc_mapping/interpreter/map_interpreter.h"
 #include "proc_mapping/raw_map.h"
@@ -61,12 +63,19 @@ class ProcMappingNode {
   /// registery, empty it and publish the objects.
   void Spin();
 
+  void ResetOdometryCallback(const sonia_msgs::ResetOdometry::ConstPtr& msg);
+
+  bool SendMapCallback(sonia_msgs::SendSemanticMap::Request &req,
+                       sonia_msgs::SendSemanticMap::Response &res);
+
  private:
   //==========================================================================
   // P R I V A T E   M E M B E R S
 
   ros::NodeHandlePtr nh_;
   ros::Publisher map_pub_;
+  ros::Subscriber reset_odom_sub_;
+  ros::ServiceServer send_map_srv_;
 
   RawMap raw_map_;
   MapInterpreter map_interpreter_;

@@ -28,7 +28,6 @@
 
 #include <opencv/cv.h>
 #include <ros/ros.h>
-#include <sonia_msgs/Target.h>
 #include <memory>
 
 #include <highgui.h>
