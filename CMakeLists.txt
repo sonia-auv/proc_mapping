@@ -38,11 +38,11 @@ find_package(
     pcl_conversions
     lib_atlas
     sonia_msgs
-    eigen_conversions
 )
 
-#find_package(catkin REQUIRED cmake_modules)
-#find_package(Eigen REQUIRED)
+find_package(catkin REQUIRED cmake_modules)
+find_package(Eigen REQUIRED)
+find_package(PCL REQUIRED)
 
 #===============================================================================
 # G E N E R A T E   M E S S A G E S   &   S E R V I C E S
@@ -61,6 +61,7 @@ catkin_package(
     pcl_conversions
     lib_atlas
     sonia_msgs
+    DEPENDS Eigen PCL
 )
 
 #===============================================================================
@@ -77,7 +78,8 @@ include_directories(
     ${catkin_INCLUDE_DIRS}
     ${proc_mapping_SRC_DIR}
     ${lib_atlas_INCLUDE_DIRS}
-    ${eigen_conversions_INCLUDE_DIRS}
+    ${Eigen_INCLUDE_DIRS}
+    ${PCL_INCLUDE_DIRS}
     ${OpenCV_INCLUDE_DIRS}
 )
 
@@ -88,17 +90,14 @@ add_executable(${PROJECT_NAME}_node ${proc_mapping_SRC_DIR}/${PROJECT_NAME}/main
 target_link_libraries(${PROJECT_NAME}_node
     ${catkin_LIBRARIES}
     ${lib_atlas_LIBRARIES}
-    yaml-cpp)
+    yaml-cpp
+    ${Eigen_LIBRARIES}
+    ${PCL_LIBRARIES})
 add_dependencies(${PROJECT_NAME}_node sonia_msgs_generate_messages_cpp)
 
 #==========================================================================
 # U N I T   T E S T S
 
-catkin_add_gtest(raw_map_test test/raw_map_test.cc  ${proc_mapping_FILES})
-target_link_libraries(raw_map_test ${catkin_LIBRARIES} ${lib_atlas_LIBRARIES} yaml-cpp)
-
-#
-#if (CATKIN_ENABLE_TESTING AND ${CMAKE_CURRENT_SOURCE_DIR}/test)
-#  add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/test)
-#endif ()
-
+if (CATKIN_ENABLE_TESTING)
+  add_subdirectory(test)
+endif ()
