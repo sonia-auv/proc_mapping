@@ -35,33 +35,9 @@
 #include <memory>
 #include <mutex>
 #include <vector>
-#include "proc_mapping/proc_unit/proc_unit.h"
+#include "proc_mapping/proc_unit/proc_tree.h"
 
 namespace proc_mapping {
-
-/**
- * This is a simple interface for the DataInterpreter so we are able to store
- * pointers of it.
- * We especially need this in the ObjectMapper object that agregate this a
- * list of DataInterpreter.
- */
-class DataInterpreterInterface : public atlas::Subject<> {
- public:
-  //============================================================================
-  // T Y P E D E F   A N D   E N U M
-
-  using Ptr = std::shared_ptr<DataInterpreterInterface>;
-  using ConstPtr = std::shared_ptr<const DataInterpreterInterface>;
-  using PtrList = std::vector<DataInterpreterInterface::Ptr>;
-  using ConstPtrList = std::vector<DataInterpreterInterface::ConstPtr>;
-
-  //============================================================================
-  // P U B L I C   C / D T O R S
-
-  explicit DataInterpreterInterface(const ros::NodeHandlePtr &nh) {}
-
-  virtual ~DataInterpreterInterface() = default;
-};
 
 /**
  * A DataInterpreter is an object that subscribe to a source of information (
@@ -72,13 +48,24 @@ class DataInterpreterInterface : public atlas::Subject<> {
  * See DataInterpreterInterface for public interface informations.
  */
 template <class Tp_>
-class DataInterpreter : public DataInterpreterInterface,
-                        public atlas::Observer<cv::Mat> {
+class DataInterpreter : public atlas::Observer<Tp_>, public atlas::Subject<> {
  public:
+  //==========================================================================
+  // T Y P E D E F   A N D   E N U M
+
+  using Ptr = std::shared_ptr<DataInterpreter>;
+  using ConstPtr = std::shared_ptr<const DataInterpreter>;
+  using PtrList = std::vector<DataInterpreter::Ptr>;
+  using ConstPtrList = std::vector<DataInterpreter::ConstPtr>;
+
+  using ProcTreeType = typename ProcTree<Tp_>::Ptr;
+  using ProcTreeTypeList = std::vector<ProcTreeType>;
+
   //============================================================================
   // P U B L I C   C / D T O R S
 
-  explicit DataInterpreter(const ros::NodeHandlePtr &nh);
+  explicit DataInterpreter(const ros::NodeHandlePtr &nh,
+                           const std::string &proc_trees_file_name);
 
   virtual ~DataInterpreter();
 
@@ -100,13 +87,27 @@ class DataInterpreter : public DataInterpreterInterface,
 
   void SetNewData(const Tp_ &data);
 
-  void AddProcUnit(const typename ProcUnit<Tp_>::Ptr &proc_unit);
-
   bool IsNewDataReady() const;
+
+  bool SetCurrentProcTree(const std::string &name);
+  bool SetCurrentProcTree(const ProcTreeType &proc_tree);
+
+  //==========================================================================
+  // P R O T E C T E D   M E M B E R S
+
+  ros::NodeHandlePtr nh_;
 
  private:
   //============================================================================
+  // P R I V A T E   M E T H O D S
+
+  void InstanciateProcTrees(const std::string &proc_tree_file_name);
+
+  //============================================================================
   // P R I V A T E   M E M B E R S
+
+  ProcTreeTypeList all_proc_trees_;
+  ProcTreeType current_proc_tree_;
 
   bool new_data_ready_;
 
@@ -118,15 +119,10 @@ class DataInterpreter : public DataInterpreterInterface,
   Tp_ last_data_;
 
   mutable std::mutex data_mutex_;
-
-  /**
-   * List of the processing unit that will sort
-   */
-  typename ProcUnit<Tp_>::PtrList proc_units_;
 };
 
 }  // namespace proc_mapping
 
-#include <proc_mapping/interpreter/data_interpreter_inl.h>
+#include "proc_mapping/interpreter/data_interpreter_inl.h"
 
 #endif  // PROC_MAPPING_INTERPRETER_DATA_INTERPRETER_H_

@@ -25,12 +25,6 @@
 
 #include "proc_mapping/interpreter/map_interpreter.h"
 #include <tf/transform_datatypes.h>
-#include "proc_mapping/proc_unit/blob_detector.h"
-#include "proc_mapping/proc_unit/blur.h"
-#include "proc_mapping/proc_unit/dilate.h"
-#include "proc_mapping/proc_unit/histogram.h"
-#include "proc_mapping/proc_unit/pattern_detection.h"
-#include "proc_mapping/proc_unit/threshold.h"
 
 namespace proc_mapping {
 
@@ -39,24 +33,9 @@ namespace proc_mapping {
 
 //------------------------------------------------------------------------------
 //
-MapInterpreter::MapInterpreter(const ros::NodeHandlePtr &nh)
-    : DataInterpreter<cv::Mat>(nh), nh_(nh) {
-  ProcUnit<cv::Mat>::Ptr pu1{new Blur(1, false)};
-  AddProcUnit(std::move(pu1));
-  //  ProcUnit<cv::Mat>::Ptr pu_hist{new Histogram()};
-  //  AddProcUnit(std::move(pu_hist));
-  ProcUnit<cv::Mat>::Ptr pu2{new Threshold(0, false)};
-  AddProcUnit(std::move(pu2));
-  ProcUnit<cv::Mat>::Ptr pu3{new Dilate(false)};
-  AddProcUnit(std::move(pu3));
-  ProcUnit<cv::Mat>::Ptr pu4{new BlobDetector(nh, true)};
-  AddProcUnit(std::move(pu4));
-  // This is not a proc unit that is going to be used, but let's keep it
-  // for demo purpose for now, we will delete it once every thing works with
-  // the other algos.
-  //  ProcUnit<cv::Mat>::Ptr test_pu{new PatternDetection(nh)};
-  //  AddProcUnit(std::move(test_pu));
-}
+MapInterpreter::MapInterpreter(const ros::NodeHandlePtr &nh,
+                               const std::string &proc_trees_file_name)
+    : DataInterpreter<cv::Mat>(nh_, proc_trees_file_name) {}
 
 //------------------------------------------------------------------------------
 //

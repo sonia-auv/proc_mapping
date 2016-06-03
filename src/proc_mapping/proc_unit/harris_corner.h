@@ -23,8 +23,8 @@
  * along with S.O.N.I.A. software. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef PROC_MAPPING_HARRIS_CORNER_H
-#define PROC_MAPPING_HARRIS_CORNER_H
+#ifndef PROC_MAPPING_PROC_UNIT_HARRIS_CORNER_H_
+#define PROC_MAPPING_PROC_UNIT_HARRIS_CORNER_H_
 
 #include <opencv/cv.h>
 #include <vector>
@@ -84,4 +84,4 @@ class HarrisCorner : public ProcUnit<cv::Mat> {
 
 }  // namespace proc_mapping
 
-#endif  // PROC_MAPPING_HARRIS_CORNER_H
+#endif  // PROC_MAPPING_PROC_UNIT_HARRIS_CORNER_H_

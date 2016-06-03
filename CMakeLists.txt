@@ -85,14 +85,17 @@ include_directories(
 # C R E A T E   E X E C U T A B L E
 
 add_executable(${PROJECT_NAME}_node ${proc_mapping_SRC_DIR}/${PROJECT_NAME}/main.cc ${proc_mapping_FILES})
-target_link_libraries(${PROJECT_NAME}_node ${catkin_LIBRARIES} ${lib_atlas_LIBRARIES} )
+target_link_libraries(${PROJECT_NAME}_node
+    ${catkin_LIBRARIES}
+    ${lib_atlas_LIBRARIES}
+    yaml-cpp)
 add_dependencies(${PROJECT_NAME}_node sonia_msgs_generate_messages_cpp)
 
 #==========================================================================
 # U N I T   T E S T S
 
 catkin_add_gtest(raw_map_test test/raw_map_test.cc  ${proc_mapping_FILES})
-target_link_libraries(raw_map_test ${catkin_LIBRARIES} ${lib_atlas_LIBRARIES})
+target_link_libraries(raw_map_test ${catkin_LIBRARIES} ${lib_atlas_LIBRARIES} yaml-cpp)
 
 #
 #if (CATKIN_ENABLE_TESTING AND ${CMAKE_CURRENT_SOURCE_DIR}/test)

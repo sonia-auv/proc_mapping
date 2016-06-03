@@ -56,7 +56,8 @@ class MapInterpreter : public DataInterpreter<cv::Mat> {
   //==========================================================================
   // P U B L I C   C / D T O R S
 
-  explicit MapInterpreter(const ros::NodeHandlePtr &nh);
+  explicit MapInterpreter(const ros::NodeHandlePtr &nh,
+                          const std::string &proc_trees_file_name);
 
   virtual ~MapInterpreter();
 
@@ -67,12 +68,6 @@ class MapInterpreter : public DataInterpreter<cv::Mat> {
   /// This will run the whole processing chain as the method SetNewData
   /// start it.
   void OnSubjectNotify(atlas::Subject<cv::Mat> &subject, cv::Mat args) override;
-
- private:
-  //==========================================================================
-  // P R I V A T E   M E M B E R S
-
-  ros::NodeHandlePtr nh_;
 };
 
 }  // namespace proc_mapping

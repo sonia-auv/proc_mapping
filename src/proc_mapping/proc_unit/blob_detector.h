@@ -23,13 +23,15 @@
  * along with S.O.N.I.A. software. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef PROC_MAPPING_BLOB_DETECTOR_H
-#define PROC_MAPPING_BLOB_DETECTOR_H
+#ifndef PROC_MAPPING_PROC_UNIT_BLOB_DETECTOR_H_
+#define PROC_MAPPING_PROC_UNIT_BLOB_DETECTOR_H_
 
 #include <opencv/cv.h>
 #include <ros/ros.h>
 #include <sonia_msgs/ObstacleTemplate.h>
 #include <memory>
+
+#include <highgui.h>
 #include "proc_mapping/interpreter/object_registery.h"
 #include "proc_mapping/proc_unit/proc_unit.h"
 
@@ -185,8 +187,8 @@ class BlobDetector : public ProcUnit<cv::Mat> {
       cv::drawKeypoints(input, keyPoints, output, cv::Scalar(0, 0, 255),
                         cv::DrawMatchesFlags::DRAW_RICH_KEYPOINTS);
 
-//      cv::imshow("Blob Detector", output);
-//      cv::waitKey(1);
+      //      cv::imshow("Blob Detector", output);
+      //      cv::waitKey(1);
     }
   }
 
@@ -201,6 +203,7 @@ class BlobDetector : public ProcUnit<cv::Mat> {
   cv::SimpleBlobDetector::Params params_;
   bool debug_ = false;
 };
+
 }  // namespace proc_mapping
 
-#endif  // PROC_MAPPING_BLOB_DETECTOR_H
+#endif  // PROC_MAPPING_PROC_UNIT_BLOB_DETECTOR_H_

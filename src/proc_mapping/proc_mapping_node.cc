@@ -24,9 +24,8 @@
  */
 
 #include "proc_mapping/proc_mapping_node.h"
-#include <ros/ros.h>
-#include <sonia_msgs/MapObject.h>
-#include "proc_mapping/interpreter/object_registery.h"
+#include <sonia_msgs/SemanticMap.h>
+#include "proc_mapping/config.h"
 
 namespace proc_mapping {
 
@@ -37,18 +36,20 @@ namespace proc_mapping {
 //
 ProcMappingNode::ProcMappingNode(const ros::NodeHandlePtr &nh)
     : nh_(nh),
-      object_pub_(),
+      map_pub_(),
       raw_map_(nh_),
-      map_interpreter_(nh_),
+      map_interpreter_(nh_, "proc_trees"),
       semantic_map_(std::shared_ptr<RawMap>(&raw_map_)) {
-  object_pub_ =
+  map_pub_ =
       nh_->advertise<sonia_msgs::MapObject>("/proc_mapping/objects", 100);
 
   raw_map_.Attach(map_interpreter_);
   map_interpreter_.Attach(semantic_map_);
 
+#ifdef DEBUG
   map_ = cv::Mat(800, 800, CV_8UC1);
   map_.setTo(cv::Scalar(0));
+#endif
 }
 
 //------------------------------------------------------------------------------
@@ -65,21 +66,25 @@ void ProcMappingNode::Spin() {
     cv::Point2d offset = raw_map_.GetPositionOffset();
 
     if (semantic_map_.IsNewDataAvailable()) {
+      sonia_msgs::SemanticMap map_msg;
       for (const auto &obj : semantic_map_.GetMapObjects()) {
-        object_pub_.publish(obj);
+        map_msg.objects.push_back(obj);
+#ifdef DEBUG
         cv::Point2d object(obj.pose.x, obj.pose.y);
         object += offset;
         object = raw_map_.WorldToPixelCoordinates(object);
         cv::circle(map_, object, 10, cv::Scalar(255), -1);
+#endif
       }
+      map_pub_.publish(map_msg);
     }
 
+#ifdef DEBUG
     cv::Point2d sub = raw_map_.GetSubMarinePosition();
     sub += offset;
-    cv::line(map_, cv::Point2d(800 / 2, 800 / 2),
-             cv::Point2d(800 / 2, 0), cv::Scalar(255));
-    cv::line(map_, cv::Point2d(800 / 2, 800 / 2),
-             cv::Point2d(800, 800 / 2),
+    cv::line(map_, cv::Point2d(800 / 2, 800 / 2), cv::Point2d(800 / 2, 0),
+             cv::Scalar(255));
+    cv::line(map_, cv::Point2d(800 / 2, 800 / 2), cv::Point2d(800, 800 / 2),
              cv::Scalar(255));
     sub = raw_map_.WorldToPixelCoordinates(sub);
     sub.y = (800 / 2) - sub.y + (800 / 2);
@@ -87,6 +92,7 @@ void ProcMappingNode::Spin() {
     cv::circle(map_, sub, 5, cv::Scalar(255), -1);
     cv::imshow("Semantic Map", map_);
     cv::circle(map_, sub, 5, cv::Scalar(0), -1);
+#endif
 
     cv::waitKey(1);
 

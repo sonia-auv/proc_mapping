@@ -23,8 +23,8 @@
  * along with S.O.N.I.A. software. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef PROC_MAPPING_OBJECT_REGISTERY_H
-#define PROC_MAPPING_OBJECT_REGISTERY_H
+#ifndef PROC_MAPPING_INTERPRETER_OBJECT_REGISTERY_H_
+#define PROC_MAPPING_INTERPRETER_OBJECT_REGISTERY_H_
 
 #include <opencv/cv.h>
 #include <sonia_msgs/MapObject.h>
@@ -81,4 +81,4 @@ class ObjectRegistery {
 
 }  // namespace proc_mapping
 
-#endif  // PROC_MAPPING_OBJECT_REGISTERY_H
+#endif  // PROC_MAPPING_INTERPRETER_OBJECT_REGISTERY_H_

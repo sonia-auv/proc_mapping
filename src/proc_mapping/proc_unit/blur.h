@@ -23,8 +23,8 @@
  * along with S.O.N.I.A. software. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef PROC_MAPPING_BLUR_H
-#define PROC_MAPPING_BLUR_H
+#ifndef PROC_MAPPING_PROC_UNIT_BLUR_H_
+#define PROC_MAPPING_PROC_UNIT_BLUR_H_
 
 #include <opencv/cv.h>
 #include "proc_mapping/proc_unit/proc_unit.h"
@@ -99,4 +99,4 @@ class Blur : public ProcUnit<cv::Mat> {
 
 }  // namespace proc_mapping
 
-#endif  // PROC_MAPPING_BLUR_H
+#endif  // PROC_MAPPING_PROC_UNIT_BLUR_H_

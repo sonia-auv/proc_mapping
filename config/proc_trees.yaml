@@ -1,0 +1,20 @@
+proc_trees:
+  - name: buoys
+    proc_units:
+      - name: blur
+        blur_type: 1
+        debug: false
+      - name: threshold
+        threshold_type: 0
+        debug: false
+      - name: dilate
+        debug: false
+      - name: blob_detector
+        debug: false
+  - name: fence
+    proc_units:
+      - name: blob_detector
+        debug: false
+
+# Comment this line in order to have no default proc tree
+default: buoys

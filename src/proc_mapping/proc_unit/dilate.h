@@ -23,8 +23,8 @@
  * along with S.O.N.I.A. software. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef PROC_MAPPING_DILATE_H
-#define PROC_MAPPING_DILATE_H
+#ifndef PROC_MAPPING_PROC_UNIT_DILATE_H_
+#define PROC_MAPPING_PROC_UNIT_DILATE_H_
 
 namespace proc_mapping {
 
@@ -77,4 +77,4 @@ class Dilate : public ProcUnit<cv::Mat> {
 
 }  // namespace proc_mapping
 
-#endif  // PROC_MAPPING_DILATE_H
+#endif  // PROC_MAPPING_PROC_UNIT_DILATE_H_

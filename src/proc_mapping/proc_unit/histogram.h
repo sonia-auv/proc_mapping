@@ -2,8 +2,8 @@
 // Created by root on 5/26/16.
 //
 
-#ifndef PROC_MAPPING_HISTOGRAM_H
-#define PROC_MAPPING_HISTOGRAM_H
+#ifndef PROC_MAPPING_PROC_UNIT_HISTOGRAM_H_
+#define PROC_MAPPING_PROC_UNIT_HISTOGRAM_H_
 
 #include <opencv/cv.h>
 #include "proc_mapping/proc_unit/proc_unit.h"
@@ -56,11 +56,11 @@ class Histogram : public ProcUnit<cv::Mat> {
                cv::Scalar(255), 2, 8, 0);
     }
 
-//    float thresh = (static_cast<float>(thresh_value) /
-//                    static_cast<float>(thresh_value_max));
-//
-//    cv::line(hist_image, cv::Point(hist_w * thresh, 0),
-//             cv::Point(hist_w * thresh, hist_h), cv::Scalar(255));
+    //    float thresh = (static_cast<float>(thresh_value) /
+    //                    static_cast<float>(thresh_value_max));
+    //
+    //    cv::line(hist_image, cv::Point(hist_w * thresh, 0),
+    //             cv::Point(hist_w * thresh, hist_h), cv::Scalar(255));
 
     cv::imshow("Histogram", hist_image);
     cv::waitKey(1);
@@ -69,4 +69,4 @@ class Histogram : public ProcUnit<cv::Mat> {
 
 }  // namespace proc_mapping
 
-#endif  // PROC_MAPPING_HISTOGRAM_H
+#endif  // PROC_MAPPING_PROC_UNIT_HISTOGRAM_H_

@@ -23,8 +23,8 @@
  * along with S.O.N.I.A. software. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef PROC_MAPPING_THRESHOLD_H
-#define PROC_MAPPING_THRESHOLD_H
+#ifndef PROC_MAPPING_PROC_UNIT_THRESHOLD_H_
+#define PROC_MAPPING_PROC_UNIT_THRESHOLD_H_
 
 #include <opencv/cv.h>
 #include "proc_mapping/proc_unit/proc_unit.h"
@@ -87,4 +87,4 @@ class Threshold : public ProcUnit<cv::Mat> {
 
 }  // namespace proc_mapping
 
-#endif  // PROC_MAPPING_THRESHOLD_H
+#endif  // PROC_MAPPING_PROC_UNIT_THRESHOLD_H_

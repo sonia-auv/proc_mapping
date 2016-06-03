@@ -28,6 +28,7 @@
 #endif  // PROC_MAPPING_INTERPRETER_DATA_INTERPRETER_H_
 
 #include <opencv2/opencv.hpp>
+#include <yaml-cpp/yaml.h>
 #include "proc_mapping/interpreter/data_interpreter.h"
 #include "proc_mapping/interpreter/object_registery.h"
 
@@ -39,8 +40,15 @@ namespace proc_mapping {
 //------------------------------------------------------------------------------
 //
 template <class Tp_>
-inline DataInterpreter<Tp_>::DataInterpreter(const ros::NodeHandlePtr &nh)
-    : DataInterpreterInterface(nh), new_data_ready_(false), last_data_() {}
+inline DataInterpreter<Tp_>::DataInterpreter(
+    const ros::NodeHandlePtr &nh, const std::string &proc_tree_file_name)
+    : nh_(nh),
+      all_proc_trees_(),
+      current_proc_tree_(nullptr),
+      new_data_ready_(false),
+      last_data_() {
+  InstanciateProcTrees(proc_tree_file_name + ".yaml");
+}
 
 //------------------------------------------------------------------------------
 //
@@ -79,20 +87,68 @@ inline bool DataInterpreter<Tp_>::IsNewDataReady() const {
 //------------------------------------------------------------------------------
 //
 template <class Tp_>
-inline void DataInterpreter<Tp_>::AddProcUnit(
-    const typename ProcUnit<Tp_>::Ptr &proc_unit) {
-  proc_units_.push_back(proc_unit);
+inline void DataInterpreter<Tp_>::ProcessData() {
+  if (current_proc_tree_) {
+    auto data = GetLastData();
+    current_proc_tree_->ProcessData(data);
+  }
 }
 
 //------------------------------------------------------------------------------
 //
 template <class Tp_>
-inline void DataInterpreter<Tp_>::ProcessData() {
-  auto data = GetLastData();
-  for (const auto &proc_unit : proc_units_) {
-    proc_unit->ProcessData(data);
+bool DataInterpreter<Tp_>::SetCurrentProcTree(const std::string &name) {
+  for (const auto &pt : all_proc_trees_) {
+    if (pt->GetName().equals(name)) {
+      current_proc_tree_ = pt;
+      return true;
+    }
+  }
+  ROS_ERROR("There is no proc tree with this name");
+  return false;
+}
+
+//------------------------------------------------------------------------------
+//
+template <class Tp_>
+bool DataInterpreter<Tp_>::SetCurrentProcTree(const ProcTreeType &proc_tree) {
+  for (const auto &pt : all_proc_trees_) {
+    if (&(pt.get()) == &(proc_tree.get())) {
+      current_proc_tree_ = pt;
+      return true;
+    }
+  }
+  ROS_ERROR("There is no proc tree with this address");
+  return false;
+}
+
+//------------------------------------------------------------------------------
+//
+template <class Tp_>
+void DataInterpreter<Tp_>::InstanciateProcTrees(const std::string &proc_tree_file_name) {
+  YAML::Node node = YAML::LoadFile(kProcTreesFilePath + proc_tree_file_name);
+
+  std::string default_pt{""};
+  if(node["default"]) {
+    default_pt = node["default"].as<std::string>();
+  }
+
+  if (node["proc_trees"]) {
+    auto proc_trees = node["proc_trees"];
+    assert(proc_trees.Type() == YAML::NodeType::Sequence);
+
+    for (std::size_t i = 0; i < proc_trees.size(); i++) {
+      auto proc_tree = std::make_shared<ProcTree<Tp_>>(proc_trees[i],
+                                                             nh_);
+      if(!default_pt.empty() && default_pt == proc_trees[i]["name"]
+          .as<std::string>()) {
+        current_proc_tree_ = proc_tree;
+      }
+      all_proc_trees_.push_back(proc_tree);
+    }
   }
 }
+
 
 //------------------------------------------------------------------------------
 //

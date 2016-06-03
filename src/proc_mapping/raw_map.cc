@@ -181,7 +181,6 @@ void RawMap::SetMapParameters(const size_t &w, const size_t &h,
 //------------------------------------------------------------------------------
 //
 void RawMap::ProcessPointCloud(const sensor_msgs::PointCloud2::ConstPtr &msg) {
-  bool debug = false;
   float x = 0, y = 0, z = 0, intensity = 0;
   std::vector<uint8_t> intensity_map;
   std::vector<cv::Point2i> coordinate_map;
@@ -237,48 +236,47 @@ void RawMap::ProcessPointCloud(const sensor_msgs::PointCloud2::ConstPtr &msg) {
   for (size_t j = 0; j < intensity_map.size() - 1; j++) {
     UpdateMat(coordinate_map[j], intensity_map[j]);
   }
-  //  cv::Point2d sub = WorldToPixelCoordinates(sub_position);
-  //  sub.y = (pixel_.width/2) - sub.y + (pixel_.width/2);
-  //
-  //  cv::circle(pixel_.map, sub, 2, cv::Scalar::all(255), -1);
+//  cv::Point2d sub = WorldToPixelCoordinates(sub_position);
+//  sub.y = (pixel_.width/2) - sub.y + (pixel_.width/2);
+//
+//  cv::circle(pixel_.map, sub, 2, cv::Scalar::all(255), -1);
 
 //  cv::imshow("Original", pixel_.map);
 //  cv::waitKey(1);
 
-  if (debug) {
-    // Create sub heading, sonar_scan left and rigth limit
-    cv::Point2d heading(cos(sub_.yaw) * sonar_range_,
-                        sin(sub_.yaw) * sonar_range_);
-    heading += GetPositionOffset();
-    heading = WorldToPixelCoordinates(heading);
+#ifdef DEBUG
+  // Create sub heading, sonar_scan left and rigth limit
+  cv::Point2d heading(cos(sub_.yaw) * sonar_range_,
+                      sin(sub_.yaw) * sonar_range_);
+  heading += GetPositionOffset();
+  heading = WorldToPixelCoordinates(heading);
 
-    cv::Point2d left_limit(cos(sub_.yaw - 0.785398) * sonar_range_,
-                           sin(sub_.yaw - 0.785398) * sonar_range_);
-    left_limit += GetPositionOffset();
-    left_limit = WorldToPixelCoordinates(left_limit);
+  cv::Point2d left_limit(cos(sub_.yaw - 0.785398) * sonar_range_,
+                         sin(sub_.yaw - 0.785398) * sonar_range_);
+  left_limit += GetPositionOffset();
+  left_limit = WorldToPixelCoordinates(left_limit);
 
-    cv::Point2d rigth_limit(cos(sub_.yaw + 0.785398) * sonar_range_,
-                            sin(sub_.yaw + 0.785398) * sonar_range_);
-    rigth_limit += GetPositionOffset();
-    rigth_limit = WorldToPixelCoordinates(rigth_limit);
+  cv::Point2d rigth_limit(cos(sub_.yaw + 0.785398) * sonar_range_,
+                          sin(sub_.yaw + 0.785398) * sonar_range_);
+  rigth_limit += GetPositionOffset();
+  rigth_limit = WorldToPixelCoordinates(rigth_limit);
 
-    cv::Mat debug_mat(pixel_.width, pixel_.height, CV_8UC1);
-    cv::line(pixel_.map, cv::Point2d(pixel_.width / 2, pixel_.height / 2),
-             cv::Point2d(pixel_.width / 2, 0), cv::Scalar::all(255));
-    cv::line(pixel_.map, cv::Point2d(pixel_.width / 2, pixel_.height / 2),
-             cv::Point2d(pixel_.height, pixel_.height / 2),
-             cv::Scalar::all(255));
+  cv::Mat debug_mat(pixel_.width, pixel_.height, CV_8UC1);
+  cv::line(pixel_.map, cv::Point2d(pixel_.width / 2, pixel_.height / 2),
+           cv::Point2d(pixel_.width / 2, 0), cv::Scalar::all(255));
+  cv::line(pixel_.map, cv::Point2d(pixel_.width / 2, pixel_.height / 2),
+           cv::Point2d(pixel_.height, pixel_.height / 2), cv::Scalar::all(255));
 
-    cv::Point2d sub = WorldToPixelCoordinates(sub_position);
-    sub.y = (pixel_.width / 2) - sub.y + (pixel_.width / 2);
+  cv::Point2d sub = WorldToPixelCoordinates(sub_position);
+  sub.y = (pixel_.width / 2) - sub.y + (pixel_.width / 2);
 
-    cv::circle(debug_mat, sub, 2, cv::Scalar::all(255), -1);
-    cv::circle(pixel_.map, sub, 2, cv::Scalar::all(255), -1);
-    cv::line(debug_mat, sub, heading, cv::Scalar::all(255));
-    cv::line(debug_mat, sub, left_limit, cv::Scalar::all(100));
-    cv::line(debug_mat, sub, rigth_limit, cv::Scalar::all(100));
-    cv::imshow("Debug", debug_mat);
-  }
+  cv::circle(debug_mat, sub, 2, cv::Scalar::all(255), -1);
+  cv::circle(pixel_.map, sub, 2, cv::Scalar::all(255), -1);
+  cv::line(debug_mat, sub, heading, cv::Scalar::all(255));
+  cv::line(debug_mat, sub, left_limit, cv::Scalar::all(100));
+  cv::line(debug_mat, sub, rigth_limit, cv::Scalar::all(100));
+  cv::imshow("Debug", debug_mat);
+#endif
 
   // Send a command when enough scanline is arrived
   scanline_counter_++;

@@ -24,8 +24,8 @@
  * along with S.O.N.I.A. software. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef PROC_MAPPING_PATTERN_DETECTION_H
-#define PROC_MAPPING_PATTERN_DETECTION_H
+#ifndef PROC_MAPPING_PROC_UNIT_PATTERN_DETECTION_H_
+#define PROC_MAPPING_PROC_UNIT_PATTERN_DETECTION_H_
 
 #include <lib_atlas/config.h>
 #include <lib_atlas/macros.h>
@@ -117,4 +117,4 @@ class PatternDetection : public ProcUnit<cv::Mat> {
 
 }  // namespace proc_mapping
 
-#endif  // PROC_MAPPING_PATTERN_DETECTION_H
+#endif  // PROC_MAPPING_PROC_UNIT_PATTERN_DETECTION_H_

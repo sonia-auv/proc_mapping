@@ -23,8 +23,8 @@
  * along with S.O.N.I.A. software. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef PROC_MAPPING_PROC_UNIT_H
-#define PROC_MAPPING_PROC_UNIT_H
+#ifndef PROC_MAPPING_PROC_UNIT_PROC_UNIT_H_
+#define PROC_MAPPING_PROC_UNIT_PROC_UNIT_H_
 
 #include <memory.h>
 
@@ -52,7 +52,7 @@ class ProcUnit {
   //==========================================================================
   // P U B L I C   C / D T O R S
 
-  ProcUnit(){};
+  ProcUnit() = default;
 
   virtual ~ProcUnit() = default;
 
@@ -64,4 +64,4 @@ class ProcUnit {
 
 }  // namespace proc_mapping
 
-#endif  // PROC_MAPPING_PROC_UNIT_H
+#endif  // PROC_MAPPING_PROC_UNIT_PROC_UNIT_H_

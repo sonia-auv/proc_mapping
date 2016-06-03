@@ -23,8 +23,8 @@
  * along with S.O.N.I.A. software. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef PROC_MAPPING_INTERPRETER_RAW_MAP_H_
-#define PROC_MAPPING_INTERPRETER_RAW_MAP_H_
+#ifndef PROC_MAPPING_RAW_MAP_H_
+#define PROC_MAPPING_RAW_MAP_H_
 
 #include <lib_atlas/macros.h>
 #include <nav_msgs/Odometry.h>
@@ -191,4 +191,4 @@ class RawMap : public atlas::Subject<cv::Mat>, public atlas::Runnable {
 
 }  // namespace proc_mapping
 
-#endif  // PROC_MAPPING_INTERPRETER_RAW_MAP_H_
+#endif  // PROC_MAPPING_RAW_MAP_H_
