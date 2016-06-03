@@ -58,8 +58,8 @@ class Threshold : public ProcUnit<cv::Mat> {
   // P U B L I C   M E T H O D S
 
   virtual void ProcessData(cv::Mat &input) override {
-    cv::createTrackbar("Thresh Value", "Threshold", &Parameters::thresh_value,
-                       Parameters::thresh_value_max);
+//    cv::createTrackbar("Thresh Value", "Threshold", &Parameters::thresh_value,
+//                       Parameters::thresh_value_max);
     if ((threshold_type == 0) | (threshold_type == 1) | (threshold_type == 2) |
         (threshold_type == 3) | (threshold_type == 4) | (threshold_type == 7) |
         (threshold_type == 8)) {

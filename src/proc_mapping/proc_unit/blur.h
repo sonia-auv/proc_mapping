@@ -58,8 +58,8 @@ class Blur : public ProcUnit<cv::Mat> {
   // P U B L I C   M E T H O D S
 
   virtual void ProcessData(cv::Mat &input) override {
-    cv::createTrackbar("Kernel Size", "Blur", &Parameters::kernel_size,
-                       Parameters::kernel_size_max);
+//    cv::createTrackbar("Kernel Size", "Blur", &Parameters::kernel_size,
+//                       Parameters::kernel_size_max);
     // To keep the kernel size odd, multiply by 2 and add 1
     cv::Size2i kernel(Parameters::kernel_size * 2 + 1,
                       Parameters::kernel_size * 2 + 1);

@@ -84,13 +84,13 @@ class BlobDetector : public ProcUnit<cv::Mat> {
   // P U B L I C   M E T H O D S
 
   virtual void ProcessData(cv::Mat &input) override {
-    cv::createTrackbar("area filter", "Blob Detector",
-                       &Parameters::filter_area_off,
-                       Parameters::filter_area_on);
-    cv::createTrackbar("min area", "Blob Detector", &Parameters::min_area,
-                       Parameters::min_area_max);
-    cv::createTrackbar("max area", "Blob Detector", &Parameters::max_area,
-                       Parameters::max_area_max);
+//    cv::createTrackbar("area filter", "Blob Detector",
+//                       &Parameters::filter_area_off,
+//                       Parameters::filter_area_on);
+//    cv::createTrackbar("min area", "Blob Detector", &Parameters::min_area,
+//                       Parameters::min_area_max);
+//    cv::createTrackbar("max area", "Blob Detector", &Parameters::max_area,
+//                       Parameters::max_area_max);
     //    cv::createTrackbar("circularity filter", "Blob Detector",
     //    &filter_circularity_off, filter_circularity_on);
     //    cv::createTrackbar("min circularity", "Blob Detector",
