@@ -119,6 +119,7 @@ class DataInterpreter : public atlas::Observer<Tp_> {
   Tp_ last_data_;
 
   mutable std::mutex data_mutex_;
+  mutable std::mutex proc_tree_mutex_;
 };
 
 }  // namespace proc_mapping

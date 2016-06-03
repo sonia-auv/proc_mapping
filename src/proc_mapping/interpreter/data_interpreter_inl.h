@@ -87,6 +87,11 @@ inline bool DataInterpreter<Tp_>::IsNewDataReady() const {
 //
 template <class Tp_>
 inline void DataInterpreter<Tp_>::ProcessData() {
+  // WARNING:
+  // We want to lock the whole proccessing on the SemanticMap, because we don't
+  // want to process objects inserted in the ObjectRegistery while they are not
+  // the objects we expect them to be.
+  std::lock_guard<std::mutex> guard(proc_tree_mutex_);
   if (current_proc_tree_) {
     auto data = GetLastData();
     current_proc_tree_->ProcessData(data);
@@ -97,6 +102,7 @@ inline void DataInterpreter<Tp_>::ProcessData() {
 //
 template <class Tp_>
 bool DataInterpreter<Tp_>::SetCurrentProcTree(const std::string &name) {
+  std::lock_guard<std::mutex> guard(proc_tree_mutex_);
   for (const auto &pt : all_proc_trees_) {
     if (pt->GetName() == name) {
       current_proc_tree_ = pt;
@@ -111,6 +117,7 @@ bool DataInterpreter<Tp_>::SetCurrentProcTree(const std::string &name) {
 //
 template <class Tp_>
 bool DataInterpreter<Tp_>::SetCurrentProcTree(const ProcTreeType &proc_tree) {
+  std::lock_guard<std::mutex> guard(proc_tree_mutex_);
   if (!proc_tree) {
     current_proc_tree_ = nullptr;
     return true;
