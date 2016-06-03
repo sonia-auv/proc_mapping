@@ -6,6 +6,7 @@
 #define PROC_MAPPING_PROC_UNIT_HISTOGRAM_H_
 
 #include <opencv/cv.h>
+#include "proc_mapping/config.h"
 #include "proc_mapping/proc_unit/proc_unit.h"
 
 namespace proc_mapping {

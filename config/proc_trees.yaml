@@ -10,6 +10,7 @@ proc_trees:
       - name: dilate
         debug: false
       - name: blob_detector
+        target: 0
         debug: false
   - name: fence
     proc_units:

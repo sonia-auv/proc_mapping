@@ -26,7 +26,8 @@
 #ifndef PROC_MAPPING_PROC_UNIT_PROC_UNIT_H_
 #define PROC_MAPPING_PROC_UNIT_PROC_UNIT_H_
 
-#include <memory.h>
+#include <memory>
+#include <vector>
 
 namespace proc_mapping {
 

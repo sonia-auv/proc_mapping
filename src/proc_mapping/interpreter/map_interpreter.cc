@@ -35,7 +35,7 @@ namespace proc_mapping {
 //
 MapInterpreter::MapInterpreter(const ros::NodeHandlePtr &nh,
                                const std::string &proc_trees_file_name)
-    : DataInterpreter<cv::Mat>(nh_, proc_trees_file_name) {}
+    : DataInterpreter<cv::Mat>(nh, proc_trees_file_name) {}
 
 //------------------------------------------------------------------------------
 //

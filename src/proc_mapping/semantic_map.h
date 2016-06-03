@@ -88,7 +88,7 @@ class SemanticMap : public atlas::Observer<> {
   std::vector<Keypoint> trigged_keypoints_;
   std::vector<MapObjectsType> map_objects_;
 
-  uint8_t  target_;
+  uint8_t target_;
 
   bool new_objects_available_;
   mutable std::mutex object_mutex_;

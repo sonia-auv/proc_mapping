@@ -43,8 +43,7 @@ namespace proc_mapping {
 //------------------------------------------------------------------------------
 //
 template <class Tp_>
-ProcTree<Tp_>::ProcTree(const YAML::Node &node,
-                        const ros::NodeHandlePtr &nh)
+ProcTree<Tp_>::ProcTree(const YAML::Node &node, const ros::NodeHandlePtr &nh)
     : nh_(nh), proc_units_({}) {
   Deserialize(node);
 }
@@ -82,7 +81,8 @@ typename ProcUnit<Tp_>::Ptr ProcTree<Tp_>::ProcUnitFactory(
       return std::make_shared<Dilate>(debug);
     } else if (proc_unit_name == "blob_detector") {
       auto debug = node["debug"].as<bool>();
-      return std::make_shared<BlobDetector>(nh_, debug);
+      auto target = node["target"].as<int>();
+      return std::make_shared<BlobDetector>(target, debug);
     }
 
   } else {
@@ -96,7 +96,6 @@ typename ProcUnit<Tp_>::Ptr ProcTree<Tp_>::ProcUnitFactory(
 //
 template <class Tp_>
 bool ProcTree<Tp_>::Deserialize(const YAML::Node &node) {
-
   name_ = node["name"].as<std::string>();
 
   auto proc_units = node["proc_units"];

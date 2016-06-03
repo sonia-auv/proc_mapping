@@ -31,9 +31,6 @@
 
 namespace proc_mapping {
 
-const int kernel_size_max = 15;
-int kernel_size = 5;
-
 class Blur : public ProcUnit<cv::Mat> {
  public:
   //==========================================================================
@@ -44,10 +41,15 @@ class Blur : public ProcUnit<cv::Mat> {
   using PtrList = std::vector<Blur::Ptr>;
   using ConstPtrList = std::vector<Blur::ConstPtr>;
 
+  struct Parameters {
+    static const int kernel_size_max;
+    static int kernel_size;
+  };
+
   //==========================================================================
   // P U B L I C   C / D T O R S
 
-  Blur(int blur_type = 1, bool debug = false)
+  explicit Blur(int blur_type = 1, bool debug = false)
       : blur_type(blur_type), debug(debug){};
 
   virtual ~Blur() = default;
@@ -56,9 +58,11 @@ class Blur : public ProcUnit<cv::Mat> {
   // P U B L I C   M E T H O D S
 
   virtual void ProcessData(cv::Mat &input) override {
-    cv::createTrackbar("Kernel Size", "Blur", &kernel_size, kernel_size_max);
+    cv::createTrackbar("Kernel Size", "Blur", &Parameters::kernel_size,
+                       Parameters::kernel_size_max);
     // To keep the kernel size odd, multiply by 2 and add 1
-    cv::Size2i kernel(kernel_size * 2 + 1, kernel_size * 2 + 1);
+    cv::Size2i kernel(Parameters::kernel_size * 2 + 1,
+                      Parameters::kernel_size * 2 + 1);
     // Bilateral Filter need another Mat to do algorithm
     cv::Mat dst = input.clone();
     if (blur_type == 0) {
@@ -66,10 +70,11 @@ class Blur : public ProcUnit<cv::Mat> {
     } else if (blur_type == 1) {
       cv::GaussianBlur(input, input, kernel, 0, 0);
     } else if (blur_type == 2) {
-      cv::medianBlur(input, input, kernel_size * 2 + 1);
+      cv::medianBlur(input, input, Parameters::kernel_size * 2 + 1);
     } else if (blur_type == 3) {
-      cv::bilateralFilter(input, dst, kernel_size * 2 + 1,
-                          (kernel_size * 2 + 1) * 2, (kernel_size * 2 + 1) / 2);
+      cv::bilateralFilter(input, dst, Parameters::kernel_size * 2 + 1,
+                          (Parameters::kernel_size * 2 + 1) * 2,
+                          (Parameters::kernel_size * 2 + 1) / 2);
       input = dst;
     } else {
       ROS_ERROR("Blur Type is undefined");

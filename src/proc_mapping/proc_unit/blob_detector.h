@@ -37,31 +37,6 @@
 
 namespace proc_mapping {
 
-int filter_area_off = 1;
-const int filter_area_on = 1;
-int min_area = 0;
-const int min_area_max = 3000;
-int max_area = 0;
-const int max_area_max = 3000;
-int filter_circularity_off = 0;
-const int filter_circularity_on = 1;
-int min_circularity = 0;
-const int min_circularity_max = 100;
-int max_circularity = 0;
-const int max_circularity_max = 100;
-int filter_convexity_off = 0;
-const int filter_convexity_on = 1;
-int min_convexity = 0;
-const int min_convexity_max = 10;
-int max_convexity = 0;
-const int max_convexity_max = 10;
-int filter_inertial_off = 0;
-const int filter_inertial_on = 1;
-int min_inertia_ratio = 0;
-const int min_inertia_ratio_max = 10;
-int max_inertia_ratio = 0;
-const int max_inertia_ratio_max = 10;
-
 class BlobDetector : public ProcUnit<cv::Mat> {
  public:
   //==========================================================================
@@ -72,21 +47,51 @@ class BlobDetector : public ProcUnit<cv::Mat> {
   using PtrList = std::vector<BlobDetector::Ptr>;
   using ConstPtrList = std::vector<BlobDetector::ConstPtr>;
 
+  struct Parameters {
+    static int filter_area_off;
+    static const int filter_area_on;
+    static int min_area;
+    static const int min_area_max;
+    static int max_area;
+    static const int max_area_max;
+    static int filter_circularity_off;
+    static const int filter_circularity_on;
+    static int min_circularity;
+    static const int min_circularity_max;
+    static int max_circularity;
+    static const int max_circularity_max;
+    static int filter_convexity_off;
+    static const int filter_convexity_on;
+    static int min_convexity;
+    static const int min_convexity_max;
+    static int max_convexity;
+    static const int max_convexity_max;
+    static int filter_inertial_off;
+    static const int filter_inertial_on;
+    static int min_inertia_ratio;
+    static const int min_inertia_ratio_max;
+    static int max_inertia_ratio;
+    static const int max_inertia_ratio_max;
+  };
+
   //==========================================================================
   // P U B L I C   C / D T O R S
 
   BlobDetector(uint8_t target = 0, bool debug = false)
-      : target_(target), debug_(debug) { }
+      : target_(target), debug_(debug) {}
   virtual ~BlobDetector() = default;
 
   //==========================================================================
   // P U B L I C   M E T H O D S
 
   virtual void ProcessData(cv::Mat &input) override {
-    cv::createTrackbar("area filter", "Blob Detector", &filter_area_off,
-                       filter_area_on);
-    cv::createTrackbar("min area", "Blob Detector", &min_area, min_area_max);
-    cv::createTrackbar("max area", "Blob Detector", &max_area, max_area_max);
+    cv::createTrackbar("area filter", "Blob Detector",
+                       &Parameters::filter_area_off,
+                       Parameters::filter_area_on);
+    cv::createTrackbar("min area", "Blob Detector", &Parameters::min_area,
+                       Parameters::min_area_max);
+    cv::createTrackbar("max area", "Blob Detector", &Parameters::max_area,
+                       Parameters::max_area_max);
     //    cv::createTrackbar("circularity filter", "Blob Detector",
     //    &filter_circularity_off, filter_circularity_on);
     //    cv::createTrackbar("min circularity", "Blob Detector",
@@ -114,22 +119,22 @@ class BlobDetector : public ProcUnit<cv::Mat> {
       params_.minThreshold = 0;
       params_.maxThreshold = 255;
       // Filter by Area.
-      params_.filterByArea = filter_area_off;
-      params_.minArea = min_area;
-      params_.maxArea = max_area;
+      params_.filterByArea = Parameters::filter_area_off;
+      params_.minArea = Parameters::min_area;
+      params_.maxArea = Parameters::max_area;
       //// Filter by Circularity
-      params_.filterByCircularity = filter_circularity_off;
-      params_.minCircularity = min_circularity / 100;
-      params_.maxCircularity = max_circularity / 100;
+      params_.filterByCircularity = Parameters::filter_circularity_off;
+      params_.minCircularity = Parameters::min_circularity / 100;
+      params_.maxCircularity = Parameters::max_circularity / 100;
       params_.filterByColor = false;
       // Filter by Convexity
-      params_.filterByConvexity = filter_convexity_off;
-      params_.minConvexity = min_convexity / 10;
-      params_.maxConvexity = max_convexity / 10;
+      params_.filterByConvexity = Parameters::filter_convexity_off;
+      params_.minConvexity = Parameters::min_convexity / 10;
+      params_.maxConvexity = Parameters::max_convexity / 10;
       // Filter by Inertia
-      params_.filterByInertia = filter_inertial_off;
-      params_.minInertiaRatio = min_inertia_ratio / 10;
-      params_.maxInertiaRatio = max_inertia_ratio / 10;
+      params_.filterByInertia = Parameters::filter_inertial_off;
+      params_.minInertiaRatio = Parameters::min_inertia_ratio / 10;
+      params_.maxInertiaRatio = Parameters::max_inertia_ratio / 10;
     }
     cv::SimpleBlobDetector detector(params_);
     std::vector<cv::KeyPoint> keyPoints;

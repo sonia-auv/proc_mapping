@@ -28,11 +28,6 @@
 
 namespace proc_mapping {
 
-const int kernel_size_x_max = 32;
-const int kernel_size_y_max = 32;
-int kernel_size_x = 5;
-int kernel_size_y = 5;
-
 class Dilate : public ProcUnit<cv::Mat> {
  public:
   //==========================================================================
@@ -42,6 +37,13 @@ class Dilate : public ProcUnit<cv::Mat> {
   using ConstPtr = std::shared_ptr<const Dilate>;
   using PtrList = std::vector<Dilate::Ptr>;
   using ConstPtrList = std::vector<Dilate::ConstPtr>;
+
+  struct Parameters {
+    static const int kernel_size_x_max;
+    static const int kernel_size_y_max;
+    static int kernel_size_x;
+    static int kernel_size_y;
+  };
 
   //==========================================================================
   // P U B L I C   C / D T O R S
@@ -54,11 +56,12 @@ class Dilate : public ProcUnit<cv::Mat> {
   // P U B L I C   M E T H O D S
 
   virtual void ProcessData(cv::Mat &input) override {
-    cv::createTrackbar("Kernel Size X", "Dilate", &kernel_size_x,
-                       kernel_size_x_max);
-    cv::createTrackbar("Kernel Size Y", "Dilate", &kernel_size_y,
-                       kernel_size_y_max);
-    cv::Size size = cv::Size(kernel_size_x, kernel_size_y);
+    cv::createTrackbar("Kernel Size X", "Dilate", &Parameters::kernel_size_x,
+                       Parameters::kernel_size_x_max);
+    cv::createTrackbar("Kernel Size Y", "Dilate", &Parameters::kernel_size_y,
+                       Parameters::kernel_size_y_max);
+    cv::Size size =
+        cv::Size(Parameters::kernel_size_x, Parameters::kernel_size_y);
     cv::Mat kernel_ = cv::getStructuringElement(kernelType, size, anchor_);
     cv::dilate(input, input, kernel_, anchor_, iteration);
     if (debug_) {

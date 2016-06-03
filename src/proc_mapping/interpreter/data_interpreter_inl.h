@@ -27,9 +27,8 @@
 #error This file may only be included data_interpreter.h
 #endif  // PROC_MAPPING_INTERPRETER_DATA_INTERPRETER_H_
 
-#include <opencv2/opencv.hpp>
 #include <yaml-cpp/yaml.h>
-#include "proc_mapping/interpreter/data_interpreter.h"
+#include <opencv2/opencv.hpp>
 #include "proc_mapping/interpreter/object_registery.h"
 
 namespace proc_mapping {
@@ -125,11 +124,12 @@ bool DataInterpreter<Tp_>::SetCurrentProcTree(const ProcTreeType &proc_tree) {
 //------------------------------------------------------------------------------
 //
 template <class Tp_>
-void DataInterpreter<Tp_>::InstanciateProcTrees(const std::string &proc_tree_file_name) {
+void DataInterpreter<Tp_>::InstanciateProcTrees(
+    const std::string &proc_tree_file_name) {
   YAML::Node node = YAML::LoadFile(kProcTreesFilePath + proc_tree_file_name);
 
   std::string default_pt{""};
-  if(node["default"]) {
+  if (node["default"]) {
     default_pt = node["default"].as<std::string>();
   }
 
@@ -138,17 +138,15 @@ void DataInterpreter<Tp_>::InstanciateProcTrees(const std::string &proc_tree_fil
     assert(proc_trees.Type() == YAML::NodeType::Sequence);
 
     for (std::size_t i = 0; i < proc_trees.size(); i++) {
-      auto proc_tree = std::make_shared<ProcTree<Tp_>>(proc_trees[i],
-                                                             nh_);
-      if(!default_pt.empty() && default_pt == proc_trees[i]["name"]
-          .as<std::string>()) {
+      auto proc_tree = std::make_shared<ProcTree<Tp_>>(proc_trees[i], nh_);
+      if (!default_pt.empty() &&
+          default_pt == proc_trees[i]["name"].as<std::string>()) {
         current_proc_tree_ = proc_tree;
       }
       all_proc_trees_.push_back(proc_tree);
     }
   }
 }
-
 
 //------------------------------------------------------------------------------
 //

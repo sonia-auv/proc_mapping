@@ -28,6 +28,7 @@
 
 #include <opencv/cv.h>
 #include <vector>
+#include "proc_mapping/config.h"
 #include "proc_mapping/proc_unit/proc_unit.h"
 
 namespace proc_mapping {

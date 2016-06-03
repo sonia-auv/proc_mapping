@@ -33,6 +33,7 @@
 #include <ros/ros.h>
 #include <sonia_msgs/MapObject.h>
 #include <memory>
+#include "proc_mapping/config.h"
 #include "proc_mapping/interpreter/object_registery.h"
 #include "proc_mapping/proc_unit/proc_unit.h"
 

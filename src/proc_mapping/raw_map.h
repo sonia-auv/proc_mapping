@@ -27,6 +27,8 @@
 #define PROC_MAPPING_RAW_MAP_H_
 
 #include <lib_atlas/macros.h>
+#include <lib_atlas/pattern/runnable.h>
+#include <lib_atlas/pattern/subject.h>
 #include <nav_msgs/Odometry.h>
 #include <opencv/cv.h>
 #include <pcl/point_cloud.h>
@@ -37,7 +39,6 @@
 #include <eigen3/Eigen/Geometry>
 #include <memory>
 #include <vector>
-#include "proc_mapping/interpreter/data_interpreter.h"
 
 namespace proc_mapping {
 

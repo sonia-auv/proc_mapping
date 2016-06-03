@@ -31,9 +31,6 @@
 
 namespace proc_mapping {
 
-const int thresh_value_max = 255;
-int thresh_value = 0;
-
 class Threshold : public ProcUnit<cv::Mat> {
  public:
   //==========================================================================
@@ -44,11 +41,16 @@ class Threshold : public ProcUnit<cv::Mat> {
   using PtrList = std::vector<Threshold::Ptr>;
   using ConstPtrList = std::vector<Threshold::ConstPtr>;
 
+  struct Parameters {
+    static const int thresh_value_max;
+    static int thresh_value;
+  };
+
   //==========================================================================
   // P U B L I C   C / D T O R S
 
-  Threshold(int threshold_type = 0, bool debug = false)
-      : threshold_type(threshold_type), debug(debug){};
+  explicit Threshold(int threshold_type = 0, bool debug = false)
+      : threshold_type(threshold_type), debug(debug) {}
 
   virtual ~Threshold() = default;
 
@@ -56,12 +58,13 @@ class Threshold : public ProcUnit<cv::Mat> {
   // P U B L I C   M E T H O D S
 
   virtual void ProcessData(cv::Mat &input) override {
-    cv::createTrackbar("Thresh Value", "Threshold", &thresh_value,
-                       thresh_value_max);
+    cv::createTrackbar("Thresh Value", "Threshold", &Parameters::thresh_value,
+                       Parameters::thresh_value_max);
     if ((threshold_type == 0) | (threshold_type == 1) | (threshold_type == 2) |
         (threshold_type == 3) | (threshold_type == 4) | (threshold_type == 7) |
         (threshold_type == 8)) {
-      cv::threshold(input, input, thresh_value, 255, threshold_type);
+      cv::threshold(input, input, Parameters::thresh_value, 255,
+                    threshold_type);
     } else {
       ROS_ERROR("Threshold type is undefined");
     }
