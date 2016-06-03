@@ -32,7 +32,6 @@
 #include <opencv/cv.h>
 #include <ros/ros.h>
 #include <sonia_msgs/MapObject.h>
-#include <sonia_msgs/ObstacleTemplate.h>
 #include <memory>
 #include "proc_mapping/interpreter/object_registery.h"
 #include "proc_mapping/proc_unit/proc_unit.h"
@@ -53,9 +52,7 @@ class PatternDetection : public ProcUnit<cv::Mat> {
   // P U B L I C   C / D T O R S
 
   PatternDetection(const ros::NodeHandlePtr &nh)
-      : ProcUnit(), nh_(nh), template_server_(), obstacle_template_path_() {
-    template_server_ = nh_->advertiseService(
-        "obstacle_template", &PatternDetection::ObstacleTemplate, this);
+      : ProcUnit(), nh_(nh), obstacle_template_path_() {
     obstacle_template_path_ =
         atlas::kWorkspaceRoot + "/src/proc_mapping/template/buoy_template2.png";
   }
@@ -64,13 +61,6 @@ class PatternDetection : public ProcUnit<cv::Mat> {
 
   //==========================================================================
   // P U B L I C   M E T H O D S
-
-  // Method use to change the obstacle template path
-  bool ObstacleTemplate(sonia_msgs::ObstacleTemplate::Request &req,
-                        sonia_msgs::ObstacleTemplate::Response &resp) {
-    obstacle_template_path_ = req.obstacle_template;
-    return true;
-  }
 
   virtual void ProcessData(cv::Mat &input) override {
     cv::Mat result;
@@ -110,7 +100,6 @@ class PatternDetection : public ProcUnit<cv::Mat> {
   // P R I V A T E   M E M B E R S
 
   ros::NodeHandlePtr nh_;
-  ros::ServiceServer template_server_;
 
   std::string obstacle_template_path_;
 };

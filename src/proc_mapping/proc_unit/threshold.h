@@ -47,7 +47,7 @@ class Threshold : public ProcUnit<cv::Mat> {
   //==========================================================================
   // P U B L I C   C / D T O R S
 
-  Threshold(int threshold_type = 8, bool debug = false)
+  Threshold(int threshold_type = 0, bool debug = false)
       : threshold_type(threshold_type), debug(debug){};
 
   virtual ~Threshold() = default;
@@ -72,17 +72,17 @@ class Threshold : public ProcUnit<cv::Mat> {
   }
 
  private:
+  /*
+ * 0: Binary
+ * 1: Binary Inverted
+ * 2: Threshold Truncated
+ * 3: Threshold to Zero
+ * 4: Threshold to Zero Inverted
+ * 7: Threshold Mask
+ * 8: Threshold OTSU
+ */
   int threshold_type;
   bool debug;
-  /*
-   * 0: Binary
-   * 1: Binary Inverted
-   * 2: Threshold Truncated
-   * 3: Threshold to Zero
-   * 4: Threshold to Zero Inverted
-   * 7: Threshold Mask
-   * 8: Threshold OTSU
-   */
 };
 
 }  // namespace proc_mapping

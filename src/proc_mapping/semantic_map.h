@@ -54,12 +54,6 @@ class SemanticMap : public atlas::Observer<> {
     bool is_object_send;
   };
 
-  enum class DetectionMode {
-    NO_MODE = 0,
-    BUOYS,
-    FENCE,
-  };
-
   //==========================================================================
   // P U B L I C   C / D T O R S
 
@@ -94,7 +88,7 @@ class SemanticMap : public atlas::Observer<> {
   std::vector<Keypoint> trigged_keypoints_;
   std::vector<MapObjectsType> map_objects_;
 
-  DetectionMode mode_;
+  uint8_t  target_;
 
   bool new_objects_available_;
   mutable std::mutex object_mutex_;
