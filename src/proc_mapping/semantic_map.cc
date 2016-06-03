@@ -34,10 +34,7 @@ namespace proc_mapping {
 //------------------------------------------------------------------------------
 //
 SemanticMap::SemanticMap(const RawMap::Ptr &raw_map)
-    : raw_map_(raw_map),
-      map_objects_({}),
-      target_(1),
-      new_objects_available_(false){};
+    : raw_map_(raw_map), map_objects_({}), new_objects_available_(false){};
 
 //------------------------------------------------------------------------------
 //
@@ -48,17 +45,18 @@ SemanticMap::~SemanticMap() = default;
 
 //------------------------------------------------------------------------------
 //
-void SemanticMap::OnSubjectNotify(atlas::Subject<> &) {
+void SemanticMap::OnSubjectNotify(atlas::Subject<DetectionMode> &subject,
+                                  DetectionMode mode) {
   auto map_objects = ObjectRegistery::GetInstance().GetAllMapObject();
   ObjectRegistery::GetInstance().ClearRegistery();
-  switch (target_) {
-    case 1:
+  switch (mode) {
+    case DetectionMode::BUOYS:
       GetMetaDataForBuoys(std::move(map_objects));
       break;
-    case 2:
+    case DetectionMode::FENCE:
       // Todo : Impl the algo for the fence detection from keyPoints
       break;
-    case 0:
+    case DetectionMode::NONE:
       ROS_WARN("There is no execution mode set for the semantic map.");
       break;
   }

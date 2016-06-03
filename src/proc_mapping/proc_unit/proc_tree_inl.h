@@ -63,6 +63,13 @@ void ProcTree<Tp_>::ProcessData(Tp_ &input) const {
 //------------------------------------------------------------------------------
 //
 template <class Tp_>
+const std::string &ProcTree<Tp_>::GetName() const {
+  return name_;
+}
+
+//------------------------------------------------------------------------------
+//
+template <class Tp_>
 typename ProcUnit<Tp_>::Ptr ProcTree<Tp_>::ProcUnitFactory(
     const YAML::Node &node) const {
   if (node["name"]) {

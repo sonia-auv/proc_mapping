@@ -48,7 +48,7 @@ namespace proc_mapping {
  * See DataInterpreterInterface for public interface informations.
  */
 template <class Tp_>
-class DataInterpreter : public atlas::Observer<Tp_>, public atlas::Subject<> {
+class DataInterpreter : public atlas::Observer<Tp_> {
  public:
   //==========================================================================
   // T Y P E D E F   A N D   E N U M

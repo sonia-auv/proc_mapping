@@ -35,7 +35,10 @@ namespace proc_mapping {
 //
 MapInterpreter::MapInterpreter(const ros::NodeHandlePtr &nh,
                                const std::string &proc_trees_file_name)
-    : DataInterpreter<cv::Mat>(nh, proc_trees_file_name) {}
+    : DataInterpreter<cv::Mat>(nh, proc_trees_file_name),
+      mode_(DetectionMode::NONE) {
+  SetDetectionMode(mode_);
+}
 
 //------------------------------------------------------------------------------
 //
@@ -56,7 +59,22 @@ void MapInterpreter::OnSubjectNotify(atlas::Subject<cv::Mat> &subject,
   ProcessData();
 
   // Notify potential observers that we just added new objects in the registery.
-  Notify();
+  Notify(mode_);
+}
+
+//------------------------------------------------------------------------------
+//
+void MapInterpreter::SetDetectionMode(const DetectionMode &mode) {
+  if (mode == DetectionMode::BUOYS) {
+    SetCurrentProcTree("buoy");
+  } else if (mode == DetectionMode::FENCE) {
+    SetCurrentProcTree("fence");
+  } else {
+    mode_ = DetectionMode::NONE;
+    SetCurrentProcTree(ProcTree<cv::Mat>::Ptr(nullptr));
+    return;
+  }
+  mode_ = mode;
 }
 
 }  // namespace proc_mapping

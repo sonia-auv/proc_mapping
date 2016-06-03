@@ -29,6 +29,7 @@
 #include <lib_atlas/pattern/observer.h>
 #include <opencv/cv.h>
 #include <sonia_msgs/MapObject.h>
+#include "proc_mapping/interpreter/map_interpreter.h"
 #include "proc_mapping/raw_map.h"
 
 namespace proc_mapping {
@@ -36,7 +37,7 @@ namespace proc_mapping {
 /// Inheriting a blank observer, just receiving a notification when a process
 /// loop has been done (We don't want to know anything about the raw map or the
 /// data interpreters)
-class SemanticMap : public atlas::Observer<> {
+class SemanticMap : public atlas::Observer<DetectionMode> {
  public:
   //==========================================================================
   // T Y P E D E F   A N D   E N U M
@@ -64,7 +65,8 @@ class SemanticMap : public atlas::Observer<> {
   //==========================================================================
   // P U B L I C   M E T H O D S
 
-  void OnSubjectNotify(atlas::Subject<> &) override;
+  void OnSubjectNotify(atlas::Subject<DetectionMode> &subject,
+                       DetectionMode mode) override;
 
   const std::vector<MapObjectsType> &GetMapObjects();
 
@@ -87,8 +89,6 @@ class SemanticMap : public atlas::Observer<> {
   RawMap::Ptr raw_map_;
   std::vector<Keypoint> trigged_keypoints_;
   std::vector<MapObjectsType> map_objects_;
-
-  uint8_t target_;
 
   bool new_objects_available_;
   mutable std::mutex object_mutex_;

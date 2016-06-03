@@ -45,12 +45,14 @@ ProcMappingNode::ProcMappingNode(const ros::NodeHandlePtr &nh)
   map_pub_ =
       nh_->advertise<sonia_msgs::MapObject>("/proc_mapping/objects", 100);
 
-  reset_odom_sub_ = nh_->subscribe("/proc_navigation/reset_odometry", 100,
-                                   &ProcMappingNode::ResetOdometryCallback,
-                                   this);
-  send_map_srv_ = nh_->advertiseService("send_map",
-                                        &ProcMappingNode::SendMapCallback,
-                                        this);
+  reset_odom_sub_ =
+      nh_->subscribe("/proc_navigation/reset_odometry", 100,
+                     &ProcMappingNode::ResetOdometryCallback, this);
+  send_map_srv_ = nh_->advertiseService(
+      "send_map", &ProcMappingNode::SendMapCallback, this);
+
+  change_pt_srv_ = nh_->advertiseService(
+      "change_proc_tree", &ProcMappingNode::ChangeProcTreeCallback, this);
 
   raw_map_.Attach(map_interpreter_);
   map_interpreter_.Attach(semantic_map_);
@@ -70,21 +72,37 @@ ProcMappingNode::~ProcMappingNode() {}
 
 //------------------------------------------------------------------------------
 //
-void ProcMappingNode::ResetOdometryCallback(const
-                                            sonia_msgs::ResetOdometry::ConstPtr& msg) {
+void ProcMappingNode::ResetOdometryCallback(
+    const sonia_msgs::ResetOdometry::ConstPtr &msg) {
   // Todo: Implement the logic for resetting the map;
 }
 
 //------------------------------------------------------------------------------
 //
-bool ProcMappingNode::SendMapCallback(sonia_msgs::SendSemanticMap::Request &req,
-                     sonia_msgs::SendSemanticMap::Response &res) {
+bool ProcMappingNode::SendMapCallback(
+    sonia_msgs::SendSemanticMap::Request &req,
+    sonia_msgs::SendSemanticMap::Response &res) {
   sonia_msgs::SemanticMap map_msg;
   for (const auto &obj : semantic_map_.GetMapObjects()) {
     map_msg.objects.push_back(obj);
   }
   map_pub_.publish(map_msg);
   return true;
+}
+
+//------------------------------------------------------------------------------
+//
+bool ProcMappingNode::ChangeProcTreeCallback(
+    sonia_msgs::ChangeProcTree::Request &req,
+    sonia_msgs::ChangeProcTree::Response &res) {
+  if (req.target == req.BUOYS) {
+    map_interpreter_.SetDetectionMode(DetectionMode::BUOYS);
+  } else if (req.target == req.FENCE) {
+    map_interpreter_.SetDetectionMode(DetectionMode::FENCE);
+  } else {
+    map_interpreter_.SetDetectionMode(DetectionMode::NONE);
+  }
+  return false;
 }
 
 //------------------------------------------------------------------------------

@@ -98,7 +98,7 @@ inline void DataInterpreter<Tp_>::ProcessData() {
 template <class Tp_>
 bool DataInterpreter<Tp_>::SetCurrentProcTree(const std::string &name) {
   for (const auto &pt : all_proc_trees_) {
-    if (pt->GetName().equals(name)) {
+    if (pt->GetName() == name) {
       current_proc_tree_ = pt;
       return true;
     }
@@ -111,8 +111,13 @@ bool DataInterpreter<Tp_>::SetCurrentProcTree(const std::string &name) {
 //
 template <class Tp_>
 bool DataInterpreter<Tp_>::SetCurrentProcTree(const ProcTreeType &proc_tree) {
+  if (!proc_tree) {
+    current_proc_tree_ = nullptr;
+    return true;
+  }
+
   for (const auto &pt : all_proc_trees_) {
-    if (&(pt.get()) == &(proc_tree.get())) {
+    if (&(*pt.get()) == &(*proc_tree.get())) {
       current_proc_tree_ = pt;
       return true;
     }

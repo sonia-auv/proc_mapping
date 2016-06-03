@@ -43,7 +43,10 @@
 
 namespace proc_mapping {
 
-class MapInterpreter : public DataInterpreter<cv::Mat> {
+enum class DetectionMode { NONE = 0, BUOYS, FENCE };
+
+class MapInterpreter : public DataInterpreter<cv::Mat>,
+                       public atlas::Subject<DetectionMode> {
  public:
   //==========================================================================
   // T Y P E D E F   A N D   E N U M
@@ -61,6 +64,8 @@ class MapInterpreter : public DataInterpreter<cv::Mat> {
 
   virtual ~MapInterpreter();
 
+  void SetDetectionMode(const DetectionMode &mode);
+
   //==========================================================================
   // P U B L I C   M E T H O D S
 
@@ -68,6 +73,9 @@ class MapInterpreter : public DataInterpreter<cv::Mat> {
   /// This will run the whole processing chain as the method SetNewData
   /// start it.
   void OnSubjectNotify(atlas::Subject<cv::Mat> &subject, cv::Mat args) override;
+
+ private:
+  DetectionMode mode_;
 };
 
 }  // namespace proc_mapping

@@ -57,6 +57,8 @@ class ProcTree {
 
   void ProcessData(Tp_ &input) const;
 
+  const std::string &GetName() const;
+
  private:
   //==========================================================================
   // P R I V A T E   M E T H O D S

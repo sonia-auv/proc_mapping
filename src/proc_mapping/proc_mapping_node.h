@@ -28,10 +28,11 @@
 
 #include <lib_atlas/macros.h>
 #include <ros/node_handle.h>
-#include <memory>
-#include <vector>
+#include <sonia_msgs/ChangeProcTree.h>
 #include <sonia_msgs/ResetOdometry.h>
 #include <sonia_msgs/SendSemanticMap.h>
+#include <memory>
+#include <vector>
 #include "proc_mapping/config.h"
 #include "proc_mapping/interpreter/map_interpreter.h"
 #include "proc_mapping/raw_map.h"
@@ -43,8 +44,6 @@ class ProcMappingNode {
  public:
   //==========================================================================
   // T Y P E D E F   A N D   E N U M
-
-  enum class DetectionMode { NONE = 0, BUOYS, FENCE };
 
   using Ptr = std::shared_ptr<ProcMappingNode>;
   using ConstPtr = std::shared_ptr<const ProcMappingNode>;
@@ -63,10 +62,13 @@ class ProcMappingNode {
   /// registery, empty it and publish the objects.
   void Spin();
 
-  void ResetOdometryCallback(const sonia_msgs::ResetOdometry::ConstPtr& msg);
+  void ResetOdometryCallback(const sonia_msgs::ResetOdometry::ConstPtr &msg);
 
   bool SendMapCallback(sonia_msgs::SendSemanticMap::Request &req,
                        sonia_msgs::SendSemanticMap::Response &res);
+
+  bool ChangeProcTreeCallback(sonia_msgs::ChangeProcTree::Request &req,
+                              sonia_msgs::ChangeProcTree::Response &res);
 
  private:
   //==========================================================================
@@ -76,6 +78,7 @@ class ProcMappingNode {
   ros::Publisher map_pub_;
   ros::Subscriber reset_odom_sub_;
   ros::ServiceServer send_map_srv_;
+  ros::ServiceServer change_pt_srv_;
 
   RawMap raw_map_;
   MapInterpreter map_interpreter_;
