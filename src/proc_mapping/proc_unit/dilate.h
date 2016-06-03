@@ -56,15 +56,16 @@ class Dilate : public ProcUnit<cv::Mat> {
   // P U B L I C   M E T H O D S
 
   virtual void ProcessData(cv::Mat &input) override {
-//    cv::createTrackbar("Kernel Size X", "Dilate", &Parameters::kernel_size_x,
-//                       Parameters::kernel_size_x_max);
-//    cv::createTrackbar("Kernel Size Y", "Dilate", &Parameters::kernel_size_y,
-//                       Parameters::kernel_size_y_max);
     cv::Size size =
         cv::Size(Parameters::kernel_size_x, Parameters::kernel_size_y);
     cv::Mat kernel_ = cv::getStructuringElement(kernelType, size, anchor_);
     cv::dilate(input, input, kernel_, anchor_, iteration);
     if (debug_) {
+      cv::createTrackbar("Kernel Size X", "Dilate", &Parameters::kernel_size_x,
+                         Parameters::kernel_size_x_max);
+      cv::createTrackbar("Kernel Size Y", "Dilate", &Parameters::kernel_size_y,
+                         Parameters::kernel_size_y_max);
+
       cv::imshow("Dilate", input);
       cv::waitKey(1);
     }

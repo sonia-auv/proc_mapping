@@ -84,32 +84,6 @@ class BlobDetector : public ProcUnit<cv::Mat> {
   // P U B L I C   M E T H O D S
 
   virtual void ProcessData(cv::Mat &input) override {
-//    cv::createTrackbar("area filter", "Blob Detector",
-//                       &Parameters::filter_area_off,
-//                       Parameters::filter_area_on);
-//    cv::createTrackbar("min area", "Blob Detector", &Parameters::min_area,
-//                       Parameters::min_area_max);
-//    cv::createTrackbar("max area", "Blob Detector", &Parameters::max_area,
-//                       Parameters::max_area_max);
-    //    cv::createTrackbar("circularity filter", "Blob Detector",
-    //    &filter_circularity_off, filter_circularity_on);
-    //    cv::createTrackbar("min circularity", "Blob Detector",
-    //    &min_circularity, min_circularity_max);
-    //    cv::createTrackbar("max circularity", "Blob Detector",
-    //    &max_circularity, max_circularity_max);
-    //    cv::createTrackbar("convexity filter", "Blob Detector",
-    //    &filter_convexity_off, filter_convexity_on);
-    //    cv::createTrackbar("min convexity", "Blob Detector", &min_convexity,
-    //    min_convexity_max);
-    //    cv::createTrackbar("max convexity", "Blob Detector", &max_convexity,
-    //    max_convexity_max);
-    //    cv::createTrackbar("inertia filter", "Blob Detector",
-    //    &filter_inertial_off, filter_inertial_on);
-    //    cv::createTrackbar("min inertia", "Blob Detector", &min_inertia_ratio,
-    //    min_inertia_ratio_max);
-    //    cv::createTrackbar("max inertia", "Blob Detector", &max_inertia_ratio,
-    //    max_inertia_ratio_max);
-
     if (target_ == 0) {
       params_.minThreshold = 0;
       params_.maxThreshold = 255;
@@ -150,6 +124,41 @@ class BlobDetector : public ProcUnit<cv::Mat> {
     }
 
     if (debug_) {
+      cv::createTrackbar("area filter", "Blob Detector",
+                         &Parameters::filter_area_off,
+                         Parameters::filter_area_on);
+      cv::createTrackbar("min area", "Blob Detector", &Parameters::min_area,
+                         Parameters::min_area_max);
+      cv::createTrackbar("max area", "Blob Detector", &Parameters::max_area,
+                         Parameters::max_area_max);
+      cv::createTrackbar("circularity filter", "Blob Detector",
+                         &Parameters::filter_circularity_off,
+                         Parameters::filter_circularity_on);
+      cv::createTrackbar("min circularity", "Blob Detector",
+                         &Parameters::min_circularity,
+                         Parameters::min_circularity_max);
+      cv::createTrackbar("max circularity", "Blob Detector",
+                         &Parameters::max_circularity,
+                         Parameters::max_circularity_max);
+      cv::createTrackbar("convexity filter", "Blob Detector",
+                         &Parameters::filter_convexity_off,
+                         Parameters::filter_convexity_on);
+      cv::createTrackbar("min convexity", "Blob Detector",
+                         &Parameters::min_convexity,
+                         Parameters::min_convexity_max);
+      cv::createTrackbar("max convexity", "Blob Detector",
+                         &Parameters::max_convexity,
+                         Parameters::max_convexity_max);
+      cv::createTrackbar("inertia filter", "Blob Detector",
+                         &Parameters::filter_inertial_off,
+                         Parameters::filter_inertial_on);
+      cv::createTrackbar("min inertia", "Blob Detector",
+                         &Parameters::min_inertia_ratio,
+                         Parameters::min_inertia_ratio_max);
+      cv::createTrackbar("max inertia", "Blob Detector",
+                         &Parameters::max_inertia_ratio,
+                         Parameters::max_inertia_ratio_max);
+
       cv::Mat output;
       cv::drawKeypoints(input, keyPoints, output, cv::Scalar(0, 0, 255),
                         cv::DrawMatchesFlags::DRAW_RICH_KEYPOINTS);

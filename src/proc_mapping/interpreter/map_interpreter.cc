@@ -24,8 +24,8 @@
  */
 
 #include "proc_mapping/interpreter/map_interpreter.h"
-#include <tf/transform_datatypes.h>
 #include <ros/console.h>
+#include <tf/transform_datatypes.h>
 
 namespace proc_mapping {
 
@@ -99,13 +99,14 @@ void MapInterpreter::InstanciateProcTrees(
       all_proc_trees_.push_back(proc_tree);
       if (!default_pt.empty() &&
           default_pt == proc_trees[i]["name"].as<std::string>()) {
-        if(default_pt == "buoys") {
+        if (default_pt == "buoys") {
           SetDetectionMode(DetectionMode::BUOYS);
-        } else if (default_pt == "fence"){
+        } else if (default_pt == "fence") {
           SetDetectionMode(DetectionMode::FENCE);
         } else {
-          ROS_ERROR("Trying to set default proc tree: There is no proc tree "
-                        "with this name");
+          ROS_ERROR(
+              "Trying to set default proc tree: There is no proc tree "
+              "with this name");
         }
       }
     }

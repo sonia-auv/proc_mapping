@@ -75,8 +75,8 @@ class MapInterpreter : public DataInterpreter<cv::Mat>,
   /// start it.
   void OnSubjectNotify(atlas::Subject<cv::Mat> &subject, cv::Mat args) override;
 
-  virtual void InstanciateProcTrees(const std::string &proc_tree_file_name)
-  override;
+  virtual void InstanciateProcTrees(
+      const std::string &proc_tree_file_name) override;
 
  private:
   //==========================================================================

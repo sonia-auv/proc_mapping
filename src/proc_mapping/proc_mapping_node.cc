@@ -42,8 +42,7 @@ ProcMappingNode::ProcMappingNode(const ros::NodeHandlePtr &nh)
       raw_map_(nh_),
       map_interpreter_(nh_, "proc_trees"),
       semantic_map_(std::shared_ptr<RawMap>(&raw_map_)) {
-  map_pub_ =
-      nh_->advertise<sonia_msgs::SemanticMap>("/proc_mapping/map", 100);
+  map_pub_ = nh_->advertise<sonia_msgs::SemanticMap>("/proc_mapping/map", 100);
 
   reset_odom_sub_ =
       nh_->subscribe("/proc_navigation/reset_odometry", 100,
@@ -109,9 +108,9 @@ bool ProcMappingNode::ChangeProcTreeCallback(
 //
 void ProcMappingNode::Spin() {
   while (ros::ok()) {
-  #ifdef DEBUG
+#ifdef DEBUG
     cv::Point2d offset = raw_map_.GetPositionOffset();
-  #endif
+#endif
 
     if (semantic_map_.IsNewDataAvailable()) {
       sonia_msgs::SemanticMap map_msg;
