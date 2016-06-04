@@ -52,6 +52,7 @@ class SemanticMap : public atlas::Observer<DetectionMode> {
   struct Keypoint {
     cv::KeyPoint trigged_keypoint;
     cv::Rect bounding_box;
+    uint8_t weight;
     bool is_object_send;
   };
 
@@ -81,6 +82,7 @@ class SemanticMap : public atlas::Observer<DetectionMode> {
   /// line of functions anyway.
   void GetMetaDataForBuoys(std::vector<cv::KeyPoint> &&);
 
+  bool IsAlreadyTrigged(cv::KeyPoint map_object);
   double GetDistanceBewteenKeypoint(cv::Point2d p1, cv::Point2d p2);
   cv::Rect SetBoundingBox(cv::Point2d keypoint, int box_size);
 

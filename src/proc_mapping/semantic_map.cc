@@ -66,31 +66,26 @@ void SemanticMap::OnSubjectNotify(atlas::Subject<DetectionMode> &subject,
 //
 void SemanticMap::GetMetaDataForBuoys(std::vector<cv::KeyPoint> &&map_objects) {
   std::lock_guard<std::mutex> guard(object_mutex_);
-  if (map_objects.size() > 1) {
-    for (size_t i = 0; i < map_objects.size(); i++) {
-      double distance_to_right_blob =
-          GetDistanceBewteenKeypoint(map_objects[i].pt, map_objects[i + 1].pt);
-      double distance_to_left_blob =
-          GetDistanceBewteenKeypoint(map_objects[i].pt, map_objects[i - 1].pt);
+  for (size_t i = 0; i < map_objects.size(); i++) {
+    double distance_to_right_blob =
+        GetDistanceBewteenKeypoint(map_objects[i].pt, map_objects[i + 1].pt);
+    double distance_to_left_blob =
+        GetDistanceBewteenKeypoint(map_objects[i].pt, map_objects[i - 1].pt);
 
-      if ((distance_to_right_blob > 1.0f and distance_to_right_blob < 1.6f) or
-          (distance_to_left_blob > 1.0f and distance_to_left_blob < 1.6f)) {
-        bool is_already_trigged = false;
+    if ((distance_to_right_blob > 1.0f and distance_to_right_blob < 1.6f) or
+        (distance_to_left_blob > 1.0f and distance_to_left_blob < 1.6f)) {
 
-        for (uint32_t k = 0; k < trigged_keypoints_.size(); ++k) {
-          if (map_objects[i].pt.inside(trigged_keypoints_.at(k).bounding_box)) {
-            is_already_trigged = true;
-          }
-        }
+      bool is_already_trigged = IsAlreadyTrigged(map_objects[i]);
 
-        if (!is_already_trigged) {
-          Keypoint trigged_keypoint;
-          trigged_keypoint.trigged_keypoint = map_objects[i];
-          trigged_keypoint.bounding_box = SetBoundingBox(map_objects[i].pt, 20);
-          trigged_keypoint.is_object_send = false;
-          trigged_keypoints_.push_back(trigged_keypoint);
-        }
+      if (!is_already_trigged) {
+        Keypoint trigged_keypoint;
+        trigged_keypoint.trigged_keypoint = map_objects[i];
+        trigged_keypoint.bounding_box = SetBoundingBox(map_objects[i].pt, 20);
+        trigged_keypoint.is_object_send = false;
+        trigged_keypoints_.push_back(trigged_keypoint);
+      }
 
+      if (trigged_keypoints_.size() >= 3) {
         for (uint32_t k = 0; k < trigged_keypoints_.size(); ++k) {
           if (!trigged_keypoints_.at(k).is_object_send) {
             sonia_msgs::MapObject obj;
@@ -113,6 +108,18 @@ void SemanticMap::GetMetaDataForBuoys(std::vector<cv::KeyPoint> &&map_objects) {
       }
     }
   }
+}
+
+//------------------------------------------------------------------------------
+//
+bool SemanticMap::IsAlreadyTrigged(cv::KeyPoint map_object) {
+  for (uint32_t k = 0; k < trigged_keypoints_.size(); ++k) {
+    if (map_object.pt.inside(trigged_keypoints_.at(k).bounding_box)) {
+      trigged_keypoints_.at(k).weight++;
+      return true;
+    }
+  }
+  return false;
 }
 
 //------------------------------------------------------------------------------
