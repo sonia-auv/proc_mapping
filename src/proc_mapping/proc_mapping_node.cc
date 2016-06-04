@@ -118,7 +118,7 @@ bool ProcMappingNode::ChangeProcTreeCallback(
 bool ProcMappingNode::InsertRectROI(
     sonia_msgs::ChangeProcTree::Request &req,
     sonia_msgs::ChangeProcTree::Response &res) {
-
+  return true;
 }
 
 //------------------------------------------------------------------------------
@@ -126,7 +126,7 @@ bool ProcMappingNode::InsertRectROI(
   bool ProcMappingNode::InsertCircleROI(
       sonia_msgs::ChangeProcTree::Request &req,
       sonia_msgs::ChangeProcTree::Response &res) {
-    
+  return true;
 }
 //------------------------------------------------------------------------------
 //

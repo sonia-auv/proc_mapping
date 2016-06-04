@@ -71,12 +71,10 @@ class ProcMappingNode {
                               sonia_msgs::ChangeProcTree::Response &res);
 
   bool InsertRectROI(sonia_msgs::ChangeProcTree::Request &req,
-                     sonia_msgs::ChangeProcTree::Response &res) {
-  }
+                     sonia_msgs::ChangeProcTree::Response &res);
 
   bool InsertCircleROI(sonia_msgs::ChangeProcTree::Request &req,
-                       sonia_msgs::ChangeProcTree::Response &res) {
-  }
+                       sonia_msgs::ChangeProcTree::Response &res);
 
  private:
   //==========================================================================
