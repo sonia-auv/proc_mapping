@@ -72,6 +72,7 @@ RawMap::RawMap(const ros::NodeHandlePtr &nh)
                  scanlines_for_process_, 10);
 
   sonar_range_ = range;  // This member is used for debug purpose
+  world_.offset = world_.origin;
 
   // Resolution is equal to the range of the sonar divide by the number of bin
   // of a scanline.
@@ -324,7 +325,16 @@ bool RawMap::IsMapReadyForProcess() { return is_map_ready_for_process_; }
 
 //------------------------------------------------------------------------------
 //
-cv::Point2d RawMap::GetPositionOffset() const { return world_.origin; }
+void RawMap::ResetRawMap() { pixel_.map.setTo(cv::Scalar(0)); }
+
+//------------------------------------------------------------------------------
+//
+void RawMap::SetPositionOffset(cv::Point2d offset) { world_.offset = offset; }
+
+
+//------------------------------------------------------------------------------
+//
+cv::Point2d RawMap::GetPositionOffset() const { return world_.offset; }
 
 //------------------------------------------------------------------------------
 //
@@ -339,7 +349,8 @@ cv::Point2d RawMap::GetSubMarinePosition() const noexcept {
 //------------------------------------------------------------------------------
 //
 void RawMap::ResetPosition() {
-  world_.origin -= sub_.position;
+  cv::Point2d delta = world_.origin - sub_.position;
+  SetPositionOffset(delta);
 }
 
 }  // namespace proc_mapping

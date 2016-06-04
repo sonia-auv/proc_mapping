@@ -78,6 +78,7 @@ class RawMap : public atlas::Subject<cv::Mat>, public atlas::Runnable {
     double width;
     double height;
     cv::Point2d origin;
+    cv::Point2d offset;
   };
 
   //==========================================================================
@@ -111,6 +112,8 @@ class RawMap : public atlas::Subject<cv::Mat>, public atlas::Runnable {
   /// We want the submarine to be in the center of the raw map.
   /// Thus, we are going to offset it by the half of the map size.
   cv::Point2d GetPositionOffset() const;
+
+  void ResetRawMap();
 
   void ResetPosition();
 
@@ -153,6 +156,8 @@ class RawMap : public atlas::Subject<cv::Mat>, public atlas::Runnable {
    * \param intensity The intensity of the point
    */
   void UpdateMat(const cv::Point2i &p, const uint8_t &intensity);
+
+  void SetPositionOffset(cv::Point2d offset);
 
   bool IsMapReadyForProcess();
 
