@@ -70,6 +70,14 @@ class ProcMappingNode {
   bool ChangeProcTreeCallback(sonia_msgs::ChangeProcTree::Request &req,
                               sonia_msgs::ChangeProcTree::Response &res);
 
+  bool InsertRectROI(sonia_msgs::ChangeProcTree::Request &req,
+                     sonia_msgs::ChangeProcTree::Response &res) {
+  }
+
+  bool InsertCircleROI(sonia_msgs::ChangeProcTree::Request &req,
+                       sonia_msgs::ChangeProcTree::Response &res) {
+  }
+
  private:
   //==========================================================================
   // P R I V A T E   M E M B E R S
@@ -79,6 +87,8 @@ class ProcMappingNode {
   ros::Subscriber reset_odom_sub_;
   ros::ServiceServer send_map_srv_;
   ros::ServiceServer change_pt_srv_;
+  ros::ServiceServer insert_rect_ROI_srv_;
+  ros::ServiceServer insert_circle_ROI_srv_;
 
   RawMap raw_map_;
   MapInterpreter map_interpreter_;

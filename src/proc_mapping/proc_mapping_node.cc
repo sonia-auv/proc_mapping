@@ -53,6 +53,12 @@ ProcMappingNode::ProcMappingNode(const ros::NodeHandlePtr &nh)
   change_pt_srv_ = nh_->advertiseService(
       "change_proc_tree", &ProcMappingNode::ChangeProcTreeCallback, this);
 
+  insert_rect_ROI_srv_ = nh_->advertiseService(
+      "insert_rect_ROI", &ProcMappingNode::ChangeProcTreeCallback, this);
+
+  insert_circle_ROI_srv_ = nh_->advertiseService(
+      "insert_circle_ROI", &ProcMappingNode::ChangeProcTreeCallback, this);
+
   raw_map_.Attach(map_interpreter_);
   map_interpreter_.Attach(semantic_map_);
 
@@ -107,6 +113,21 @@ bool ProcMappingNode::ChangeProcTreeCallback(
   return true;
 }
 
+//------------------------------------------------------------------------------
+//
+bool ProcMappingNode::InsertRectROI(
+    sonia_msgs::ChangeProcTree::Request &req,
+    sonia_msgs::ChangeProcTree::Response &res) {
+
+}
+
+//------------------------------------------------------------------------------
+//
+  bool ProcMappingNode::InsertCircleROI(
+      sonia_msgs::ChangeProcTree::Request &req,
+      sonia_msgs::ChangeProcTree::Response &res) {
+    
+}
 //------------------------------------------------------------------------------
 //
 void ProcMappingNode::Spin() {
