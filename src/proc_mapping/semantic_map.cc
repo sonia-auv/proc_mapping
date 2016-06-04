@@ -102,6 +102,7 @@ void SemanticMap::GetMetaDataForBuoys(std::vector<cv::KeyPoint> &&map_objects) {
             obj.size = trigged_keypoints_.at(k).trigged_keypoint.size;
             obj.pose.x = world_point.x - offset.x;
             obj.pose.y = world_point.y - offset.y;
+            obj.type = sonia_msgs::MapObject::BUOYS;
             trigged_keypoints_.at(k).is_object_send = true;
 
             // Finally adding the object to the semantic map

@@ -65,8 +65,8 @@ RawMap::RawMap(const ros::NodeHandlePtr &nh)
 
   nh->param<int>("/proc_mapping/map/width", w, 20);
   nh->param<int>("/proc_mapping/map/height", h, 20);
-  nh->param<double>("/proc_mapping/map/origin_x", world_.origin.x, 15.0);
-  nh->param<double>("/proc_mapping/map/origin_y", world_.origin.y, 15.0);
+  nh->param<double>("/proc_mapping/map/origin_x", world_.origin.x, 10.0);
+  nh->param<double>("/proc_mapping/map/origin_y", world_.origin.y, 10.0);
   nh->param<double>("/proc_mapping/map/sonar_threshold", sonar_threshold, 1.0);
   nh->param<int>("/proc_mapping/tile/number_of_scanlines",
                  scanlines_for_process_, 10);
@@ -339,7 +339,7 @@ cv::Point2d RawMap::GetSubMarinePosition() const noexcept {
 //------------------------------------------------------------------------------
 //
 void RawMap::ResetPosition() {
-  // Todo: Implement the Reset of the map.
+  world_.origin -= sub_.position;
 }
 
 }  // namespace proc_mapping
