@@ -88,7 +88,7 @@ class BlobDetector : public ProcUnit<cv::Mat> {
       params_.minThreshold = 0;
       params_.maxThreshold = 255;
       params_.filterByArea = true;
-      params_.minArea = 350;
+      params_.minArea = 200;
       params_.maxArea = 600;
       params_.filterByCircularity = false;
       params_.filterByColor = false;

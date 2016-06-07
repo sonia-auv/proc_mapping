@@ -75,6 +75,8 @@ class SemanticMap : public atlas::Observer<DetectionMode> {
 
   void ClearMapObjects();
 
+  void InsertRectROI(std::string name, cv::Rect rect);
+
  private:
   //==========================================================================
   // P R I V A T E   M E T H O D S
@@ -93,6 +95,7 @@ class SemanticMap : public atlas::Observer<DetectionMode> {
   RawMap::Ptr raw_map_;
   std::vector<Keypoint> trigged_keypoints_;
   std::vector<MapObjectsType> map_objects_;
+  std::vector<cv::Rect> map_roi_;
 
   bool new_objects_available_;
   mutable std::mutex object_mutex_;

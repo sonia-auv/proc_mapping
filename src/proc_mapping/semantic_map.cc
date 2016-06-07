@@ -81,6 +81,13 @@ void SemanticMap::GetMetaDataForBuoys(std::vector<cv::KeyPoint> &&map_objects) {
         trigged_keypoint.trigged_keypoint = map_objects[i];
         trigged_keypoint.bounding_box = SetBoundingBox(map_objects[i].pt, 20);
         trigged_keypoint.is_object_send = false;
+        if (map_roi_.size() > 0) {
+          if (map_objects[i].pt.inside(map_roi_.at(0))) {
+            trigged_keypoint.weight += 10;
+          } else {
+            trigged_keypoint.weight += 1;
+          }
+        }
         trigged_keypoints_.push_back(trigged_keypoint);
       }
 
@@ -164,6 +171,12 @@ void SemanticMap::ClearMapObjects() {
   map_objects_.clear();
   trigged_keypoints_.clear();
   new_objects_available_ = true;
+}
+
+//------------------------------------------------------------------------------
+//
+void SemanticMap::InsertRectROI(std::string name, cv::Rect rect) {
+  map_roi_.push_back(rect);
 }
 
 }  // namespace proc_mapping

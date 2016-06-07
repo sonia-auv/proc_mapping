@@ -148,9 +148,9 @@ void ProcMappingNode::InsertCircleROI(std::string name, cv::Point2d center, int 
 //------------------------------------------------------------------------------
 //
 void ProcMappingNode::InsertRectROI(std::string name, cv::Rect rect) {
+  semantic_map_.InsertRectROI(name, rect);
   cv::rectangle(map_, rect, cv::Scalar(255), 2);
 }
-
 
 //------------------------------------------------------------------------------
 //

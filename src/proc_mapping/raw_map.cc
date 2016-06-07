@@ -220,15 +220,15 @@ void RawMap::ProcessPointCloud(const sensor_msgs::PointCloud2::ConstPtr &msg) {
       bin_coordinate.y =
           (pixel_.width / 2) - bin_coordinate.y + (pixel_.width / 2);
 
-          uint8_t threat_intensity = static_cast<uint8_t>(255.0f * intensity);
-          if (threat_intensity > 10) {
-            threat_intensity = 255;
-          }
+//          uint8_t threat_intensity = static_cast<uint8_t>(255.0f * intensity);
+//          if (threat_intensity > 10) {
+//            threat_intensity = 255;
+//          }
 
       // Filling the two maps without thresholded data
       if (i > point_cloud_threshold_) {
-              intensity_map[i] = threat_intensity;
-//        intensity_map[i] = static_cast<uint8_t>(255.0f * intensity);
+//              intensity_map[i] = threat_intensity;
+        intensity_map[i] = static_cast<uint8_t>(255.0f * intensity);
         coordinate_map[i] = bin_coordinate;
       }
     }
@@ -283,7 +283,7 @@ void RawMap::ProcessPointCloud(const sensor_msgs::PointCloud2::ConstPtr &msg) {
   // Send a command when enough scanline is arrived
   scanline_counter_++;
 
-  if (scanline_counter_ == 50) {
+  if (scanline_counter_ == 200) {
     is_first_scan_complete_ = true;
   }
 
