@@ -283,7 +283,7 @@ void RawMap::ProcessPointCloud(const sensor_msgs::PointCloud2::ConstPtr &msg) {
   // Send a command when enough scanline is arrived
   scanline_counter_++;
 
-  if (scanline_counter_ == 1) {
+  if (scanline_counter_ == 50) {
     is_first_scan_complete_ = true;
   }
 
@@ -359,6 +359,7 @@ cv::Point2d RawMap::GetSubMarinePosition() const noexcept {
 void RawMap::ResetPosition() {
   cv::Point2d delta = world_.origin - sub_.position;
   SetPositionOffset(delta);
+  is_first_scan_complete_ = false;
 }
 
 }  // namespace proc_mapping
