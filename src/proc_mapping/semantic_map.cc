@@ -74,7 +74,6 @@ void SemanticMap::GetMetaDataForBuoys(std::vector<cv::KeyPoint> &&map_objects) {
 
     if ((distance_to_right_blob > 1.0f and distance_to_right_blob < 1.6f) or
         (distance_to_left_blob > 1.0f and distance_to_left_blob < 1.6f)) {
-
       bool is_already_trigged = IsAlreadyTrigged(map_objects[i]);
 
       if (!is_already_trigged) {
@@ -163,6 +162,7 @@ bool SemanticMap::IsNewDataAvailable() const {
 void SemanticMap::ClearMapObjects() {
   std::lock_guard<std::mutex> guard(object_mutex_);
   map_objects_.clear();
+  trigged_keypoints_.clear();
   new_objects_available_ = true;
 }
 
