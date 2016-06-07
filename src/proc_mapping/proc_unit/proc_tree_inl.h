@@ -34,6 +34,7 @@
 #include "proc_mapping/proc_unit/blur.h"
 #include "proc_mapping/proc_unit/dilate.h"
 #include "proc_mapping/proc_unit/threshold.h"
+#include "proc_mapping/proc_unit/morphology.h"
 
 namespace proc_mapping {
 
@@ -86,6 +87,9 @@ typename ProcUnit<Tp_>::Ptr ProcTree<Tp_>::ProcUnitFactory(
     } else if (proc_unit_name == "dilate") {
       auto debug = node["debug"].as<bool>();
       return std::make_shared<Dilate>(debug);
+    } else if (proc_unit_name == "morphology") {
+      auto debug = node["debug"].as<bool>();
+      return std::make_shared<Morphology>(debug);
     } else if (proc_unit_name == "blob_detector") {
       auto debug = node["debug"].as<bool>();
       auto target = node["target"].as<int>();

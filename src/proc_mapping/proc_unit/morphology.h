@@ -1,7 +1,7 @@
 /**
- * \file	threshold.h
+ * \file	morphology.h
  * \author	Francis Masse <francis.masse05@gmail.com>
- * \date	18/05/2016
+ * \date	06/06/2016
  *
  * \copyright Copyright (c) 2016 S.O.N.I.A. All rights reserved.
  *
@@ -23,71 +23,52 @@
  * along with S.O.N.I.A. software. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef PROC_MAPPING_PROC_UNIT_THRESHOLD_H_
-#define PROC_MAPPING_PROC_UNIT_THRESHOLD_H_
+#ifndef PROC_MAPPING_MORPHOLOGY_H
+#define PROC_MAPPING_MORPHOLOGY_H
 
 #include <opencv/cv.h>
 #include "proc_mapping/proc_unit/proc_unit.h"
 
 namespace proc_mapping {
 
-class Threshold : public ProcUnit<cv::Mat> {
+class Morphology : public ProcUnit<cv::Mat> {
  public:
   //==========================================================================
   // T Y P E D E F   A N D   E N U M
 
-  using Ptr = std::shared_ptr<Threshold>;
-  using ConstPtr = std::shared_ptr<const Threshold>;
-  using PtrList = std::vector<Threshold::Ptr>;
-  using ConstPtrList = std::vector<Threshold::ConstPtr>;
-
-  struct Parameters {
-    static const int thresh_value_max;
-    static int thresh_value;
-  };
+  using Ptr = std::shared_ptr<Morphology>;
+  using ConstPtr = std::shared_ptr<const Morphology>;
+  using PtrList = std::vector<Morphology::Ptr>;
+  using ConstPtrList = std::vector<Morphology::ConstPtr>;
 
   //==========================================================================
   // P U B L I C   C / D T O R S
 
-  explicit Threshold(int threshold_type = 0, bool debug = false)
-      : threshold_type(threshold_type), debug(debug) {}
+  explicit Morphology(bool debug = false)
+      : debug(debug) {}
 
-  virtual ~Threshold() = default;
+  virtual ~Morphology() = default;
 
   //==========================================================================
   // P U B L I C   M E T H O D S
 
   virtual void ProcessData(cv::Mat &input) override {
-    if ((threshold_type == 0) | (threshold_type == 1) | (threshold_type == 2) |
-        (threshold_type == 3) | (threshold_type == 4) | (threshold_type == 7) |
-        (threshold_type == 8)) {
-      cv::threshold(input, input, Parameters::thresh_value, 255,
-                    threshold_type);
-    } else {
-      ROS_ERROR("Threshold type is undefined");
-    }
+    cv::Mat element = cv::getStructuringElement(
+        0, cv::Size( 2*2 + 1, 2*2+1 ), cv::Point(2, 2));
+
+    cv::morphologyEx(input, input, cv::MORPH_CLOSE, element);
+
     if (debug) {
-      cv::createTrackbar("Thresh Value", "Threshold", &Parameters::thresh_value,
-                         Parameters::thresh_value_max);
-      cv::imshow("Threshold", input);
+      cv::imshow("Morphology", input);
       cv::waitKey(1);
     }
   }
 
  private:
-  /*
- * 0: Binary
- * 1: Binary Inverted
- * 2: Threshold Truncated
- * 3: Threshold to Zero
- * 4: Threshold to Zero Inverted
- * 7: Threshold Mask
- * 8: Threshold OTSU
- */
-  int threshold_type;
+
   bool debug;
 };
 
 }  // namespace proc_mapping
 
-#endif  // PROC_MAPPING_PROC_UNIT_THRESHOLD_H_
+#endif //PROC_MAPPING_MORPHOLOGY_H
