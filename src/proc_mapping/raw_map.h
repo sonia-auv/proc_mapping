@@ -195,6 +195,7 @@ class RawMap : public atlas::Subject<cv::Mat>, public atlas::Runnable {
   /// Flag that states if the first odometry message has already been received.
   /// It is used to calculate the initial position of the submarine.
   bool is_first_odom_;
+  bool is_first_scan_complete_;
 };
 
 }  // namespace proc_mapping

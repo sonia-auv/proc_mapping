@@ -74,6 +74,7 @@ class SemanticMap : public atlas::Observer<DetectionMode> {
   bool IsNewDataAvailable() const;
 
   void ClearMapObjects();
+
  private:
   //==========================================================================
   // P R I V A T E   M E T H O D S
