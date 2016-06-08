@@ -1,0 +1,7 @@
+regions_of_interest:
+  - objecy_type: buoys
+    points:
+      - [0, 0]
+      - [0, 0]
+      - [0, 0]
+      - [0, 0]

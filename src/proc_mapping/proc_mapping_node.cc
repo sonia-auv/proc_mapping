@@ -115,17 +115,16 @@ bool ProcMappingNode::ChangeProcTreeCallback(
 
 //------------------------------------------------------------------------------
 //
-bool ProcMappingNode::InsertRectROI(
-    sonia_msgs::ChangeProcTree::Request &req,
-    sonia_msgs::ChangeProcTree::Response &res) {
+bool ProcMappingNode::InsertRectROI(sonia_msgs::ChangeProcTree::Request &req,
+                                    sonia_msgs::ChangeProcTree::Response &res) {
   return true;
 }
 
 //------------------------------------------------------------------------------
 //
-  bool ProcMappingNode::InsertCircleROI(
-      sonia_msgs::ChangeProcTree::Request &req,
-      sonia_msgs::ChangeProcTree::Response &res) {
+bool ProcMappingNode::InsertCircleROI(
+    sonia_msgs::ChangeProcTree::Request &req,
+    sonia_msgs::ChangeProcTree::Response &res) {
   return true;
 }
 //------------------------------------------------------------------------------

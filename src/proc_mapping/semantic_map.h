@@ -31,6 +31,7 @@
 #include <sonia_msgs/MapObject.h>
 #include "proc_mapping/interpreter/map_interpreter.h"
 #include "proc_mapping/raw_map.h"
+#include "region_of_interest.h"
 
 namespace proc_mapping {
 
@@ -70,10 +71,16 @@ class SemanticMap : public atlas::Observer<DetectionMode> {
                        DetectionMode mode) override;
 
   const std::vector<MapObjectsType> &GetMapObjects();
+  const std::vector<RegionOfInterest> &GetRegionOfInterest() const;
 
   bool IsNewDataAvailable() const;
 
   void ClearMapObjects();
+
+  /// Get the list of the regions of interest from the config file and
+  /// instanciate all of them by sending them the appropriate YAML node.
+  void InstanciateRegionsOfInterest(const std::string &proc_tree_file_name);
+
  private:
   //==========================================================================
   // P R I V A T E   M E T H O D S
@@ -92,6 +99,7 @@ class SemanticMap : public atlas::Observer<DetectionMode> {
   RawMap::Ptr raw_map_;
   std::vector<Keypoint> trigged_keypoints_;
   std::vector<MapObjectsType> map_objects_;
+  std::vector<RegionOfInterest> rois_;
 
   bool new_objects_available_;
   mutable std::mutex object_mutex_;

@@ -331,7 +331,6 @@ void RawMap::ResetRawMap() { pixel_.map.setTo(cv::Scalar(0)); }
 //
 void RawMap::SetPositionOffset(cv::Point2d offset) { world_.offset = offset; }
 
-
 //------------------------------------------------------------------------------
 //
 cv::Point2d RawMap::GetPositionOffset() const { return world_.offset; }

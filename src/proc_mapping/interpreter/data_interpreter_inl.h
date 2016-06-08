@@ -136,7 +136,7 @@ bool DataInterpreter<Tp_>::SetCurrentProcTree(const ProcTreeType &proc_tree) {
 template <class Tp_>
 void DataInterpreter<Tp_>::InstanciateProcTrees(
     const std::string &proc_tree_file_name) {
-  YAML::Node node = YAML::LoadFile(kProcTreesFilePath + proc_tree_file_name);
+  YAML::Node node = YAML::LoadFile(kConfigFilePath + proc_tree_file_name);
 
   if (node["proc_trees"]) {
     auto proc_trees = node["proc_trees"];

@@ -34,7 +34,12 @@ namespace proc_mapping {
 //------------------------------------------------------------------------------
 //
 SemanticMap::SemanticMap(const RawMap::Ptr &raw_map)
-    : raw_map_(raw_map), map_objects_({}), new_objects_available_(false){};
+    : raw_map_(raw_map),
+      map_objects_({}),
+      rois_{},
+      new_objects_available_(false) {
+  InstanciateRegionsOfInterest("regions_of_interest.yaml");
+}
 
 //------------------------------------------------------------------------------
 //
@@ -74,7 +79,6 @@ void SemanticMap::GetMetaDataForBuoys(std::vector<cv::KeyPoint> &&map_objects) {
 
     if ((distance_to_right_blob > 1.0f and distance_to_right_blob < 1.6f) or
         (distance_to_left_blob > 1.0f and distance_to_left_blob < 1.6f)) {
-
       bool is_already_trigged = IsAlreadyTrigged(map_objects[i]);
 
       if (!is_already_trigged) {
@@ -153,6 +157,13 @@ const std::vector<SemanticMap::MapObjectsType> &SemanticMap::GetMapObjects() {
 
 //------------------------------------------------------------------------------
 //
+const std::vector<RegionOfInterest> &SemanticMap::GetRegionOfInterest() const {
+  std::lock_guard<std::mutex> guard(object_mutex_);
+  return rois_;
+}
+
+//------------------------------------------------------------------------------
+//
 bool SemanticMap::IsNewDataAvailable() const {
   std::lock_guard<std::mutex> guard(object_mutex_);
   return new_objects_available_;
@@ -164,6 +175,22 @@ void SemanticMap::ClearMapObjects() {
   std::lock_guard<std::mutex> guard(object_mutex_);
   map_objects_.clear();
   new_objects_available_ = true;
+}
+
+//------------------------------------------------------------------------------
+//
+void SemanticMap::InstanciateRegionsOfInterest(
+    const std::string &proc_tree_file_name) {
+  YAML::Node node = YAML::LoadFile(kConfigFilePath + proc_tree_file_name);
+
+  assert(node["regions_of_interest"]);
+  auto regions_of_interests = node["regions_of_interest"];
+  assert(regions_of_interests.Type() == YAML::NodeType::Sequence);
+
+  for (int i = 0; i < regions_of_interests.size(); ++i) {
+    RegionOfInterest r{regions_of_interests[i]};
+    rois_.push_back(std::move(r));
+  }
 }
 
 }  // namespace proc_mapping

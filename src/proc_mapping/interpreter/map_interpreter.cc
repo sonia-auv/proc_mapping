@@ -83,7 +83,7 @@ void MapInterpreter::SetDetectionMode(const DetectionMode &mode) {
 //
 void MapInterpreter::InstanciateProcTrees(
     const std::string &proc_tree_file_name) {
-  YAML::Node node = YAML::LoadFile(kProcTreesFilePath + proc_tree_file_name);
+  YAML::Node node = YAML::LoadFile(kConfigFilePath + proc_tree_file_name);
 
   std::string default_pt{""};
   if (node["default"]) {

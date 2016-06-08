@@ -30,7 +30,7 @@
 
 #define DEBUG 1
 
-const std::string kProcTreesFilePath =
+const std::string kConfigFilePath =
     atlas::kWorkspaceRoot + "/src/proc_mapping/config/";
 
 #endif  // PROC_MAPPING_CONFIG_H_
