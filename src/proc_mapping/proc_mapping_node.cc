@@ -129,7 +129,7 @@ bool ProcMappingNode::InsertRectROICallback(
       raw_map_.WorldToPixelCoordinates(cv::Point2d(req.d.x, req.d.y)));
   RegionOfInterest roi(req.name, rect_point);
   semantic_map_.InsertRegionOfInterest(std::move(roi));
-  cv::rectangle(map_, rect, cv::Scalar(255), 2);
+  cv::rectangle(map_, roi.GetCvBoundingRect(), cv::Scalar(255), 2);
   return true;
 }
 
@@ -141,7 +141,8 @@ bool ProcMappingNode::InsertCircleROICallback(
   cv::Point2d center;
   center.x = req.center.x;
   center.y = req.center.y;
-  cv::circle(map_, raw_map_.WorldToPixelCoordinates(center), req.radius, cv::Scalar(255), 2);
+  cv::circle(map_, raw_map_.WorldToPixelCoordinates(center), req.radius,
+             cv::Scalar(255), 2);
   return true;
 }
 

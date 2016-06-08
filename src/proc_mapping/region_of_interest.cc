@@ -23,7 +23,7 @@
  * along with S.O.N.I.A. software. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "region_of_interest.h"
+#include "proc_mapping/region_of_interest.h"
 
 namespace proc_mapping {
 
@@ -39,7 +39,8 @@ RegionOfInterest::RegionOfInterest(const YAML::Node &node)
 
 //------------------------------------------------------------------------------
 //
-RegionOfInterest::RegionOfInterest(const std::string &name, const ContourType &contour,
+RegionOfInterest::RegionOfInterest(const std::string &name,
+                                   const ContourType &contour,
                                    const DetectionMode &mode)
     : object_type_(mode), contours_(contour), name_(name) {}
 
@@ -53,7 +54,6 @@ bool RegionOfInterest::Deserialize(const YAML::Node &node) {
   assert(node["objecy_type"]);
   assert(node["points"]);
   assert(node["name"]);
-  assert(node.Type() == YAML::NodeType::Sequence);
 
   name_ = node["name"].as<std::string>();
 
@@ -71,7 +71,7 @@ bool RegionOfInterest::Deserialize(const YAML::Node &node) {
     assert(points_node[i].Type() == YAML::NodeType::Sequence);
     assert(points_node[i].size() == 2);
     contours_.push_back(
-        {points_node[i][0].as<double>(), points_node[i][1].as<double>()});
+        {points_node[i][0].as<int>(), points_node[i][1].as<int>()});
   }
   return true;
 }
