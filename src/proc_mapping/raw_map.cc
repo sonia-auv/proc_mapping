@@ -46,7 +46,8 @@ RawMap::RawMap(const ros::NodeHandlePtr &nh)
       is_map_ready_for_process_(false),
       scanlines_for_process_(0),
       scanline_counter_(0),
-      is_first_odom_(true) {
+      is_first_odom_(true),
+      is_first_scan_complete_(false) {
   std::string point_cloud_topic;
   std::string odometry_topic;
 
@@ -219,14 +220,15 @@ void RawMap::ProcessPointCloud(const sensor_msgs::PointCloud2::ConstPtr &msg) {
       bin_coordinate.y =
           (pixel_.width / 2) - bin_coordinate.y + (pixel_.width / 2);
 
-      //    uint8_t threat_intensity = static_cast<uint8_t>(255.0f * intensity);
-      //    if (threat_intensity > 10) {
-      //      threat_intensity = 255;
-      //    }
+      //          uint8_t threat_intensity = static_cast<uint8_t>(255.0f *
+      //          intensity);
+      //          if (threat_intensity > 10) {
+      //            threat_intensity = 255;
+      //          }
 
       // Filling the two maps without thresholded data
       if (i > point_cloud_threshold_) {
-        //      intensity_map[i] = threat_intensity;
+        //              intensity_map[i] = threat_intensity;
         intensity_map[i] = static_cast<uint8_t>(255.0f * intensity);
         coordinate_map[i] = bin_coordinate;
       }
@@ -281,9 +283,16 @@ void RawMap::ProcessPointCloud(const sensor_msgs::PointCloud2::ConstPtr &msg) {
 
   // Send a command when enough scanline is arrived
   scanline_counter_++;
-  if (scanline_counter_ >= scanlines_for_process_) {
-    is_map_ready_for_process_ = true;
-    scanline_counter_ = 0;
+
+  if (scanline_counter_ == 200) {
+    is_first_scan_complete_ = true;
+  }
+
+  if (is_first_scan_complete_) {
+    if (scanline_counter_ >= scanlines_for_process_) {
+      is_map_ready_for_process_ = true;
+      scanline_counter_ = 0;
+    }
   }
 }
 
@@ -350,6 +359,7 @@ cv::Point2d RawMap::GetSubMarinePosition() const noexcept {
 void RawMap::ResetPosition() {
   cv::Point2d delta = world_.origin - sub_.position;
   SetPositionOffset(delta);
+  is_first_scan_complete_ = false;
 }
 
 }  // namespace proc_mapping

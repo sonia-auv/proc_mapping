@@ -29,6 +29,8 @@
 #include <lib_atlas/macros.h>
 #include <ros/node_handle.h>
 #include <sonia_msgs/ChangeProcTree.h>
+#include <sonia_msgs/InsertCircleROI.h>
+#include <sonia_msgs/InsertRectROI.h>
 #include <sonia_msgs/ResetOdometry.h>
 #include <sonia_msgs/SendSemanticMap.h>
 #include <memory>
@@ -70,11 +72,11 @@ class ProcMappingNode {
   bool ChangeProcTreeCallback(sonia_msgs::ChangeProcTree::Request &req,
                               sonia_msgs::ChangeProcTree::Response &res);
 
-  bool InsertRectROI(sonia_msgs::ChangeProcTree::Request &req,
-                     sonia_msgs::ChangeProcTree::Response &res);
+  bool InsertRectROICallback(sonia_msgs::InsertRectROI::Request &req,
+                             sonia_msgs::InsertRectROI::Response &res);
 
-  bool InsertCircleROI(sonia_msgs::ChangeProcTree::Request &req,
-                       sonia_msgs::ChangeProcTree::Response &res);
+  bool InsertCircleROICallback(sonia_msgs::InsertCircleROI::Request &req,
+                               sonia_msgs::InsertCircleROI::Response &res);
 
  private:
   //==========================================================================

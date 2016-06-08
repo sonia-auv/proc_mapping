@@ -37,6 +37,12 @@ RegionOfInterest::RegionOfInterest(const YAML::Node &node)
   Deserialize(node);
 }
 
+//------------------------------------------------------------------------------
+//
+RegionOfInterest::RegionOfInterest(const std::string &name, const ContourType &contour,
+                                   const DetectionMode &mode)
+    : object_type_(mode), contours_(contour), name_(name) {}
+
 //==============================================================================
 // M E T H O D   S E C T I O N
 
@@ -46,7 +52,10 @@ bool RegionOfInterest::Deserialize(const YAML::Node &node) {
   // Asser that the node is formated correctly.
   assert(node["objecy_type"]);
   assert(node["points"]);
+  assert(node["name"]);
   assert(node.Type() == YAML::NodeType::Sequence);
+
+  name_ = node["name"].as<std::string>();
 
   auto objecy_type = node["objecy_type"].as<std::string>();
   if (objecy_type == "buoys") {
@@ -88,7 +97,7 @@ cv::Rect RegionOfInterest::GetCvBoundingRect() const {
 
 //------------------------------------------------------------------------------
 //
-bool RegionOfInterest::IsInZone(const cv::Point2d &p) const {
+bool RegionOfInterest::IsInZone(const cv::Point2i &p) const {
   auto result = cv::pointPolygonTest(contours_, p, false);
   return result == 0 || result == 1;
 }

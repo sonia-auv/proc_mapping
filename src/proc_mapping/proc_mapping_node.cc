@@ -54,10 +54,10 @@ ProcMappingNode::ProcMappingNode(const ros::NodeHandlePtr &nh)
       "change_proc_tree", &ProcMappingNode::ChangeProcTreeCallback, this);
 
   insert_rect_ROI_srv_ = nh_->advertiseService(
-      "insert_rect_ROI", &ProcMappingNode::ChangeProcTreeCallback, this);
+      "insert_rect_ROI", &ProcMappingNode::InsertRectROICallback, this);
 
   insert_circle_ROI_srv_ = nh_->advertiseService(
-      "insert_circle_ROI", &ProcMappingNode::ChangeProcTreeCallback, this);
+      "insert_circle_ROI", &ProcMappingNode::InsertCircleROICallback, this);
 
   raw_map_.Attach(map_interpreter_);
   map_interpreter_.Attach(semantic_map_);
@@ -115,18 +115,36 @@ bool ProcMappingNode::ChangeProcTreeCallback(
 
 //------------------------------------------------------------------------------
 //
-bool ProcMappingNode::InsertRectROI(sonia_msgs::ChangeProcTree::Request &req,
-                                    sonia_msgs::ChangeProcTree::Response &res) {
+bool ProcMappingNode::InsertRectROICallback(
+    sonia_msgs::InsertRectROI::Request &req,
+    sonia_msgs::InsertRectROI::Response &res) {
+  std::vector<cv::Point2i> rect_point;
+  rect_point.push_back(
+      raw_map_.WorldToPixelCoordinates(cv::Point2d(req.a.x, req.a.y)));
+  rect_point.push_back(
+      raw_map_.WorldToPixelCoordinates(cv::Point2d(req.b.x, req.b.y)));
+  rect_point.push_back(
+      raw_map_.WorldToPixelCoordinates(cv::Point2d(req.c.x, req.c.y)));
+  rect_point.push_back(
+      raw_map_.WorldToPixelCoordinates(cv::Point2d(req.d.x, req.d.y)));
+  RegionOfInterest roi(req.name, rect_point);
+  semantic_map_.InsertRegionOfInterest(std::move(roi));
+  cv::rectangle(map_, rect, cv::Scalar(255), 2);
   return true;
 }
 
 //------------------------------------------------------------------------------
 //
-bool ProcMappingNode::InsertCircleROI(
-    sonia_msgs::ChangeProcTree::Request &req,
-    sonia_msgs::ChangeProcTree::Response &res) {
+bool ProcMappingNode::InsertCircleROICallback(
+    sonia_msgs::InsertCircleROI::Request &req,
+    sonia_msgs::InsertCircleROI::Response &res) {
+  cv::Point2d center;
+  center.x = req.center.x;
+  center.y = req.center.y;
+  cv::circle(map_, raw_map_.WorldToPixelCoordinates(center), req.radius, cv::Scalar(255), 2);
   return true;
 }
+
 //------------------------------------------------------------------------------
 //
 void ProcMappingNode::Spin() {
@@ -152,10 +170,12 @@ void ProcMappingNode::Spin() {
 #ifdef DEBUG
     cv::Point2d sub = raw_map_.GetSubMarinePosition();
     sub += offset;
+
     cv::line(map_, cv::Point2d(800 / 2, 800 / 2), cv::Point2d(800 / 2, 0),
              cv::Scalar(255));
     cv::line(map_, cv::Point2d(800 / 2, 800 / 2), cv::Point2d(800, 800 / 2),
              cv::Scalar(255));
+
     sub = raw_map_.WorldToPixelCoordinates(sub);
     sub.y = (800 / 2) - sub.y + (800 / 2);
 

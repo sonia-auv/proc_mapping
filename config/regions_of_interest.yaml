@@ -1,5 +1,6 @@
 regions_of_interest:
   - objecy_type: buoys
+    name: BUOY_ROI
     points:
       - [0, 0]
       - [0, 0]

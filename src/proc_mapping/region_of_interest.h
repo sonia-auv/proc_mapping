@@ -42,12 +42,15 @@ class RegionOfInterest {
 
   // We don't want to use cv::Rect here because we want to be able to give an
   // orientation to the rectangle.
-  using ContourType = std::vector<cv::Point2d>;
+  using ContourType = std::vector<cv::Point2i>;
 
   //==========================================================================
   // P U B L I C   C / D T O R S
 
   explicit RegionOfInterest(const YAML::Node &node);
+  explicit RegionOfInterest(const std::string &name, const ContourType &contour,
+                            const DetectionMode &mode = DetectionMode::NONE);
+
   ~RegionOfInterest() = default;
 
   //==========================================================================
@@ -57,7 +60,7 @@ class RegionOfInterest {
 
   cv::Rect GetCvBoundingRect() const;
 
-  bool IsInZone(const cv::Point2d &p) const;
+  bool IsInZone(const cv::Point2i &p) const;
   bool IsInZone(const cv::Rect &p) const;
 
   bool Deserialize(const YAML::Node &node);
@@ -70,6 +73,8 @@ class RegionOfInterest {
   DetectionMode object_type_;
 
   ContourType contours_;
+
+  std::string name_;
 };
 
 }  // namespace proc_mapping
