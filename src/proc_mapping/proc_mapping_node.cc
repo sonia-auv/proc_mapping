@@ -129,7 +129,6 @@ bool ProcMappingNode::InsertRectROICallback(
       raw_map_.WorldToPixelCoordinates(cv::Point2d(req.d.x, req.d.y)));
   RegionOfInterest roi(req.name, rect_point);
   semantic_map_.InsertRegionOfInterest(std::move(roi));
-  cv::rectangle(map_, roi.GetCvBoundingRect(), cv::Scalar(255), 2);
   return true;
 }
 
@@ -172,10 +171,24 @@ void ProcMappingNode::Spin() {
     cv::Point2d sub = raw_map_.GetSubMarinePosition();
     sub += offset;
 
-    cv::line(map_, cv::Point2d(800 / 2, 800 / 2), cv::Point2d(800 / 2, 0),
-             cv::Scalar(255));
-    cv::line(map_, cv::Point2d(800 / 2, 800 / 2), cv::Point2d(800, 800 / 2),
-             cv::Scalar(255));
+    for (int i = 0; i < 800; i+=40) {
+      cv::line(map_, cv::Point2d(i, 0), cv::Point2d(i, 800),
+               cv::Scalar(255));
+      cv::line(map_, cv::Point2d(0, i), cv::Point2d(800, i),
+               cv::Scalar(255));
+    }
+
+    for (const auto &roi : semantic_map_.GetRegionOfInterest()) {
+      cv::RotatedRect rotated_rect = roi.GetRotatedRect();
+      cv::Point2f rect_points[4];
+      rotated_rect.points(rect_points);
+      for (int i = 0; i < 4; ++i) {
+        rect_points[i] = raw_map_.WorldToPixelCoordinates(rect_points[i]);
+      }
+      for (int i = 0; i < 4; ++i) {
+        cv::line(map_, rect_points[i], rect_points[(i+1)%4], cv::Scalar(255), 3);
+      }
+    }
 
     sub = raw_map_.WorldToPixelCoordinates(sub);
     sub.y = (800 / 2) - sub.y + (800 / 2);

@@ -52,8 +52,10 @@ RegionOfInterest::RegionOfInterest(const std::string &name,
 bool RegionOfInterest::Deserialize(const YAML::Node &node) {
   // Asser that the node is formated correctly.
   assert(node["objecy_type"]);
-  assert(node["points"]);
   assert(node["name"]);
+  assert(node["center"]);
+  assert(node["size"]);
+  assert(node["angle"]);
 
   name_ = node["name"].as<std::string>();
 
@@ -66,13 +68,24 @@ bool RegionOfInterest::Deserialize(const YAML::Node &node) {
     object_type_ = DetectionMode::NONE;
   }
 
-  auto points_node = node["points"];
-  for (int i = 0; i < points_node.size(); ++i) {
-    assert(points_node[i].Type() == YAML::NodeType::Sequence);
-    assert(points_node[i].size() == 2);
-    contours_.push_back(
-        {points_node[i][0].as<int>(), points_node[i][1].as<int>()});
+  auto center = node["center"];
+  for (size_t i = 0; i < center.size(); ++i) {
+    assert(center[i].Type() == YAML::NodeType::Sequence);
+    assert(center[i].size() == 2);
+    center_.x = center[i][0].as<int>();
+    center_.y = center[i][1].as<int>();
   }
+
+  auto size = node["size"];
+  for (size_t i = 0; i < size.size(); ++i) {
+    assert(size[i].Type() == YAML::NodeType::Sequence);
+    assert(size[i].size() == 2);
+    size_.width = size[i][0].as<int>();
+    size_.height = size[i][1].as<int>();
+  }
+
+  angle_ = node["angle"].as<double>();
+
   return true;
 }
 
@@ -91,8 +104,14 @@ const DetectionMode &RegionOfInterest::GetObjectType() const {
 
 //------------------------------------------------------------------------------
 //
-cv::Rect RegionOfInterest::GetCvBoundingRect() const {
-  return cv::boundingRect(contours_);
+RegionOfInterest::ContourType RegionOfInterest::GetContour() const {
+  return contours_;
+}
+
+//------------------------------------------------------------------------------
+//
+RegionOfInterest::RotatedRectType RegionOfInterest::GetRotatedRect() const {
+    return cv::RotatedRect(center_, size_, angle_);
 }
 
 //------------------------------------------------------------------------------

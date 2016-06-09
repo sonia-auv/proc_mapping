@@ -43,6 +43,7 @@ class RegionOfInterest {
   // We don't want to use cv::Rect here because we want to be able to give an
   // orientation to the rectangle.
   using ContourType = std::vector<cv::Point2i>;
+  using RotatedRectType = cv::RotatedRect;
 
   //==========================================================================
   // P U B L I C   C / D T O R S
@@ -58,7 +59,9 @@ class RegionOfInterest {
 
   const DetectionMode &GetObjectType() const;
 
-  cv::Rect GetCvBoundingRect() const;
+  ContourType GetContour() const;
+  RotatedRectType GetRotatedRect() const;
+
 
   bool IsInZone(const cv::Point2i &p) const;
   bool IsInZone(const cv::Rect &p) const;
@@ -72,9 +75,13 @@ class RegionOfInterest {
 
   DetectionMode object_type_;
 
+  std::string name_;
+
   ContourType contours_;
 
-  std::string name_;
+  cv::Point2d center_;
+  cv::Size2d size_;
+  double angle_;
 };
 
 }  // namespace proc_mapping

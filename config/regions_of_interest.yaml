@@ -1,8 +1,14 @@
 regions_of_interest:
   - objecy_type: buoys
     name: BUOY_ROI
-    points:
-      - [0, 0]
-      - [0, 0]
-      - [0, 0]
-      - [0, 0]
+    center:
+      - [10, 10]
+    size:
+      - [3, 7]
+    angle: 135
+
+#    points:
+#      - [6, 10] #Top left
+#      - [8, 8] #Top right
+#      - [12, 11] #Bottom right
+#      - [9, 12] #Bottom left
