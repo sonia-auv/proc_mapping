@@ -100,6 +100,10 @@ class RawMap : public atlas::Subject<cv::Mat>, public atlas::Runnable {
   /// In order to do this, we will use the m_to_pixel ratio from the PixelCS
   /// struct.
   cv::Point2i WorldToPixelCoordinates(const cv::Point2d &p) const noexcept;
+  std::vector<cv::Point2i> WorldToPixelCoordinates(
+      const std::vector<cv::Point2d> &p) const noexcept;
+
+  cv::Rect WorldToPixelCoordinates(const cv::Rect &p) const noexcept;
 
   /// Converting a pixel point to the world Coordinate system.
   /// Apply the opposite convetion that WorldToPixelCoordinates does.

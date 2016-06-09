@@ -54,8 +54,16 @@ const DetectionMode &RegionOfInterest::GetObjectType() const {
 
 //------------------------------------------------------------------------------
 //
-const std::string &RegionOfInterest::GetName() const {
-  return name_;
+const std::string &RegionOfInterest::GetName() const { return name_; }
+
+//------------------------------------------------------------------------------
+//
+void RegionOfInterest::SetObjectType(const DetectionMode &object_type) {
+  object_type_ = object_type;
 }
+
+//------------------------------------------------------------------------------
+//
+void RegionOfInterest::SetName(const std::string &name) { name_ = name; }
 
 }  // namespace proc_mapping

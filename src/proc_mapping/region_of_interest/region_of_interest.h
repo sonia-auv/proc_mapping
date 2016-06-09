@@ -23,8 +23,8 @@
  * along with S.O.N.I.A. software. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef PROC_MAPPING_REGION_OF_INTEREST_H_
-#define PROC_MAPPING_REGION_OF_INTEREST_H_
+#ifndef PROC_MAPPING_REGION_OF_INTEREST_REGION_OF_INTEREST_H_
+#define PROC_MAPPING_REGION_OF_INTEREST_REGION_OF_INTEREST_H_
 
 #include "proc_mapping/interpreter/map_interpreter.h"
 
@@ -53,15 +53,20 @@ class RegionOfInterest {
   // P U B L I C   M E T H O D S
 
   const DetectionMode &GetObjectType() const;
+  void SetObjectType(const DetectionMode &object_type);
+
   const std::string &GetName() const;
+  void SetName(const std::string &name);
 
   virtual bool IsInZone(const cv::Point2i &p) const = 0;
   virtual bool IsInZone(const cv::Rect &p) const = 0;
 
-  virtual void DrawRegion(cv::Mat mat) const = 0;
+  virtual void DrawRegion(cv::Mat mat,
+                          const std::function<cv::Point2i(const cv::Point2d &p)>
+                              &convert) const = 0;
 
-  bool Deserialize(const YAML::Node &node) = 0;
-  bool Serialize(const YAML::Node &node) = 0;
+  virtual bool Deserialize(const YAML::Node &node) = 0;
+  virtual bool Serialize(const YAML::Node &node) = 0;
 
  private:
   //==========================================================================
@@ -74,4 +79,4 @@ class RegionOfInterest {
 
 }  // namespace proc_mapping
 
-#endif  //  PROC_MAPPING_REGION_OF_INTEREST_H_
+#endif  //  PROC_MAPPING_REGION_OF_INTEREST_REGION_OF_INTEREST_H_

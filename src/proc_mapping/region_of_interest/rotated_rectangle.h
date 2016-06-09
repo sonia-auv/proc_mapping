@@ -23,9 +23,12 @@
  * along with S.O.N.I.A. software. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef PROC_MAPPING_REGION_OF_INTEREST_H_
-#define PROC_MAPPING_REGION_OF_INTEREST_H_
+#ifndef PROC_MAPPING_REGION_OF_INTEREST_ROTATED_RECTANGLE_H_
+#define PROC_MAPPING_REGION_OF_INTEREST_ROTATED_RECTANGLE_H_
 
+#include <yaml-cpp/yaml.h>
+#include <memory>
+#include "proc_mapping/interpreter/map_interpreter.h"
 #include "proc_mapping/region_of_interest/region_of_interest.h"
 
 namespace proc_mapping {
@@ -48,25 +51,31 @@ class RotatedRectangle : public RegionOfInterest {
   // P U B L I C   C / D T O R S
 
   explicit RotatedRectangle(const YAML::Node &node);
-  explicit RotatedRectangle(const std::string &name, const RotatedRectangleType &contour,
-                   const DetectionMode &mode = DetectionMode::NONE);
+  explicit RotatedRectangle(const std::string &name, const cv::Point2d &center,
+                            const cv::Size2d &size, double angle,
+                            const DetectionMode &mode = DetectionMode::NONE);
 
   virtual ~RotatedRectangle() = default;
 
   //==========================================================================
   // P U B L I C   M E T H O D S
 
-  const DetectionMode &GetObjectType() const;
-
   virtual bool IsInZone(const cv::Point2i &p) const override;
   virtual bool IsInZone(const cv::Rect &p) const override;
 
-  virtual void DrawRegion(cv::Mat mat) const override;
+  virtual void DrawRegion(cv::Mat mat,
+                          const std::function<cv::Point2i(const cv::Point2d &p)>
+                              &convert) const override;
 
   bool Deserialize(const YAML::Node &node) override;
   bool Serialize(const YAML::Node &node) override;
 
  private:
+  //==========================================================================
+  // P R I V A T E   M E T H O D S
+
+  cv::RotatedRect GetCvRotatedRect() const;
+
   //==========================================================================
   // P R I V A T E   M E M B E R S
 
@@ -79,4 +88,4 @@ class RotatedRectangle : public RegionOfInterest {
 
 }  // namespace proc_mapping
 
-#endif  //  PROC_MAPPING_REGION_OF_INTEREST_H_
+#endif  //  PROC_MAPPING_REGION_OF_INTEREST_ROTATED_RECTANGLE_H_

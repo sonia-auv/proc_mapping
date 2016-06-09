@@ -24,7 +24,9 @@
  */
 
 #include "proc_mapping/semantic_map.h"
-#include <proc_mapping/interpreter/object_registery.h>
+#include "proc_mapping/interpreter/object_registery.h"
+#include "proc_mapping/region_of_interest/contour.h"
+#include "proc_mapping/region_of_interest/rotated_rectangle.h"
 
 namespace proc_mapping {
 
@@ -38,7 +40,7 @@ SemanticMap::SemanticMap(const RawMap::Ptr &raw_map)
       map_objects_({}),
       rois_{},
       new_objects_available_(false) {
-  RegionOfInterestFactory("regions_of_interest.yaml");
+  InsertRegionOfInterest("regions_of_interest.yaml");
 }
 
 //------------------------------------------------------------------------------
@@ -86,13 +88,15 @@ void SemanticMap::GetMetaDataForBuoys(std::vector<cv::KeyPoint> &&map_objects) {
         trigged_keypoint.trigged_keypoint = map_objects[i];
         trigged_keypoint.bounding_box = SetBoundingBox(map_objects[i].pt, 20);
         trigged_keypoint.is_object_send = false;
-        if (rois_.size() > 0) {
-          if (map_objects[i].pt.inside(rois_.at(0).GetCvBoundingRect())) {
-            trigged_keypoint.weight += 10;
-          } else {
-            trigged_keypoint.weight += 1;
-          }
-        }
+        //        if (rois_.size() > 0) {
+        //          if
+        //          (map_objects[i].pt.inside(rois_.at(0).GetCvBoundingRect()))
+        //          {
+        //            trigged_keypoint.weight += 10;
+        //          } else {
+        //            trigged_keypoint.weight += 1;
+        //          }
+        //        }
         trigged_keypoints_.push_back(trigged_keypoint);
       }
 
@@ -164,7 +168,8 @@ const std::vector<SemanticMap::MapObjectsType> &SemanticMap::GetMapObjects() {
 
 //------------------------------------------------------------------------------
 //
-const std::vector<RegionOfInterest> &SemanticMap::GetRegionOfInterest() const {
+const std::vector<SemanticMap::RegionOfInterestType>
+    &SemanticMap::GetRegionOfInterest() const {
   std::lock_guard<std::mutex> guard(object_mutex_);
   return rois_;
 }
@@ -187,7 +192,35 @@ void SemanticMap::ClearMapObjects() {
 
 //------------------------------------------------------------------------------
 //
-void SemanticMap::RegionOfInterestFactory(
+SemanticMap::RegionOfInterestType SemanticMap::RegionOfInterestFactory(
+    const YAML::Node &node) const {
+  assert(node["roi_type"]);
+  auto roi_type = node["roi_type"].as<std::string>();
+
+  RegionOfInterest *r = nullptr;
+  if (roi_type == "rotated_rectangle") {
+    r = new RotatedRectangle(node);
+  } else if (roi_type == "contour") {
+    r = new Contour(node);
+  }
+
+  if (r) {
+    return RegionOfInterest::Ptr{r};
+  }
+
+  return nullptr;
+}
+
+//------------------------------------------------------------------------------
+//
+void SemanticMap::InsertRegionOfInterest(const RegionOfInterest::Ptr &roi) {
+  std::lock_guard<std::mutex> guard(object_mutex_);
+  rois_.push_back(roi);
+}
+
+//------------------------------------------------------------------------------
+//
+void SemanticMap::InsertRegionOfInterest(
     const std::string &proc_tree_file_name) {
   YAML::Node node = YAML::LoadFile(kConfigFilePath + proc_tree_file_name);
 
@@ -196,17 +229,12 @@ void SemanticMap::RegionOfInterestFactory(
   assert(regions_of_interests.Type() == YAML::NodeType::Sequence);
 
   std::lock_guard<std::mutex> guard(object_mutex_);
-  for (int i = 0; i < regions_of_interests.size(); ++i) {
-    RegionOfInterest r{regions_of_interests[i]};
-    rois_.push_back(std::move(r));
+  for (size_t i = 0; i < regions_of_interests.size(); ++i) {
+    auto roi = RegionOfInterestFactory(regions_of_interests[i]);
+    if (roi) {
+      InsertRegionOfInterest(roi);
+    }
   }
-}
-
-//------------------------------------------------------------------------------
-//
-void SemanticMap::InsertRegionOfInterest(const RegionOfInterest &roi) {
-  std::lock_guard<std::mutex> guard(object_mutex_);
-  rois_.push_back(roi);
 }
 
 }  // namespace proc_mapping

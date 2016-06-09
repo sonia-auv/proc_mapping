@@ -318,6 +318,26 @@ cv::Point2i RawMap::WorldToPixelCoordinates(const cv::Point2d &p) const
 
 //------------------------------------------------------------------------------
 //
+std::vector<cv::Point2i> RawMap::WorldToPixelCoordinates(
+    const std::vector<cv::Point2d> &p) const noexcept {
+  std::vector<cv::Point2i> v(p.size());
+  for (size_t i = 0; i < p.size(); ++i) {
+    v[i] = WorldToPixelCoordinates(p[i]);
+  }
+  return v;
+}
+
+//------------------------------------------------------------------------------
+//
+cv::Rect RawMap::WorldToPixelCoordinates(const cv::Rect &p) const noexcept {
+  cv::Rect world_rect(p.x * pixel_.m_to_pixel, p.y * pixel_.m_to_pixel,
+                      p.height * pixel_.m_to_pixel,
+                      p.width * pixel_.m_to_pixel);
+  return world_rect;
+}
+
+//------------------------------------------------------------------------------
+//
 cv::Point2d RawMap::PixelToWorldCoordinates(const cv::Point2i &p) const
     noexcept {
   // The operator/ does not exist for Point2i, we must assign members one by

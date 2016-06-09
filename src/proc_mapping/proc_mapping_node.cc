@@ -25,7 +25,9 @@
 
 #include "proc_mapping/proc_mapping_node.h"
 #include <sonia_msgs/SemanticMap.h>
+#include <functional>
 #include "proc_mapping/config.h"
+#include "proc_mapping/region_of_interest/rotated_rectangle.h"
 
 namespace proc_mapping {
 
@@ -118,18 +120,9 @@ bool ProcMappingNode::ChangeProcTreeCallback(
 bool ProcMappingNode::InsertRectROICallback(
     sonia_msgs::InsertRectROI::Request &req,
     sonia_msgs::InsertRectROI::Response &res) {
-  std::vector<cv::Point2i> rect_point;
-  rect_point.push_back(
-      raw_map_.WorldToPixelCoordinates(cv::Point2d(req.a.x, req.a.y)));
-  rect_point.push_back(
-      raw_map_.WorldToPixelCoordinates(cv::Point2d(req.b.x, req.b.y)));
-  rect_point.push_back(
-      raw_map_.WorldToPixelCoordinates(cv::Point2d(req.c.x, req.c.y)));
-  rect_point.push_back(
-      raw_map_.WorldToPixelCoordinates(cv::Point2d(req.d.x, req.d.y)));
-  RegionOfInterest roi(req.name, rect_point);
-  semantic_map_.InsertRegionOfInterest(std::move(roi));
-  cv::rectangle(map_, roi.GetCvBoundingRect(), cv::Scalar(255), 2);
+  // Todo: Reimplement this method
+  // auto roi = std::make_shared<RotatedRectangle>(req.name, rect_point);
+  // semantic_map_.InsertRegionOfInterest(std::move(roi));
   return true;
 }
 
@@ -138,11 +131,7 @@ bool ProcMappingNode::InsertRectROICallback(
 bool ProcMappingNode::InsertCircleROICallback(
     sonia_msgs::InsertCircleROI::Request &req,
     sonia_msgs::InsertCircleROI::Response &res) {
-  cv::Point2d center;
-  center.x = req.center.x;
-  center.y = req.center.y;
-  cv::circle(map_, raw_map_.WorldToPixelCoordinates(center), req.radius,
-             cv::Scalar(255), 2);
+  // Todo Implement the Circle ROI logic
   return true;
 }
 
@@ -172,10 +161,14 @@ void ProcMappingNode::Spin() {
     cv::Point2d sub = raw_map_.GetSubMarinePosition();
     sub += offset;
 
-    cv::line(map_, cv::Point2d(800 / 2, 800 / 2), cv::Point2d(800 / 2, 0),
-             cv::Scalar(255));
-    cv::line(map_, cv::Point2d(800 / 2, 800 / 2), cv::Point2d(800, 800 / 2),
-             cv::Scalar(255));
+    for (int i = 0; i < 800; i += 40) {
+      cv::line(map_, cv::Point2d(i, 0), cv::Point2d(i, 800), cv::Scalar(255));
+      cv::line(map_, cv::Point2d(0, i), cv::Point2d(800, i), cv::Scalar(255));
+    }
+
+    for (const auto &roi : semantic_map_.GetRegionOfInterest()) {
+      roi->DrawRegion(map_, GetConvertionFunction<cv::Point2d>());
+    }
 
     sub = raw_map_.WorldToPixelCoordinates(sub);
     sub.y = (800 / 2) - sub.y + (800 / 2);
@@ -189,6 +182,20 @@ void ProcMappingNode::Spin() {
 
     ros::spinOnce();
   }
+}
+
+//------------------------------------------------------------------------------
+//
+template <class Tp_>
+auto ProcMappingNode::GetConvertionFunction() const
+    -> std::function<cv::Point2i(const Tp_ &)> {
+  using std::placeholders::_1;
+  // The function WorldToPixelCoordinates is overloaded, thus can't be
+  // binded automatically, need to do this manually.
+  // cf. http://www.boost.org/doc/libs/1_50_0/libs/bind/bind.html#err_overloaded
+  return std::bind(static_cast<cv::Point2i (RawMap::*)(const Tp_ &) const>(
+                       &RawMap::WorldToPixelCoordinates),
+                   &raw_map_, _1);
 }
 
 }  // namespace proc_mapping

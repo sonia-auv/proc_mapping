@@ -32,14 +32,12 @@ namespace proc_mapping {
 
 //------------------------------------------------------------------------------
 //
-Contour::Contour(const YAML::Node &node)
-    : RegionOfInterest(node) {}
+Contour::Contour(const YAML::Node &node) : RegionOfInterest(node) {}
 
 //------------------------------------------------------------------------------
 //
-Contour::Contour(const std::string &name,
-                                   const ContourType &contour,
-                                   const DetectionMode &mode)
+Contour::Contour(const std::string &name, const ContourType &contour,
+                 const DetectionMode &mode)
     : RegionOfInterest(name, mode), contours_(contour) {}
 
 //==============================================================================
@@ -53,15 +51,15 @@ bool Contour::Deserialize(const YAML::Node &node) {
   assert(node["points"]);
   assert(node["name"]);
 
-  name_ = node["name"].as<std::string>();
+  SetName(node["name"].as<std::string>());
 
   auto objecy_type = node["objecy_type"].as<std::string>();
   if (objecy_type == "buoys") {
-    object_type_ = DetectionMode::BUOYS;
+    SetObjectType(DetectionMode::BUOYS);
   } else if (objecy_type == "fence") {
-    object_type_ = DetectionMode::FENCE;
+    SetObjectType(DetectionMode::FENCE);
   } else {
-    object_type_ = DetectionMode::NONE;
+    SetObjectType(DetectionMode::NONE);
   }
 
   auto points_node = node["points"];
@@ -114,6 +112,14 @@ bool Contour::IsInZone(const cv::Rect &p) const {
   }
 
   return true;
+}
+
+//------------------------------------------------------------------------------
+//
+void Contour::DrawRegion(
+    cv::Mat mat,
+    const std::function<cv::Point2i(const cv::Point2d &p)> &convert) const {
+  // Todo: Implement method
 }
 
 }  // namespace proc_mapping

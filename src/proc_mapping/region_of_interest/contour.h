@@ -23,9 +23,12 @@
  * along with S.O.N.I.A. software. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef PROC_MAPPING_REGION_OF_INTEREST_H_
-#define PROC_MAPPING_REGION_OF_INTEREST_H_
+#ifndef PROC_MAPPING_REGION_OF_INTEREST_CONTOUR_H_
+#define PROC_MAPPING_REGION_OF_INTEREST_CONTOUR_H_
 
+#include <yaml-cpp/yaml.h>
+#include <memory>
+#include "proc_mapping/interpreter/map_interpreter.h"
 #include "proc_mapping/region_of_interest/region_of_interest.h"
 
 namespace proc_mapping {
@@ -49,19 +52,19 @@ class Contour : public RegionOfInterest {
 
   explicit Contour(const YAML::Node &node);
   explicit Contour(const std::string &name, const ContourType &contour,
-                            const DetectionMode &mode = DetectionMode::NONE);
+                   const DetectionMode &mode = DetectionMode::NONE);
 
   virtual ~Contour() = default;
 
   //==========================================================================
   // P U B L I C   M E T H O D S
 
-  const DetectionMode &GetObjectType() const;
-
   virtual bool IsInZone(const cv::Point2i &p) const override;
   virtual bool IsInZone(const cv::Rect &p) const override;
 
-  virtual void DrawRegion(cv::Mat mat) const override;
+  virtual void DrawRegion(cv::Mat mat,
+                          const std::function<cv::Point2i(const cv::Point2d &p)>
+                              &convert) const override;
 
   bool Deserialize(const YAML::Node &node) override;
   bool Serialize(const YAML::Node &node) override;
@@ -75,4 +78,4 @@ class Contour : public RegionOfInterest {
 
 }  // namespace proc_mapping
 
-#endif  //  PROC_MAPPING_REGION_OF_INTEREST_H_
+#endif  //  PROC_MAPPING_REGION_OF_INTEREST_CONTOUR_H_
