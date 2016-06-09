@@ -1,14 +1,17 @@
 regions_of_interest:
   - objecy_type: buoys
+    roi_type: rotated_rectangle
     name: BUOY_ROI
     center:
       - [10, 10]
     size:
       - [3, 7]
     angle: 135
-
-#    points:
-#      - [6, 10] #Top left
-#      - [8, 8] #Top right
-#      - [12, 11] #Bottom right
-#      - [9, 12] #Bottom left
+  - objecy_type: fence
+    roi_type: contour
+    name: FENCE_ROI
+    points:
+      - [6, 10] #Top left
+      - [8, 8] #Top right
+      - [12, 11] #Bottom right
+      - [9, 12] #Bottom left

@@ -331,7 +331,8 @@ std::vector<cv::Point2i> RawMap::WorldToPixelCoordinates(
 //
 cv::Rect RawMap::WorldToPixelCoordinates(const cv::Rect &p) const noexcept {
   cv::Rect world_rect(p.x * pixel_.m_to_pixel, p.y * pixel_.m_to_pixel,
-                      p.height * pixel_.m_to_pixel, p.width * pixel_.m_to_pixel);
+                      p.height * pixel_.m_to_pixel,
+                      p.width * pixel_.m_to_pixel);
   return world_rect;
 }
 

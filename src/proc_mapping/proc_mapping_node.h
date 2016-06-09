@@ -79,6 +79,11 @@ class ProcMappingNode {
                                sonia_msgs::InsertCircleROI::Response &res);
 
  private:
+  // Function that return the conversion function of the RawMap object (need
+  // the delegate to send it to the Draw method of the rois).
+  template <class Tp_>
+  auto GetConvertionFunction() const -> std::function<cv::Point2i(const Tp_ &)>;
+
   //==========================================================================
   // P R I V A T E   M E M B E R S
 

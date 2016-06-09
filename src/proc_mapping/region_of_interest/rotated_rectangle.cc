@@ -1,7 +1,7 @@
 /**
- * \file	semantic_map.cc
+ * \file	rotated_rectangle.cc
  * \author	Thibaut Mattio <thibaut.mattio@gmail.com>
- * \date	31/05/2016
+ * \date	09/06/2016
  *
  * \copyright Copyright (c) 2015 S.O.N.I.A. All rights reserved.
  *
@@ -23,7 +23,7 @@
  * along with S.O.N.I.A. software. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "proc_mapping/region_of_interest.h"
+#include "proc_mapping/region_of_interest/rotated_rectangle.h"
 
 namespace proc_mapping {
 
@@ -32,24 +32,26 @@ namespace proc_mapping {
 
 //------------------------------------------------------------------------------
 //
-RegionOfInterest::RegionOfInterest(const YAML::Node &node)
-    : object_type_(DetectionMode::NONE), contours_({}) {
-  Deserialize(node);
-}
+RotatedRectangle::RotatedRectangle(const YAML::Node &node)
+    : RegionOfInterest(node) {}
 
 //------------------------------------------------------------------------------
 //
-RegionOfInterest::RegionOfInterest(const std::string &name,
-                                   const ContourType &contour,
+RotatedRectangle::RotatedRectangle(const std::string &name,
+                                   const cv::Point2d &center,
+                                   const cv::Size2d &size, double angle,
                                    const DetectionMode &mode)
-    : object_type_(mode), contours_(contour), name_(name) {}
+    : RegionOfInterest(name, mode),
+      center_(center),
+      size_(size),
+      angle_(angle) {}
 
 //==============================================================================
 // M E T H O D   S E C T I O N
 
 //------------------------------------------------------------------------------
 //
-bool RegionOfInterest::Deserialize(const YAML::Node &node) {
+bool RotatedRectangle::Deserialize(const YAML::Node &node) {
   // Asser that the node is formated correctly.
   assert(node["objecy_type"]);
   assert(node["name"]);
@@ -57,15 +59,15 @@ bool RegionOfInterest::Deserialize(const YAML::Node &node) {
   assert(node["size"]);
   assert(node["angle"]);
 
-  name_ = node["name"].as<std::string>();
+  SetName(node["name"].as<std::string>());
 
   auto objecy_type = node["objecy_type"].as<std::string>();
   if (objecy_type == "buoys") {
-    object_type_ = DetectionMode::BUOYS;
+    SetObjectType(DetectionMode::BUOYS);
   } else if (objecy_type == "fence") {
-    object_type_ = DetectionMode::FENCE;
+    SetObjectType(DetectionMode::FENCE);
   } else {
-    object_type_ = DetectionMode::NONE;
+    SetObjectType(DetectionMode::NONE);
   }
 
   auto center = node["center"];
@@ -91,62 +93,45 @@ bool RegionOfInterest::Deserialize(const YAML::Node &node) {
 
 //------------------------------------------------------------------------------
 //
-bool RegionOfInterest::Serialize(const YAML::Node &node) {
+bool RotatedRectangle::Serialize(const YAML::Node &node) {
   // Todo Thibaut: Implement the serializing for the RegionOfInterest
   return true;
 }
 
 //------------------------------------------------------------------------------
 //
-const DetectionMode &RegionOfInterest::GetObjectType() const {
-  return object_type_;
-}
-
-//------------------------------------------------------------------------------
-//
-RegionOfInterest::ContourType RegionOfInterest::GetContour() const {
-  return contours_;
-}
-
-//------------------------------------------------------------------------------
-//
-RegionOfInterest::RotatedRectType RegionOfInterest::GetRotatedRect() const {
-    return cv::RotatedRect(center_, size_, angle_);
-}
-
-//------------------------------------------------------------------------------
-//
-bool RegionOfInterest::IsInZone(const cv::Point2i &p) const {
-  auto result = cv::pointPolygonTest(contours_, p, false);
-  return result == 0 || result == 1;
-}
-
-//------------------------------------------------------------------------------
-//
-bool RegionOfInterest::IsInZone(const cv::Rect &p) const {
-  auto result = cv::pointPolygonTest(contours_, cv::Point2d(p.x, p.y), false);
-  if (!(result == 0 || result == 1)) {
-    return false;
-  }
-
-  result =
-      cv::pointPolygonTest(contours_, cv::Point2d(p.x + p.width, p.y), false);
-  if (!(result == 0 || result == 1)) {
-    return false;
-  }
-
-  result =
-      cv::pointPolygonTest(contours_, cv::Point2d(p.x, p.y + p.height), false);
-  if (!(result == 0 || result == 1)) {
-    return false;
-  }
-  result = cv::pointPolygonTest(
-      contours_, cv::Point2d(p.x + p.width, p.y + p.height), false);
-  if (!(result == 0 || result == 1)) {
-    return false;
-  }
-
+bool RotatedRectangle::IsInZone(const cv::Point2i &p) const {
+  // TODO: Implement this method
   return true;
+}
+
+//------------------------------------------------------------------------------
+//
+bool RotatedRectangle::IsInZone(const cv::Rect &p) const {
+  // TODO: Implement this method
+  return true;
+}
+
+//------------------------------------------------------------------------------
+//
+cv::RotatedRect RotatedRectangle::GetCvRotatedRect() const {
+  return cv::RotatedRect(center_, size_, angle_);
+}
+
+//------------------------------------------------------------------------------
+//
+void RotatedRectangle::DrawRegion(
+    cv::Mat mat,
+    const std::function<cv::Point2i(const cv::Point2d &p)> &convert) const {
+  cv::Point2f rect_points[4];
+  auto rotated_rect = GetCvRotatedRect();
+  rotated_rect.points(rect_points);
+  for (int i = 0; i < 4; ++i) {
+    rect_points[i] = convert(rect_points[i]);
+  }
+  for (int i = 0; i < 4; ++i) {
+    cv::line(mat, rect_points[i], rect_points[(i + 1) % 4], cv::Scalar(255), 3);
+  }
 }
 
 }  // namespace proc_mapping

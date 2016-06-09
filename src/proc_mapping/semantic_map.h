@@ -31,7 +31,7 @@
 #include <sonia_msgs/MapObject.h>
 #include "proc_mapping/interpreter/map_interpreter.h"
 #include "proc_mapping/raw_map.h"
-#include "region_of_interest.h"
+#include "proc_mapping/region_of_interest/region_of_interest.h"
 
 namespace proc_mapping {
 
@@ -49,6 +49,7 @@ class SemanticMap : public atlas::Observer<DetectionMode> {
   using ConstPtrList = std::vector<SemanticMap::ConstPtr>;
 
   using MapObjectsType = sonia_msgs::MapObject;
+  using RegionOfInterestType = RegionOfInterest::Ptr;
 
   struct Keypoint {
     cv::KeyPoint trigged_keypoint;
@@ -71,7 +72,7 @@ class SemanticMap : public atlas::Observer<DetectionMode> {
                        DetectionMode mode) override;
 
   const std::vector<MapObjectsType> &GetMapObjects();
-  const std::vector<RegionOfInterest> &GetRegionOfInterest() const;
+  const std::vector<RegionOfInterestType> &GetRegionOfInterest() const;
 
   bool IsNewDataAvailable() const;
 
@@ -79,9 +80,10 @@ class SemanticMap : public atlas::Observer<DetectionMode> {
 
   /// Get the list of the regions of interest from the config file and
   /// instanciate all of them by sending them the appropriate YAML node.
-  void InstanciateRegionsOfInterest(const std::string &proc_tree_file_name);
+  RegionOfInterestType RegionOfInterestFactory(const YAML::Node &node) const;
 
-  void InsertRegionOfInterest(const RegionOfInterest &roi);
+  void InsertRegionOfInterest(const RegionOfInterestType &roi);
+  void InsertRegionOfInterest(const std::string &proc_tree_file_name);
 
  private:
   //==========================================================================
@@ -101,7 +103,7 @@ class SemanticMap : public atlas::Observer<DetectionMode> {
   RawMap::Ptr raw_map_;
   std::vector<Keypoint> trigged_keypoints_;
   std::vector<MapObjectsType> map_objects_;
-  std::vector<RegionOfInterest> rois_;
+  std::vector<RegionOfInterestType> rois_;
 
   bool new_objects_available_;
   mutable std::mutex object_mutex_;
