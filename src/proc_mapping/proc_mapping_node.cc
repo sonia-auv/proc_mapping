@@ -107,6 +107,8 @@ bool ProcMappingNode::ChangeProcTreeCallback(
     map_interpreter_.SetDetectionMode(DetectionMode::BUOYS);
   } else if (req.target == req.FENCE) {
     map_interpreter_.SetDetectionMode(DetectionMode::FENCE);
+  } else if (req.target == req.WALL) {
+    map_interpreter_.SetDetectionMode(DetectionMode::WALL);
   } else {
     map_interpreter_.SetDetectionMode(DetectionMode::NONE);
   }

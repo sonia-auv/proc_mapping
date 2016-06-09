@@ -61,6 +61,8 @@ void SemanticMap::OnSubjectNotify(atlas::Subject<DetectionMode> &subject,
     case DetectionMode::FENCE:
       // Todo : Impl the algo for the fence detection from keyPoints
       break;
+    case DetectionMode ::WALL:
+      // Todo
     case DetectionMode::NONE:
       ROS_WARN("There is no execution mode set for the semantic map.");
       break;

@@ -43,7 +43,7 @@
 
 namespace proc_mapping {
 
-enum class DetectionMode { NONE = 0, BUOYS, FENCE };
+enum class DetectionMode { NONE = 0, BUOYS, FENCE, WALL };
 
 class MapInterpreter : public DataInterpreter<cv::Mat>,
                        public atlas::Subject<DetectionMode> {
