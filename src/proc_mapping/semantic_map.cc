@@ -38,7 +38,7 @@ SemanticMap::SemanticMap(const RawMap::Ptr &raw_map)
       map_objects_({}),
       rois_{},
       new_objects_available_(false) {
-  InstanciateRegionsOfInterest("regions_of_interest.yaml");
+  RegionOfInterestFactory("regions_of_interest.yaml");
 }
 
 //------------------------------------------------------------------------------
@@ -187,7 +187,7 @@ void SemanticMap::ClearMapObjects() {
 
 //------------------------------------------------------------------------------
 //
-void SemanticMap::InstanciateRegionsOfInterest(
+void SemanticMap::RegionOfInterestFactory(
     const std::string &proc_tree_file_name) {
   YAML::Node node = YAML::LoadFile(kConfigFilePath + proc_tree_file_name);
 

@@ -31,7 +31,7 @@
 #include <sonia_msgs/MapObject.h>
 #include "proc_mapping/interpreter/map_interpreter.h"
 #include "proc_mapping/raw_map.h"
-#include "region_of_interest.h"
+#include "proc_mapping/region_of_interest/region_of_interest.h"
 
 namespace proc_mapping {
 
@@ -79,7 +79,7 @@ class SemanticMap : public atlas::Observer<DetectionMode> {
 
   /// Get the list of the regions of interest from the config file and
   /// instanciate all of them by sending them the appropriate YAML node.
-  void InstanciateRegionsOfInterest(const std::string &proc_tree_file_name);
+  void RegionOfInterestFactory(const std::string &proc_tree_file_name);
 
   void InsertRegionOfInterest(const RegionOfInterest &roi);
 

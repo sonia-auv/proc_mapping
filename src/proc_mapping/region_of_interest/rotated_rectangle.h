@@ -26,55 +26,55 @@
 #ifndef PROC_MAPPING_REGION_OF_INTEREST_H_
 #define PROC_MAPPING_REGION_OF_INTEREST_H_
 
-#include "proc_mapping/interpreter/map_interpreter.h"
+#include "proc_mapping/region_of_interest/region_of_interest.h"
 
 namespace proc_mapping {
 
-class RegionOfInterest {
+class RotatedRectangle : public RegionOfInterest {
  public:
   //==========================================================================
   // T Y P E D E F   A N D   E N U M
 
-  using Ptr = std::shared_ptr<RegionOfInterest>;
-  using ConstPtr = std::shared_ptr<const RegionOfInterest>;
-  using PtrList = std::vector<RegionOfInterest::Ptr>;
-  using ConstPtrList = std::vector<RegionOfInterest::ConstPtr>;
+  using Ptr = std::shared_ptr<RotatedRectangle>;
+  using ConstPtr = std::shared_ptr<const RotatedRectangle>;
+  using PtrList = std::vector<RotatedRectangle::Ptr>;
+  using ConstPtrList = std::vector<RotatedRectangle::ConstPtr>;
 
   // We don't want to use cv::Rect here because we want to be able to give an
   // orientation to the rectangle.
-  using ContourType = std::vector<cv::Point2i>;
+  using RotatedRectangleType = std::vector<cv::Point2i>;
 
   //==========================================================================
   // P U B L I C   C / D T O R S
 
-  explicit RegionOfInterest(const YAML::Node &node);
-  explicit RegionOfInterest(const std::string &name, const ContourType &contour,
-                            const DetectionMode &mode = DetectionMode::NONE);
+  explicit RotatedRectangle(const YAML::Node &node);
+  explicit RotatedRectangle(const std::string &name, const RotatedRectangleType &contour,
+                   const DetectionMode &mode = DetectionMode::NONE);
 
-  ~RegionOfInterest() = default;
+  virtual ~RotatedRectangle() = default;
 
   //==========================================================================
   // P U B L I C   M E T H O D S
 
   const DetectionMode &GetObjectType() const;
 
-  cv::Rect GetCvBoundingRect() const;
+  virtual bool IsInZone(const cv::Point2i &p) const override;
+  virtual bool IsInZone(const cv::Rect &p) const override;
 
-  bool IsInZone(const cv::Point2i &p) const;
-  bool IsInZone(const cv::Rect &p) const;
+  virtual void DrawRegion(cv::Mat mat) const override;
 
-  bool Deserialize(const YAML::Node &node);
-  bool Serialize(const YAML::Node &node);
+  bool Deserialize(const YAML::Node &node) override;
+  bool Serialize(const YAML::Node &node) override;
 
  private:
   //==========================================================================
   // P R I V A T E   M E M B E R S
 
-  DetectionMode object_type_;
+  cv::Point2d center_;
 
-  ContourType contours_;
+  cv::Size2d size_;
 
-  std::string name_;
+  double angle_;
 };
 
 }  // namespace proc_mapping

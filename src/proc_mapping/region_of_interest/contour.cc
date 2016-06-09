@@ -1,5 +1,5 @@
 /**
- * \file	semantic_map.cc
+ * \file	contour.cc
  * \author	Thibaut Mattio <thibaut.mattio@gmail.com>
  * \date	31/05/2016
  *
@@ -23,7 +23,7 @@
  * along with S.O.N.I.A. software. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "proc_mapping/region_of_interest.h"
+#include "proc_mapping/region_of_interest/contour.h"
 
 namespace proc_mapping {
 
@@ -32,24 +32,22 @@ namespace proc_mapping {
 
 //------------------------------------------------------------------------------
 //
-RegionOfInterest::RegionOfInterest(const YAML::Node &node)
-    : object_type_(DetectionMode::NONE), contours_({}) {
-  Deserialize(node);
-}
+Contour::Contour(const YAML::Node &node)
+    : RegionOfInterest(node) {}
 
 //------------------------------------------------------------------------------
 //
-RegionOfInterest::RegionOfInterest(const std::string &name,
+Contour::Contour(const std::string &name,
                                    const ContourType &contour,
                                    const DetectionMode &mode)
-    : object_type_(mode), contours_(contour), name_(name) {}
+    : RegionOfInterest(name, mode), contours_(contour) {}
 
 //==============================================================================
 // M E T H O D   S E C T I O N
 
 //------------------------------------------------------------------------------
 //
-bool RegionOfInterest::Deserialize(const YAML::Node &node) {
+bool Contour::Deserialize(const YAML::Node &node) {
   // Asser that the node is formated correctly.
   assert(node["objecy_type"]);
   assert(node["points"]);
@@ -78,33 +76,21 @@ bool RegionOfInterest::Deserialize(const YAML::Node &node) {
 
 //------------------------------------------------------------------------------
 //
-bool RegionOfInterest::Serialize(const YAML::Node &node) {
+bool Contour::Serialize(const YAML::Node &node) {
   // Todo Thibaut: Implement the serializing for the RegionOfInterest
   return true;
 }
 
 //------------------------------------------------------------------------------
 //
-const DetectionMode &RegionOfInterest::GetObjectType() const {
-  return object_type_;
-}
-
-//------------------------------------------------------------------------------
-//
-cv::Rect RegionOfInterest::GetCvBoundingRect() const {
-  return cv::boundingRect(contours_);
-}
-
-//------------------------------------------------------------------------------
-//
-bool RegionOfInterest::IsInZone(const cv::Point2i &p) const {
+bool Contour::IsInZone(const cv::Point2i &p) const {
   auto result = cv::pointPolygonTest(contours_, p, false);
   return result == 0 || result == 1;
 }
 
 //------------------------------------------------------------------------------
 //
-bool RegionOfInterest::IsInZone(const cv::Rect &p) const {
+bool Contour::IsInZone(const cv::Rect &p) const {
   auto result = cv::pointPolygonTest(contours_, cv::Point2d(p.x, p.y), false);
   if (!(result == 0 || result == 1)) {
     return false;
