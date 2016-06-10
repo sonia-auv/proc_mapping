@@ -215,13 +215,6 @@ SemanticMap::RegionOfInterestType SemanticMap::RegionOfInterestFactory(
 
 //------------------------------------------------------------------------------
 //
-void SemanticMap::InsertRegionOfInterest(const RegionOfInterest::Ptr &roi) {
-  std::lock_guard<std::mutex> guard(object_mutex_);
-  rois_.push_back(roi);
-}
-
-//------------------------------------------------------------------------------
-//
 void SemanticMap::InsertRegionOfInterest(
     const std::string &proc_tree_file_name) {
   YAML::Node node = YAML::LoadFile(kConfigFilePath + proc_tree_file_name);
@@ -234,7 +227,7 @@ void SemanticMap::InsertRegionOfInterest(
   for (size_t i = 0; i < regions_of_interests.size(); ++i) {
     auto roi = RegionOfInterestFactory(regions_of_interests[i]);
     if (roi) {
-      InsertRegionOfInterest(roi);
+      rois_.push_back(roi);
     }
   }
 }

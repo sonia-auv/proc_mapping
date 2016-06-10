@@ -82,7 +82,6 @@ class SemanticMap : public atlas::Observer<DetectionMode> {
   /// instanciate all of them by sending them the appropriate YAML node.
   RegionOfInterestType RegionOfInterestFactory(const YAML::Node &node) const;
 
-  void InsertRegionOfInterest(const RegionOfInterestType &roi);
   void InsertRegionOfInterest(const std::string &proc_tree_file_name);
 
  private:
