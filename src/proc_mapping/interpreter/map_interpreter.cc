@@ -71,6 +71,8 @@ void MapInterpreter::SetDetectionMode(const DetectionMode &mode) {
     SetCurrentProcTree("buoys");
   } else if (mode == DetectionMode::FENCE) {
     SetCurrentProcTree("fence");
+  } else if (mode == DetectionMode::WALL) {
+    SetCurrentProcTree("wall");
   } else {
     mode_ = DetectionMode::NONE;
     SetCurrentProcTree(ProcTree<cv::Mat>::Ptr(nullptr));
