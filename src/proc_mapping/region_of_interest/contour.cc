@@ -116,9 +116,9 @@ bool Contour::IsInZone(const cv::Rect &p) const {
 
 //------------------------------------------------------------------------------
 //
-void Contour::DrawRegion(
-    cv::Mat mat,
-    const std::function<cv::Point2i(const cv::Point2d &p)> &convert) const {
+void Contour::DrawRegion(cv::Mat mat,
+                         const std::function<cv::Point2i(const cv::Point2d &p)
+                                                 const> &convert) const {
   // Todo: Implement method
 }
 

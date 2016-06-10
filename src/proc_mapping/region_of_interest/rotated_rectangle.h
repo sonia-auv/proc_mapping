@@ -63,9 +63,10 @@ class RotatedRectangle : public RegionOfInterest {
   virtual bool IsInZone(const cv::Point2i &p) const override;
   virtual bool IsInZone(const cv::Rect &p) const override;
 
-  virtual void DrawRegion(cv::Mat mat,
-                          const std::function<cv::Point2i(const cv::Point2d &p)>
-                              &convert) const override;
+  virtual void DrawRegion(
+      cv::Mat mat,
+      const std::function<cv::Point2i(const cv::Point2d &p) const> &convert)
+      const override;
 
   bool Deserialize(const YAML::Node &node) override;
   bool Serialize(const YAML::Node &node) override;
