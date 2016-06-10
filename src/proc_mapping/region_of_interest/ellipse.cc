@@ -1,5 +1,5 @@
 /**
- * \file	rotated_rectangle.cc
+ * \file	ellipse.cc
  * \author	Thibaut Mattio <thibaut.mattio@gmail.com>
  * \date	09/06/2016
  *
@@ -23,7 +23,7 @@
  * along with S.O.N.I.A. software. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "proc_mapping/region_of_interest/rotated_rectangle.h"
+#include "proc_mapping/region_of_interest/ellipse.h"
 
 namespace proc_mapping {
 
@@ -32,89 +32,76 @@ namespace proc_mapping {
 
 //------------------------------------------------------------------------------
 //
-RotatedRectangle::RotatedRectangle(const YAML::Node &node)
-    : RegionOfInterest(node) {
+Ellipse::Ellipse(const YAML::Node &node) : RegionOfInterest(node) {
   Deserialize(node);
 }
 
 //------------------------------------------------------------------------------
 //
-RotatedRectangle::RotatedRectangle(const std::string &name,
-                                   const cv::Point2d &center,
-                                   const cv::Size2d &size, double angle,
-                                   const DetectionMode &mode)
+Ellipse::Ellipse(const std::string &name, const cv::Point2d &center,
+                 const cv::Size &axes, double angle, double start_angle,
+                 double end_angle, const DetectionMode &mode)
     : RegionOfInterest(name, mode),
       center_(center),
-      size_(size),
-      angle_(angle) {}
+      axes_(axes),
+      angle_(angle),
+      start_angle_(start_angle),
+      end_angle_(end_angle) {}
 
 //==============================================================================
 // M E T H O D   S E C T I O N
 
 //------------------------------------------------------------------------------
 //
-bool RotatedRectangle::Deserialize(const YAML::Node &node) {
+bool Ellipse::Deserialize(const YAML::Node &node) {
   // Asser that the node is formated correctly.
   assert(node["object_type"]);
   assert(node["name"]);
   assert(node["center"]);
-  assert(node["size"]);
+  assert(node["axes"]);
   assert(node["angle"]);
+  assert(node["start_angle"]);
+  assert(node["end_angle"]);
 
   SetName(node["name"].as<std::string>());
 
   auto object_type = node["object_type"].as<std::string>();
   DetectionModeFactory(object_type);
 
+  axes_ = cv::Size(node["axes"][0].as<int>(), node["axes"][1].as<int>());
   center_ = cv::Point2d(node["center"][0].as<double>(),
                         node["center"][1].as<double>());
-  size_ = cv::Size(node["size"][0].as<int>(), node["size"][1].as<int>());
   angle_ = node["angle"].as<double>();
+  start_angle_ = node["start_angle"].as<double>();
+  end_angle_ = node["end_angle"].as<double>();
 
   return true;
 }
 
 //------------------------------------------------------------------------------
 //
-bool RotatedRectangle::Serialize(const YAML::Node &node) {
+bool Ellipse::Serialize(const YAML::Node &node) {
   // Todo Thibaut: Implement the serializing for the RegionOfInterest
   return true;
 }
 
 //------------------------------------------------------------------------------
 //
-bool RotatedRectangle::IsInZone(const cv::Point2i &p) const {
-  // TODO: Implement this method
-  return true;
-}
+bool Ellipse::IsInZone(const cv::Point2i &p) const { return true; }
 
 //------------------------------------------------------------------------------
 //
-bool RotatedRectangle::IsInZone(const cv::Rect &p) const {
-  // TODO: Implement this method
-  return true;
-}
+bool Ellipse::IsInZone(const cv::Rect &p) const { return true; }
 
 //------------------------------------------------------------------------------
 //
-cv::RotatedRect RotatedRectangle::GetCvRotatedRect() const {
-  return cv::RotatedRect(center_, size_, angle_);
-}
-
-//------------------------------------------------------------------------------
-//
-void RotatedRectangle::DrawRegion(
+void Ellipse::DrawRegion(
     cv::Mat mat,
     const std::function<cv::Point2i(const cv::Point2d &p)> &convert) const {
-  cv::Point2f rect_points[4];
-  auto rotated_rect = GetCvRotatedRect();
-  rotated_rect.points(rect_points);
-  for (int i = 0; i < 4; ++i) {
-    rect_points[i] = convert(rect_points[i]);
-  }
-  for (int i = 0; i < 4; ++i) {
-    cv::line(mat, rect_points[i], rect_points[(i + 1) % 4], cv::Scalar(255), 3);
-  }
+  cv::Size pixel_axes{convert({static_cast<double>(axes_.width),
+                               static_cast<double>(pixel_axes.height)})};
+  cv::ellipse(mat, convert(center_), pixel_axes, angle_, start_angle_,
+              end_angle_, cv::Scalar(255), 3);
 }
 
 }  // namespace proc_mapping

@@ -26,6 +26,7 @@
 #include "proc_mapping/semantic_map.h"
 #include "proc_mapping/interpreter/object_registery.h"
 #include "proc_mapping/region_of_interest/contour.h"
+#include "proc_mapping/region_of_interest/ellipse.h"
 #include "proc_mapping/region_of_interest/rotated_rectangle.h"
 
 namespace proc_mapping {
@@ -204,6 +205,8 @@ SemanticMap::RegionOfInterestType SemanticMap::RegionOfInterestFactory(
     r = new RotatedRectangle(node);
   } else if (roi_type == "contour") {
     r = new Contour(node);
+  } else if (roi_type == "ellipse") {
+    r = new Ellipse(node);
   }
 
   if (r) {

@@ -62,6 +62,20 @@ void RegionOfInterest::SetObjectType(const DetectionMode &object_type) {
 
 //------------------------------------------------------------------------------
 //
+void RegionOfInterest::DetectionModeFactory(const std::string &object_type) {
+  if (object_type == "buoys") {
+    SetObjectType(DetectionMode::BUOYS);
+  } else if (object_type == "fence") {
+    SetObjectType(DetectionMode::FENCE);
+  } else if (object_type == "wall") {
+    SetObjectType(DetectionMode::WALL);
+  } else {
+    SetObjectType(DetectionMode::NONE);
+  }
+}
+
+//------------------------------------------------------------------------------
+//
 void RegionOfInterest::SetName(const std::string &name) { name_ = name; }
 
 }  // namespace proc_mapping

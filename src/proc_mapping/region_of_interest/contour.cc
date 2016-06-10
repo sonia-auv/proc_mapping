@@ -49,16 +49,16 @@ Contour::Contour(const std::string &name, const ContourType &contour,
 //
 bool Contour::Deserialize(const YAML::Node &node) {
   // Asser that the node is formated correctly.
-  assert(node["objecy_type"]);
+  assert(node["object_type"]);
   assert(node["points"]);
   assert(node["name"]);
 
   SetName(node["name"].as<std::string>());
 
-  auto objecy_type = node["objecy_type"].as<std::string>();
-  if (objecy_type == "buoys") {
+  auto object_type = node["object_type"].as<std::string>();
+  if (object_type == "buoys") {
     SetObjectType(DetectionMode::BUOYS);
-  } else if (objecy_type == "fence") {
+  } else if (object_type == "fence") {
     SetObjectType(DetectionMode::FENCE);
   } else {
     SetObjectType(DetectionMode::NONE);

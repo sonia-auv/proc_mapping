@@ -1,5 +1,5 @@
 /**
- * \file	region_of_interest.cc
+ * \file	ellipse.h
  * \author	Thibaut Mattio <thibaut.mattio@gmail.com>
  * \date	07/06/2016
  *
@@ -23,66 +23,70 @@
  * along with S.O.N.I.A. software. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef PROC_MAPPING_REGION_OF_INTEREST_REGION_OF_INTEREST_H_
-#define PROC_MAPPING_REGION_OF_INTEREST_REGION_OF_INTEREST_H_
+#ifndef PROC_MAPPING_REGION_OF_INTEREST_ELLIPSE_H_
+#define PROC_MAPPING_REGION_OF_INTEREST_ELLIPSE_H_
 
+#include <yaml-cpp/yaml.h>
+#include <memory>
 #include "proc_mapping/interpreter/map_interpreter.h"
+#include "proc_mapping/region_of_interest/region_of_interest.h"
 
 namespace proc_mapping {
 
-class RegionOfInterest {
+class Ellipse : public RegionOfInterest {
  public:
   //==========================================================================
   // T Y P E D E F   A N D   E N U M
 
-  using Ptr = std::shared_ptr<RegionOfInterest>;
-  using ConstPtr = std::shared_ptr<const RegionOfInterest>;
-  using PtrList = std::vector<RegionOfInterest::Ptr>;
-  using ConstPtrList = std::vector<RegionOfInterest::ConstPtr>;
+  using Ptr = std::shared_ptr<Ellipse>;
+  using ConstPtr = std::shared_ptr<const Ellipse>;
+  using PtrList = std::vector<Ellipse::Ptr>;
+  using ConstPtrList = std::vector<Ellipse::ConstPtr>;
 
   //==========================================================================
   // P U B L I C   C / D T O R S
 
-  explicit RegionOfInterest(const YAML::Node &node);
-  explicit RegionOfInterest(const std::string &name,
-                            const DetectionMode &mode = DetectionMode::NONE);
+  explicit Ellipse(const YAML::Node &node);
+  explicit Ellipse(const std::string &name, const cv::Point2d &center,
+                   const cv::Size &axes, double angle, double start_angle,
+                   double end_angle,
+                   const DetectionMode &mode = DetectionMode::NONE);
 
-  virtual ~RegionOfInterest() = default;
+  virtual ~Ellipse() = default;
 
   //==========================================================================
   // P U B L I C   M E T H O D S
 
-  const DetectionMode &GetObjectType() const;
-  void SetObjectType(const DetectionMode &object_type);
-
-  const std::string &GetName() const;
-  void SetName(const std::string &name);
-
-  virtual bool IsInZone(const cv::Point2i &p) const = 0;
-  virtual bool IsInZone(const cv::Rect &p) const = 0;
+  virtual bool IsInZone(const cv::Point2i &p) const override;
+  virtual bool IsInZone(const cv::Rect &p) const override;
 
   virtual void DrawRegion(cv::Mat mat,
                           const std::function<cv::Point2i(const cv::Point2d &p)>
-                              &convert) const = 0;
+                              &convert) const override;
 
-  virtual bool Deserialize(const YAML::Node &node) = 0;
-  virtual bool Serialize(const YAML::Node &node) = 0;
-
- protected:
-  //==========================================================================
-  // P R O T E C T E D  M E T H O D S
-
-  void DetectionModeFactory(const std::string &object_type);
+  bool Deserialize(const YAML::Node &node) override;
+  bool Serialize(const YAML::Node &node) override;
 
  private:
   //==========================================================================
   // P R I V A T E   M E M B E R S
 
-  DetectionMode object_type_;
+  /// Center of the ellipse
+  cv::Point2d center_;
 
-  std::string name_;
+  /// Half of the size of the ellipse main axes.
+  cv::Size axes_;
+
+  /// Ellipse rotation angle in degrees.
+  double angle_;
+
+  /// Starting angle of the elliptic arc in degrees.
+  double start_angle_;
+
+  /// Ending angle of the elliptic arc in degrees.
+  double end_angle_;
 };
 
 }  // namespace proc_mapping
 
-#endif  //  PROC_MAPPING_REGION_OF_INTEREST_REGION_OF_INTEREST_H_
+#endif  //  PROC_MAPPING_REGION_OF_INTEREST_ELLIPSE_H_
