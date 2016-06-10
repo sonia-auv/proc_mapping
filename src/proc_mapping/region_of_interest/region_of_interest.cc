@@ -33,8 +33,7 @@ namespace proc_mapping {
 //------------------------------------------------------------------------------
 //
 RegionOfInterest::RegionOfInterest(const YAML::Node &node)
-    : object_type_(DetectionMode::NONE) {
-}
+    : object_type_(DetectionMode::NONE) {}
 
 //------------------------------------------------------------------------------
 //

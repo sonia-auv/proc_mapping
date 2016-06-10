@@ -45,7 +45,7 @@ class Contour : public RegionOfInterest {
 
   // We don't want to use cv::Rect here because we want to be able to give an
   // orientation to the rectangle.
-  using ContourType = std::vector<cv::Point2i>;
+  using ContourType = std::vector<cv::Point2d>;
 
   //==========================================================================
   // P U B L I C   C / D T O R S

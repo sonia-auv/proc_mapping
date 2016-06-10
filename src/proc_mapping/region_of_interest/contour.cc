@@ -32,7 +32,9 @@ namespace proc_mapping {
 
 //------------------------------------------------------------------------------
 //
-Contour::Contour(const YAML::Node &node) : RegionOfInterest(node) {}
+Contour::Contour(const YAML::Node &node) : RegionOfInterest(node) {
+  Deserialize(node);
+}
 
 //------------------------------------------------------------------------------
 //
@@ -67,7 +69,7 @@ bool Contour::Deserialize(const YAML::Node &node) {
     assert(points_node[i].Type() == YAML::NodeType::Sequence);
     assert(points_node[i].size() == 2);
     contours_.push_back(
-        {points_node[i][0].as<int>(), points_node[i][1].as<int>()});
+        {points_node[i][0].as<double>(), points_node[i][1].as<double>()});
   }
   return true;
 }
@@ -119,7 +121,11 @@ bool Contour::IsInZone(const cv::Rect &p) const {
 void Contour::DrawRegion(
     cv::Mat mat,
     const std::function<cv::Point2i(const cv::Point2d &p)> &convert) const {
-  // Todo: Implement method
+  cv::Vec3b mycolor(100,0,0);
+  for (int i=0;i<contours_.size();i++) {
+    auto pt = convert(contours_[i]);
+    mat.at<cv::Vec3b>(pt.x, pt.y) = mycolor;
+  }
 }
 
 }  // namespace proc_mapping

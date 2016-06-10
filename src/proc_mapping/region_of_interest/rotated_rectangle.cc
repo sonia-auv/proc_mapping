@@ -33,7 +33,9 @@ namespace proc_mapping {
 //------------------------------------------------------------------------------
 //
 RotatedRectangle::RotatedRectangle(const YAML::Node &node)
-    : RegionOfInterest(node) {}
+    : RegionOfInterest(node) {
+  Deserialize(node);
+}
 
 //------------------------------------------------------------------------------
 //
