@@ -57,20 +57,21 @@ class Blur : public ProcUnit<cv::Mat> {
   //==========================================================================
   // P U B L I C   M E T H O D S
 
-  virtual void ProcessData(cv::Mat &input) override {
+  virtual void ProcessData(boost::any &input) override {
+    cv::Mat map = boost::any_cast<cv::Mat>(input);
     // To keep the kernel size odd, multiply by 2 and add 1
     cv::Size2i kernel(Parameters::kernel_size * 2 + 1,
                       Parameters::kernel_size * 2 + 1);
     // Bilateral Filter need another Mat to do algorithm
-    cv::Mat dst = input.clone();
+    cv::Mat dst = map.clone();
     if (blur_type == 0) {
-      cv::blur(input, input, kernel);
+      cv::blur(map, map, kernel);
     } else if (blur_type == 1) {
-      cv::GaussianBlur(input, input, kernel, 0, 0);
+      cv::GaussianBlur(map, map, kernel, 0, 0);
     } else if (blur_type == 2) {
-      cv::medianBlur(input, input, Parameters::kernel_size * 2 + 1);
+      cv::medianBlur(map, map, Parameters::kernel_size * 2 + 1);
     } else if (blur_type == 3) {
-      cv::bilateralFilter(input, dst, Parameters::kernel_size * 2 + 1,
+      cv::bilateralFilter(map, dst, Parameters::kernel_size * 2 + 1,
                           (Parameters::kernel_size * 2 + 1) * 2,
                           (Parameters::kernel_size * 2 + 1) / 2);
       input = dst;
@@ -84,7 +85,7 @@ class Blur : public ProcUnit<cv::Mat> {
         cv::imshow("Blur", dst);
         cv::waitKey(1);
       } else {
-        cv::imshow("Blur", input);
+        cv::imshow("Blur", map);
         cv::waitKey(1);
       }
     }

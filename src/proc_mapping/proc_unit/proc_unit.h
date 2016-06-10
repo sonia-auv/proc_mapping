@@ -26,6 +26,7 @@
 #ifndef PROC_MAPPING_PROC_UNIT_PROC_UNIT_H_
 #define PROC_MAPPING_PROC_UNIT_PROC_UNIT_H_
 
+#include <boost/any.hpp>
 #include <memory>
 #include <vector>
 
@@ -60,7 +61,7 @@ class ProcUnit {
   //==========================================================================
   // P U B L I C   M E T H O D S
 
-  virtual void ProcessData(Tp_ &input) = 0;
+  virtual void ProcessData(boost::any &input) = 0;
 };
 
 }  // namespace proc_mapping

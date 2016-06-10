@@ -30,6 +30,7 @@
 #include <fstream>
 #include <string>
 #include "proc_mapping/config.h"
+#include "proc_mapping/proc_unit/buoys_detector.h"
 #include "proc_mapping/proc_unit/blob_detector.h"
 #include "proc_mapping/proc_unit/blur.h"
 #include "proc_mapping/proc_unit/dilate.h"
@@ -55,7 +56,7 @@ ProcTree<Tp_>::ProcTree(const YAML::Node &node, const ros::NodeHandlePtr &nh)
 //------------------------------------------------------------------------------
 //
 template <class Tp_>
-void ProcTree<Tp_>::ProcessData(Tp_ &input) const {
+void ProcTree<Tp_>::ProcessData(boost::any &input) const {
   for (const auto &pu : proc_units_) {
     pu->ProcessData(input);
   }
@@ -95,6 +96,9 @@ typename ProcUnit<Tp_>::Ptr ProcTree<Tp_>::ProcUnitFactory(
       auto target = node["target"].as<int>();
       return std::make_shared<BlobDetector>(target, debug);
     }
+//    } else if (proc_unit_name == "buoys_detector") {
+//      return std::make_shared<BuoysDetector>();
+//    }
 
   } else {
     ROS_ERROR("The proc tree file is not formatted correcly");

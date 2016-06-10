@@ -65,7 +65,7 @@ bool Contour::Deserialize(const YAML::Node &node) {
   }
 
   auto points_node = node["points"];
-  for (int i = 0; i < points_node.size(); ++i) {
+  for (size_t i = 0; i < points_node.size(); ++i) {
     assert(points_node[i].Type() == YAML::NodeType::Sequence);
     assert(points_node[i].size() == 2);
     contours_.push_back(

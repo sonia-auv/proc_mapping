@@ -28,7 +28,7 @@
 
 namespace proc_mapping {
 
-class Dilate : public ProcUnit<cv::Mat> {
+class Dilate : public ProcUnit<boost::any> {
  public:
   //==========================================================================
   // T Y P E D E F   A N D   E N U M
@@ -55,18 +55,19 @@ class Dilate : public ProcUnit<cv::Mat> {
   //==========================================================================
   // P U B L I C   M E T H O D S
 
-  virtual void ProcessData(cv::Mat &input) override {
+  virtual void ProcessData(boost::any &input) override {
+    cv::Mat map = boost::any_cast<cv::Mat>(input);
     cv::Size size =
         cv::Size(Parameters::kernel_size_x, Parameters::kernel_size_y);
     cv::Mat kernel_ = cv::getStructuringElement(kernelType, size, anchor_);
-    cv::dilate(input, input, kernel_, anchor_, iteration);
+    cv::dilate(map, map, kernel_, anchor_, iteration);
     if (debug_) {
       cv::createTrackbar("Kernel Size X", "Dilate", &Parameters::kernel_size_x,
                          Parameters::kernel_size_x_max);
       cv::createTrackbar("Kernel Size Y", "Dilate", &Parameters::kernel_size_y,
                          Parameters::kernel_size_y_max);
 
-      cv::imshow("Dilate", input);
+      cv::imshow("Dilate", map);
       cv::waitKey(1);
     }
   }

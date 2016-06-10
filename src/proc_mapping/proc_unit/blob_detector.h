@@ -83,7 +83,8 @@ class BlobDetector : public ProcUnit<cv::Mat> {
   //==========================================================================
   // P U B L I C   M E T H O D S
 
-  virtual void ProcessData(cv::Mat &input) override {
+  virtual void ProcessData(boost::any &input) override {
+    cv::Mat map = boost::any_cast<cv::Mat>(input);
     if (target_ == 0) {
       params_.minThreshold = 0;
       params_.maxThreshold = 255;
@@ -117,7 +118,7 @@ class BlobDetector : public ProcUnit<cv::Mat> {
     }
     cv::SimpleBlobDetector detector(params_);
     std::vector<cv::KeyPoint> keyPoints;
-    detector.detect(input, keyPoints);
+    detector.detect(map, keyPoints);
 
     for (auto &key_point : keyPoints) {
       auto buoy = std::make_shared<Buoy>(key_point);
@@ -161,7 +162,7 @@ class BlobDetector : public ProcUnit<cv::Mat> {
       //                         Parameters::max_inertia_ratio_max);
 
       cv::Mat output;
-      cv::drawKeypoints(input, keyPoints, output, cv::Scalar(0, 0, 255),
+      cv::drawKeypoints(map, keyPoints, output, cv::Scalar(0, 0, 255),
                         cv::DrawMatchesFlags::DRAW_RICH_KEYPOINTS);
 
       cv::imshow("Blob Detector", output);
