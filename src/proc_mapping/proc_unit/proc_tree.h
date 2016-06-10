@@ -55,7 +55,7 @@ class ProcTree {
   //==========================================================================
   // P U B L I C   M E T H O D S
 
-  void ProcessData(Tp_ &input) const;
+  void ProcessData(boost::any &input) const;
 
   const std::string &GetName() const;
 

@@ -80,9 +80,9 @@ class DataInterpreter : public atlas::Subject<> {
    */
   virtual void ProcessData() = 0;
 
-  Tp_ &GetLastData();
+  boost::any &GetLastData();
 
-  void SetNewData(const Tp_ &data);
+  void SetNewData(const boost::any &data);
 
   bool IsNewDataReady() const;
 

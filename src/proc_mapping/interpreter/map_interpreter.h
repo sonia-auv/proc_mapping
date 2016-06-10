@@ -37,8 +37,8 @@ namespace proc_mapping {
 
 enum class DetectionMode { NONE = 0, BUOYS, FENCE, WALL };
 
-class MapInterpreter : public DataInterpreter<cv::Mat>,
-                       public atlas::Observer<cv::Mat> {
+class MapInterpreter : public DataInterpreter<boost::any>,
+                       public atlas::Observer<boost::any> {
  public:
   //==========================================================================
   // T Y P E D E F   A N D   E N U M
@@ -68,7 +68,7 @@ class MapInterpreter : public DataInterpreter<cv::Mat>,
   /// The method will update the latest data in the DataInterpreter.
   /// This will run the whole processing chain as the method SetNewData
   /// start it.
-  void OnSubjectNotify(atlas::Subject<cv::Mat> &subject, cv::Mat args) override;
+  void OnSubjectNotify(atlas::Subject<boost::any> &subject, boost::any args) override;
 
   virtual void InstanciateProcTrees(const std::string &proc_tree_file_name);
 

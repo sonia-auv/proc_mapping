@@ -57,11 +57,12 @@ class Threshold : public ProcUnit<cv::Mat> {
   //==========================================================================
   // P U B L I C   M E T H O D S
 
-  virtual void ProcessData(cv::Mat &input) override {
+  virtual void ProcessData(boost::any &input) override {
+    cv::Mat map = boost::any_cast<cv::Mat>(input);
     if ((threshold_type == 0) | (threshold_type == 1) | (threshold_type == 2) |
         (threshold_type == 3) | (threshold_type == 4) | (threshold_type == 7) |
         (threshold_type == 8)) {
-      cv::threshold(input, input, Parameters::thresh_value, 255,
+      cv::threshold(map, map, Parameters::thresh_value, 255,
                     threshold_type);
     } else {
       ROS_ERROR("Threshold type is undefined");
@@ -69,7 +70,7 @@ class Threshold : public ProcUnit<cv::Mat> {
     if (debug) {
       cv::createTrackbar("Thresh Value", "Threshold", &Parameters::thresh_value,
                          Parameters::thresh_value_max);
-      cv::imshow("Threshold", input);
+      cv::imshow("Threshold", map);
       cv::waitKey(1);
     }
   }
