@@ -31,7 +31,7 @@
 
 namespace proc_mapping {
 
-class Blur : public ProcUnit<cv::Mat> {
+class Blur : public ProcUnit {
  public:
   //==========================================================================
   // T Y P E D E F   A N D   E N U M
@@ -57,7 +57,7 @@ class Blur : public ProcUnit<cv::Mat> {
   //==========================================================================
   // P U B L I C   M E T H O D S
 
-  virtual void ProcessData(boost::any &input) override {
+  virtual boost::any ProcessData(boost::any input) override {
     cv::Mat map = boost::any_cast<cv::Mat>(input);
     // To keep the kernel size odd, multiply by 2 and add 1
     cv::Size2i kernel(Parameters::kernel_size * 2 + 1,
@@ -89,6 +89,7 @@ class Blur : public ProcUnit<cv::Mat> {
         cv::waitKey(1);
       }
     }
+    return boost::any(map);
   }
 
  private:

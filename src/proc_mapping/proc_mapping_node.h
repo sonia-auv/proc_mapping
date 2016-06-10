@@ -37,8 +37,8 @@
 #include <vector>
 #include "proc_mapping/config.h"
 #include "proc_mapping/interpreter/map_interpreter.h"
-#include "proc_mapping/raw_map.h"
-#include "proc_mapping/semantic_map.h"
+#include "proc_mapping/map/raw_map.h"
+#include "proc_mapping/map/semantic_map.h"
 
 namespace proc_mapping {
 
@@ -79,11 +79,6 @@ class ProcMappingNode {
                                sonia_msgs::InsertCircleROI::Response &res);
 
  private:
-  // Function that return the conversion function of the RawMap object (need
-  // the delegate to send it to the Draw method of the rois).
-  template <class Tp_>
-  auto GetConvertionFunction() const -> std::function<cv::Point2i(const Tp_ &)>;
-
   //==========================================================================
   // P R I V A T E   M E M B E R S
 
@@ -95,15 +90,11 @@ class ProcMappingNode {
   ros::ServiceServer insert_rect_ROI_srv_;
   ros::ServiceServer insert_circle_ROI_srv_;
 
+  CoordinateSystems::Ptr cs_;
+
   RawMap raw_map_;
   MapInterpreter map_interpreter_;
   SemanticMap semantic_map_;
-
-#ifdef DEBUG
-  /// This is a map used to display the submarine and objects detected in the
-  /// semantic map.
-  cv::Mat map_;
-#endif
 };
 
 }  // namespace proc_mapping

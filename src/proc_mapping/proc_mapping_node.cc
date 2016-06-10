@@ -41,9 +41,10 @@ ProcMappingNode::ProcMappingNode(const ros::NodeHandlePtr &nh)
       map_pub_(),
       reset_odom_sub_(),
       send_map_srv_(),
-      raw_map_(nh_),
+      cs_(std::make_shared<CoordinateSystems>(nh_)),
+      raw_map_(nh_, cs_),
       map_interpreter_(nh_, "proc_trees"),
-      semantic_map_(std::shared_ptr<RawMap>(&raw_map_)) {
+      semantic_map_(cs_) {
   map_pub_ = nh_->advertise<sonia_msgs::SemanticMap>("/proc_mapping/map", 100);
 
   reset_odom_sub_ =
@@ -63,11 +64,6 @@ ProcMappingNode::ProcMappingNode(const ros::NodeHandlePtr &nh)
 
   raw_map_.Attach(map_interpreter_);
   map_interpreter_.Attach(semantic_map_);
-
-#ifdef DEBUG
-  map_ = cv::Mat(800, 800, CV_8UC1);
-  map_.setTo(cv::Scalar(0));
-#endif
 }
 
 //------------------------------------------------------------------------------
@@ -82,9 +78,9 @@ ProcMappingNode::~ProcMappingNode() {}
 void ProcMappingNode::ResetOdometryCallback(
     const sonia_msgs::ResetOdometry::ConstPtr &msg) {
   semantic_map_.ClearMapObjects();
-  map_.setTo(cv::Scalar(0));
   raw_map_.ResetRawMap();
-  raw_map_.ResetPosition();
+  semantic_map_.ResetSemanticMap();
+  cs_->ResetPosition();
 }
 
 //------------------------------------------------------------------------------
@@ -92,10 +88,7 @@ void ProcMappingNode::ResetOdometryCallback(
 bool ProcMappingNode::SendMapCallback(
     sonia_msgs::SendSemanticMap::Request &req,
     sonia_msgs::SendSemanticMap::Response &res) {
-  sonia_msgs::SemanticMap map_msg;
-  for (const auto &obj : semantic_map_.GetMapObjects()) {
-    map_msg.objects.push_back(obj);
-  }
+  auto map_msg = semantic_map_.GenerateSemanticMapMessage();
   map_pub_.publish(map_msg);
   return true;
 }
@@ -141,63 +134,17 @@ bool ProcMappingNode::InsertCircleROICallback(
 //
 void ProcMappingNode::Spin() {
   while (ros::ok()) {
-#ifdef DEBUG
-    cv::Point2d offset = raw_map_.GetPositionOffset();
-#endif
-
     if (semantic_map_.IsNewDataAvailable()) {
-      sonia_msgs::SemanticMap map_msg;
-      for (const auto &obj : semantic_map_.GetMapObjects()) {
-        map_msg.objects.push_back(obj);
-#ifdef DEBUG
-        cv::Point2d object(obj.pose.x, obj.pose.y);
-        object += offset;
-        object = raw_map_.WorldToPixelCoordinates(object);
-        cv::circle(map_, object, 10, cv::Scalar(255), -1);
-#endif
-      }
+      auto map_msg = semantic_map_.GenerateSemanticMapMessage();
       map_pub_.publish(map_msg);
     }
 
 #ifdef DEBUG
-    cv::Point2d sub = raw_map_.GetSubMarinePosition();
-    sub += offset;
-
-    for (int i = 0; i < 800; i += 40) {
-      cv::line(map_, cv::Point2d(i, 0), cv::Point2d(i, 800), cv::Scalar(255));
-      cv::line(map_, cv::Point2d(0, i), cv::Point2d(800, i), cv::Scalar(255));
-    }
-
-    for (const auto &roi : semantic_map_.GetRegionOfInterest()) {
-      roi->DrawRegion(map_, GetConvertionFunction<cv::Point2d>());
-    }
-
-    sub = raw_map_.WorldToPixelCoordinates(sub);
-    sub.y = (800 / 2) - sub.y + (800 / 2);
-
-    cv::circle(map_, sub, 5, cv::Scalar(255), -1);
-    cv::imshow("Semantic Map", map_);
-    cv::circle(map_, sub, 5, cv::Scalar(0), -1);
-
-    cv::waitKey(1);
+    semantic_map_.PrintMap();
 #endif
 
     ros::spinOnce();
   }
-}
-
-//------------------------------------------------------------------------------
-//
-template <class Tp_>
-auto ProcMappingNode::GetConvertionFunction() const
-    -> std::function<cv::Point2i(const Tp_ &)> {
-  using std::placeholders::_1;
-  // The function WorldToPixelCoordinates is overloaded, thus can't be
-  // binded automatically, need to do this manually.
-  // cf. http://www.boost.org/doc/libs/1_50_0/libs/bind/bind.html#err_overloaded
-  return std::bind(static_cast<cv::Point2i (RawMap::*)(const Tp_ &) const>(
-                       &RawMap::WorldToPixelCoordinates),
-                   const_cast<const RawMap *>(&raw_map_), _1);
 }
 
 }  // namespace proc_mapping

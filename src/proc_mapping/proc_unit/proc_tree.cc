@@ -24,6 +24,12 @@
  */
 
 #include "proc_mapping/proc_unit/proc_tree.h"
+#include "proc_mapping/proc_unit/blob_detector.h"
+#include "proc_mapping/proc_unit/blur.h"
+#include "proc_mapping/proc_unit/buoys_detector.h"
+#include "proc_mapping/proc_unit/dilate.h"
+#include "proc_mapping/proc_unit/morphology.h"
+#include "proc_mapping/proc_unit/threshold.h"
 
 namespace proc_mapping {
 
@@ -62,5 +68,81 @@ int Dilate::Parameters::kernel_size_y = 5;
 
 const int Threshold::Parameters::thresh_value_max = 255;
 int Threshold::Parameters::thresh_value = 0;
+
+//==============================================================================
+// C / D T O R S   S E C T I O N
+
+//------------------------------------------------------------------------------
+//
+ProcTree::ProcTree(const YAML::Node &node, const ros::NodeHandlePtr &nh)
+    : nh_(nh), proc_units_({}) {
+  Deserialize(node);
+}
+
+//==============================================================================
+// M E T H O D   S E C T I O N
+
+//------------------------------------------------------------------------------
+//
+void ProcTree::ProcessData(boost::any input) const {
+  for (const auto &pu : proc_units_) {
+    input = pu->ProcessData(input);
+  }
+}
+
+//------------------------------------------------------------------------------
+//
+const std::string &ProcTree::GetName() const { return name_; }
+
+//------------------------------------------------------------------------------
+//
+typename ProcUnit::Ptr ProcTree::ProcUnitFactory(const YAML::Node &node) const {
+  if (node["name"]) {
+    auto proc_unit_name = node["name"].as<std::string>();
+
+    if (proc_unit_name == "blur") {
+      auto debug = node["debug"].as<bool>();
+      auto blur_type = node["blur_type"].as<int>();
+      return std::make_shared<Blur>(blur_type, debug);
+    } else if (proc_unit_name == "threshold") {
+      auto debug = node["debug"].as<bool>();
+      auto threshold_type = node["threshold_type"].as<int>();
+      return std::make_shared<Threshold>(threshold_type, debug);
+    } else if (proc_unit_name == "dilate") {
+      auto debug = node["debug"].as<bool>();
+      return std::make_shared<Dilate>(debug);
+    } else if (proc_unit_name == "blob_detector") {
+      auto debug = node["debug"].as<bool>();
+      auto target = node["target"].as<int>();
+      return std::make_shared<BlobDetector>(target, debug);
+    } else if (proc_unit_name == "buoys_detector") {
+      return std::make_shared<BuoysDetector>();
+    }
+
+  } else {
+    ROS_ERROR("The proc tree file is not formatted correcly");
+  }
+  ROS_ERROR("There is no ProcUnit with such a name");
+  return nullptr;
+}
+
+//------------------------------------------------------------------------------
+//
+bool ProcTree::Deserialize(const YAML::Node &node) {
+  name_ = node["name"].as<std::string>();
+
+  auto proc_units = node["proc_units"];
+  assert(proc_units.Type() == YAML::NodeType::Sequence);
+
+  for (std::size_t j = 0; j < proc_units.size(); j++) {
+    auto name = proc_units[j]["name"].as<std::string>();
+    auto proc_unit = ProcUnitFactory(proc_units[j]);
+
+    if (proc_unit) {
+      proc_units_.push_back(std::move(proc_unit));
+    }
+  }
+  return true;
+}
 
 }  // namespace proc_mapping

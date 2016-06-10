@@ -53,7 +53,7 @@ inline DataInterpreter<Tp_>::~DataInterpreter() {}
 //------------------------------------------------------------------------------
 //
 template <class Tp_>
-inline boost::any &DataInterpreter<Tp_>::GetLastData() {
+inline Tp_ DataInterpreter<Tp_>::GetLastData() {
   std::lock_guard<std::mutex> guard(data_mutex_);
   new_data_ready_ = false;
   return last_data_;
@@ -62,7 +62,7 @@ inline boost::any &DataInterpreter<Tp_>::GetLastData() {
 //------------------------------------------------------------------------------
 //
 template <class Tp_>
-inline void DataInterpreter<Tp_>::SetNewData(const boost::any &data) {
+inline void DataInterpreter<Tp_>::SetNewData(const Tp_ &data) {
   std::lock_guard<std::mutex> guard(data_mutex_);
   last_data_ = data;
   new_data_ready_ = true;

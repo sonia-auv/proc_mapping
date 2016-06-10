@@ -34,7 +34,6 @@
 
 namespace proc_mapping {
 
-template <class Tp_>
 class ProcTree {
  public:
   //==========================================================================
@@ -55,7 +54,7 @@ class ProcTree {
   //==========================================================================
   // P U B L I C   M E T H O D S
 
-  void ProcessData(boost::any &input) const;
+  void ProcessData(boost::any input) const;
 
   const std::string &GetName() const;
 
@@ -63,7 +62,7 @@ class ProcTree {
   //==========================================================================
   // P R I V A T E   M E T H O D S
 
-  typename ProcUnit<Tp_>::Ptr ProcUnitFactory(const YAML::Node &node) const;
+  typename ProcUnit::Ptr ProcUnitFactory(const YAML::Node &node) const;
 
   bool Deserialize(const YAML::Node &node);
 
@@ -74,11 +73,9 @@ class ProcTree {
 
   std::string name_;
 
-  std::vector<typename ProcUnit<Tp_>::Ptr> proc_units_;
+  std::vector<ProcUnit::Ptr> proc_units_;
 };
 
 }  // namespace proc_mapping
-
-#include "proc_mapping/proc_unit/proc_tree_inl.h"
 
 #endif  // PROC_MAPPING_PROC_UNIT_PROC_TREE_H_

@@ -31,7 +31,7 @@
 
 namespace proc_mapping {
 
-class Morphology : public ProcUnit<cv::Mat> {
+class Morphology : public ProcUnit {
  public:
   //==========================================================================
   // T Y P E D E F   A N D   E N U M
@@ -51,7 +51,7 @@ class Morphology : public ProcUnit<cv::Mat> {
   //==========================================================================
   // P U B L I C   M E T H O D S
 
-  virtual void ProcessData(boost::any &input) override {
+  virtual boost::any ProcessData(boost::any input) override {
     cv::Mat map = boost::any_cast<cv::Mat>(input);
     cv::Mat element = cv::getStructuringElement(
         0, cv::Size(2 * 2 + 1, 2 * 2 + 1), cv::Point(2, 2));
@@ -62,6 +62,7 @@ class Morphology : public ProcUnit<cv::Mat> {
       cv::imshow("Morphology", map);
       cv::waitKey(1);
     }
+    return boost::any(map);
   }
 
  private:

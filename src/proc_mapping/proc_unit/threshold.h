@@ -31,7 +31,7 @@
 
 namespace proc_mapping {
 
-class Threshold : public ProcUnit<cv::Mat> {
+class Threshold : public ProcUnit {
  public:
   //==========================================================================
   // T Y P E D E F   A N D   E N U M
@@ -57,13 +57,12 @@ class Threshold : public ProcUnit<cv::Mat> {
   //==========================================================================
   // P U B L I C   M E T H O D S
 
-  virtual void ProcessData(boost::any &input) override {
+  virtual boost::any ProcessData(boost::any input) override {
     cv::Mat map = boost::any_cast<cv::Mat>(input);
     if ((threshold_type == 0) | (threshold_type == 1) | (threshold_type == 2) |
         (threshold_type == 3) | (threshold_type == 4) | (threshold_type == 7) |
         (threshold_type == 8)) {
-      cv::threshold(map, map, Parameters::thresh_value, 255,
-                    threshold_type);
+      cv::threshold(map, map, Parameters::thresh_value, 255, threshold_type);
     } else {
       ROS_ERROR("Threshold type is undefined");
     }
@@ -73,6 +72,7 @@ class Threshold : public ProcUnit<cv::Mat> {
       cv::imshow("Threshold", map);
       cv::waitKey(1);
     }
+    return boost::any(map);
   }
 
  private:

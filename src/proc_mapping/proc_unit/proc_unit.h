@@ -40,7 +40,6 @@ namespace proc_mapping {
  * allow us to connect an output to a different one depending on the type
  * (e.g. not the same input/output types)
  */
-template <class Tp_>
 class ProcUnit {
  public:
   //==========================================================================
@@ -55,13 +54,12 @@ class ProcUnit {
   // P U B L I C   C / D T O R S
 
   ProcUnit() = default;
-
   virtual ~ProcUnit() = default;
 
   //==========================================================================
   // P U B L I C   M E T H O D S
 
-  virtual void ProcessData(boost::any &input) = 0;
+  virtual boost::any ProcessData(boost::any input) = 0;
 };
 
 }  // namespace proc_mapping

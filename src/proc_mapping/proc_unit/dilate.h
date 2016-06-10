@@ -28,7 +28,7 @@
 
 namespace proc_mapping {
 
-class Dilate : public ProcUnit<boost::any> {
+class Dilate : public ProcUnit {
  public:
   //==========================================================================
   // T Y P E D E F   A N D   E N U M
@@ -55,7 +55,7 @@ class Dilate : public ProcUnit<boost::any> {
   //==========================================================================
   // P U B L I C   M E T H O D S
 
-  virtual void ProcessData(boost::any &input) override {
+  virtual boost::any ProcessData(boost::any input) override {
     cv::Mat map = boost::any_cast<cv::Mat>(input);
     cv::Size size =
         cv::Size(Parameters::kernel_size_x, Parameters::kernel_size_y);
@@ -70,6 +70,7 @@ class Dilate : public ProcUnit<boost::any> {
       cv::imshow("Dilate", map);
       cv::waitKey(1);
     }
+    return boost::any(map);
   }
 
  private:

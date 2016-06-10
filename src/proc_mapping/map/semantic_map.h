@@ -29,8 +29,10 @@
 #include <lib_atlas/pattern/observer.h>
 #include <opencv/cv.h>
 #include <sonia_msgs/MapObject.h>
-#include "proc_mapping/interpreter/map_interpreter.h"
-#include "proc_mapping/raw_map.h"
+#include <sonia_msgs/SemanticMap.h>
+#include "proc_mapping/config.h"
+#include "proc_mapping/map/coordinate_systems.h"
+#include "proc_mapping/map_objects/buoy.h"
 #include "proc_mapping/region_of_interest/region_of_interest.h"
 
 namespace proc_mapping {
@@ -48,20 +50,10 @@ class SemanticMap : public atlas::Observer<> {
   using PtrList = std::vector<SemanticMap::Ptr>;
   using ConstPtrList = std::vector<SemanticMap::ConstPtr>;
 
-  using MapObjectsType = sonia_msgs::MapObject;
-  using RegionOfInterestType = RegionOfInterest::Ptr;
-
-  struct Keypoint {
-    cv::KeyPoint trigged_keypoint;
-    cv::Rect bounding_box;
-    uint8_t weight;
-    bool is_object_send;
-  };
-
   //==========================================================================
   // P U B L I C   C / D T O R S
 
-  explicit SemanticMap(const RawMap::Ptr &raw_map);
+  explicit SemanticMap(const CoordinateSystems::Ptr &cs);
 
   virtual ~SemanticMap();
 
@@ -70,34 +62,42 @@ class SemanticMap : public atlas::Observer<> {
 
   void OnSubjectNotify(atlas::Subject<> &subject) override;
 
-  const std::vector<MapObjectsType> &GetMapObjects();
-  const std::vector<RegionOfInterestType> &GetRegionOfInterest() const;
+  const std::vector<MapObject::Ptr> &GetMapObjects();
+  const std::vector<RegionOfInterest::Ptr> &GetRegionOfInterest() const;
+
+  sonia_msgs::SemanticMap GenerateSemanticMapMessage() const;
 
   bool IsNewDataAvailable() const;
 
   void ClearMapObjects();
 
-  /// Get the list of the regions of interest from the config file and
-  /// instanciate all of them by sending them the appropriate YAML node.
-  RegionOfInterestType RegionOfInterestFactory(const YAML::Node &node) const;
-
   void InsertRegionOfInterest(const std::string &proc_tree_file_name);
+
+  void ResetSemanticMap();
+
+#ifdef DEBUG
+  void PrintMap();
+#endif
 
  private:
   //==========================================================================
   // P R I V A T E   M E T H O D S
 
-  /// Passing rvalue for optimization purpose, we are just using it as a stream
-  /// line of functions anyway.
-  void GetMetaDataForBuoys(std::vector<Buoy *> &&);
+  /// Get the list of the regions of interest from the config file and
+  /// instanciate all of them by sending them the appropriate YAML node.
+  RegionOfInterest::Ptr RegionOfInterestFactory(const YAML::Node &node) const;
 
   //==========================================================================
   // P R I V A T E   M E M B E R S
 
-  RawMap::Ptr raw_map_;
-  std::vector<Keypoint> trigged_keypoints_;
-  std::vector<MapObjectsType> map_objects_;
-  std::vector<RegionOfInterestType> rois_;
+  std::vector<MapObject::Ptr> map_objects_;
+  std::vector<RegionOfInterest::Ptr> rois_;
+
+  CoordinateSystems::Ptr cs_;
+
+#ifdef DEBUG
+  cv::Mat display_map_;
+#endif
 
   bool new_objects_available_;
   mutable std::mutex object_mutex_;

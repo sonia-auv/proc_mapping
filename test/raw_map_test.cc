@@ -37,7 +37,7 @@
 #include "lib_atlas/pattern/runnable.h"
 #include <eigen3/Eigen/Geometry>
 #include <proc_mapping/proc_mapping_node.h>
-#include "proc_mapping/raw_map.h"
+#include "proc_mapping/map/raw_map.h"
 
 static const std::string node_prefix("proc_mapping");
 

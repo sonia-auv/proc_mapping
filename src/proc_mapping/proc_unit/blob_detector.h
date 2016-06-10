@@ -36,7 +36,7 @@
 
 namespace proc_mapping {
 
-class BlobDetector : public ProcUnit<cv::Mat> {
+class BlobDetector : public ProcUnit {
  public:
   //==========================================================================
   // T Y P E D E F   A N D   E N U M
@@ -83,7 +83,7 @@ class BlobDetector : public ProcUnit<cv::Mat> {
   //==========================================================================
   // P U B L I C   M E T H O D S
 
-  virtual void ProcessData(boost::any &input) override {
+  virtual boost::any ProcessData(boost::any input) override {
     cv::Mat map = boost::any_cast<cv::Mat>(input);
     if (target_ == 0) {
       params_.minThreshold = 0;
@@ -119,11 +119,6 @@ class BlobDetector : public ProcUnit<cv::Mat> {
     cv::SimpleBlobDetector detector(params_);
     std::vector<cv::KeyPoint> keyPoints;
     detector.detect(map, keyPoints);
-
-    for (auto &key_point : keyPoints) {
-      auto buoy = std::make_shared<Buoy>(key_point);
-      ObjectRegistery::GetInstance().AddObject(std::move(buoy));
-    }
 
     if (debug_) {
       cv::createTrackbar("area filter", "Blob Detector",
@@ -168,6 +163,7 @@ class BlobDetector : public ProcUnit<cv::Mat> {
       cv::imshow("Blob Detector", output);
       cv::waitKey(1);
     }
+    return boost::any(keyPoints);
   }
 
  private:

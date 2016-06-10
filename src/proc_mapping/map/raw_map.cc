@@ -23,7 +23,7 @@
  * along with S.O.N.I.A. software. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "proc_mapping/raw_map.h"
+#include "raw_map.h"
 #include <opencv/cv.h>
 #include <pcl/common/transforms.h>
 #include <opencv2/highgui/highgui.hpp>
@@ -35,56 +35,40 @@ namespace proc_mapping {
 
 //------------------------------------------------------------------------------
 //
-RawMap::RawMap(const ros::NodeHandlePtr &nh)
+RawMap::RawMap(const ros::NodeHandlePtr &nh, const CoordinateSystems::Ptr &cs)
     : atlas::Subject<cv::Mat>(),
       nh_(nh),
       points2_sub_(),
-      odom_sub_(),
+      number_of_hits_({}),
+      cs_(cs),
+      display_map_(),
       point_cloud_threshold_(0),
       new_pcl_ready_(false),
       last_pcl_(nullptr),
       is_map_ready_for_process_(false),
       scanlines_for_process_(0),
       scanline_counter_(0),
-      is_first_odom_(true),
       is_first_scan_complete_(false) {
   std::string point_cloud_topic;
-  std::string odometry_topic;
-
   nh->param<std::string>("/proc_mapping/topics/point_cloud2", point_cloud_topic,
                          "/provider_sonar/point_cloud2");
-  nh->param<std::string>("/proc_mapping/topics/odometry", odometry_topic,
-                         "/proc_navigation/odom");
 
-  int n_bin = 0;
-  int w = 0;
-  int h = 0;
-  double range = 0.;
   double sonar_threshold = 0.;
-  nh->param<int>("/provider_sonar/sonar/n_bins_", n_bin, 400);
-  nh->param<double>("/provider_sonar/sonar/range_", range, 10.0);
-
-  nh->param<int>("/proc_mapping/map/width", w, 20);
-  nh->param<int>("/proc_mapping/map/height", h, 20);
-  nh->param<double>("/proc_mapping/map/origin_x", world_.origin.x, 10.0);
-  nh->param<double>("/proc_mapping/map/origin_y", world_.origin.y, 10.0);
   nh->param<double>("/proc_mapping/map/sonar_threshold", sonar_threshold, 1.0);
   nh->param<int>("/proc_mapping/tile/number_of_scanlines",
                  scanlines_for_process_, 10);
 
-  sonar_range_ = range;  // This member is used for debug purpose
-  world_.offset = world_.origin;
-
-  // Resolution is equal to the range of the sonar divide by the number of bin
-  // of a scanline.
-  double r = range / n_bin;
-
-  SetMapParameters(static_cast<uint32_t>(w), static_cast<uint32_t>(h), r);
   SetPointCloudThreshold(sonar_threshold);
+
+  display_map_ =
+      cv::Mat(cs_->GetPixel().width, cs_->GetPixel().height, CV_8UC1);
+  display_map_.setTo(cv::Scalar(0));
+
+  //  Keeps the number of hits for each pixels
+  number_of_hits_.resize(cs_->GetPixel().width * cs_->GetPixel().height, 0);
 
   points2_sub_ =
       nh_->subscribe(point_cloud_topic, 100, &RawMap::PointCloudCallback, this);
-  odom_sub_ = nh_->subscribe(odometry_topic, 100, &RawMap::OdomCallback, this);
   Start();
 }
 
@@ -101,48 +85,15 @@ void RawMap::PointCloudCallback(
 
 //------------------------------------------------------------------------------
 //
-void RawMap::OdomCallback(const nav_msgs::Odometry::ConstPtr &odo_in) {
-  if (is_first_odom_) {
-    sub_.initial_position.x = odo_in.get()->pose.pose.position.x;
-    sub_.initial_position.y = odo_in.get()->pose.pose.position.y;
-    is_first_odom_ = false;
-  }
-
-  //  Generate 3x3 transformation matrix from Quaternions
-  auto orientation = &odo_in.get()->pose.pose.orientation;
-  Eigen::Quaterniond quaterniond(orientation->w, orientation->x, orientation->y,
-                                 orientation->z);
-  //  The quaternion is required to be normalized, otherwise the result is
-  //  undefined.
-  quaterniond.normalized();
-
-  Eigen::Matrix3d rotation;
-  rotation = quaterniond.toRotationMatrix();
-  //  Set all odometry values that will be use in the cv::mat update thread
-  Eigen::Vector3d euler_vec = rotation.eulerAngles(0, 1, 2);
-  double roll = euler_vec.x();
-  double pitch = euler_vec.y();
-  double yaw = euler_vec.z();
-
-  sub_.rotation = rotation;
-  sub_.yaw = yaw;
-  sub_.pitch = pitch;
-  sub_.roll = roll;
-  sub_.position.x = odo_in.get()->pose.pose.position.x;
-  sub_.position.y = odo_in.get()->pose.pose.position.y;
-}
-
-//------------------------------------------------------------------------------
-//
 void RawMap::Run() {
   while (IsRunning()) {
-    if (is_first_odom_ == false) {
+    if (cs_->IsCoordinateSystemReady()) {
       if (new_pcl_ready_ && last_pcl_) {
         ProcessPointCloud(last_pcl_);
         new_pcl_ready_ = false;
 
         if (IsMapReadyForProcess()) {
-          Notify(pixel_.map);
+          Notify(display_map_);
           is_map_ready_for_process_ = false;
         }
       }
@@ -154,30 +105,7 @@ void RawMap::Run() {
 //
 void RawMap::SetPointCloudThreshold(double sonar_threshold) {
   point_cloud_threshold_ =
-      static_cast<uint32_t>(sonar_threshold * pixel_.m_to_pixel);
-}
-
-//------------------------------------------------------------------------------
-//
-void RawMap::SetMapParameters(const size_t &w, const size_t &h,
-                              const double &r) {
-  world_.width = w;
-  world_.height = h;
-
-  pixel_.width = static_cast<uint32_t>(w / r);
-  pixel_.height = static_cast<uint32_t>(h / r);
-  pixel_.pixel_to_m = r;
-  pixel_.m_to_pixel = 1 / r;
-
-  pixel_.map = cv::Mat(pixel_.width, pixel_.height, CV_8UC1);
-  pixel_.map.setTo(cv::Scalar(0));
-  std::cout << "Map meter info: Width=" << w << " Height=" << h << std::endl;
-  std::cout << "Map pixel info: Width=" << pixel_.width
-            << " Height= " << pixel_.height << std::endl;
-  std::cout << "Resolution in meter: " << r << std::endl;
-
-  //  Keeps the number of hits for each pixels
-  pixel_.number_of_hits_.resize(pixel_.width * pixel_.height, 0);
+      static_cast<uint32_t>(sonar_threshold * cs_->GetPixel().m_to_pixel);
 }
 
 //------------------------------------------------------------------------------
@@ -189,7 +117,7 @@ void RawMap::ProcessPointCloud(const sensor_msgs::PointCloud2::ConstPtr &msg) {
 
   uint32_t max_size = static_cast<uint32_t>(msg->data.size() / msg->point_step);
   cv::Point2i bin_coordinate;
-  cv::Point2d sub_position = sub_.position + GetPositionOffset();
+  cv::Point2d sub_position = cs_->GetSub().position + cs_->GetPositionOffset();
 
   intensity_map.resize(max_size);
   coordinate_map.resize(max_size);
@@ -206,19 +134,19 @@ void RawMap::ProcessPointCloud(const sensor_msgs::PointCloud2::ConstPtr &msg) {
     Eigen::Vector3d in(x, -1 * y, z), out;
 
     // Apply the rotation matrix to the input Vector3
-    out = sub_.rotation * in;
+    out = cs_->GetSub().rotation * in;
 
     // Adding the sub_position to position the point cloud in the world map.
     cv::Point2d coordinate_transformed(cv::Point2d(out.x(), out.y()) +
                                        sub_position);
-    bin_coordinate = WorldToPixelCoordinates(coordinate_transformed);
+    bin_coordinate = cs_->WorldToPixelCoordinates(coordinate_transformed);
 
     // Check if bin_coordinate are in the map boundary
-    if ((bin_coordinate.x < pixel_.width and bin_coordinate.x > 0) and
-        (bin_coordinate.y < pixel_.height and bin_coordinate.y > 0)) {
+    if ((bin_coordinate.x < cs_->GetPixel().width and bin_coordinate.x > 0) and
+        (bin_coordinate.y < cs_->GetPixel().height and bin_coordinate.y > 0)) {
       // Invert the y axe value to fit in opencv Mat coodinate
-      bin_coordinate.y =
-          (pixel_.width / 2) - bin_coordinate.y + (pixel_.width / 2);
+      bin_coordinate.y = (cs_->GetPixel().width / 2) - bin_coordinate.y +
+                         (cs_->GetPixel().width / 2);
 
       //          uint8_t threat_intensity = static_cast<uint8_t>(255.0f *
       //          intensity);
@@ -284,7 +212,7 @@ void RawMap::ProcessPointCloud(const sensor_msgs::PointCloud2::ConstPtr &msg) {
   // Send a command when enough scanline is arrived
   scanline_counter_++;
 
-  if (scanline_counter_ == 200) {
+  if (scanline_counter_ == 2) {
     is_first_scan_complete_ = true;
   }
 
@@ -299,53 +227,14 @@ void RawMap::ProcessPointCloud(const sensor_msgs::PointCloud2::ConstPtr &msg) {
 //------------------------------------------------------------------------------
 //
 void RawMap::UpdateMat(const cv::Point2i &p, const uint8_t &intensity) {
-  if (p.x < pixel_.width && p.y < pixel_.height) {
+  if (p.x < cs_->GetPixel().width && p.y < cs_->GetPixel().height) {
     //  Infinite mean
-    int position = p.x + p.y * pixel_.width;
-    pixel_.number_of_hits_.at(static_cast<unsigned long>(position))++;
-    int n = pixel_.number_of_hits_.at(static_cast<unsigned long>(position)) + 1;
-    pixel_.map.at<uint8_t>(p.y, p.x) = static_cast<uint8_t>(
-        intensity / n + pixel_.map.at<uint8_t>(p.y, p.x) * (n - 1) / n);
+    int position = p.x + p.y * cs_->GetPixel().width;
+    number_of_hits_.at(static_cast<unsigned long>(position))++;
+    int n = number_of_hits_.at(static_cast<unsigned long>(position)) + 1;
+    display_map_.at<uint8_t>(p.y, p.x) = static_cast<uint8_t>(
+        intensity / n + display_map_.at<uint8_t>(p.y, p.x) * (n - 1) / n);
   }
-}
-
-//------------------------------------------------------------------------------
-//
-cv::Point2i RawMap::WorldToPixelCoordinates(const cv::Point2d &p) const
-    noexcept {
-  return p * pixel_.m_to_pixel;
-}
-
-//------------------------------------------------------------------------------
-//
-std::vector<cv::Point2i> RawMap::WorldToPixelCoordinates(
-    const std::vector<cv::Point2d> &p) const noexcept {
-  std::vector<cv::Point2i> v(p.size());
-  for (size_t i = 0; i < p.size(); ++i) {
-    v[i] = WorldToPixelCoordinates(p[i]);
-  }
-  return v;
-}
-
-//------------------------------------------------------------------------------
-//
-cv::Rect RawMap::WorldToPixelCoordinates(const cv::Rect &p) const noexcept {
-  cv::Rect world_rect(p.x * pixel_.m_to_pixel, p.y * pixel_.m_to_pixel,
-                      p.height * pixel_.m_to_pixel,
-                      p.width * pixel_.m_to_pixel);
-  return world_rect;
-}
-
-//------------------------------------------------------------------------------
-//
-cv::Point2d RawMap::PixelToWorldCoordinates(const cv::Point2i &p) const
-    noexcept {
-  // The operator/ does not exist for Point2i, we must assign members one by
-  // one.
-  cv::Point2d world_point;
-  world_point.x = static_cast<double>(p.x) / pixel_.m_to_pixel;
-  world_point.y = static_cast<double>(p.y) / pixel_.m_to_pixel;
-  return world_point;
 }
 
 //------------------------------------------------------------------------------
@@ -354,31 +243,8 @@ bool RawMap::IsMapReadyForProcess() { return is_map_ready_for_process_; }
 
 //------------------------------------------------------------------------------
 //
-void RawMap::ResetRawMap() { pixel_.map.setTo(cv::Scalar(0)); }
-
-//------------------------------------------------------------------------------
-//
-void RawMap::SetPositionOffset(cv::Point2d offset) { world_.offset = offset; }
-
-//------------------------------------------------------------------------------
-//
-cv::Point2d RawMap::GetPositionOffset() const { return world_.offset; }
-
-//------------------------------------------------------------------------------
-//
-double RawMap::GetSubMarineYaw() const noexcept { return sub_.yaw; }
-
-//------------------------------------------------------------------------------
-//
-cv::Point2d RawMap::GetSubMarinePosition() const noexcept {
-  return sub_.position;
-}
-
-//------------------------------------------------------------------------------
-//
-void RawMap::ResetPosition() {
-  cv::Point2d delta = world_.origin - sub_.position;
-  SetPositionOffset(delta);
+void RawMap::ResetRawMap() {
+  display_map_.setTo(cv::Scalar(0));
   is_first_scan_complete_ = false;
 }
 

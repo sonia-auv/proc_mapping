@@ -26,6 +26,7 @@
 #include "proc_mapping/interpreter/map_interpreter.h"
 #include <ros/console.h>
 #include <tf/transform_datatypes.h>
+#include "proc_mapping/config.h"
 
 namespace proc_mapping {
 
@@ -36,7 +37,7 @@ namespace proc_mapping {
 //
 MapInterpreter::MapInterpreter(const ros::NodeHandlePtr &nh,
                                const std::string &proc_trees_file_name)
-    : DataInterpreter<boost::any>(nh),
+    : DataInterpreter<cv::Mat>(nh),
       mode_(DetectionMode::NONE),
       all_proc_trees_(),
       current_proc_tree_(nullptr),
@@ -54,11 +55,12 @@ MapInterpreter::~MapInterpreter() {}
 
 //------------------------------------------------------------------------------
 //
-void MapInterpreter::OnSubjectNotify(atlas::Subject<boost::any> &subject,
-                                     boost::any args) {
+void MapInterpreter::OnSubjectNotify(atlas::Subject<cv::Mat> &subject,
+                                     cv::Mat args) {
   /// We want to recreate a new map everytime so the processed map does not
   /// interfer with the real one.
-  cv::Mat new_data = boost::any_cast<cv::Mat>(args);
+  cv::Mat new_data;
+  args.copyTo(new_data);
   SetNewData(new_data);
   ProcessData();
 
@@ -75,7 +77,7 @@ void MapInterpreter::ProcessData() {
   // the objects we expect them to be.
   std::lock_guard<std::mutex> guard(proc_tree_mutex_);
   if (current_proc_tree_) {
-    auto data = GetLastData();
+    boost::any data{GetLastData()};
     current_proc_tree_->ProcessData(data);
   }
 }
@@ -91,7 +93,7 @@ void MapInterpreter::SetDetectionMode(const DetectionMode &mode) {
     SetCurrentProcTree("wall");
   } else {
     mode_ = DetectionMode::NONE;
-    SetCurrentProcTree(ProcTree<boost::any>::Ptr(nullptr));
+    SetCurrentProcTree(ProcTree::Ptr(nullptr));
     return;
   }
   mode_ = mode;
@@ -113,7 +115,7 @@ void MapInterpreter::InstanciateProcTrees(
     assert(proc_trees.Type() == YAML::NodeType::Sequence);
 
     for (std::size_t i = 0; i < proc_trees.size(); i++) {
-      auto proc_tree = std::make_shared<ProcTree<boost::any>>(proc_trees[i], nh_);
+      auto proc_tree = std::make_shared<ProcTree>(proc_trees[i], nh_);
       all_proc_trees_.push_back(proc_tree);
       if (!default_pt.empty() &&
           default_pt == proc_trees[i]["name"].as<std::string>()) {

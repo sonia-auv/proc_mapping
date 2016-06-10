@@ -58,7 +58,7 @@ class DataInterpreter : public atlas::Subject<> {
   using PtrList = std::vector<DataInterpreter::Ptr>;
   using ConstPtrList = std::vector<DataInterpreter::ConstPtr>;
 
-  using ProcTreeType = typename ProcTree<Tp_>::Ptr;
+  using ProcTreeType = typename ProcTree::Ptr;
   using ProcTreeTypeList = std::vector<ProcTreeType>;
 
   //============================================================================
@@ -80,9 +80,9 @@ class DataInterpreter : public atlas::Subject<> {
    */
   virtual void ProcessData() = 0;
 
-  boost::any &GetLastData();
+  Tp_ GetLastData();
 
-  void SetNewData(const boost::any &data);
+  void SetNewData(const Tp_ &data);
 
   bool IsNewDataReady() const;
 
@@ -97,11 +97,9 @@ class DataInterpreter : public atlas::Subject<> {
 
   bool new_data_ready_;
 
-  /**
-   * Cannot use std::atomic here because it requieres to be nothrow constructor
-   * type. Using mutext in the accessors of the variables instead.
-   * (rf. http://cplusplus.github.io/LWG/lwg-defects.html#2165)
-   */
+  /// Cannot use std::atomic here because it requieres to be nothrow constructor
+  /// type. Using mutext in the accessors of the variables instead.
+  /// (rf. http://cplusplus.github.io/LWG/lwg-defects.html#2165)
   Tp_ last_data_;
 
   mutable std::mutex data_mutex_;

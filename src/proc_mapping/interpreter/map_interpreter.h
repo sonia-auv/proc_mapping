@@ -37,8 +37,13 @@ namespace proc_mapping {
 
 enum class DetectionMode { NONE = 0, BUOYS, FENCE, WALL };
 
-class MapInterpreter : public DataInterpreter<boost::any>,
-                       public atlas::Observer<boost::any> {
+/// The MapInterpreter is responsible for interpretting the informations of the
+/// Raw map. It listen for new RawMap data to be available and execute a
+/// proccessing tree for discovering MapObject.
+/// It specify the DataInterpreter as a cv::Mat as it will deal with cv::Mat
+/// as its data to interpret.
+class MapInterpreter : public DataInterpreter<cv::Mat>,
+                       public atlas::Observer<cv::Mat> {
  public:
   //==========================================================================
   // T Y P E D E F   A N D   E N U M
@@ -68,9 +73,9 @@ class MapInterpreter : public DataInterpreter<boost::any>,
   /// The method will update the latest data in the DataInterpreter.
   /// This will run the whole processing chain as the method SetNewData
   /// start it.
-  void OnSubjectNotify(atlas::Subject<boost::any> &subject, boost::any args) override;
+  void OnSubjectNotify(atlas::Subject<cv::Mat> &subject, cv::Mat args) override;
 
-  virtual void InstanciateProcTrees(const std::string &proc_tree_file_name);
+  void InstanciateProcTrees(const std::string &proc_tree_file_name);
 
   virtual void ProcessData() override;
 

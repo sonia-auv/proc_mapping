@@ -34,7 +34,7 @@ class Histogram : public ProcUnit<cv::Mat> {
   //==========================================================================
   // P U B L I C   M E T H O D S
 
-  virtual void ProcessData(boost::any &input) override {
+  virtual boost::any ProcessData(boost::any input) override {
     cv::Mat map = boost::any_cast<cv::Mat>(input);
     int hist_size = 256;
     float range[] = {0, 255};
@@ -42,8 +42,8 @@ class Histogram : public ProcUnit<cv::Mat> {
 
     cv::Mat hist;
 
-    cv::calcHist(&map, 1, 0, cv::Mat(), hist, 1, &hist_size, &hist_range,
-                 true, false);
+    cv::calcHist(&map, 1, 0, cv::Mat(), hist, 1, &hist_size, &hist_range, true,
+                 false);
 
     int hist_w = 1024;
     int hist_h = 400;

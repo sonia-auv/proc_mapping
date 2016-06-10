@@ -23,7 +23,8 @@
  * along with S.O.N.I.A. software. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "proc_mapping/semantic_map.h"
+#include "semantic_map.h"
+#include "proc_mapping/config.h"
 #include "proc_mapping/interpreter/object_registery.h"
 #include "proc_mapping/map_objects/buoy.h"
 #include "proc_mapping/map_objects/fence.h"
@@ -40,12 +41,20 @@ namespace proc_mapping {
 
 //------------------------------------------------------------------------------
 //
-SemanticMap::SemanticMap(const RawMap::Ptr &raw_map)
-    : raw_map_(raw_map),
-      map_objects_({}),
+SemanticMap::SemanticMap(const CoordinateSystems::Ptr &cs)
+    : map_objects_({}),
       rois_{},
+      cs_(cs),
+#ifdef DEBUG
+      display_map_(),
+#endif
       new_objects_available_(false) {
   InsertRegionOfInterest("regions_of_interest.yaml");
+
+#ifdef DEBUG
+  display_map_ = cv::Mat(800, 800, CV_8UC1);
+  display_map_.setTo(cv::Scalar(0));
+#endif
 }
 
 //------------------------------------------------------------------------------
@@ -61,10 +70,12 @@ void SemanticMap::OnSubjectNotify(atlas::Subject<> &subject) {
   auto map_objects = ObjectRegistery::GetInstance().GetAllMapObject();
   ObjectRegistery::GetInstance().ClearRegistery();
 
-  std::vector<Buoy *> buoys;
   for (auto &object : map_objects) {
     if (dynamic_cast<Buoy *>(object.get())) {
-      buoys.push_back(dynamic_cast<Buoy *>(object.get()));
+#ifdef DEBUG
+      object->DrawToMap(display_map_,
+                        cs_->GetConvertionFunction<cv::Point2d>());
+#endif
     } else if (dynamic_cast<Fence *>(object.get())) {
       // Todo: How to treat fences objects ?
     } else if (dynamic_cast<Wall *>(object.get())) {
@@ -73,20 +84,11 @@ void SemanticMap::OnSubjectNotify(atlas::Subject<> &subject) {
       ROS_WARN("The map object is not recognized.");
     }
   }
-
-  GetMetaDataForBuoys(std::move(buoys));
 }
 
 //------------------------------------------------------------------------------
 //
-void SemanticMap::GetMetaDataForBuoys(std::vector<Buoy *> &&map_objects) {
-  std::lock_guard<std::mutex> guard(object_mutex_);
-
-}
-
-//------------------------------------------------------------------------------
-//
-const std::vector<SemanticMap::MapObjectsType> &SemanticMap::GetMapObjects() {
+const std::vector<MapObject::Ptr> &SemanticMap::GetMapObjects() {
   std::lock_guard<std::mutex> guard(object_mutex_);
   new_objects_available_ = false;
   return map_objects_;
@@ -94,8 +96,8 @@ const std::vector<SemanticMap::MapObjectsType> &SemanticMap::GetMapObjects() {
 
 //------------------------------------------------------------------------------
 //
-const std::vector<SemanticMap::RegionOfInterestType>
-    &SemanticMap::GetRegionOfInterest() const {
+const std::vector<RegionOfInterest::Ptr> &SemanticMap::GetRegionOfInterest()
+    const {
   std::lock_guard<std::mutex> guard(object_mutex_);
   return rois_;
 }
@@ -112,13 +114,12 @@ bool SemanticMap::IsNewDataAvailable() const {
 void SemanticMap::ClearMapObjects() {
   std::lock_guard<std::mutex> guard(object_mutex_);
   map_objects_.clear();
-  trigged_keypoints_.clear();
   new_objects_available_ = true;
 }
 
 //------------------------------------------------------------------------------
 //
-SemanticMap::RegionOfInterestType SemanticMap::RegionOfInterestFactory(
+RegionOfInterest::Ptr SemanticMap::RegionOfInterestFactory(
     const YAML::Node &node) const {
   assert(node["roi_type"]);
   auto roi_type = node["roi_type"].as<std::string>();
@@ -157,5 +158,45 @@ void SemanticMap::InsertRegionOfInterest(
     }
   }
 }
+
+//------------------------------------------------------------------------------
+//
+sonia_msgs::SemanticMap SemanticMap::GenerateSemanticMapMessage() const {
+  return sonia_msgs::SemanticMap();
+}
+
+//------------------------------------------------------------------------------
+//
+void SemanticMap::ResetSemanticMap() { display_map_.setTo(cv::Scalar(0)); }
+
+#ifdef DEBUG
+//------------------------------------------------------------------------------
+//
+void SemanticMap::PrintMap() {
+  cv::Point2d offset = cs_->GetPositionOffset();
+  cv::Point2d sub = cs_->GetSub().position;
+  sub += offset;
+
+  for (int i = 0; i < 800; i += 40) {
+    cv::line(display_map_, cv::Point2d(i, 0), cv::Point2d(i, 800),
+             cv::Scalar(255));
+    cv::line(display_map_, cv::Point2d(0, i), cv::Point2d(800, i),
+             cv::Scalar(255));
+  }
+
+  for (const auto &roi : GetRegionOfInterest()) {
+    roi->DrawRegion(display_map_, cs_->GetConvertionFunction<cv::Point2d>());
+  }
+
+  sub = cs_->WorldToPixelCoordinates(sub);
+  sub.y = (800 / 2) - sub.y + (800 / 2);
+
+  cv::circle(display_map_, sub, 5, cv::Scalar(255), -1);
+  cv::imshow("Semantic Map", display_map_);
+  cv::circle(display_map_, sub, 5, cv::Scalar(0), -1);
+
+  cv::waitKey(1);
+}
+#endif
 
 }  // namespace proc_mapping

@@ -1,7 +1,7 @@
 /**
- * \file	raw_map_interpreter.h
+ * \file	vision_interpreter.h
  * \author	Thibaut Mattio <thibaut.mattio@gmail.com>
- * \date	07/02/2016
+ * \date	09/06/2016
  *
  * \copyright Copyright (c) 2015 S.O.N.I.A. All rights reserved.
  *
@@ -23,34 +23,28 @@
  * along with S.O.N.I.A. software. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef PROC_MAPPING_RAW_MAP_H_
-#define PROC_MAPPING_RAW_MAP_H_
+#ifndef PROC_MAPPING_COORDINATE_SYSTEM_CONVERTOR_H_
+#define PROC_MAPPING_COORDINATE_SYSTEM_CONVERTOR_H_
 
-#include <lib_atlas/macros.h>
-#include <lib_atlas/pattern/runnable.h>
-#include <lib_atlas/pattern/subject.h>
 #include <nav_msgs/Odometry.h>
-#include <opencv/cv.h>
-#include <pcl/point_cloud.h>
-#include <pcl/point_types.h>
-#include <pcl_conversions/pcl_conversions.h>
-#include <sensor_msgs/PointCloud2.h>
-#include <array>
-#include <eigen3/Eigen/Geometry>
+#include <ros/ros.h>
+#include <atomic>
+#include <eigen3/Eigen/Eigen>
 #include <memory>
 #include <vector>
+#include "opencv/highgui.h"
 
 namespace proc_mapping {
 
-class RawMap : public atlas::Subject<cv::Mat>, public atlas::Runnable {
+class CoordinateSystems {
  public:
   //==========================================================================
   // T Y P E D E F   A N D   E N U M
 
-  using Ptr = std::shared_ptr<RawMap>;
-  using ConstPtr = std::shared_ptr<const RawMap>;
-  using PtrList = std::vector<RawMap::Ptr>;
-  using ConstPtrList = std::vector<RawMap::ConstPtr>;
+  using Ptr = std::shared_ptr<CoordinateSystems>;
+  using ConstPtr = std::shared_ptr<const CoordinateSystems>;
+  using PtrList = std::vector<CoordinateSystems::Ptr>;
+  using ConstPtrList = std::vector<CoordinateSystems::ConstPtr>;
 
   // Pixel Coordinate System
   struct PixelCS {
@@ -59,13 +53,10 @@ class RawMap : public atlas::Subject<cv::Mat>, public atlas::Runnable {
     int height;
     double m_to_pixel;
     double pixel_to_m;
-    cv::Mat map;
-    std::vector<uint8_t> number_of_hits_;  //  Number of Hits per pixel
   };
 
   // Sub Marine Coordinate System
   struct SubMarineCS {
-    Eigen::Transform<double, 3, Eigen::Affine> affine;
     Eigen::Matrix3d rotation;
     double yaw;
     double pitch;
@@ -84,22 +75,19 @@ class RawMap : public atlas::Subject<cv::Mat>, public atlas::Runnable {
   //==========================================================================
   // P U B L I C   C / D T O R S
 
-  explicit RawMap(const ros::NodeHandlePtr &nh);
-
-  virtual ~RawMap() = default;
+  explicit CoordinateSystems(const ros::NodeHandlePtr &nh);
+  virtual ~CoordinateSystems();
 
   //==========================================================================
   // P U B L I C   M E T H O D S
 
-  /// We have a separate thread for it because we want to sync the odometry
-  /// with the point cloud. We simply check the flags for new data and
-  /// run the processing when needed.
-  void Run() override;
+  void OdomCallback(const nav_msgs::Odometry::ConstPtr &odo_in);
 
   /// Converting a point from the world Coordinate System to the pixel CS.
   /// In order to do this, we will use the m_to_pixel ratio from the PixelCS
   /// struct.
   cv::Point2i WorldToPixelCoordinates(const cv::Point2d &p) const noexcept;
+
   std::vector<cv::Point2i> WorldToPixelCoordinates(
       const std::vector<cv::Point2d> &p) const noexcept;
 
@@ -108,26 +96,6 @@ class RawMap : public atlas::Subject<cv::Mat>, public atlas::Runnable {
   /// Converting a pixel point to the world Coordinate system.
   /// Apply the opposite convetion that WorldToPixelCoordinates does.
   cv::Point2d PixelToWorldCoordinates(const cv::Point2i &p) const noexcept;
-
-  double GetSubMarineYaw() const noexcept;
-
-  cv::Point2d GetSubMarinePosition() const noexcept;
-
-  /// We want the submarine to be in the center of the raw map.
-  /// Thus, we are going to offset it by the half of the map size.
-  cv::Point2d GetPositionOffset() const;
-
-  void ResetRawMap();
-
-  void ResetPosition();
-
- private:
-  //==========================================================================
-  // P R I V A T E   M E T H O D S
-
-  void PointCloudCallback(const sensor_msgs::PointCloud2::ConstPtr &msg_in);
-
-  void OdomCallback(const nav_msgs::Odometry::ConstPtr &odo_in);
 
   /**
    * Set the parameters of the coordinate systems. These parameters are going
@@ -139,47 +107,32 @@ class RawMap : public atlas::Subject<cv::Mat>, public atlas::Runnable {
    */
   void SetMapParameters(const size_t &w, const size_t &h, const double &r);
 
-  /**
-   * Set the point cloud threshold to subtract the front sonar noise.
-   *
-   * \param sonar_threshold The sonar threshold in meters
-   */
-  void SetPointCloudThreshold(double sonar_threshold);
+  // Function that return the conversion function of the RawMap object (need
+  // the delegate to send it to the Draw method of the rois).
+  template <class Tp_>
+  auto GetConvertionFunction() const -> std::function<cv::Point2i(const Tp_ &)>;
 
-  /**
-   * Received and treat point cloud data and update the world map
-   *
-   * \param msg The point cloud message from the provider_sonar
-   */
-  void ProcessPointCloud(const sensor_msgs::PointCloud2::ConstPtr &msg);
+  const PixelCS &GetPixel() const;
 
-  /**
-   * Update world map and apllying an infinite mean.
-   *
-   * \param p The position x,y in the map
-   * \param intensity The intensity of the point
-   */
-  void UpdateMat(const cv::Point2i &p, const uint8_t &intensity);
+  const SubMarineCS &GetSub() const;
 
+  const WorldCS &GetWorld() const;
+
+  bool IsCoordinateSystemReady() const;
+
+  /// We want the submarine to be in the center of the raw map.
+  /// Thus, we are going to offset it by the half of the map size.
+  cv::Point2d GetPositionOffset() const;
   void SetPositionOffset(cv::Point2d offset);
 
-  bool IsMapReadyForProcess();
+  void ResetPosition();
 
+ private:
   //==========================================================================
   // P R I V A T E   M E M B E R S
 
-  ros::NodeHandlePtr nh_;
-  ros::Subscriber points2_sub_;
+  std::atomic<bool> is_first_odom_;
   ros::Subscriber odom_sub_;
-
-  /// The first data of the sonar may be scrap. Keeping a threshold and starting
-  /// to process data after it
-  uint32_t point_cloud_threshold_;
-  double sonar_range_;
-
-  std::atomic<bool> new_pcl_ready_;
-
-  sensor_msgs::PointCloud2::ConstPtr last_pcl_;
 
   /// There is a few transformation involved here. We are going to store the
   /// Coordinate system as well as the informations for changing the
@@ -188,20 +141,51 @@ class RawMap : public atlas::Subject<cv::Mat>, public atlas::Runnable {
   SubMarineCS sub_;
   WorldCS world_;
 
-  /// As we don't want to process the map every scanline, we set a counter of
-  /// scan line and increment it. When the scanline_counter hits the wanted
-  /// value, we set the map to be ready to process and it is sent to the map
-  /// interpreter for processing.
-  bool is_map_ready_for_process_;
-  int scanlines_for_process_;
-  int scanline_counter_;
-
-  /// Flag that states if the first odometry message has already been received.
-  /// It is used to calculate the initial position of the submarine.
-  bool is_first_odom_;
-  bool is_first_scan_complete_;
+  mutable std::mutex data_mutex;
 };
+
+//------------------------------------------------------------------------------
+//
+inline const CoordinateSystems::PixelCS &CoordinateSystems::GetPixel() const {
+  std::lock_guard<std::mutex> lock(data_mutex);
+  return pixel_;
+}
+
+//------------------------------------------------------------------------------
+//
+inline const CoordinateSystems::SubMarineCS &CoordinateSystems::GetSub() const {
+  std::lock_guard<std::mutex> lock(data_mutex);
+  return sub_;
+}
+
+//------------------------------------------------------------------------------
+//
+inline const CoordinateSystems::WorldCS &CoordinateSystems::GetWorld() const {
+  std::lock_guard<std::mutex> lock(data_mutex);
+  return world_;
+}
+
+//------------------------------------------------------------------------------
+//
+inline bool CoordinateSystems::IsCoordinateSystemReady() const {
+  return is_first_odom_ == false;
+}
+
+//------------------------------------------------------------------------------
+//
+template <class Tp_>
+inline auto CoordinateSystems::GetConvertionFunction() const
+    -> std::function<cv::Point2i(const Tp_ &)> {
+  using std::placeholders::_1;
+  // The function WorldToPixelCoordinates is overloaded, thus can't be
+  // binded automatically, need to do this manually.
+  // cf. http://www.boost.org/doc/libs/1_50_0/libs/bind/bind.html#err_overloaded
+  return std::bind(
+      static_cast<cv::Point2i (CoordinateSystems::*)(const Tp_ &) const>(
+          &CoordinateSystems::WorldToPixelCoordinates),
+      this, _1);
+}
 
 }  // namespace proc_mapping
 
-#endif  // PROC_MAPPING_RAW_MAP_H_
+#endif  // PROC_MAPPING_COORDINATE_SYSTEM_CONVERTOR_H_
