@@ -11,7 +11,7 @@ regions_of_interest:
     roi_type: contour
     name: FENCE_ROI
     points:
-      - [6, 10] #Top left
-      - [8, 8] #Top right
-      - [12, 11] #Bottom right
-      - [9, 12] #Bottom left
+      - [1, 10] #Top left
+      - [3, 6] #Top right
+      - [6, 3] #Bottom right
+      - [1, 2] #Bottom left

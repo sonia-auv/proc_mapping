@@ -121,11 +121,13 @@ bool Contour::IsInZone(const cv::Rect &p) const {
 void Contour::DrawRegion(
     cv::Mat mat,
     const std::function<cv::Point2i(const cv::Point2d &p)> &convert) const {
-  cv::Vec3b mycolor(100,0,0);
-  for (int i=0;i<contours_.size();i++) {
-    auto pt = convert(contours_[i]);
-    mat.at<cv::Vec3b>(pt.x, pt.y) = mycolor;
+  std::vector<cv::Point2i> pixel_contours;
+
+  for (const auto &p : contours_) {
+    pixel_contours.push_back(convert(p));
   }
+
+  cv::polylines(mat, pixel_contours, true, cv::Scalar(255), 3);
 }
 
 }  // namespace proc_mapping

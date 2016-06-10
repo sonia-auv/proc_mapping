@@ -197,7 +197,7 @@ auto ProcMappingNode::GetConvertionFunction() const
   // cf. http://www.boost.org/doc/libs/1_50_0/libs/bind/bind.html#err_overloaded
   return std::bind(static_cast<cv::Point2i (RawMap::*)(const Tp_ &) const>(
                        &RawMap::WorldToPixelCoordinates),
-                   const_cast<const RawMap*>(&raw_map_), _1);
+                   const_cast<const RawMap *>(&raw_map_), _1);
 }
 
 }  // namespace proc_mapping
