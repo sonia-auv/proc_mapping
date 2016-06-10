@@ -122,8 +122,7 @@ cv::RotatedRect RotatedRectangle::GetCvRotatedRect() const {
 //
 void RotatedRectangle::DrawRegion(
     cv::Mat mat,
-    const std::function<cv::Point2i(const cv::Point2d &p) const> &convert)
-    const {
+    const std::function<cv::Point2i(const cv::Point2d &p)> &convert) const {
   cv::Point2f rect_points[4];
   auto rotated_rect = GetCvRotatedRect();
   rotated_rect.points(rect_points);

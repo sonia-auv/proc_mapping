@@ -190,7 +190,7 @@ void ProcMappingNode::Spin() {
 //
 template <class Tp_>
 auto ProcMappingNode::GetConvertionFunction() const
-    -> std::function<cv::Point2i(const Tp_ &) const> {
+    -> std::function<cv::Point2i(const Tp_ &)> {
   using std::placeholders::_1;
   // The function WorldToPixelCoordinates is overloaded, thus can't be
   // binded automatically, need to do this manually.

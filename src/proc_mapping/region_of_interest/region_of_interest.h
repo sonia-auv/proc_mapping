@@ -62,8 +62,8 @@ class RegionOfInterest {
   virtual bool IsInZone(const cv::Rect &p) const = 0;
 
   virtual void DrawRegion(cv::Mat mat,
-                          const std::function<cv::Point2i(const cv::Point2d &p)
-                                                  const> &convert) const = 0;
+                          const std::function<cv::Point2i(const cv::Point2d &p)>
+                              &convert) const = 0;
 
   virtual bool Deserialize(const YAML::Node &node) = 0;
   virtual bool Serialize(const YAML::Node &node) = 0;
