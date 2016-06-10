@@ -38,7 +38,7 @@ namespace proc_mapping {
 /// Inheriting a blank observer, just receiving a notification when a process
 /// loop has been done (We don't want to know anything about the raw map or the
 /// data interpreters)
-class SemanticMap : public atlas::Observer<DetectionMode> {
+class SemanticMap : public atlas::Observer<> {
  public:
   //==========================================================================
   // T Y P E D E F   A N D   E N U M
@@ -68,8 +68,7 @@ class SemanticMap : public atlas::Observer<DetectionMode> {
   //==========================================================================
   // P U B L I C   M E T H O D S
 
-  void OnSubjectNotify(atlas::Subject<DetectionMode> &subject,
-                       DetectionMode mode) override;
+  void OnSubjectNotify(atlas::Subject<> &subject) override;
 
   const std::vector<MapObjectsType> &GetMapObjects();
   const std::vector<RegionOfInterestType> &GetRegionOfInterest() const;
@@ -90,7 +89,7 @@ class SemanticMap : public atlas::Observer<DetectionMode> {
 
   /// Passing rvalue for optimization purpose, we are just using it as a stream
   /// line of functions anyway.
-  void GetMetaDataForBuoys(std::vector<cv::KeyPoint> &&);
+  void GetMetaDataForBuoys(std::vector<Buoy *> &&);
 
   bool IsAlreadyTrigged(cv::KeyPoint map_object);
   double GetDistanceBewteenKeypoint(cv::Point2d p1, cv::Point2d p2);

@@ -27,8 +27,8 @@
 #define PROC_MAPPING_INTERPRETER_OBJECT_REGISTERY_H_
 
 #include <opencv/cv.h>
-#include <sonia_msgs/MapObject.h>
 #include <mutex>
+#include "proc_mapping/map_objects/map_object.h"
 
 namespace proc_mapping {
 
@@ -37,8 +37,7 @@ class ObjectRegistery {
   //==========================================================================
   // T Y P E D E F   A N D   E N U M
 
-  using MapObject = cv::KeyPoint;
-  using MapObjectList = std::vector<MapObject>;
+  using MapObjectList = std::vector<MapObject::Ptr>;
 
   // Deleting the copy ctor for the Singleton pattern compliance.
   // Deleting move ctor as well, we have a mutex here anyway.
@@ -56,8 +55,8 @@ class ObjectRegistery {
   //==========================================================================
   // P U B L I C   M E T H O D S
 
-  void AddObject(MapObject &obj);
-  void DeleteObject(const MapObject &obj);
+  void AddObject(const MapObject::Ptr &obj);
+  void DeleteObject(const MapObject::Ptr &obj);
 
   const MapObjectList GetAllMapObject() const;
 

@@ -1,7 +1,7 @@
 /**
- * \file	raw_map_interpreter.h
+ * \file	vision_interpreter.h
  * \author	Thibaut Mattio <thibaut.mattio@gmail.com>
- * \date	07/02/2016
+ * \date	09/06/2016
  *
  * \copyright Copyright (c) 2015 S.O.N.I.A. All rights reserved.
  *
@@ -23,11 +23,12 @@
  * along with S.O.N.I.A. software. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef PROC_MAPPING_INTERPRETER_RAW_MAP_INTERPRETER_H_
-#define PROC_MAPPING_INTERPRETER_RAW_MAP_INTERPRETER_H_
+#ifndef PROC_MAPPING_INTERPRETER_VISION_INTERPRETER_H_
+#define PROC_MAPPING_INTERPRETER_VISION_INTERPRETER_H_
 
 #include <lib_atlas/pattern/subject.h>
 #include <ros/ros.h>
+#include <sonia_msgs/VisionTarget.h>
 #include <memory>
 #include <string>
 #include <vector>
@@ -35,56 +36,33 @@
 
 namespace proc_mapping {
 
-enum class DetectionMode { NONE = 0, BUOYS, FENCE, WALL };
-
-class MapInterpreter : public DataInterpreter<cv::Mat>,
-                       public atlas::Observer<cv::Mat> {
+class VisionInterpreter : public DataInterpreter<sonia_msgs::VisionTarget> {
  public:
   //==========================================================================
   // T Y P E D E F   A N D   E N U M
 
-  using Ptr = std::shared_ptr<MapInterpreter>;
-  using ConstPtr = std::shared_ptr<const MapInterpreter>;
-  using PtrList = std::vector<MapInterpreter::Ptr>;
-  using ConstPtrList = std::vector<MapInterpreter::ConstPtr>;
+  using Ptr = std::shared_ptr<VisionInterpreter>;
+  using ConstPtr = std::shared_ptr<const VisionInterpreter>;
+  using PtrList = std::vector<VisionInterpreter::Ptr>;
+  using ConstPtrList = std::vector<VisionInterpreter::ConstPtr>;
 
   //==========================================================================
   // P U B L I C   C / D T O R S
 
-  explicit MapInterpreter(const ros::NodeHandlePtr &nh,
-                          const std::string &proc_trees_file_name);
+  explicit VisionInterpreter(const ros::NodeHandlePtr &nh);
+  virtual ~VisionInterpreter();
 
-  virtual ~MapInterpreter();
-
-  void SetDetectionMode(const DetectionMode &mode);
-
-  bool SetCurrentProcTree(const std::string &name);
-  bool SetCurrentProcTree(const ProcTreeType &proc_tree);
-
- private:
+ protected:
   //==========================================================================
-  // P R I V A T E   M E T H O D S
-
-  /// The method will update the latest data in the DataInterpreter.
-  /// This will run the whole processing chain as the method SetNewData
-  /// start it.
-  void OnSubjectNotify(atlas::Subject<cv::Mat> &subject, cv::Mat args) override;
-
-  virtual void InstanciateProcTrees(const std::string &proc_tree_file_name);
+  // P R O T E C T E D   M E T H O D S
 
   virtual void ProcessData() override;
 
+ private:
   //==========================================================================
   // P R I V A T E   M E M B E R S
-
-  DetectionMode mode_;
-
-  ProcTreeTypeList all_proc_trees_;
-  ProcTreeType current_proc_tree_;
-
-  mutable std::mutex proc_tree_mutex_;
 };
 
 }  // namespace proc_mapping
 
-#endif  // PROC_MAPPING_INTERPRETER_RAW_MAP_INTERPRETER_H_
+#endif  // PROC_MAPPING_INTERPRETER_VISION_INTERPRETER_H_

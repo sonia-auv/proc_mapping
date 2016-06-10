@@ -25,6 +25,10 @@
 
 #include "proc_mapping/semantic_map.h"
 #include "proc_mapping/interpreter/object_registery.h"
+#include "proc_mapping/map_objects/buoy.h"
+#include "proc_mapping/map_objects/fence.h"
+#include "proc_mapping/map_objects/map_object.h"
+#include "proc_mapping/map_objects/wall.h"
 #include "proc_mapping/region_of_interest/contour.h"
 #include "proc_mapping/region_of_interest/ellipse.h"
 #include "proc_mapping/region_of_interest/rotated_rectangle.h"
@@ -53,43 +57,56 @@ SemanticMap::~SemanticMap() = default;
 
 //------------------------------------------------------------------------------
 //
-void SemanticMap::OnSubjectNotify(atlas::Subject<DetectionMode> &subject,
-                                  DetectionMode mode) {
+void SemanticMap::OnSubjectNotify(atlas::Subject<> &subject) {
   auto map_objects = ObjectRegistery::GetInstance().GetAllMapObject();
   ObjectRegistery::GetInstance().ClearRegistery();
-  switch (mode) {
-    case DetectionMode::BUOYS:
-      GetMetaDataForBuoys(std::move(map_objects));
-      break;
-    case DetectionMode::FENCE:
-      // Todo : Impl the algo for the fence detection from keyPoints
-      break;
-    case DetectionMode::WALL:
-    // Todo
-    case DetectionMode::NONE:
-      ROS_WARN("There is no execution mode set for the semantic map.");
-      break;
+
+  std::vector<Buoy *> buoys;
+  for (auto &object : map_objects) {
+    if (dynamic_cast<Buoy *>(object.get())) {
+      buoys.push_back(dynamic_cast<Buoy *>(object.get()));
+    } else if (dynamic_cast<Fence *>(object.get())) {
+      // Todo: How to treat fences objects ?
+    } else if (dynamic_cast<Wall *>(object.get())) {
+      // Todo: How to treat walls ?
+    } else {
+      ROS_WARN("The map object is not recognized.");
+    }
   }
+
+  GetMetaDataForBuoys(std::move(buoys));
 }
 
 //------------------------------------------------------------------------------
 //
-void SemanticMap::GetMetaDataForBuoys(std::vector<cv::KeyPoint> &&map_objects) {
+void SemanticMap::GetMetaDataForBuoys(std::vector<Buoy *> &&map_objects) {
   std::lock_guard<std::mutex> guard(object_mutex_);
-  for (size_t i = 0; i < map_objects.size(); i++) {
+
+  // Todo: This solves the illegal access to the memory on the code below, but
+  // this line break the algorithm. Must find why we try to access to element
+  // that does not exist map_object[-1] and map_object[4]...
+  if (map_objects.size() < 3) {
+    return;
+  }
+
+  for (size_t i = 1; i < map_objects.size() - 1; i++) {
     double distance_to_right_blob =
-        GetDistanceBewteenKeypoint(map_objects[i].pt, map_objects[i + 1].pt);
+        GetDistanceBewteenKeypoint(map_objects[i]->GetCvKeyPoint().pt,
+                                   map_objects[i + 1]->GetCvKeyPoint().pt);
     double distance_to_left_blob =
-        GetDistanceBewteenKeypoint(map_objects[i].pt, map_objects[i - 1].pt);
+        GetDistanceBewteenKeypoint(map_objects[i]->GetCvKeyPoint().pt,
+                                   map_objects[i - 1]->GetCvKeyPoint().pt);
 
     if ((distance_to_right_blob > 1.0f and distance_to_right_blob < 1.6f) or
         (distance_to_left_blob > 1.0f and distance_to_left_blob < 1.6f)) {
-      bool is_already_trigged = IsAlreadyTrigged(map_objects[i]);
+      bool is_already_trigged =
+          IsAlreadyTrigged(map_objects[i]->GetCvKeyPoint());
 
       if (!is_already_trigged) {
         Keypoint trigged_keypoint;
-        trigged_keypoint.trigged_keypoint = map_objects[i];
-        trigged_keypoint.bounding_box = SetBoundingBox(map_objects[i].pt, 20);
+        trigged_keypoint.trigged_keypoint = map_objects[i]->GetCvKeyPoint();
+        trigged_keypoint.bounding_box =
+            SetBoundingBox(map_objects[i]->GetCvKeyPoint().pt, 20);
         trigged_keypoint.is_object_send = false;
         //        if (rois_.size() > 0) {
         //          if

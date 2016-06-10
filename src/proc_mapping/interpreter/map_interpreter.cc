@@ -36,8 +36,11 @@ namespace proc_mapping {
 //
 MapInterpreter::MapInterpreter(const ros::NodeHandlePtr &nh,
                                const std::string &proc_trees_file_name)
-    : DataInterpreter<cv::Mat>(nh, proc_trees_file_name),
-      mode_(DetectionMode::NONE) {
+    : DataInterpreter<cv::Mat>(nh),
+      mode_(DetectionMode::NONE),
+      all_proc_trees_(),
+      current_proc_tree_(nullptr),
+      proc_tree_mutex_() {
   SetDetectionMode(mode_);
   InstanciateProcTrees(proc_trees_file_name + ".yaml");
 }
@@ -61,7 +64,21 @@ void MapInterpreter::OnSubjectNotify(atlas::Subject<cv::Mat> &subject,
   ProcessData();
 
   // Notify potential observers that we just added new objects in the registery.
-  Notify(mode_);
+  Notify();
+}
+
+//------------------------------------------------------------------------------
+//
+void MapInterpreter::ProcessData() {
+  // WARNING:
+  // We want to lock the whole proccessing on the SemanticMap, because we don't
+  // want to process objects inserted in the ObjectRegistery while they are not
+  // the objects we expect them to be.
+  std::lock_guard<std::mutex> guard(proc_tree_mutex_);
+  if (current_proc_tree_) {
+    auto data = GetLastData();
+    current_proc_tree_->ProcessData(data);
+  }
 }
 
 //------------------------------------------------------------------------------
@@ -113,6 +130,39 @@ void MapInterpreter::InstanciateProcTrees(
       }
     }
   }
+}
+
+//------------------------------------------------------------------------------
+//
+bool MapInterpreter::SetCurrentProcTree(const std::string &name) {
+  std::lock_guard<std::mutex> guard(proc_tree_mutex_);
+  for (const auto &pt : all_proc_trees_) {
+    if (pt->GetName() == name) {
+      current_proc_tree_ = pt;
+      return true;
+    }
+  }
+  ROS_ERROR("There is no proc tree with this name");
+  return false;
+}
+
+//------------------------------------------------------------------------------
+//
+bool MapInterpreter::SetCurrentProcTree(const ProcTreeType &proc_tree) {
+  std::lock_guard<std::mutex> guard(proc_tree_mutex_);
+  if (!proc_tree) {
+    current_proc_tree_ = nullptr;
+    return true;
+  }
+
+  for (const auto &pt : all_proc_trees_) {
+    if (&(*pt.get()) == &(*proc_tree.get())) {
+      current_proc_tree_ = pt;
+      return true;
+    }
+  }
+  ROS_ERROR("There is no proc tree with this address");
+  return false;
 }
 
 }  // namespace proc_mapping

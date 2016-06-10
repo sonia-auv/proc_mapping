@@ -39,16 +39,18 @@ ObjectRegistery::ObjectRegistery() : objects_({}), object_mutex_() {}
 
 //------------------------------------------------------------------------------
 //
-void ObjectRegistery::AddObject(MapObject &obj) {
+void ObjectRegistery::AddObject(const MapObject::Ptr &obj) {
   std::lock_guard<std::mutex> guard(object_mutex_);
   objects_.push_back(obj);
 }
 
 //------------------------------------------------------------------------------
 //
-void ObjectRegistery::DeleteObject(const MapObject &obj) {
+void ObjectRegistery::DeleteObject(const MapObject::Ptr &obj) {
   std::lock_guard<std::mutex> guard(object_mutex_);
-  auto find_cond = [&obj](const MapObject &item) { return &item == &obj; };
+  auto find_cond = [&obj](const MapObject::Ptr &item) {
+    return item.get() == obj.get();
+  };
 
   auto it = std::find_if(objects_.begin(), objects_.end(), find_cond);
   if (it != objects_.end()) {

@@ -48,7 +48,7 @@ namespace proc_mapping {
  * See DataInterpreterInterface for public interface informations.
  */
 template <class Tp_>
-class DataInterpreter : public atlas::Observer<Tp_> {
+class DataInterpreter : public atlas::Subject<> {
  public:
   //==========================================================================
   // T Y P E D E F   A N D   E N U M
@@ -64,8 +64,7 @@ class DataInterpreter : public atlas::Observer<Tp_> {
   //============================================================================
   // P U B L I C   C / D T O R S
 
-  explicit DataInterpreter(const ros::NodeHandlePtr &nh,
-                           const std::string &proc_trees_file_name);
+  explicit DataInterpreter(const ros::NodeHandlePtr &nh);
 
   virtual ~DataInterpreter();
 
@@ -73,17 +72,13 @@ class DataInterpreter : public atlas::Observer<Tp_> {
   //============================================================================
   // P R O T E C T E D   M E T H O D S
 
-  void OnSubjectNotify(atlas::Subject<Tp_> &subject, Tp_ args) override;
-
-  virtual void InstanciateProcTrees(const std::string &proc_tree_file_name);
-
   /**
    * This is the most important method of the DataInterpreter as it is the one
    * that will return the WeightedObjects. When a new data is ready (should) be
    * set by the specific DataInterpreter, this method is called and a
    * notification will be sent to observers (particulary ObjectMapper)
    */
-  virtual void ProcessData();
+  virtual void ProcessData() = 0;
 
   Tp_ &GetLastData();
 
@@ -91,16 +86,10 @@ class DataInterpreter : public atlas::Observer<Tp_> {
 
   bool IsNewDataReady() const;
 
-  bool SetCurrentProcTree(const std::string &name);
-  bool SetCurrentProcTree(const ProcTreeType &proc_tree);
-
   //==========================================================================
   // P R O T E C T E D   M E M B E R S
 
   ros::NodeHandlePtr nh_;
-
-  ProcTreeTypeList all_proc_trees_;
-  ProcTreeType current_proc_tree_;
 
  private:
   //============================================================================
@@ -116,7 +105,6 @@ class DataInterpreter : public atlas::Observer<Tp_> {
   Tp_ last_data_;
 
   mutable std::mutex data_mutex_;
-  mutable std::mutex proc_tree_mutex_;
 };
 
 }  // namespace proc_mapping

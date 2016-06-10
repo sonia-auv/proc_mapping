@@ -1,7 +1,7 @@
 /**
- * \file	data_interpreter.cc
+ * \file	vision_interpreter.cc
  * \author	Thibaut Mattio <thibaut.mattio@gmail.com>
- * \date	07/02/2016
+ * \date	09/06/2016
  *
  * \copyright Copyright (c) 2015 S.O.N.I.A. All rights reserved.
  *
@@ -23,13 +23,9 @@
  * along with S.O.N.I.A. software. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef PROC_MAPPING_INTERPRETER_DATA_INTERPRETER_H_
-#error This file may only be included data_interpreter.h
-#endif  // PROC_MAPPING_INTERPRETER_DATA_INTERPRETER_H_
-
-#include <yaml-cpp/yaml.h>
-#include <opencv2/opencv.hpp>
-#include "proc_mapping/interpreter/object_registery.h"
+#include "proc_mapping/interpreter/vision_interpreter.h"
+#include <ros/console.h>
+#include <tf/transform_datatypes.h>
 
 namespace proc_mapping {
 
@@ -38,42 +34,20 @@ namespace proc_mapping {
 
 //------------------------------------------------------------------------------
 //
-template <class Tp_>
-inline DataInterpreter<Tp_>::DataInterpreter(const ros::NodeHandlePtr &nh)
-    : nh_(nh), new_data_ready_(false), last_data_() {}
+VisionInterpreter::VisionInterpreter(const ros::NodeHandlePtr &nh)
+    : DataInterpreter<sonia_msgs::VisionTarget>(nh) {}
 
 //------------------------------------------------------------------------------
 //
-template <class Tp_>
-inline DataInterpreter<Tp_>::~DataInterpreter() {}
+VisionInterpreter::~VisionInterpreter() {}
 
 //==============================================================================
 // M E T H O D   S E C T I O N
 
 //------------------------------------------------------------------------------
 //
-template <class Tp_>
-inline Tp_ &DataInterpreter<Tp_>::GetLastData() {
-  std::lock_guard<std::mutex> guard(data_mutex_);
-  new_data_ready_ = false;
-  return last_data_;
-}
-
-//------------------------------------------------------------------------------
-//
-template <class Tp_>
-inline void DataInterpreter<Tp_>::SetNewData(const Tp_ &data) {
-  std::lock_guard<std::mutex> guard(data_mutex_);
-  last_data_ = data;
-  new_data_ready_ = true;
-}
-
-//------------------------------------------------------------------------------
-//
-template <class Tp_>
-inline bool DataInterpreter<Tp_>::IsNewDataReady() const {
-  std::lock_guard<std::mutex> guard(data_mutex_);
-  return new_data_ready_;
+void VisionInterpreter::ProcessData() {
+  // Todo: Implement this method
 }
 
 }  // namespace proc_mapping

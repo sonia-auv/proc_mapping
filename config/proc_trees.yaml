@@ -11,7 +11,7 @@ proc_trees:
         debug: false
       - name: blob_detector
         target: 0
-        debug: true
+        debug: false
   - name: fence
     proc_units:
       - name: blur
@@ -25,7 +25,6 @@ proc_trees:
       - name: blob_detector
         target: 0
         debug: false
-
   - name: wall
     proc_units:
       - name: blur

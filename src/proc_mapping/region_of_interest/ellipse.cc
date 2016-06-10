@@ -98,8 +98,8 @@ bool Ellipse::IsInZone(const cv::Rect &p) const { return true; }
 void Ellipse::DrawRegion(
     cv::Mat mat,
     const std::function<cv::Point2i(const cv::Point2d &p)> &convert) const {
-  cv::Size pixel_axes{convert({static_cast<double>(axes_.width),
-                               static_cast<double>(pixel_axes.height)})};
+  cv::Size pixel_axes{convert(
+      {static_cast<double>(axes_.width), static_cast<double>(axes_.height)})};
   cv::ellipse(mat, convert(center_), pixel_axes, angle_, start_angle_,
               end_angle_, cv::Scalar(255), 3);
 }

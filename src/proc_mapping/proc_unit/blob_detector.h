@@ -26,12 +26,12 @@
 #ifndef PROC_MAPPING_PROC_UNIT_BLOB_DETECTOR_H_
 #define PROC_MAPPING_PROC_UNIT_BLOB_DETECTOR_H_
 
+#include <highgui.h>
 #include <opencv/cv.h>
 #include <ros/ros.h>
 #include <memory>
-
-#include <highgui.h>
 #include "proc_mapping/interpreter/object_registery.h"
+#include "proc_mapping/map_objects/buoy.h"
 #include "proc_mapping/proc_unit/proc_unit.h"
 
 namespace proc_mapping {
@@ -120,7 +120,8 @@ class BlobDetector : public ProcUnit<cv::Mat> {
     detector.detect(input, keyPoints);
 
     for (auto &key_point : keyPoints) {
-      ObjectRegistery::GetInstance().AddObject(key_point);
+      auto buoy = std::make_shared<Buoy>(key_point);
+      ObjectRegistery::GetInstance().AddObject(std::move(buoy));
     }
 
     if (debug_) {
