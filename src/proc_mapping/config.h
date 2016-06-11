@@ -33,4 +33,6 @@
 const std::string kConfigFilePath =
     atlas::kWorkspaceRoot + "/src/proc_mapping/config/";
 
+enum class DetectionMode { NONE = 0, BUOYS, FENCE, WALL };
+
 #endif  // PROC_MAPPING_CONFIG_H_

@@ -36,8 +36,9 @@ namespace proc_mapping {
 //------------------------------------------------------------------------------
 //
 MapInterpreter::MapInterpreter(const ros::NodeHandlePtr &nh,
-                               const std::string &proc_trees_file_name)
-    : DataInterpreter<cv::Mat>(nh),
+                               const std::string &proc_trees_file_name,
+                               const ObjectRegistery::Ptr &object_registery)
+    : DataInterpreter<cv::Mat>(nh, object_registery),
       mode_(DetectionMode::NONE),
       all_proc_trees_(),
       current_proc_tree_(nullptr),
@@ -115,7 +116,8 @@ void MapInterpreter::InstanciateProcTrees(
     assert(proc_trees.Type() == YAML::NodeType::Sequence);
 
     for (std::size_t i = 0; i < proc_trees.size(); i++) {
-      auto proc_tree = std::make_shared<ProcTree>(proc_trees[i], nh_);
+      auto proc_tree =
+          std::make_shared<ProcTree>(proc_trees[i], nh_, object_registery_);
       all_proc_trees_.push_back(proc_tree);
       if (!default_pt.empty() &&
           default_pt == proc_trees[i]["name"].as<std::string>()) {
@@ -149,7 +151,7 @@ bool MapInterpreter::SetCurrentProcTree(const std::string &name) {
 
 //------------------------------------------------------------------------------
 //
-bool MapInterpreter::SetCurrentProcTree(const ProcTreeType &proc_tree) {
+bool MapInterpreter::SetCurrentProcTree(const ProcTree::Ptr &proc_tree) {
   std::lock_guard<std::mutex> guard(proc_tree_mutex_);
   if (!proc_tree) {
     current_proc_tree_ = nullptr;

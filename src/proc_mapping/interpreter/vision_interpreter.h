@@ -49,7 +49,8 @@ class VisionInterpreter : public DataInterpreter<sonia_msgs::VisionTarget> {
   //==========================================================================
   // P U B L I C   C / D T O R S
 
-  explicit VisionInterpreter(const ros::NodeHandlePtr &nh);
+  explicit VisionInterpreter(const ros::NodeHandlePtr &nh,
+                             const ObjectRegistery::Ptr &object_registery);
   virtual ~VisionInterpreter();
 
  protected:

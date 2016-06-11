@@ -32,6 +32,7 @@
 #include <sonia_msgs/SemanticMap.h>
 #include "proc_mapping/config.h"
 #include "proc_mapping/map/coordinate_systems.h"
+#include "proc_mapping/map/object_registery.h"
 #include "proc_mapping/map_objects/buoy.h"
 #include "proc_mapping/region_of_interest/region_of_interest.h"
 
@@ -55,23 +56,24 @@ class SemanticMap : public atlas::Observer<> {
 
   explicit SemanticMap(const CoordinateSystems::Ptr &cs);
 
-  virtual ~SemanticMap();
+  ~SemanticMap() = default;
 
   //==========================================================================
   // P U B L I C   M E T H O D S
 
   void OnSubjectNotify(atlas::Subject<> &subject) override;
 
-  const std::vector<MapObject::Ptr> &GetMapObjects();
-  const std::vector<RegionOfInterest::Ptr> &GetRegionOfInterest() const;
+  /// Proxy method for that returns all the MapObject from the ObjectRegistery.
+  const ObjectRegistery::MapObjectList &GetMapObjects();
+  const ObjectRegistery::RegionOfInterestList &GetRegionOfInterest() const;
+  void InsertRegionOfInterest(const std::string &proc_tree_file_name);
+  void ClearSemanticMap();
 
   sonia_msgs::SemanticMap GenerateSemanticMapMessage() const;
 
   bool IsNewDataAvailable() const;
 
-  void ClearMapObjects();
-
-  void InsertRegionOfInterest(const std::string &proc_tree_file_name);
+  ObjectRegistery::Ptr GetObjectRegistery();
 
   void ResetSemanticMap();
 
@@ -90,10 +92,8 @@ class SemanticMap : public atlas::Observer<> {
   //==========================================================================
   // P R I V A T E   M E M B E R S
 
-  std::vector<MapObject::Ptr> map_objects_;
-  std::vector<RegionOfInterest::Ptr> rois_;
-
   CoordinateSystems::Ptr cs_;
+  ObjectRegistery object_registery_;
 
 #ifdef DEBUG
   cv::Mat display_map_;

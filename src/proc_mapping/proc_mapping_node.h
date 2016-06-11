@@ -93,8 +93,8 @@ class ProcMappingNode {
   CoordinateSystems::Ptr cs_;
 
   RawMap raw_map_;
-  MapInterpreter map_interpreter_;
   SemanticMap semantic_map_;
+  MapInterpreter map_interpreter_;
 };
 
 }  // namespace proc_mapping

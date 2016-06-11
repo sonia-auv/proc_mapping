@@ -26,7 +26,9 @@
 #ifndef PROC_MAPPING_REGION_OF_INTEREST_REGION_OF_INTEREST_H_
 #define PROC_MAPPING_REGION_OF_INTEREST_REGION_OF_INTEREST_H_
 
-#include "proc_mapping/interpreter/map_interpreter.h"
+#include <highgui.h>
+#include <yaml-cpp/yaml.h>
+#include "proc_mapping/config.h"
 
 namespace proc_mapping {
 

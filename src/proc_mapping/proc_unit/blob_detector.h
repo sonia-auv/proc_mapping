@@ -30,7 +30,7 @@
 #include <opencv/cv.h>
 #include <ros/ros.h>
 #include <memory>
-#include "proc_mapping/interpreter/object_registery.h"
+#include "proc_mapping/map/object_registery.h"
 #include "proc_mapping/map_objects/buoy.h"
 #include "proc_mapping/proc_unit/proc_unit.h"
 

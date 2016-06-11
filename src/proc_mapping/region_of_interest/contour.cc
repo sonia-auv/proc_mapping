@@ -24,6 +24,7 @@
  */
 
 #include "proc_mapping/region_of_interest/contour.h"
+#include <cv.h>
 
 namespace proc_mapping {
 

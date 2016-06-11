@@ -29,6 +29,7 @@
 #include <opencv/cv.h>
 #include <mutex>
 #include "proc_mapping/map_objects/map_object.h"
+#include "proc_mapping/region_of_interest/region_of_interest.h"
 
 namespace proc_mapping {
 
@@ -37,40 +38,44 @@ class ObjectRegistery {
   //==========================================================================
   // T Y P E D E F   A N D   E N U M
 
+  using Ptr = std::shared_ptr<ObjectRegistery>;
+  using ConstPtr = std::shared_ptr<const ObjectRegistery>;
+  using PtrList = std::vector<ObjectRegistery::Ptr>;
+  using ConstPtrList = std::vector<ObjectRegistery::ConstPtr>;
+
   using MapObjectList = std::vector<MapObject::Ptr>;
+  using RegionOfInterestList = std::vector<RegionOfInterest::Ptr>;
 
-  // Deleting the copy ctor for the Singleton pattern compliance.
-  // Deleting move ctor as well, we have a mutex here anyway.
-  ObjectRegistery(ObjectRegistery const &) = delete;
-  ObjectRegistery(ObjectRegistery &&) = delete;
-
-  void operator=(ObjectRegistery const &) = delete;
-  void operator=(ObjectRegistery &&) = delete;
-
-  static ObjectRegistery &GetInstance() {
-    static ObjectRegistery instance;
-    return instance;
-  }
-
-  //==========================================================================
-  // P U B L I C   M E T H O D S
-
-  void AddObject(const MapObject::Ptr &obj);
-  void DeleteObject(const MapObject::Ptr &obj);
-
-  const MapObjectList GetAllMapObject() const;
-
-  void ClearRegistery();
-
- private:
   // As a Singleton, we want the object itself only to be able to create an
   // instance of itself.
   ObjectRegistery();
 
   //==========================================================================
+  // P U B L I C   M E T H O D S
+
+  void AddMapObject(const MapObject::Ptr &obj);
+  void DeleteMapObject(const MapObject::Ptr &obj);
+  const MapObjectList &GetAllMapObject() const;
+
+  void AddRegionOfInterest(const RegionOfInterest::Ptr &obj);
+  void DeleteRegionOfInterest(const RegionOfInterest::Ptr &obj);
+  const RegionOfInterestList &GetAllRegionOfInterest() const;
+
+  /// Template method that will return a vector of all the object of the
+  /// specified type to the user.
+  /// e.g. calling GetObjectOfType<Buoy> will return all the buoys from the
+  /// ObjectRegistery.
+  template <class Tp_>
+  std::vector<std::shared_ptr<Tp_>> GetObjectsOfType() const;
+
+  void ClearRegistery();
+
+ private:
+  //==========================================================================
   // P R I V A T E   M E M B E R S
 
   MapObjectList objects_;
+  RegionOfInterestList rois_;
 
   /// We access the registry from the main thread as well as the processing
   /// thread (when we receive a scanline or an odometry). Thus, we must

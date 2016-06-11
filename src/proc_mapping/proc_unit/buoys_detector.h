@@ -51,7 +51,8 @@ class BuoysDetector : public ProcUnit {
   //==========================================================================
   // P U B L I C   C / D T O R S
 
-  BuoysDetector(){};
+  explicit BuoysDetector(const ObjectRegistery::Ptr &object_registery)
+      : object_registery_(object_registery) {}
 
   virtual ~BuoysDetector() = default;
 
@@ -77,7 +78,7 @@ class BuoysDetector : public ProcUnit {
           if (!trigged_keypoints_.at(k).is_object_send) {
             MapObject::Ptr map_object =
                 std::make_shared<Buoy>(trigged_keypoints_[i].trigged_keypoint);
-            ObjectRegistery::GetInstance().AddObject(std::move(map_object));
+            object_registery_->AddMapObject(std::move(map_object));
           }
         }
       }
@@ -88,8 +89,9 @@ class BuoysDetector : public ProcUnit {
   }
 
  private:
-  //------------------------------------------------------------------------------
-  //
+  //==========================================================================
+  // PRIVATE   M E T H O D S
+
   inline bool IsAlreadyTrigged(cv::KeyPoint map_object) {
     for (uint32_t k = 0; k < trigged_keypoints_.size(); ++k) {
       if (map_object.pt.inside(trigged_keypoints_.at(k).bounding_box)) {
@@ -100,8 +102,6 @@ class BuoysDetector : public ProcUnit {
     return false;
   }
 
-  //------------------------------------------------------------------------------
-  //
   inline double GetDistanceBewteenKeypoint(cv::Point2d p1, cv::Point2d p2) {
     //    cv::Point2d world_p1 = raw_map_->PixelToWorldCoordinates(p1);
     //    cv::Point2d world_p2 = raw_map_->PixelToWorldCoordinates(p2);
@@ -111,8 +111,6 @@ class BuoysDetector : public ProcUnit {
     return 0;
   }
 
-  //------------------------------------------------------------------------------
-  //
   inline cv::Rect SetBoundingBox(cv::Point2d keypoint, int box_size) {
     std::vector<cv::Point> rect;
     rect.push_back(cv::Point2d(keypoint.x + box_size, keypoint.y + box_size));
@@ -122,7 +120,11 @@ class BuoysDetector : public ProcUnit {
     return cv::boundingRect(rect);
   }
 
+  //==========================================================================
+  // P R I V A T E   M E M B E R S
+
   std::vector<Keypoint> trigged_keypoints_;
+  ObjectRegistery::Ptr object_registery_;
 };
 
 }  // namespace proc_mapping

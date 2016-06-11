@@ -26,11 +26,12 @@
 #ifndef PROC_MAPPING_PROC_UNIT_PROC_TREE_H_
 #define PROC_MAPPING_PROC_UNIT_PROC_TREE_H_
 
-#include <proc_mapping/proc_unit/proc_unit.h>
 #include <ros/forwards.h>
 #include <yaml-cpp/yaml.h>
 #include <memory>
 #include <vector>
+#include "proc_mapping/map/object_registery.h"
+#include "proc_mapping/proc_unit/proc_unit.h"
 
 namespace proc_mapping {
 
@@ -47,7 +48,8 @@ class ProcTree {
   //==========================================================================
   // P U B L I C   C / D T O R S
 
-  explicit ProcTree(const YAML::Node &node, const ros::NodeHandlePtr &nh);
+  explicit ProcTree(const YAML::Node &node, const ros::NodeHandlePtr &nh,
+                    const ObjectRegistery::Ptr &object_registery);
 
   virtual ~ProcTree() = default;
 
@@ -74,6 +76,7 @@ class ProcTree {
   std::string name_;
 
   std::vector<ProcUnit::Ptr> proc_units_;
+  ObjectRegistery::Ptr object_registery_;
 };
 
 }  // namespace proc_mapping

@@ -29,7 +29,7 @@
 
 #include <yaml-cpp/yaml.h>
 #include <opencv2/opencv.hpp>
-#include "proc_mapping/interpreter/object_registery.h"
+#include "proc_mapping/map/object_registery.h"
 
 namespace proc_mapping {
 
@@ -39,8 +39,12 @@ namespace proc_mapping {
 //------------------------------------------------------------------------------
 //
 template <class Tp_>
-inline DataInterpreter<Tp_>::DataInterpreter(const ros::NodeHandlePtr &nh)
-    : nh_(nh), new_data_ready_(false), last_data_() {}
+inline DataInterpreter<Tp_>::DataInterpreter(
+    const ros::NodeHandlePtr &nh, const ObjectRegistery::Ptr &object_registery)
+    : nh_(nh),
+      object_registery_(object_registery),
+      new_data_ready_(false),
+      last_data_() {}
 
 //------------------------------------------------------------------------------
 //

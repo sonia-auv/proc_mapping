@@ -35,7 +35,7 @@
 #include <memory>
 #include <mutex>
 #include <vector>
-#include "proc_mapping/proc_unit/proc_tree.h"
+#include "proc_mapping/map/object_registery.h"
 
 namespace proc_mapping {
 
@@ -58,13 +58,11 @@ class DataInterpreter : public atlas::Subject<> {
   using PtrList = std::vector<DataInterpreter::Ptr>;
   using ConstPtrList = std::vector<DataInterpreter::ConstPtr>;
 
-  using ProcTreeType = typename ProcTree::Ptr;
-  using ProcTreeTypeList = std::vector<ProcTreeType>;
-
   //============================================================================
   // P U B L I C   C / D T O R S
 
-  explicit DataInterpreter(const ros::NodeHandlePtr &nh);
+  explicit DataInterpreter(const ros::NodeHandlePtr &nh,
+                           const ObjectRegistery::Ptr &object_registery);
 
   virtual ~DataInterpreter();
 
@@ -90,6 +88,8 @@ class DataInterpreter : public atlas::Subject<> {
   // P R O T E C T E D   M E M B E R S
 
   ros::NodeHandlePtr nh_;
+
+  ObjectRegistery::Ptr object_registery_;
 
  private:
   //============================================================================

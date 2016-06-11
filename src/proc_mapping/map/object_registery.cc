@@ -39,14 +39,14 @@ ObjectRegistery::ObjectRegistery() : objects_({}), object_mutex_() {}
 
 //------------------------------------------------------------------------------
 //
-void ObjectRegistery::AddObject(const MapObject::Ptr &obj) {
+void ObjectRegistery::AddMapObject(const MapObject::Ptr &obj) {
   std::lock_guard<std::mutex> guard(object_mutex_);
   objects_.push_back(obj);
 }
 
 //------------------------------------------------------------------------------
 //
-void ObjectRegistery::DeleteObject(const MapObject::Ptr &obj) {
+void ObjectRegistery::DeleteMapObject(const MapObject::Ptr &obj) {
   std::lock_guard<std::mutex> guard(object_mutex_);
   auto find_cond = [&obj](const MapObject::Ptr &item) {
     return item.get() == obj.get();
@@ -60,9 +60,52 @@ void ObjectRegistery::DeleteObject(const MapObject::Ptr &obj) {
 
 //------------------------------------------------------------------------------
 //
-const ObjectRegistery::MapObjectList ObjectRegistery::GetAllMapObject() const {
+const ObjectRegistery::MapObjectList &ObjectRegistery::GetAllMapObject() const {
   std::lock_guard<std::mutex> guard(object_mutex_);
   return objects_;
+}
+
+//------------------------------------------------------------------------------
+//
+void ObjectRegistery::AddRegionOfInterest(const RegionOfInterest::Ptr &obj) {
+  std::lock_guard<std::mutex> guard(object_mutex_);
+  rois_.push_back(obj);
+}
+
+//------------------------------------------------------------------------------
+//
+void ObjectRegistery::DeleteRegionOfInterest(const RegionOfInterest::Ptr &obj) {
+  std::lock_guard<std::mutex> guard(object_mutex_);
+  auto find_cond = [&obj](const RegionOfInterest::Ptr &item) {
+    return item.get() == obj.get();
+  };
+
+  auto it = std::find_if(rois_.begin(), rois_.end(), find_cond);
+  if (it != rois_.end()) {
+    rois_.erase(it);
+  }
+}
+
+//------------------------------------------------------------------------------
+//
+const ObjectRegistery::RegionOfInterestList &
+ObjectRegistery::GetAllRegionOfInterest() const {
+  std::lock_guard<std::mutex> guard(object_mutex_);
+  return rois_;
+}
+
+//------------------------------------------------------------------------------
+//
+template <class Tp_>
+std::vector<std::shared_ptr<Tp_>> ObjectRegistery::GetObjectsOfType() const {
+  std::vector<std::shared_ptr<Tp_>> return_objects;
+
+  for (const auto &obj : objects_) {
+    if (auto p = std::dynamic_pointer_cast<Tp_>(obj)) {
+      return_objects.push_back(std::move(p));
+    }
+  }
+  return return_objects;
 }
 
 //------------------------------------------------------------------------------

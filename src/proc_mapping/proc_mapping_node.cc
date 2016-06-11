@@ -43,8 +43,8 @@ ProcMappingNode::ProcMappingNode(const ros::NodeHandlePtr &nh)
       send_map_srv_(),
       cs_(std::make_shared<CoordinateSystems>(nh_)),
       raw_map_(nh_, cs_),
-      map_interpreter_(nh_, "proc_trees"),
-      semantic_map_(cs_) {
+      semantic_map_(cs_),
+      map_interpreter_(nh_, "proc_trees", semantic_map_.GetObjectRegistery()) {
   map_pub_ = nh_->advertise<sonia_msgs::SemanticMap>("/proc_mapping/map", 100);
 
   reset_odom_sub_ =
@@ -77,7 +77,7 @@ ProcMappingNode::~ProcMappingNode() {}
 //
 void ProcMappingNode::ResetOdometryCallback(
     const sonia_msgs::ResetOdometry::ConstPtr &msg) {
-  semantic_map_.ClearMapObjects();
+  semantic_map_.ClearSemanticMap();
   raw_map_.ResetRawMap();
   semantic_map_.ResetSemanticMap();
   cs_->ResetPosition();

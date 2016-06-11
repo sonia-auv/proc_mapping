@@ -25,7 +25,7 @@
 
 #include "semantic_map.h"
 #include "proc_mapping/config.h"
-#include "proc_mapping/interpreter/object_registery.h"
+#include "proc_mapping/map/object_registery.h"
 #include "proc_mapping/map_objects/buoy.h"
 #include "proc_mapping/map_objects/fence.h"
 #include "proc_mapping/map_objects/map_object.h"
@@ -42,9 +42,8 @@ namespace proc_mapping {
 //------------------------------------------------------------------------------
 //
 SemanticMap::SemanticMap(const CoordinateSystems::Ptr &cs)
-    : map_objects_({}),
-      rois_{},
-      cs_(cs),
+    : cs_(cs),
+      object_registery_(),
 #ifdef DEBUG
       display_map_(),
 #endif
@@ -57,18 +56,14 @@ SemanticMap::SemanticMap(const CoordinateSystems::Ptr &cs)
 #endif
 }
 
-//------------------------------------------------------------------------------
-//
-SemanticMap::~SemanticMap() = default;
-
 //==============================================================================
 // M E T H O D   S E C T I O N
 
 //------------------------------------------------------------------------------
 //
 void SemanticMap::OnSubjectNotify(atlas::Subject<> &subject) {
-  auto map_objects = ObjectRegistery::GetInstance().GetAllMapObject();
-  ObjectRegistery::GetInstance().ClearRegistery();
+  auto map_objects = object_registery_.GetAllMapObject();
+  object_registery_.ClearRegistery();
 
   for (auto &object : map_objects) {
     if (dynamic_cast<Buoy *>(object.get())) {
@@ -91,7 +86,7 @@ void SemanticMap::OnSubjectNotify(atlas::Subject<> &subject) {
 const std::vector<MapObject::Ptr> &SemanticMap::GetMapObjects() {
   std::lock_guard<std::mutex> guard(object_mutex_);
   new_objects_available_ = false;
-  return map_objects_;
+  return object_registery_.GetAllMapObject();
 }
 
 //------------------------------------------------------------------------------
@@ -99,7 +94,7 @@ const std::vector<MapObject::Ptr> &SemanticMap::GetMapObjects() {
 const std::vector<RegionOfInterest::Ptr> &SemanticMap::GetRegionOfInterest()
     const {
   std::lock_guard<std::mutex> guard(object_mutex_);
-  return rois_;
+  return object_registery_.GetAllRegionOfInterest();
 }
 
 //------------------------------------------------------------------------------
@@ -111,9 +106,9 @@ bool SemanticMap::IsNewDataAvailable() const {
 
 //------------------------------------------------------------------------------
 //
-void SemanticMap::ClearMapObjects() {
+void SemanticMap::ClearSemanticMap() {
   std::lock_guard<std::mutex> guard(object_mutex_);
-  map_objects_.clear();
+  object_registery_.ClearRegistery();
   new_objects_available_ = true;
 }
 
@@ -154,7 +149,7 @@ void SemanticMap::InsertRegionOfInterest(
   for (size_t i = 0; i < regions_of_interests.size(); ++i) {
     auto roi = RegionOfInterestFactory(regions_of_interests[i]);
     if (roi) {
-      rois_.push_back(roi);
+      object_registery_.AddRegionOfInterest(roi);
     }
   }
 }
@@ -163,6 +158,12 @@ void SemanticMap::InsertRegionOfInterest(
 //
 sonia_msgs::SemanticMap SemanticMap::GenerateSemanticMapMessage() const {
   return sonia_msgs::SemanticMap();
+}
+
+//------------------------------------------------------------------------------
+//
+ObjectRegistery::Ptr SemanticMap::GetObjectRegistery() {
+  return ObjectRegistery::Ptr{&object_registery_};
 }
 
 //------------------------------------------------------------------------------

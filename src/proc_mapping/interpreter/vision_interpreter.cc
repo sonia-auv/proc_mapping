@@ -34,8 +34,9 @@ namespace proc_mapping {
 
 //------------------------------------------------------------------------------
 //
-VisionInterpreter::VisionInterpreter(const ros::NodeHandlePtr &nh)
-    : DataInterpreter<sonia_msgs::VisionTarget>(nh) {}
+VisionInterpreter::VisionInterpreter(
+    const ros::NodeHandlePtr &nh, const ObjectRegistery::Ptr &object_registery)
+    : DataInterpreter<sonia_msgs::VisionTarget>(nh, object_registery) {}
 
 //------------------------------------------------------------------------------
 //

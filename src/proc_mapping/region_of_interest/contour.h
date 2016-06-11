@@ -28,7 +28,7 @@
 
 #include <yaml-cpp/yaml.h>
 #include <memory>
-#include "proc_mapping/interpreter/map_interpreter.h"
+#include "proc_mapping/config.h"
 #include "proc_mapping/region_of_interest/region_of_interest.h"
 
 namespace proc_mapping {

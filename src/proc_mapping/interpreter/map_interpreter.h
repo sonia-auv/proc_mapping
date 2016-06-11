@@ -31,11 +31,12 @@
 #include <memory>
 #include <string>
 #include <vector>
+#include "proc_mapping/config.h"
 #include "proc_mapping/interpreter/data_interpreter.h"
+#include "proc_mapping/map/object_registery.h"
+#include "proc_mapping/proc_unit/proc_tree.h"
 
 namespace proc_mapping {
-
-enum class DetectionMode { NONE = 0, BUOYS, FENCE, WALL };
 
 /// The MapInterpreter is responsible for interpretting the informations of the
 /// Raw map. It listen for new RawMap data to be available and execute a
@@ -57,14 +58,15 @@ class MapInterpreter : public DataInterpreter<cv::Mat>,
   // P U B L I C   C / D T O R S
 
   explicit MapInterpreter(const ros::NodeHandlePtr &nh,
-                          const std::string &proc_trees_file_name);
+                          const std::string &proc_trees_file_name,
+                          const ObjectRegistery::Ptr &object_registery);
 
   virtual ~MapInterpreter();
 
   void SetDetectionMode(const DetectionMode &mode);
 
   bool SetCurrentProcTree(const std::string &name);
-  bool SetCurrentProcTree(const ProcTreeType &proc_tree);
+  bool SetCurrentProcTree(const ProcTree::Ptr &proc_tree);
 
  private:
   //==========================================================================
@@ -84,8 +86,8 @@ class MapInterpreter : public DataInterpreter<cv::Mat>,
 
   DetectionMode mode_;
 
-  ProcTreeTypeList all_proc_trees_;
-  ProcTreeType current_proc_tree_;
+  std::vector<ProcTree::Ptr> all_proc_trees_;
+  ProcTree::Ptr current_proc_tree_;
 
   mutable std::mutex proc_tree_mutex_;
 };

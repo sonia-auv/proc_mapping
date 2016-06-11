@@ -23,7 +23,7 @@
  * along with S.O.N.I.A. software. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "region_of_interest.h"
+#include "proc_mapping/region_of_interest/region_of_interest.h"
 
 namespace proc_mapping {
 
