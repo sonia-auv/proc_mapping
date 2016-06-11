@@ -213,7 +213,7 @@ void RawMap::ProcessPointCloud(const sensor_msgs::PointCloud2::ConstPtr &msg) {
   // Send a command when enough scanline is arrived
   scanline_counter_++;
 
-  if (scanline_counter_ == 2) {
+  if (scanline_counter_ > 2) {
     is_first_scan_complete_ = true;
   }
 
@@ -246,6 +246,7 @@ bool RawMap::IsMapReadyForProcess() { return is_map_ready_for_process_; }
 //
 void RawMap::ResetRawMap() {
   display_map_.setTo(cv::Scalar(0));
+  scanline_counter_ = 0;
   is_first_scan_complete_ = false;
 }
 
