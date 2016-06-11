@@ -87,7 +87,7 @@ bool Ellipse::Serialize(const YAML::Node &node) {
 
 //------------------------------------------------------------------------------
 //
-bool Ellipse::IsInZone(const cv::Point2i &p) const { return true; }
+bool Ellipse::IsInZone(const cv::Point2d &p) const { return true; }
 
 //------------------------------------------------------------------------------
 //

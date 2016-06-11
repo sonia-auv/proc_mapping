@@ -83,9 +83,24 @@ bool RotatedRectangle::Serialize(const YAML::Node &node) {
 
 //------------------------------------------------------------------------------
 //
-bool RotatedRectangle::IsInZone(const cv::Point2i &p) const {
-  // TODO: Implement this method
-  return true;
+bool RotatedRectangle::IsInZone(const cv::Point2d &p) const {
+  double rotation = (M_PI * angle_) / 180;
+  double delta_x = p.x - center_.x * 40;
+  double delta_y = p.y - center_.y * 40;
+  double distance = sqrt((delta_x * delta_x) + (delta_y * delta_y));
+
+  double current_angle = atan2(delta_y, delta_x);
+  double new_angle = current_angle - rotation;
+
+  double new_x = cos(new_angle) * distance;
+  double new_y = sin(new_angle) * distance;
+
+  if (new_x > -0.5 * size_.width * 40 and new_x < 0.5 * size_.width * 40 and
+      new_y > -0.5 * size_.height * 40 and new_y < 0.5 * size_.height * 40) {
+    return true;
+  }
+
+  return false;
 }
 
 //------------------------------------------------------------------------------

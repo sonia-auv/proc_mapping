@@ -4,14 +4,11 @@ proc_trees:
       - name: blur
         blur_type: 1
         debug: false
-      - name: threshold
-        threshold_type: 0
-        debug: false
       - name: dilate
         debug: false
       - name: blob_detector
         target: 0
-        debug: false
+        debug: true
       - name: buoys_detector
 #  - name: fence
 #    proc_units:

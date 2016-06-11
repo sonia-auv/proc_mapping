@@ -61,6 +61,8 @@ class ObjectRegistery {
   void DeleteRegionOfInterest(const RegionOfInterest::Ptr &obj);
   const RegionOfInterestList &GetAllRegionOfInterest() const;
 
+  const RegionOfInterestList GetRegionOfInterestOfType(const DetectionMode type) const;
+
   /// Template method that will return a vector of all the object of the
   /// specified type to the user.
   /// e.g. calling GetObjectOfType<Buoy> will return all the buoys from the

@@ -89,7 +89,7 @@ bool Contour::Serialize(const YAML::Node &node) {
 
 //------------------------------------------------------------------------------
 //
-bool Contour::IsInZone(const cv::Point2i &p) const {
+bool Contour::IsInZone(const cv::Point2d &p) const {
   auto result = cv::pointPolygonTest(contours_, p, false);
   return result == 0 || result == 1;
 }

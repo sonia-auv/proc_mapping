@@ -3,7 +3,7 @@ regions_of_interest:
     roi_type: rotated_rectangle
     name: BUOY_ROI
     center: [9, 11]
-    size: [2, 4]
+    size: [2, 3]
     angle: 135
 #  - object_type: fence
 #    roi_type: contour

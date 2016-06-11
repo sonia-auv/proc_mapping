@@ -138,7 +138,7 @@ void RawMap::ProcessPointCloud(const sensor_msgs::PointCloud2::ConstPtr &msg) {
 
     // Adding the sub_position to position the point cloud in the world map.
     cv::Point2d coordinate_transformed(cv::Point2d(out.x(), out.y()) +
-                                       sub_position);
+        sub_position);
     bin_coordinate = cs_->WorldToPixelCoordinates(coordinate_transformed);
 
     // Check if bin_coordinate are in the map boundary
@@ -146,18 +146,18 @@ void RawMap::ProcessPointCloud(const sensor_msgs::PointCloud2::ConstPtr &msg) {
         (bin_coordinate.y < cs_->GetPixel().height and bin_coordinate.y > 0)) {
       // Invert the y axe value to fit in opencv Mat coodinate
       bin_coordinate.y = (cs_->GetPixel().width / 2) - bin_coordinate.y +
-                         (cs_->GetPixel().width / 2);
+          (cs_->GetPixel().width / 2);
 
-      //          uint8_t threat_intensity = static_cast<uint8_t>(255.0f *
-      //          intensity);
-      //          if (threat_intensity > 10) {
-      //            threat_intensity = 255;
-      //          }
+      uint8_t threat_intensity = static_cast<uint8_t>(255.0f *
+          intensity);
+      if (threat_intensity > 10) {
+        threat_intensity = 255;
+      }
 
       // Filling the two maps without thresholded data
       if (i > point_cloud_threshold_) {
-        //              intensity_map[i] = threat_intensity;
-        intensity_map[i] = static_cast<uint8_t>(255.0f * intensity);
+        intensity_map[i] = threat_intensity;
+//        intensity_map[i] = static_cast<uint8_t>(255.0f * intensity);
         coordinate_map[i] = bin_coordinate;
       }
     }
@@ -212,7 +212,7 @@ void RawMap::ProcessPointCloud(const sensor_msgs::PointCloud2::ConstPtr &msg) {
   // Send a command when enough scanline is arrived
   scanline_counter_++;
 
-  if (scanline_counter_ == 2) {
+  if (scanline_counter_ == 200) {
     is_first_scan_complete_ = true;
   }
 

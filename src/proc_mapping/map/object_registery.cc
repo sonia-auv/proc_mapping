@@ -96,11 +96,29 @@ ObjectRegistery::GetAllRegionOfInterest() const {
 
 //------------------------------------------------------------------------------
 //
+const ObjectRegistery::RegionOfInterestList
+    ObjectRegistery::GetRegionOfInterestOfType(const DetectionMode type) const {
+  RegionOfInterestList return_rois;
+  for (const auto &roi : rois_) {
+    if (roi->GetObjectType() == type) {
+      return_rois.push_back(std::move(roi));
+    }
+  }
+  return return_rois;
+}
+
+//------------------------------------------------------------------------------
+//
 template <class Tp_>
 std::vector<std::shared_ptr<Tp_>> ObjectRegistery::GetObjectsOfType() const {
   std::vector<std::shared_ptr<Tp_>> return_objects;
 
   for (const auto &obj : objects_) {
+    if (auto p = std::dynamic_pointer_cast<Tp_>(obj)) {
+      return_objects.push_back(std::move(p));
+    }
+  }
+  for (const auto &obj : rois_) {
     if (auto p = std::dynamic_pointer_cast<Tp_>(obj)) {
       return_objects.push_back(std::move(p));
     }

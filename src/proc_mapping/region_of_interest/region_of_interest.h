@@ -60,7 +60,7 @@ class RegionOfInterest {
   const std::string &GetName() const;
   void SetName(const std::string &name);
 
-  virtual bool IsInZone(const cv::Point2i &p) const = 0;
+  virtual bool IsInZone(const cv::Point2d &p) const = 0;
   virtual bool IsInZone(const cv::Rect &p) const = 0;
 
   virtual void DrawRegion(cv::Mat mat,

@@ -63,8 +63,8 @@ int Blur::Parameters::kernel_size = 5;
 
 const int Dilate::Parameters::kernel_size_x_max = 32;
 const int Dilate::Parameters::kernel_size_y_max = 32;
-int Dilate::Parameters::kernel_size_x = 5;
-int Dilate::Parameters::kernel_size_y = 5;
+int Dilate::Parameters::kernel_size_x = 9;
+int Dilate::Parameters::kernel_size_y = 9;
 
 const int Threshold::Parameters::thresh_value_max = 255;
 int Threshold::Parameters::thresh_value = 0;

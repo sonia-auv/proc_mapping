@@ -86,8 +86,8 @@ class BlobDetector : public ProcUnit {
   virtual boost::any ProcessData(boost::any input) override {
     cv::Mat map = boost::any_cast<cv::Mat>(input);
     if (target_ == 0) {
-      params_.minThreshold = 0;
-      params_.maxThreshold = 255;
+      params_.minThreshold = 30;
+      params_.maxThreshold = 200;
       params_.filterByArea = true;
       params_.minArea = 200;
       params_.maxArea = 600;

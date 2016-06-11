@@ -58,7 +58,7 @@ class Ellipse : public RegionOfInterest {
   //==========================================================================
   // P U B L I C   M E T H O D S
 
-  virtual bool IsInZone(const cv::Point2i &p) const override;
+  virtual bool IsInZone(const cv::Point2d &p) const override;
   virtual bool IsInZone(const cv::Rect &p) const override;
 
   virtual void DrawRegion(cv::Mat mat,
