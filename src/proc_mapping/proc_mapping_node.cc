@@ -25,6 +25,7 @@
 
 #include "proc_mapping/proc_mapping_node.h"
 #include <sonia_msgs/SemanticMap.h>
+#include <visualization_msgs/MarkerArray.h>
 #include <functional>
 #include "proc_mapping/config.h"
 #include "proc_mapping/region_of_interest/rotated_rectangle.h"
@@ -39,6 +40,7 @@ namespace proc_mapping {
 ProcMappingNode::ProcMappingNode(const ros::NodeHandlePtr &nh)
     : nh_(nh),
       map_pub_(),
+      markers_pub_(),
       reset_odom_sub_(),
       send_map_srv_(),
       cs_(std::make_shared<CoordinateSystems>(nh_)),
@@ -46,6 +48,8 @@ ProcMappingNode::ProcMappingNode(const ros::NodeHandlePtr &nh)
       semantic_map_(cs_),
       map_interpreter_(nh_, "proc_trees", semantic_map_.GetObjectRegistery()) {
   map_pub_ = nh_->advertise<sonia_msgs::SemanticMap>("/proc_mapping/map", 100);
+  markers_pub_ = nh_->advertise<visualization_msgs::MarkerArray>(
+      "/proc_mapping/markers", 100);
 
   reset_odom_sub_ =
       nh_->subscribe("/proc_navigation/reset_odometry", 100,
@@ -138,6 +142,9 @@ void ProcMappingNode::Spin() {
       auto map_msg = semantic_map_.GenerateSemanticMapMessage();
       map_pub_.publish(map_msg);
     }
+
+    auto markers = semantic_map_.GenerateVisualizationMessage();
+    markers_pub_.publish(markers);
 
 #ifdef DEBUG
     semantic_map_.PrintMap();

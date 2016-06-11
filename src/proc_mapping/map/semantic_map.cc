@@ -23,16 +23,16 @@
  * along with S.O.N.I.A. software. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "semantic_map.h"
+#include "proc_mapping/map/semantic_map.h"
 #include "proc_mapping/config.h"
 #include "proc_mapping/map/object_registery.h"
 #include "proc_mapping/map_objects/buoy.h"
 #include "proc_mapping/map_objects/fence.h"
 #include "proc_mapping/map_objects/map_object.h"
-#include "proc_mapping/region_of_interest/wall.h"
 #include "proc_mapping/region_of_interest/contour.h"
 #include "proc_mapping/region_of_interest/ellipse.h"
 #include "proc_mapping/region_of_interest/rotated_rectangle.h"
+#include "proc_mapping/region_of_interest/wall.h"
 
 namespace proc_mapping {
 
@@ -162,6 +162,39 @@ sonia_msgs::SemanticMap SemanticMap::GenerateSemanticMapMessage() const {
 
 //------------------------------------------------------------------------------
 //
+visualization_msgs::MarkerArray SemanticMap::GenerateVisualizationMessage()
+    const {
+  visualization_msgs::Marker marker;
+  marker.header.frame_id = "map";
+  marker.header.stamp = ros::Time();
+  marker.ns = "proc_mapping";
+  marker.id = 0;
+  marker.type = visualization_msgs::Marker::MESH_RESOURCE;
+  marker.action = visualization_msgs::Marker::ADD;
+  marker.pose.position.x = cs_->GetSub().position.x;
+  marker.pose.position.y = cs_->GetSub().position.y;
+  marker.pose.position.z = cs_->GetSub().position.z;
+  marker.pose.orientation.x = cs_->GetSub().roll;
+  marker.pose.orientation.y = cs_->GetSub().pitch;
+  marker.pose.orientation.z = cs_->GetSub().yaw;
+  marker.pose.orientation.w = 1.0;
+  marker.scale.x = 1;
+  marker.scale.y = 1;
+  marker.scale.z = 1;
+  marker.color.a = 1.0;  // Don't forget to set the alpha!
+                         //  marker.color.r = 0.0;
+                         //  marker.color.g = 1.0;
+                         //  marker.color.b = 0.0;
+                         // only if using a MESH_RESOURCE marker type:
+  marker.mesh_resource = "package://proc_mapping/pr2_description/SUB.dae";
+
+  visualization_msgs::MarkerArray marker_array;
+  marker_array.markers.push_back(marker);
+  return marker_array;
+}
+
+//------------------------------------------------------------------------------
+//
 ObjectRegistery::Ptr SemanticMap::GetObjectRegistery() {
   return ObjectRegistery::Ptr{&object_registery_};
 }
@@ -175,7 +208,7 @@ void SemanticMap::ResetSemanticMap() { display_map_.setTo(cv::Scalar(0)); }
 //
 void SemanticMap::PrintMap() {
   cv::Point2d offset = cs_->GetPositionOffset();
-  cv::Point2d sub = cs_->GetSub().position;
+  auto sub = cv::Point2d(cs_->GetSub().position.x, cs_->GetSub().position.y);
   sub += offset;
 
   for (int i = 0; i < 800; i += 40) {
