@@ -32,6 +32,7 @@
 #include <eigen3/Eigen/Eigen>
 #include <memory>
 #include <vector>
+#include <mutex>
 #include "opencv/highgui.h"
 
 namespace proc_mapping {
