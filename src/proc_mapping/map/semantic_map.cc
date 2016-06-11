@@ -29,7 +29,7 @@
 #include "proc_mapping/map_objects/buoy.h"
 #include "proc_mapping/map_objects/fence.h"
 #include "proc_mapping/map_objects/map_object.h"
-#include "proc_mapping/map_objects/wall.h"
+#include "proc_mapping/region_of_interest/wall.h"
 #include "proc_mapping/region_of_interest/contour.h"
 #include "proc_mapping/region_of_interest/ellipse.h"
 #include "proc_mapping/region_of_interest/rotated_rectangle.h"

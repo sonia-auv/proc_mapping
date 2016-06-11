@@ -29,11 +29,11 @@
 #include <memory>
 #include <string>
 #include <vector>
-#include "proc_mapping/map_objects/map_object.h"
+#include "proc_mapping/region_of_interest/contour.h"
 
 namespace proc_mapping {
 
-class Wall : public MapObject {
+class Wall : public Contour {
  public:
   //==========================================================================
   // T Y P E D E F   A N D   E N U M
@@ -52,15 +52,6 @@ class Wall : public MapObject {
   //==========================================================================
   // P U B L I C   M E T H O D S
 
-  virtual void DrawToMap(cv::Mat,
-                         const std::function<cv::Point2i(const cv::Point2d &p)>
-                             &convert) const override;
-
- protected:
-  //==========================================================================
-  // P R O T E C T E D   M E T H O D S
-
-  virtual uint8_t GetMessageObjectType() const override;
 };
 
 }  // namespace proc_mapping

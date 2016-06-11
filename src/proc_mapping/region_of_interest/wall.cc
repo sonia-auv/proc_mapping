@@ -23,7 +23,7 @@
  * along with S.O.N.I.A. software. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "proc_mapping/map_objects/wall.h"
+#include "wall.h"
 
 namespace proc_mapping {
 
@@ -32,7 +32,7 @@ namespace proc_mapping {
 
 //------------------------------------------------------------------------------
 //
-Wall::Wall() : MapObject() {}
+Wall::Wall() : Contour("Wall") {}
 
 //------------------------------------------------------------------------------
 //
@@ -43,14 +43,5 @@ Wall::~Wall() = default;
 
 //------------------------------------------------------------------------------
 //
-void Wall::DrawToMap(
-    cv::Mat,
-    const std::function<cv::Point2i(const cv::Point2d &p)> &convert) const {}
-
-//------------------------------------------------------------------------------
-//
-uint8_t Wall::GetMessageObjectType() const {
-  return sonia_msgs::MapObject::UNKNOWN;
-}
 
 }  // namespace proc_mapping

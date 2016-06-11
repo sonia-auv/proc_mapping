@@ -28,6 +28,8 @@
 
 #include <yaml-cpp/yaml.h>
 #include <memory>
+#include <string>
+#include <vector>
 #include "proc_mapping/config.h"
 #include "proc_mapping/region_of_interest/region_of_interest.h"
 
@@ -51,6 +53,8 @@ class Contour : public RegionOfInterest {
   // P U B L I C   C / D T O R S
 
   explicit Contour(const YAML::Node &node);
+  explicit Contour(const std::string &name,
+                   const DetectionMode &mode = DetectionMode::NONE);
   explicit Contour(const std::string &name, const ContourType &contour,
                    const DetectionMode &mode = DetectionMode::NONE);
 

@@ -43,6 +43,11 @@ Contour::Contour(const std::string &name, const ContourType &contour,
                  const DetectionMode &mode)
     : RegionOfInterest(name, mode), contours_(contour) {}
 
+//------------------------------------------------------------------------------
+//
+Contour::Contour(const std::string &name, const DetectionMode &mode)
+    : RegionOfInterest(name, mode), contours_({}) {}
+
 //==============================================================================
 // M E T H O D   S E C T I O N
 
