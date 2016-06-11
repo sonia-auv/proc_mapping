@@ -211,10 +211,11 @@ void SemanticMap::PrintMap() {
   auto sub = cv::Point2d(cs_->GetSub().position.x, cs_->GetSub().position.y);
   sub += offset;
 
-  for (int i = 0; i < 800; i += 40) {
-    cv::line(display_map_, cv::Point2d(i, 0), cv::Point2d(i, 800),
+  auto pixel = cs_->GetPixel();
+  for (int i = 0; i < pixel.height; i += pixel.m_to_pixel) {
+    cv::line(display_map_, cv::Point2d(i, 0), cv::Point2d(i, pixel.height),
              cv::Scalar(255));
-    cv::line(display_map_, cv::Point2d(0, i), cv::Point2d(800, i),
+    cv::line(display_map_, cv::Point2d(0, i), cv::Point2d(pixel.width, i),
              cv::Scalar(255));
   }
 
@@ -223,7 +224,7 @@ void SemanticMap::PrintMap() {
   }
 
   sub = cs_->WorldToPixelCoordinates(sub);
-  sub.y = (800 / 2) - sub.y + (800 / 2);
+  sub.y = (pixel.height / 2) - sub.y + (pixel.height / 2);
 
   cv::circle(display_map_, sub, 5, cv::Scalar(255), -1);
   cv::imshow("Semantic Map", display_map_);
