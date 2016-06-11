@@ -213,7 +213,7 @@ void RawMap::ProcessPointCloud(const sensor_msgs::PointCloud2::ConstPtr &msg) {
   // Send a command when enough scanline is arrived
   scanline_counter_++;
 
-  if (scanline_counter_ == 200) {
+  if (scanline_counter_ == 2) {
     is_first_scan_complete_ = true;
   }
 

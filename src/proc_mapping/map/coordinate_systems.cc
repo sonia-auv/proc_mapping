@@ -165,7 +165,6 @@ void CoordinateSystems::SetMapParameters(const size_t &w, const size_t &h,
 //------------------------------------------------------------------------------
 //
 void CoordinateSystems::SetPositionOffset(cv::Point2d offset) {
-  std::lock_guard<std::mutex> lock(data_mutex);
   world_.offset = offset;
 }
 
