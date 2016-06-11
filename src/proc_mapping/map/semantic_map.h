@@ -30,6 +30,7 @@
 #include <opencv/cv.h>
 #include <sonia_msgs/MapObject.h>
 #include <sonia_msgs/SemanticMap.h>
+#include <visualization_msgs/MarkerArray.h>
 #include "proc_mapping/config.h"
 #include "proc_mapping/map/coordinate_systems.h"
 #include "proc_mapping/map/object_registery.h"
@@ -70,6 +71,7 @@ class SemanticMap : public atlas::Observer<> {
   void ClearSemanticMap();
 
   sonia_msgs::SemanticMap GenerateSemanticMapMessage() const;
+  visualization_msgs::MarkerArray GenerateVisualizationMessage() const;
 
   bool IsNewDataAvailable() const;
 
@@ -80,7 +82,6 @@ class SemanticMap : public atlas::Observer<> {
 #ifdef DEBUG
   void PrintMap();
 #endif
-
  private:
   //==========================================================================
   // P R I V A T E   M E T H O D S

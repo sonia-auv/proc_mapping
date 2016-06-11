@@ -84,6 +84,7 @@ class ProcMappingNode {
 
   ros::NodeHandlePtr nh_;
   ros::Publisher map_pub_;
+  ros::Publisher markers_pub_;
   ros::Subscriber reset_odom_sub_;
   ros::ServiceServer send_map_srv_;
   ros::ServiceServer change_pt_srv_;

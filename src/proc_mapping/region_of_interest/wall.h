@@ -51,7 +51,6 @@ class Wall : public Contour {
 
   //==========================================================================
   // P U B L I C   M E T H O D S
-
 };
 
 }  // namespace proc_mapping

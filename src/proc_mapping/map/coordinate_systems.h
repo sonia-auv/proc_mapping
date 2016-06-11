@@ -62,8 +62,9 @@ class CoordinateSystems {
     double yaw;
     double pitch;
     double roll;
-    cv::Point2d position;
-    cv::Point2d initial_position;
+    Eigen::Quaterniond orientation;
+    cv::Point3d position;
+    cv::Point3d initial_position;
   };
 
   struct WorldCS {

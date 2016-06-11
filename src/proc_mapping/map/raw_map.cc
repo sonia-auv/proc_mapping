@@ -117,7 +117,8 @@ void RawMap::ProcessPointCloud(const sensor_msgs::PointCloud2::ConstPtr &msg) {
 
   uint32_t max_size = static_cast<uint32_t>(msg->data.size() / msg->point_step);
   cv::Point2i bin_coordinate;
-  cv::Point2d sub_position = cs_->GetSub().position + cs_->GetPositionOffset();
+  auto pose2d = cv::Point2d(cs_->GetSub().position.x, cs_->GetSub().position.y);
+  cv::Point2d sub_position = pose2d + cs_->GetPositionOffset();
 
   intensity_map.resize(max_size);
   coordinate_map.resize(max_size);

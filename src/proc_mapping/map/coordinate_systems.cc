@@ -75,6 +75,7 @@ void CoordinateSystems::OdomCallback(
   if (is_first_odom_) {
     sub_.initial_position.x = odo_in.get()->pose.pose.position.x;
     sub_.initial_position.y = odo_in.get()->pose.pose.position.y;
+    sub_.initial_position.z = odo_in.get()->pose.pose.position.z;
     is_first_odom_ = false;
   }
 
@@ -85,6 +86,8 @@ void CoordinateSystems::OdomCallback(
   //  The quaternion is required to be normalized, otherwise the result is
   //  undefined.
   quaterniond.normalized();
+
+  sub_.orientation = quaterniond;
 
   Eigen::Matrix3d rotation;
   rotation = quaterniond.toRotationMatrix();
@@ -100,6 +103,7 @@ void CoordinateSystems::OdomCallback(
   sub_.roll = roll;
   sub_.position.x = odo_in.get()->pose.pose.position.x;
   sub_.position.y = odo_in.get()->pose.pose.position.y;
+  sub_.position.z = odo_in.get()->pose.pose.position.z;
 }
 
 //------------------------------------------------------------------------------
@@ -176,7 +180,8 @@ cv::Point2d CoordinateSystems::GetPositionOffset() const {
 //
 void CoordinateSystems::ResetPosition() {
   std::lock_guard<std::mutex> lock(data_mutex);
-  cv::Point2d delta = world_.origin - sub_.position;
+  auto pose2d = cv::Point2d(sub_.position.x, sub_.position.y);
+  cv::Point2d delta = world_.origin - pose2d;
   SetPositionOffset(delta);
 }
 
