@@ -202,9 +202,9 @@ visualization_msgs::Marker SemanticMap::GenerateSubmarineMarker() const {
   Eigen::Matrix3d rotation = cs_->GetSub().orientation.toRotationMatrix();
   Eigen::Vector3d euler_vec = rotation.eulerAngles(0, 1, 2);
 
-  double roll = euler_vec.x() + M_PI;
+  double roll = fmod(euler_vec.x() + M_PI / 2, 2 * M_PI);
   double pitch = euler_vec.y();
-  double yaw = euler_vec.z();
+  double yaw = fmod(euler_vec.z() + M_PI, 2 * M_PI);
 
   Eigen::AngleAxisd rollAngle(roll, Eigen::Vector3d::UnitX());
   Eigen::AngleAxisd pitchAngle(pitch, Eigen::Vector3d::UnitY());
