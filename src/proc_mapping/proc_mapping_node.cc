@@ -81,6 +81,7 @@ ProcMappingNode::~ProcMappingNode() {}
 //
 void ProcMappingNode::ResetOdometryCallback(
     const sonia_msgs::ResetOdometry::ConstPtr &msg) {
+  // Todo: Clearing trigged_keypoint_list_ and candidate_list_ when reset map
   semantic_map_.ClearSemanticMap();
   raw_map_.ResetRawMap();
   semantic_map_.ResetSemanticMap();
