@@ -202,7 +202,7 @@ visualization_msgs::Marker SemanticMap::GenerateSubmarineMarker() const {
   Eigen::Matrix3d rotation = cs_->GetSub().orientation.toRotationMatrix();
   Eigen::Vector3d euler_vec = rotation.eulerAngles(0, 1, 2);
 
-  double roll = euler_vec.x() - M_PI / 2;
+  double roll = euler_vec.x() + M_PI;
   double pitch = euler_vec.y();
   double yaw = euler_vec.z();
 
@@ -240,7 +240,7 @@ void SemanticMap::ResetSemanticMap() {
 //
 void SemanticMap::PrintMap() {
   cv::Point2d offset = cs_->GetPositionOffset();
-  auto sub = cv::Point2d(cs_->GetSub().position.x, cs_->GetSub().position.y);
+  auto sub = cv::Point2d(cs_->GetSub().position.y, cs_->GetSub().position.x);
   sub += offset;
 
   auto pixel = cs_->GetPixel();

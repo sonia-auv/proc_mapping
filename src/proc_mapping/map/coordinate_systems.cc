@@ -204,7 +204,8 @@ void CoordinateSystems::SetPositionOffset(cv::Point2d offset) {
 //
 cv::Point2d CoordinateSystems::GetPositionOffset() const {
   std::lock_guard<std::mutex> lock(data_mutex);
-  return world_.offset;
+  cv::Point2d offset{world_.offset.y, world_.offset.x};
+  return offset;
 }
 
 //------------------------------------------------------------------------------
