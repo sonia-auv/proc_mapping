@@ -229,7 +229,11 @@ ObjectRegistery::Ptr SemanticMap::GetObjectRegistery() {
 
 //------------------------------------------------------------------------------
 //
-void SemanticMap::ResetSemanticMap() { display_map_.setTo(cv::Scalar(0)); }
+void SemanticMap::ResetSemanticMap() {
+#ifdef DEBUG
+  display_map_.setTo(cv::Scalar(0));
+#endif
+}
 
 #ifdef DEBUG
 //------------------------------------------------------------------------------
