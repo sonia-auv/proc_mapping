@@ -53,7 +53,7 @@ class RotatedRectangle : public RegionOfInterest {
 
   explicit RotatedRectangle(const YAML::Node &node);
   explicit RotatedRectangle(const std::string &name, const cv::Point2d &center,
-                            const cv::Size2d &size, double angle,
+                            const cv::Size2f &size, double angle,
                             const DetectionMode &mode = DetectionMode::NONE);
 
   virtual ~RotatedRectangle() = default;
@@ -82,7 +82,7 @@ class RotatedRectangle : public RegionOfInterest {
 
   cv::Point2d center_;
 
-  cv::Size2d size_;
+  cv::Size2f size_;
 
   double angle_;
 };

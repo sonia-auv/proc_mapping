@@ -27,6 +27,7 @@
 #define PROC_MAPPING_REGION_OF_INTEREST_REGION_OF_INTEREST_H_
 
 #include <highgui.h>
+#include <opencv/cv.h>
 #include <yaml-cpp/yaml.h>
 #include "proc_mapping/config.h"
 
