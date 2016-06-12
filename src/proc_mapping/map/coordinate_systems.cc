@@ -120,7 +120,9 @@ void CoordinateSystems::OdomCallback(
 //
 cv::Point2i CoordinateSystems::WorldToPixelCoordinates(
     const cv::Point2d &p) const noexcept {
-  return p * pixel_.m_to_pixel;
+  cv::Point2d pix = p * pixel_.m_to_pixel;
+  pix.y = (pixel_.height / 2) - pix.y + (pixel_.height / 2);
+  return pix;
 }
 
 //------------------------------------------------------------------------------
