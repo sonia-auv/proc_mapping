@@ -184,7 +184,7 @@ visualization_msgs::MarkerArray SemanticMap::GenerateVisualizationMessage() {
 //
 visualization_msgs::Marker SemanticMap::GenerateSubmarineMarker() const {
   visualization_msgs::Marker marker;
-  marker.header.frame_id = "map";
+  marker.header.frame_id = "NED";
   marker.header.stamp = ros::Time();
   marker.ns = "proc_mapping";
   marker.id = 0;
