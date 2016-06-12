@@ -211,7 +211,8 @@ cv::Point2d CoordinateSystems::GetPositionOffset() const {
 //
 void CoordinateSystems::ResetPosition() {
   std::lock_guard<std::mutex> lock(data_mutex);
-  auto pose2d = cv::Point2d(sub_.position.x, sub_.position.y);
+  // Inverting x and y (DVL)
+  auto pose2d = cv::Point2d(sub_.position.y, sub_.position.x);
   cv::Point2d delta = world_.origin - pose2d;
   SetPositionOffset(delta);
 }

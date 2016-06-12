@@ -240,7 +240,8 @@ void SemanticMap::ResetSemanticMap() {
 //
 void SemanticMap::PrintMap() {
   cv::Point2d offset = cs_->GetPositionOffset();
-  auto sub = cv::Point2d(cs_->GetSub().position.x, cs_->GetSub().position.y);
+  // Inverting x and y (DVL)
+  auto sub = cv::Point2d(cs_->GetSub().position.y, cs_->GetSub().position.x);
   sub += offset;
 
   auto pixel = cs_->GetPixel();

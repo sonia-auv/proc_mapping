@@ -145,9 +145,10 @@ void RawMap::ProcessPointCloud(const sensor_msgs::PointCloud2::ConstPtr &msg) {
     // Check if bin_coordinate are in the map boundary
     if ((bin_coordinate.x < cs_->GetPixel().width and bin_coordinate.x > 0) and
         (bin_coordinate.y < cs_->GetPixel().height and bin_coordinate.y > 0)) {
-      // Invert the y axe value to fit in opencv Mat coodinate
-      bin_coordinate.y = (cs_->GetPixel().width / 2) - bin_coordinate.y +
-                         (cs_->GetPixel().width / 2);
+
+      // Invert the x axe value to fit in opencv Mat coodinate
+      bin_coordinate.x = (cs_->GetPixel().height / 2) - bin_coordinate.x +
+                         (cs_->GetPixel().height / 2);
 
       uint8_t threat_intensity = static_cast<uint8_t>(255.0f * intensity);
       if (threat_intensity > 10) {
