@@ -63,7 +63,6 @@ SemanticMap::SemanticMap(const CoordinateSystems::Ptr &cs)
 //
 void SemanticMap::OnSubjectNotify(atlas::Subject<> &subject) {
   auto map_objects = object_registery_.GetAllMapObject();
-  object_registery_.ClearRegistery();
 
   for (auto &object : map_objects) {
     if (dynamic_cast<Buoy *>(object.get())) {
@@ -157,13 +156,40 @@ void SemanticMap::InsertRegionOfInterest(
 //------------------------------------------------------------------------------
 //
 sonia_msgs::SemanticMap SemanticMap::GenerateSemanticMapMessage() const {
-  return sonia_msgs::SemanticMap();
+  sonia_msgs::SemanticMap map_msg;
+  for(const auto &obj : object_registery_.GetAllMapObject()) {
+    map_msg.objects.push_back(obj->GenerateToMapObjectMessge());
+  }
+  return map_msg;
 }
 
 //------------------------------------------------------------------------------
 //
 visualization_msgs::MarkerArray SemanticMap::GenerateVisualizationMessage()
     const {
+  visualization_msgs::MarkerArray marker_array;
+  marker_array.markers.push_back(GenerateSubmarineMarker());
+
+  auto map_objects = object_registery_.GetAllMapObject();
+
+  int i = 1;
+  for(const auto &obj : map_objects) {
+    auto marker = obj->GenerateVisualizationMarker(i);
+    marker.pose.position.x = cs_->PixelToWorldCoordinates(marker.pose
+                                                              .position.x);
+    marker.pose.position.y = cs_->PixelToWorldCoordinates(marker.pose
+                                                              .position.y);
+    marker.pose.position.z = 0;
+    marker_array.markers.push_back(marker);
+    ++i;
+  }
+
+  return marker_array;
+}
+
+//------------------------------------------------------------------------------
+//
+visualization_msgs::Marker SemanticMap::GenerateSubmarineMarker() const {
   visualization_msgs::Marker marker;
   marker.header.frame_id = "map";
   marker.header.stamp = ros::Time();
@@ -174,23 +200,32 @@ visualization_msgs::MarkerArray SemanticMap::GenerateVisualizationMessage()
   marker.pose.position.x = cs_->GetSub().position.x;
   marker.pose.position.y = cs_->GetSub().position.y;
   marker.pose.position.z = cs_->GetSub().position.z;
-  marker.pose.orientation.x = cs_->GetSub().roll;
-  marker.pose.orientation.y = cs_->GetSub().pitch;
-  marker.pose.orientation.z = cs_->GetSub().yaw;
-  marker.pose.orientation.w = 1.0;
-  marker.scale.x = 1;
-  marker.scale.y = 1;
-  marker.scale.z = 1;
-  marker.color.a = 1.0;  // Don't forget to set the alpha!
-                         //  marker.color.r = 0.0;
-                         //  marker.color.g = 1.0;
-                         //  marker.color.b = 0.0;
-                         // only if using a MESH_RESOURCE marker type:
-  marker.mesh_resource = "package://proc_mapping/pr2_description/SUB.dae";
+  marker.scale.x = 0.001;
+  marker.scale.y = 0.001;
+  marker.scale.z = 0.001;
+  marker.color.a = 1.0;
+  marker.mesh_resource = "package://proc_mapping/meshes/sub.stl";
 
-  visualization_msgs::MarkerArray marker_array;
-  marker_array.markers.push_back(marker);
-  return marker_array;
+  Eigen::Matrix3d rotation = cs_->GetSub().orientation.toRotationMatrix();
+  Eigen::Vector3d euler_vec = rotation.eulerAngles(0, 1, 2);
+
+  double roll = euler_vec.x() - M_PI/2;
+  double pitch = euler_vec.y();
+  double yaw = euler_vec.z();
+
+  Eigen::AngleAxisd rollAngle(roll, Eigen::Vector3d::UnitX());
+  Eigen::AngleAxisd pitchAngle(pitch, Eigen::Vector3d::UnitY());
+  Eigen::AngleAxisd yawAngle(yaw, Eigen::Vector3d::UnitZ());
+
+  Eigen::Quaterniond q = yawAngle * pitchAngle * rollAngle;
+  q.normalize();
+
+  marker.pose.orientation.x = q.x();
+  marker.pose.orientation.y = q.y();
+  marker.pose.orientation.z = q.z();
+  marker.pose.orientation.w = q.w();
+
+  return marker;
 }
 
 //------------------------------------------------------------------------------
@@ -224,7 +259,6 @@ void SemanticMap::PrintMap() {
   }
 
   sub = cs_->WorldToPixelCoordinates(sub);
-  sub.y = (pixel.height / 2) - sub.y + (pixel.height / 2);
 
   cv::circle(display_map_, sub, 5, cv::Scalar(255), -1);
   cv::imshow("Semantic Map", display_map_);

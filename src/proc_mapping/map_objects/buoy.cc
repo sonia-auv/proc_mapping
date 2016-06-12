@@ -34,6 +34,9 @@ namespace proc_mapping {
 //
 Buoy::Buoy(const cv::KeyPoint &key_point) : MapObject() {
   SetCvKeyPoint(key_point);
+
+  pose_.x = key_point.pt.x;
+  pose_.y = key_point.pt.y;
 }
 
 //------------------------------------------------------------------------------
@@ -55,6 +58,34 @@ void Buoy::DrawToMap(
 //
 uint8_t Buoy::GetMessageObjectType() const {
   return sonia_msgs::MapObject::BUOYS;
+}
+
+//------------------------------------------------------------------------------
+//
+visualization_msgs::Marker Buoy::GenerateVisualizationMarker(int id) const {
+  visualization_msgs::Marker marker;
+  marker.header.frame_id = "map";
+  marker.header.stamp = ros::Time();
+  marker.ns = "proc_mapping";
+  marker.id = id;
+  marker.type = visualization_msgs::Marker::SPHERE;
+  marker.action = visualization_msgs::Marker::ADD;
+  marker.pose.position.x = GetPose().x;
+  marker.pose.position.y = GetPose().y;
+  marker.pose.position.z = GetPose().z;
+  marker.pose.orientation.x = 0.0;
+  marker.pose.orientation.y = 0.0;
+  marker.pose.orientation.z = 0.0;
+  marker.pose.orientation.w = 1.0;
+  marker.scale.x = 0.5;
+  marker.scale.y = 0.5;
+  marker.scale.z = 0.5;
+  marker.color.a = 1.0;
+  marker.color.r = 1.0;
+  marker.color.g = 0;
+  marker.color.b = 0;
+
+  return marker;
 }
 
 }  // namespace proc_mapping

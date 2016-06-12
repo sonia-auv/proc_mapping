@@ -98,6 +98,7 @@ class CoordinateSystems {
   /// Converting a pixel point to the world Coordinate system.
   /// Apply the opposite convetion that WorldToPixelCoordinates does.
   cv::Point2d PixelToWorldCoordinates(const cv::Point2i &p) const noexcept;
+  double PixelToWorldCoordinates(double p) const noexcept;
 
   /**
    * Set the parameters of the coordinate systems. These parameters are going

@@ -24,6 +24,7 @@
  */
 
 #include "proc_mapping/map/coordinate_systems.h"
+#include <lib_atlas/maths/matrix.h>
 
 namespace proc_mapping {
 
@@ -87,17 +88,26 @@ void CoordinateSystems::OdomCallback(
   //  undefined.
   quaterniond.normalized();
 
-  sub_.orientation = quaterniond;
-
   Eigen::Matrix3d rotation;
   rotation = quaterniond.toRotationMatrix();
+
   //  Set all odometry values that will be use in the cv::mat update thread
   Eigen::Vector3d euler_vec = rotation.eulerAngles(0, 1, 2);
-  double roll = euler_vec.x();
-  double pitch = euler_vec.y();
-  double yaw = euler_vec.z();
 
-  sub_.rotation = rotation;
+  // The pitch axis as well as the yaw axes are inverted. We want to invert them
+  // here. (the minus sign)
+  double roll = euler_vec.x();
+  double pitch = -euler_vec.y();
+  double yaw = -euler_vec.z();
+
+  Eigen::AngleAxisd rollAngle(roll, Eigen::Vector3d::UnitX());
+  Eigen::AngleAxisd pitchAngle(pitch, Eigen::Vector3d::UnitY());
+  Eigen::AngleAxisd yawAngle(yaw, Eigen::Vector3d::UnitZ());
+
+  sub_.orientation = yawAngle * pitchAngle * rollAngle;
+  sub_.orientation.normalize();
+
+  sub_.rotation = sub_.orientation.matrix();
   sub_.yaw = yaw;
   sub_.pitch = pitch;
   sub_.roll = roll;
@@ -146,6 +156,14 @@ cv::Point2d CoordinateSystems::PixelToWorldCoordinates(
   world_point.x = static_cast<double>(p.x) / pixel_.m_to_pixel;
   world_point.y = static_cast<double>(p.y) / pixel_.m_to_pixel;
   return world_point;
+}
+
+//------------------------------------------------------------------------------
+//
+double CoordinateSystems::PixelToWorldCoordinates(double p) const
+noexcept {
+  std::lock_guard<std::mutex> lock(data_mutex);
+  return static_cast<double>(p) / pixel_.m_to_pixel;
 }
 
 //------------------------------------------------------------------------------

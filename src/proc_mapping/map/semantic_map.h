@@ -90,6 +90,8 @@ class SemanticMap : public atlas::Observer<> {
   /// instanciate all of them by sending them the appropriate YAML node.
   RegionOfInterest::Ptr RegionOfInterestFactory(const YAML::Node &node) const;
 
+  visualization_msgs::Marker GenerateSubmarineMarker() const;
+
   //==========================================================================
   // P R I V A T E   M E M B E R S
 
