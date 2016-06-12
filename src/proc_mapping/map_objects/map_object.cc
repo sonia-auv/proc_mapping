@@ -111,7 +111,7 @@ sonia_msgs::MapObject MapObject::GenerateToMapObjectMessge() const {
   msg.pose.x = pose_.x;
   msg.pose.y = pose_.y;
   msg.type = GetMessageObjectType();
-  return sonia_msgs::MapObject();
+  return msg;
 }
 
 }  // namespace proc_mapping

@@ -28,11 +28,11 @@
 
 #include <highgui.h>
 #include <sonia_msgs/MapObject.h>
+#include <visualization_msgs/Marker.h>
 #include <memory>
 #include <opencv2/features2d/features2d.hpp>
 #include <string>
 #include <vector>
-#include <visualization_msgs/Marker.h>
 #include "proc_mapping/map_objects/map_object.h"
 
 namespace proc_mapping {
@@ -87,8 +87,8 @@ class MapObject {
   void RemoveWeight(uint8_t to_remove);
 
   sonia_msgs::MapObject GenerateToMapObjectMessge() const;
-  virtual visualization_msgs::Marker GenerateVisualizationMarker(int id)
-      const = 0;
+  virtual visualization_msgs::Marker GenerateVisualizationMarker(
+      int id) const = 0;
 
   virtual void DrawToMap(cv::Mat,
                          const std::function<cv::Point2i(const cv::Point2d &p)>

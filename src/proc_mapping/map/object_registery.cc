@@ -60,7 +60,7 @@ void ObjectRegistery::DeleteMapObject(const MapObject::Ptr &obj) {
 
 //------------------------------------------------------------------------------
 //
-const ObjectRegistery::MapObjectList &ObjectRegistery::GetAllMapObject() const {
+const ObjectRegistery::MapObjectList &ObjectRegistery::GetAllMapObject() {
   std::lock_guard<std::mutex> guard(object_mutex_);
   return objects_;
 }
@@ -97,7 +97,7 @@ ObjectRegistery::GetAllRegionOfInterest() const {
 //------------------------------------------------------------------------------
 //
 const ObjectRegistery::RegionOfInterestList
-    ObjectRegistery::GetRegionOfInterestOfType(const DetectionMode type) const {
+ObjectRegistery::GetRegionOfInterestOfType(const DetectionMode type) const {
   RegionOfInterestList return_rois;
   for (const auto &roi : rois_) {
     if (roi->GetObjectType() == type) {

@@ -56,8 +56,8 @@ class Fence : public MapObject {
                          const std::function<cv::Point2i(const cv::Point2d &p)>
                              &convert) const override;
 
-  virtual visualization_msgs::Marker GenerateVisualizationMarker(int id)
-      const override;
+  virtual visualization_msgs::Marker GenerateVisualizationMarker(
+      int id) const override;
 
  protected:
   //==========================================================================

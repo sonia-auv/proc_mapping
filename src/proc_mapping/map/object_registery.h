@@ -55,13 +55,14 @@ class ObjectRegistery {
 
   void AddMapObject(const MapObject::Ptr &obj);
   void DeleteMapObject(const MapObject::Ptr &obj);
-  const MapObjectList &GetAllMapObject() const;
+  const MapObjectList &GetAllMapObject();
 
   void AddRegionOfInterest(const RegionOfInterest::Ptr &obj);
   void DeleteRegionOfInterest(const RegionOfInterest::Ptr &obj);
   const RegionOfInterestList &GetAllRegionOfInterest() const;
 
-  const RegionOfInterestList GetRegionOfInterestOfType(const DetectionMode type) const;
+  const RegionOfInterestList GetRegionOfInterestOfType(
+      const DetectionMode type) const;
 
   /// Template method that will return a vector of all the object of the
   /// specified type to the user.

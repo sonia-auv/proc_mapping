@@ -51,7 +51,7 @@ Buoy::~Buoy() = default;
 void Buoy::DrawToMap(
     cv::Mat map,
     const std::function<cv::Point2i(const cv::Point2d &p)> &convert) const {
-  cv::circle(map, GetCvKeyPoint().pt, 10, 255, -1);
+  cv::circle(map, convert(GetCvKeyPoint().pt), 10, 255, -1);
 }
 
 //------------------------------------------------------------------------------

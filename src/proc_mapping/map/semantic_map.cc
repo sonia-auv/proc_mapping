@@ -63,12 +63,13 @@ SemanticMap::SemanticMap(const CoordinateSystems::Ptr &cs)
 //
 void SemanticMap::OnSubjectNotify(atlas::Subject<> &subject) {
   auto map_objects = object_registery_.GetAllMapObject();
+  new_objects_available_ = true;
 
   for (auto &object : map_objects) {
     if (dynamic_cast<Buoy *>(object.get())) {
 #ifdef DEBUG
       object->DrawToMap(display_map_,
-                        cs_->GetConvertionFunction<cv::Point2d>());
+                        cs_->GetWorldToPixelFunction<cv::Point2d>());
 #endif
     } else if (dynamic_cast<Fence *>(object.get())) {
       // Todo: How to treat fences objects ?
@@ -83,7 +84,6 @@ void SemanticMap::OnSubjectNotify(atlas::Subject<> &subject) {
 //------------------------------------------------------------------------------
 //
 const std::vector<MapObject::Ptr> &SemanticMap::GetMapObjects() {
-  std::lock_guard<std::mutex> guard(object_mutex_);
   new_objects_available_ = false;
   return object_registery_.GetAllMapObject();
 }
@@ -92,21 +92,16 @@ const std::vector<MapObject::Ptr> &SemanticMap::GetMapObjects() {
 //
 const std::vector<RegionOfInterest::Ptr> &SemanticMap::GetRegionOfInterest()
     const {
-  std::lock_guard<std::mutex> guard(object_mutex_);
   return object_registery_.GetAllRegionOfInterest();
 }
 
 //------------------------------------------------------------------------------
 //
-bool SemanticMap::IsNewDataAvailable() const {
-  std::lock_guard<std::mutex> guard(object_mutex_);
-  return new_objects_available_;
-}
+bool SemanticMap::IsNewDataAvailable() const { return new_objects_available_; }
 
 //------------------------------------------------------------------------------
 //
 void SemanticMap::ClearSemanticMap() {
-  std::lock_guard<std::mutex> guard(object_mutex_);
   object_registery_.ClearRegistery();
   new_objects_available_ = true;
 }
@@ -144,7 +139,6 @@ void SemanticMap::InsertRegionOfInterest(
   auto regions_of_interests = node["regions_of_interest"];
   assert(regions_of_interests.Type() == YAML::NodeType::Sequence);
 
-  std::lock_guard<std::mutex> guard(object_mutex_);
   for (size_t i = 0; i < regions_of_interests.size(); ++i) {
     auto roi = RegionOfInterestFactory(regions_of_interests[i]);
     if (roi) {
@@ -155,9 +149,9 @@ void SemanticMap::InsertRegionOfInterest(
 
 //------------------------------------------------------------------------------
 //
-sonia_msgs::SemanticMap SemanticMap::GenerateSemanticMapMessage() const {
+sonia_msgs::SemanticMap SemanticMap::GenerateSemanticMapMessage() {
   sonia_msgs::SemanticMap map_msg;
-  for(const auto &obj : object_registery_.GetAllMapObject()) {
+  for (const auto &obj : GetMapObjects()) {
     map_msg.objects.push_back(obj->GenerateToMapObjectMessge());
   }
   return map_msg;
@@ -165,20 +159,19 @@ sonia_msgs::SemanticMap SemanticMap::GenerateSemanticMapMessage() const {
 
 //------------------------------------------------------------------------------
 //
-visualization_msgs::MarkerArray SemanticMap::GenerateVisualizationMessage()
-    const {
+visualization_msgs::MarkerArray SemanticMap::GenerateVisualizationMessage() {
   visualization_msgs::MarkerArray marker_array;
   marker_array.markers.push_back(GenerateSubmarineMarker());
 
   auto map_objects = object_registery_.GetAllMapObject();
 
   int i = 1;
-  for(const auto &obj : map_objects) {
+  for (const auto &obj : map_objects) {
     auto marker = obj->GenerateVisualizationMarker(i);
-    marker.pose.position.x = cs_->PixelToWorldCoordinates(marker.pose
-                                                              .position.x);
-    marker.pose.position.y = cs_->PixelToWorldCoordinates(marker.pose
-                                                              .position.y);
+    marker.pose.position.x =
+        cs_->PixelToWorldCoordinates(marker.pose.position.x);
+    marker.pose.position.y =
+        cs_->PixelToWorldCoordinates(marker.pose.position.y);
     marker.pose.position.z = 0;
     marker_array.markers.push_back(marker);
     ++i;
@@ -209,7 +202,7 @@ visualization_msgs::Marker SemanticMap::GenerateSubmarineMarker() const {
   Eigen::Matrix3d rotation = cs_->GetSub().orientation.toRotationMatrix();
   Eigen::Vector3d euler_vec = rotation.eulerAngles(0, 1, 2);
 
-  double roll = euler_vec.x() - M_PI/2;
+  double roll = euler_vec.x() - M_PI / 2;
   double pitch = euler_vec.y();
   double yaw = euler_vec.z();
 
@@ -255,7 +248,7 @@ void SemanticMap::PrintMap() {
   }
 
   for (const auto &roi : GetRegionOfInterest()) {
-    roi->DrawRegion(display_map_, cs_->GetConvertionFunction<cv::Point2d>());
+    roi->DrawRegion(display_map_, cs_->GetWorldToPixelFunction<cv::Point2d>());
   }
 
   sub = cs_->WorldToPixelCoordinates(sub);

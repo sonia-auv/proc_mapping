@@ -57,7 +57,7 @@ class VisionInterpreter : public DataInterpreter<sonia_msgs::VisionTarget> {
   //==========================================================================
   // P R O T E C T E D   M E T H O D S
 
-  virtual void ProcessData() override;
+  virtual bool ProcessData() override;
 
  private:
   //==========================================================================

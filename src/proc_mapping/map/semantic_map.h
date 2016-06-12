@@ -70,8 +70,8 @@ class SemanticMap : public atlas::Observer<> {
   void InsertRegionOfInterest(const std::string &proc_tree_file_name);
   void ClearSemanticMap();
 
-  sonia_msgs::SemanticMap GenerateSemanticMapMessage() const;
-  visualization_msgs::MarkerArray GenerateVisualizationMessage() const;
+  sonia_msgs::SemanticMap GenerateSemanticMapMessage();
+  visualization_msgs::MarkerArray GenerateVisualizationMessage();
 
   bool IsNewDataAvailable() const;
 
@@ -98,12 +98,11 @@ class SemanticMap : public atlas::Observer<> {
   CoordinateSystems::Ptr cs_;
   ObjectRegistery object_registery_;
 
+  bool new_objects_available_;
+
 #ifdef DEBUG
   cv::Mat display_map_;
 #endif
-
-  bool new_objects_available_;
-  mutable std::mutex object_mutex_;
 };
 
 }  // namespace proc_mapping

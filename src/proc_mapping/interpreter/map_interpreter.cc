@@ -37,8 +37,10 @@ namespace proc_mapping {
 //
 MapInterpreter::MapInterpreter(const ros::NodeHandlePtr &nh,
                                const std::string &proc_trees_file_name,
-                               const ObjectRegistery::Ptr &object_registery)
+                               const ObjectRegistery::Ptr &object_registery,
+                               const CoordinateSystems::Ptr &cs)
     : DataInterpreter<cv::Mat>(nh, object_registery),
+      cs_(cs),
       mode_(DetectionMode::NONE),
       all_proc_trees_(),
       current_proc_tree_(nullptr),
@@ -63,15 +65,16 @@ void MapInterpreter::OnSubjectNotify(atlas::Subject<cv::Mat> &subject,
   cv::Mat new_data;
   args.copyTo(new_data);
   SetNewData(new_data);
-  ProcessData();
-
-  // Notify potential observers that we just added new objects in the registery.
-  Notify();
+  if (ProcessData()) {
+    // Notify potential observers that we just added new objects in the
+    // registery.
+    Notify();
+  }
 }
 
 //------------------------------------------------------------------------------
 //
-void MapInterpreter::ProcessData() {
+bool MapInterpreter::ProcessData() {
   // WARNING:
   // We want to lock the whole proccessing on the SemanticMap, because we don't
   // want to process objects inserted in the ObjectRegistery while they are not
@@ -79,8 +82,9 @@ void MapInterpreter::ProcessData() {
   std::lock_guard<std::mutex> guard(proc_tree_mutex_);
   if (current_proc_tree_) {
     boost::any data{GetLastData()};
-    current_proc_tree_->ProcessData(data);
+    return current_proc_tree_->ProcessData(data);
   }
+  return false;
 }
 
 //------------------------------------------------------------------------------
@@ -116,8 +120,8 @@ void MapInterpreter::InstanciateProcTrees(
     assert(proc_trees.Type() == YAML::NodeType::Sequence);
 
     for (std::size_t i = 0; i < proc_trees.size(); i++) {
-      auto proc_tree =
-          std::make_shared<ProcTree>(proc_trees[i], nh_, object_registery_);
+      auto proc_tree = std::make_shared<ProcTree>(proc_trees[i], nh_,
+                                                  object_registery_, cs_);
       all_proc_trees_.push_back(proc_tree);
       if (!default_pt.empty() &&
           default_pt == proc_trees[i]["name"].as<std::string>()) {

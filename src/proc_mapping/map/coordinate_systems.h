@@ -31,8 +31,8 @@
 #include <atomic>
 #include <eigen3/Eigen/Eigen>
 #include <memory>
-#include <vector>
 #include <mutex>
+#include <vector>
 #include "opencv/highgui.h"
 
 namespace proc_mapping {
@@ -98,6 +98,7 @@ class CoordinateSystems {
   /// Converting a pixel point to the world Coordinate system.
   /// Apply the opposite convetion that WorldToPixelCoordinates does.
   cv::Point2d PixelToWorldCoordinates(const cv::Point2i &p) const noexcept;
+  cv::Point2d PixelToWorldCoordinates(const cv::Point2f &p) const noexcept;
   double PixelToWorldCoordinates(double p) const noexcept;
 
   /**
@@ -113,7 +114,12 @@ class CoordinateSystems {
   // Function that return the conversion function of the RawMap object (need
   // the delegate to send it to the Draw method of the rois).
   template <class Tp_>
-  auto GetConvertionFunction() const -> std::function<cv::Point2i(const Tp_ &)>;
+  auto GetWorldToPixelFunction() const
+      -> std::function<cv::Point2i(const Tp_ &)>;
+
+  template <class Tp_>
+  auto GetPixelToWorldFunction() const
+      -> std::function<cv::Point2d(const Tp_ &)>;
 
   const PixelCS &GetPixel() const;
 
@@ -177,7 +183,7 @@ inline bool CoordinateSystems::IsCoordinateSystemReady() const {
 //------------------------------------------------------------------------------
 //
 template <class Tp_>
-inline auto CoordinateSystems::GetConvertionFunction() const
+inline auto CoordinateSystems::GetWorldToPixelFunction() const
     -> std::function<cv::Point2i(const Tp_ &)> {
   using std::placeholders::_1;
   // The function WorldToPixelCoordinates is overloaded, thus can't be
@@ -186,6 +192,21 @@ inline auto CoordinateSystems::GetConvertionFunction() const
   return std::bind(
       static_cast<cv::Point2i (CoordinateSystems::*)(const Tp_ &) const>(
           &CoordinateSystems::WorldToPixelCoordinates),
+      this, _1);
+}
+
+//------------------------------------------------------------------------------
+//
+template <class Tp_>
+inline auto CoordinateSystems::GetPixelToWorldFunction() const
+    -> std::function<cv::Point2d(const Tp_ &)> {
+  using std::placeholders::_1;
+  // The function WorldToPixelCoordinates is overloaded, thus can't be
+  // binded automatically, need to do this manually.
+  // cf. http://www.boost.org/doc/libs/1_50_0/libs/bind/bind.html#err_overloaded
+  return std::bind(
+      static_cast<cv::Point2d (CoordinateSystems::*)(const Tp_ &) const>(
+          &CoordinateSystems::PixelToWorldCoordinates),
       this, _1);
 }
 

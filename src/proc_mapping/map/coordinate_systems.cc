@@ -160,8 +160,20 @@ cv::Point2d CoordinateSystems::PixelToWorldCoordinates(
 
 //------------------------------------------------------------------------------
 //
-double CoordinateSystems::PixelToWorldCoordinates(double p) const
-noexcept {
+cv::Point2d CoordinateSystems::PixelToWorldCoordinates(
+    const cv::Point2f &p) const noexcept {
+  std::lock_guard<std::mutex> lock(data_mutex);
+  // The operator/ does not exist for Point2i, we must assign members one by
+  // one.
+  cv::Point2d world_point;
+  world_point.x = static_cast<double>(p.x) / pixel_.m_to_pixel;
+  world_point.y = static_cast<double>(p.y) / pixel_.m_to_pixel;
+  return world_point;
+}
+
+//------------------------------------------------------------------------------
+//
+double CoordinateSystems::PixelToWorldCoordinates(double p) const noexcept {
   std::lock_guard<std::mutex> lock(data_mutex);
   return static_cast<double>(p) / pixel_.m_to_pixel;
 }

@@ -26,6 +26,7 @@
 #ifndef PROC_MAPPING_PROC_UNIT_PROC_TREE_H_
 #define PROC_MAPPING_PROC_UNIT_PROC_TREE_H_
 
+#include <proc_mapping/map/coordinate_systems.h>
 #include <ros/forwards.h>
 #include <yaml-cpp/yaml.h>
 #include <memory>
@@ -49,14 +50,15 @@ class ProcTree {
   // P U B L I C   C / D T O R S
 
   explicit ProcTree(const YAML::Node &node, const ros::NodeHandlePtr &nh,
-                    const ObjectRegistery::Ptr &object_registery);
+                    const ObjectRegistery::Ptr &object_registery,
+                    const CoordinateSystems::Ptr &cs);
 
   virtual ~ProcTree() = default;
 
   //==========================================================================
   // P U B L I C   M E T H O D S
 
-  void ProcessData(boost::any input) const;
+  bool ProcessData(boost::any input) const;
 
   const std::string &GetName() const;
 
@@ -72,6 +74,8 @@ class ProcTree {
   // P R I V A T E   M E M B E R S
 
   ros::NodeHandlePtr nh_;
+
+  CoordinateSystems::Ptr cs_;
 
   std::string name_;
 

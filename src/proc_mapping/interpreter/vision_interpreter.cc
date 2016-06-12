@@ -47,8 +47,9 @@ VisionInterpreter::~VisionInterpreter() {}
 
 //------------------------------------------------------------------------------
 //
-void VisionInterpreter::ProcessData() {
+bool VisionInterpreter::ProcessData() {
   // Todo: Implement this method
+  return false;
 }
 
 }  // namespace proc_mapping

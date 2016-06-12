@@ -46,7 +46,8 @@ ProcMappingNode::ProcMappingNode(const ros::NodeHandlePtr &nh)
       cs_(std::make_shared<CoordinateSystems>(nh_)),
       raw_map_(nh_, cs_),
       semantic_map_(cs_),
-      map_interpreter_(nh_, "proc_trees", semantic_map_.GetObjectRegistery()) {
+      map_interpreter_(nh_, "proc_trees", semantic_map_.GetObjectRegistery(),
+                       cs_) {
   map_pub_ = nh_->advertise<sonia_msgs::SemanticMap>("/proc_mapping/map", 100);
   markers_pub_ = nh_->advertise<visualization_msgs::MarkerArray>(
       "/proc_mapping/markers", 100);

@@ -76,7 +76,7 @@ class DataInterpreter : public atlas::Subject<> {
    * set by the specific DataInterpreter, this method is called and a
    * notification will be sent to observers (particulary ObjectMapper)
    */
-  virtual void ProcessData() = 0;
+  virtual bool ProcessData() = 0;
 
   Tp_ GetLastData();
 

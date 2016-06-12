@@ -27,6 +27,7 @@
 #define PROC_MAPPING_BUOYS_DETECTOR_H_
 
 #include <opencv/cv.h>
+#include <proc_mapping/map/coordinate_systems.h>
 #include <proc_mapping/region_of_interest/rotated_rectangle.h>
 #include "proc_mapping/proc_unit/proc_unit.h"
 
@@ -58,8 +59,9 @@ class BuoysDetector : public ProcUnit {
   //==========================================================================
   // P U B L I C   C / D T O R S
 
-  explicit BuoysDetector(const ObjectRegistery::Ptr &object_registery)
-      : weight_goal_(0), object_registery_(object_registery) {}
+  explicit BuoysDetector(const CoordinateSystems::Ptr &cs,
+                         const ObjectRegistery::Ptr &object_registery)
+      : cs_(cs), weight_goal_(0), object_registery_(object_registery) {}
 
   virtual ~BuoysDetector() = default;
 
@@ -72,6 +74,7 @@ class BuoysDetector : public ProcUnit {
         object_registery_->GetRegionOfInterestOfType(DetectionMode::BUOYS);
     SetWeigthGoal(100);
 
+    bool added_new_object = false;
     for (size_t i = 0; i < keypoint.size(); i++) {
       bool is_already_trigged = IsAlreadyTrigged(keypoint[i]);
 
@@ -122,17 +125,22 @@ class BuoysDetector : public ProcUnit {
       for (size_t j = 0; j < candidate_list_.size(); ++j) {
         if (IsCandidateHasEnoughWeight(candidate_list_[j])) {
           if (!candidate_list_[j].is_object_send) {
+            auto pixel_pt = candidate_list_[j].trigged_keypoint.pt;
+            auto world_pt = cs_->PixelToWorldCoordinates(pixel_pt);
+            candidate_list_[j].trigged_keypoint.pt = world_pt;
             MapObject::Ptr map_object =
                 std::make_shared<Buoy>(candidate_list_[j].trigged_keypoint);
+            map_object->SetName("Buoy [" + std::to_string(j) + "]");
             object_registery_->AddMapObject(std::move(map_object));
             candidate_list_[j].is_object_send = true;
+            added_new_object = true;
           }
         }
       }
     }
     // We are supposed to be the last PU in the pipeline, so let's return a
     // void boost any.
-    return boost::any();
+    return boost::any(added_new_object);
   }
 
  private:
@@ -290,6 +298,7 @@ class BuoysDetector : public ProcUnit {
   std::vector<Candidate> candidate_list_;
   int weight_goal_;
   ObjectRegistery::Ptr object_registery_;
+  CoordinateSystems::Ptr cs_;
 };
 
 }  // namespace proc_mapping
