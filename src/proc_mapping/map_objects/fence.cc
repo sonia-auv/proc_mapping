@@ -53,4 +53,10 @@ uint8_t Fence::GetMessageObjectType() const {
   return sonia_msgs::MapObject::FENCE;
 }
 
+//------------------------------------------------------------------------------
+//
+visualization_msgs::Marker Fence::GenerateVisualizationMarker(int id) const {
+  return visualization_msgs::Marker();
+}
+
 }  // namespace proc_mapping

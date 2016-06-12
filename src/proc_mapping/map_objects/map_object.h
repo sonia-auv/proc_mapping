@@ -32,6 +32,7 @@
 #include <opencv2/features2d/features2d.hpp>
 #include <string>
 #include <vector>
+#include <visualization_msgs/Marker.h>
 #include "proc_mapping/map_objects/map_object.h"
 
 namespace proc_mapping {
@@ -86,6 +87,8 @@ class MapObject {
   void RemoveWeight(uint8_t to_remove);
 
   sonia_msgs::MapObject GenerateToMapObjectMessge() const;
+  virtual visualization_msgs::Marker GenerateVisualizationMarker(int id)
+      const = 0;
 
   virtual void DrawToMap(cv::Mat,
                          const std::function<cv::Point2i(const cv::Point2d &p)>
@@ -97,9 +100,8 @@ class MapObject {
 
   virtual uint8_t GetMessageObjectType() const = 0;
 
- private:
   //==========================================================================
-  // P R I V A T E   M E M B E R S
+  // P R O T E C T E D   M E M B E R S
 
   std::string name_;
   Pose pose_;
