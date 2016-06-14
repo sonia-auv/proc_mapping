@@ -50,8 +50,7 @@ class ProcTree {
   // P U B L I C   C / D T O R S
 
   explicit ProcTree(const YAML::Node &node, const ros::NodeHandlePtr &nh,
-                    const ObjectRegistery::Ptr &object_registery,
-                    const CoordinateSystems::Ptr &cs);
+                    const ObjectRegistery::Ptr &object_registery);
 
   virtual ~ProcTree() = default;
 
@@ -74,8 +73,6 @@ class ProcTree {
   // P R I V A T E   M E M B E R S
 
   ros::NodeHandlePtr nh_;
-
-  CoordinateSystems::Ptr cs_;
 
   std::string name_;
 

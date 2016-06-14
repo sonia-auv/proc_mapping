@@ -8,7 +8,7 @@ proc_trees:
         debug: false
       - name: blob_detector
         target: 0
-        debug: false
+        debug: true
       - name: buoys_detector
 #  - name: fence
 #    proc_units:

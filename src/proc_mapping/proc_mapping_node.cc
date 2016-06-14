@@ -143,10 +143,9 @@ void ProcMappingNode::Spin() {
     if (semantic_map_.IsNewDataAvailable()) {
       auto map_msg = semantic_map_.GenerateSemanticMapMessage();
       map_pub_.publish(map_msg);
+      auto markers = semantic_map_.GenerateVisualizationMessage();
+      markers_pub_.publish(markers);
     }
-
-    auto markers = semantic_map_.GenerateVisualizationMessage();
-    markers_pub_.publish(markers);
 
 #ifdef DEBUG
     semantic_map_.PrintMap();

@@ -73,12 +73,6 @@ CoordinateSystems::~CoordinateSystems() {}
 void CoordinateSystems::OdomCallback(
     const nav_msgs::Odometry::ConstPtr &odo_in) {
   std::lock_guard<std::mutex> lock(data_mutex);
-  if (is_first_odom_) {
-    sub_.initial_position.x = odo_in.get()->pose.pose.position.x;
-    sub_.initial_position.y = odo_in.get()->pose.pose.position.y;
-    sub_.initial_position.z = odo_in.get()->pose.pose.position.z;
-    is_first_odom_ = false;
-  }
 
   //  Generate 3x3 transformation matrix from Quaternions
   auto orientation = &odo_in.get()->pose.pose.orientation;
@@ -91,26 +85,7 @@ void CoordinateSystems::OdomCallback(
   Eigen::Matrix3d rotation;
   rotation = quaterniond.toRotationMatrix();
 
-  //  Set all odometry values that will be use in the cv::mat update thread
-  Eigen::Vector3d euler_vec = rotation.eulerAngles(0, 1, 2);
-
-  // The pitch axis as well as the yaw axes are inverted. We want to invert them
-  // here. (the minus sign)
-  double roll = euler_vec.x();
-  double pitch = -euler_vec.y();
-  double yaw = -euler_vec.z();
-
-  Eigen::AngleAxisd rollAngle(roll, Eigen::Vector3d::UnitX());
-  Eigen::AngleAxisd pitchAngle(pitch, Eigen::Vector3d::UnitY());
-  Eigen::AngleAxisd yawAngle(yaw, Eigen::Vector3d::UnitZ());
-
-  sub_.orientation = yawAngle * pitchAngle * rollAngle;
-  sub_.orientation.normalize();
-
-  sub_.rotation = sub_.orientation.matrix();
-  sub_.yaw = yaw;
-  sub_.pitch = pitch;
-  sub_.roll = roll;
+  sub_.rotation = rotation;
   sub_.position.x = odo_in.get()->pose.pose.position.x;
   sub_.position.y = odo_in.get()->pose.pose.position.y;
   sub_.position.z = odo_in.get()->pose.pose.position.z;
@@ -204,7 +179,7 @@ void CoordinateSystems::SetPositionOffset(cv::Point2d offset) {
 //
 cv::Point2d CoordinateSystems::GetPositionOffset() const {
   std::lock_guard<std::mutex> lock(data_mutex);
-  cv::Point2d offset{world_.offset.y, world_.offset.x};
+  cv::Point2d offset{world_.offset.x, world_.offset.y};
   return offset;
 }
 

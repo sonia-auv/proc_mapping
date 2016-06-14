@@ -75,9 +75,8 @@ int Threshold::Parameters::thresh_value = 0;
 //------------------------------------------------------------------------------
 //
 ProcTree::ProcTree(const YAML::Node &node, const ros::NodeHandlePtr &nh,
-                   const ObjectRegistery::Ptr &object_registery,
-                   const CoordinateSystems::Ptr &cs)
-    : nh_(nh), cs_(cs), proc_units_({}), object_registery_(object_registery) {
+                   const ObjectRegistery::Ptr &object_registery)
+    : nh_(nh), proc_units_({}), object_registery_(object_registery) {
   Deserialize(node);
 }
 
@@ -126,7 +125,7 @@ typename ProcUnit::Ptr ProcTree::ProcUnitFactory(const YAML::Node &node) const {
       auto target = node["target"].as<int>();
       return std::make_shared<BlobDetector>(target, debug);
     } else if (proc_unit_name == "buoys_detector") {
-      return std::make_shared<BuoysDetector>(cs_, object_registery_);
+      return std::make_shared<BuoysDetector>(object_registery_);
     }
 
   } else {

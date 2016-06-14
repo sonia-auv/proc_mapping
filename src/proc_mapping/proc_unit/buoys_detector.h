@@ -59,9 +59,8 @@ class BuoysDetector : public ProcUnit {
   //==========================================================================
   // P U B L I C   C / D T O R S
 
-  explicit BuoysDetector(const CoordinateSystems::Ptr &cs,
-                         const ObjectRegistery::Ptr &object_registery)
-      : cs_(cs), weight_goal_(0), object_registery_(object_registery) {}
+  explicit BuoysDetector(const ObjectRegistery::Ptr &object_registery)
+      : weight_goal_(0), object_registery_(object_registery) {}
 
   virtual ~BuoysDetector() = default;
 
@@ -125,9 +124,6 @@ class BuoysDetector : public ProcUnit {
       for (size_t j = 0; j < candidate_list_.size(); ++j) {
         if (IsCandidateHasEnoughWeight(candidate_list_[j])) {
           if (!candidate_list_[j].is_object_send) {
-            auto pixel_pt = candidate_list_[j].trigged_keypoint.pt;
-            auto world_pt = cs_->PixelToWorldCoordinates(pixel_pt);
-            candidate_list_[j].trigged_keypoint.pt = world_pt;
             MapObject::Ptr map_object =
                 std::make_shared<Buoy>(candidate_list_[j].trigged_keypoint);
             map_object->SetName("Buoy [" + std::to_string(j) + "]");
@@ -298,7 +294,6 @@ class BuoysDetector : public ProcUnit {
   std::vector<Candidate> candidate_list_;
   int weight_goal_;
   ObjectRegistery::Ptr object_registery_;
-  CoordinateSystems::Ptr cs_;
 };
 
 }  // namespace proc_mapping

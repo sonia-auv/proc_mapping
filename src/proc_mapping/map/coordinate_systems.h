@@ -140,7 +140,6 @@ class CoordinateSystems {
   //==========================================================================
   // P R I V A T E   M E M B E R S
 
-  std::atomic<bool> is_first_odom_;
   ros::Subscriber odom_sub_;
 
   /// There is a few transformation involved here. We are going to store the

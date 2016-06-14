@@ -132,7 +132,7 @@ void RawMap::ProcessPointCloud(const sensor_msgs::PointCloud2::ConstPtr &msg) {
     memcpy(&intensity, &msg->data[step + msg->fields[3].offset], sizeof(float));
 
     // Create Vector3 and inverting the y axe
-    Eigen::Vector3d in(x, -1 * y, z), out;
+    Eigen::Vector3d in(-1 * y, x, z), out;
 
     // Apply the rotation matrix to the input Vector3
     out = cs_->GetSub().rotation * in;
