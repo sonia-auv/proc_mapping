@@ -117,7 +117,7 @@ class RawMap : public atlas::Subject<cv::Mat>, public atlas::Runnable {
   /// to process data after it
   uint32_t point_cloud_threshold_;
 
-  std::atomic<bool> new_pcl_ready_;
+  bool new_pcl_ready_;
 
   sensor_msgs::PointCloud2::ConstPtr last_pcl_;
 

@@ -37,10 +37,8 @@ namespace proc_mapping {
 //
 MapInterpreter::MapInterpreter(const ros::NodeHandlePtr &nh,
                                const std::string &proc_trees_file_name,
-                               const ObjectRegistery::Ptr &object_registery,
-                               const CoordinateSystems::Ptr &cs)
+                               const ObjectRegistery::Ptr &object_registery)
     : DataInterpreter<cv::Mat>(nh, object_registery),
-      cs_(cs),
       mode_(DetectionMode::NONE),
       all_proc_trees_(),
       current_proc_tree_(nullptr),

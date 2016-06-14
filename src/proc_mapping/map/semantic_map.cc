@@ -137,7 +137,7 @@ void SemanticMap::InsertRegionOfInterest(
 
   assert(node["regions_of_interest"]);
   auto regions_of_interests = node["regions_of_interest"];
-  assert(regions_of_interests.Type() == YAML::NodeType::Sequence);
+//  assert(regions_of_interests.Type() == YAML::NodeType::Sequence);
 
   for (size_t i = 0; i < regions_of_interests.size(); ++i) {
     auto roi = RegionOfInterestFactory(regions_of_interests[i]);
@@ -239,10 +239,9 @@ void SemanticMap::ResetSemanticMap() {
 //------------------------------------------------------------------------------
 //
 void SemanticMap::PrintMap() {
-  cv::Point2d offset = cs_->GetPositionOffset();
-  // Inverting x and y (DVL)
+  // Inverting the odom position value to transform the map in NED
   auto sub = cv::Point2d(cs_->GetSub().position.y, cs_->GetSub().position.x);
-  sub += offset;
+  sub += cs_->GetPositionOffset();
 
   auto pixel = cs_->GetPixel();
   for (int i = 0; i < pixel.height; i += pixel.m_to_pixel) {
@@ -263,6 +262,7 @@ void SemanticMap::PrintMap() {
   cv::circle(display_map_, sub, 5, cv::Scalar(0), -1);
 
   cv::waitKey(1);
+
 }
 #endif
 

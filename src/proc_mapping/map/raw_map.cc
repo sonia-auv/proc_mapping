@@ -54,7 +54,7 @@ RawMap::RawMap(const ros::NodeHandlePtr &nh, const CoordinateSystems::Ptr &cs)
                          "/provider_sonar/point_cloud2");
 
   double sonar_threshold = 0.;
-  nh->param<double>("/proc_mapping/map/sonar_threshold", sonar_threshold, 1.0);
+  nh->param<double>("/proc_mapping/map/sonar_threshold", sonar_threshold, 3.0);
   nh->param<int>("/proc_mapping/tile/number_of_scanlines",
                  scanlines_for_process_, 10);
 
@@ -117,7 +117,8 @@ void RawMap::ProcessPointCloud(const sensor_msgs::PointCloud2::ConstPtr &msg) {
 
   uint32_t max_size = static_cast<uint32_t>(msg->data.size() / msg->point_step);
   cv::Point2i bin_coordinate;
-  auto pose2d = cv::Point2d(cs_->GetSub().position.x, cs_->GetSub().position.y);
+  // Inverting the sub position value to transform the map in NED
+  auto pose2d = cv::Point2d(cs_->GetSub().position.y, cs_->GetSub().position.x);
   cv::Point2d sub_position = pose2d + cs_->GetPositionOffset();
 
   intensity_map.resize(max_size);
@@ -131,14 +132,14 @@ void RawMap::ProcessPointCloud(const sensor_msgs::PointCloud2::ConstPtr &msg) {
     memcpy(&z, &msg->data[step + msg->fields[2].offset], sizeof(float));
     memcpy(&intensity, &msg->data[step + msg->fields[3].offset], sizeof(float));
 
-    // Create Vector3 and inverting the y axe
-    Eigen::Vector3d in(-1 * y, x, z), out;
+    // Create Vector3
+    Eigen::Vector3d in(x, y, z), out;
 
     // Apply the rotation matrix to the input Vector3
     out = cs_->GetSub().rotation * in;
 
     // Adding the sub_position to position the point cloud in the world map.
-    cv::Point2d coordinate_transformed(cv::Point2d(out.x(), out.y()) +
+    cv::Point2d coordinate_transformed(cv::Point2d(out.y(), out.x()) +
                                        sub_position);
     bin_coordinate = cs_->WorldToPixelCoordinates(coordinate_transformed);
 
@@ -146,18 +147,18 @@ void RawMap::ProcessPointCloud(const sensor_msgs::PointCloud2::ConstPtr &msg) {
     if ((bin_coordinate.x < cs_->GetPixel().width and bin_coordinate.x > 0) and
         (bin_coordinate.y < cs_->GetPixel().height and bin_coordinate.y > 0)) {
 
-      // Invert the x axe value to fit in opencv Mat coodinate
-      bin_coordinate.x = (cs_->GetPixel().height / 2) - bin_coordinate.x +
+      // Invert the y axe value to fit in opencv Mat coodinate
+      bin_coordinate.y = (cs_->GetPixel().height / 2) - bin_coordinate.y +
                          (cs_->GetPixel().height / 2);
 
-      uint8_t threat_intensity = static_cast<uint8_t>(255.0f * intensity);
-      if (threat_intensity > 10) {
-        threat_intensity = 255;
+      uint8_t buffed_intensity = static_cast<uint8_t>(255.0f * intensity);
+      if (buffed_intensity > 10) {
+        buffed_intensity = 255;
       }
 
       // Filling the two maps without thresholded data
       if (i > point_cloud_threshold_) {
-        intensity_map[i] = threat_intensity;
+        intensity_map[i] = buffed_intensity;
         //        intensity_map[i] = static_cast<uint8_t>(255.0f * intensity);
         coordinate_map[i] = bin_coordinate;
       }

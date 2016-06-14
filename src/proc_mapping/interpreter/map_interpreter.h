@@ -59,8 +59,7 @@ class MapInterpreter : public DataInterpreter<cv::Mat>,
 
   explicit MapInterpreter(const ros::NodeHandlePtr &nh,
                           const std::string &proc_trees_file_name,
-                          const ObjectRegistery::Ptr &object_registery,
-                          const CoordinateSystems::Ptr &cs);
+                          const ObjectRegistery::Ptr &object_registery);
 
   virtual ~MapInterpreter();
 
@@ -85,8 +84,6 @@ class MapInterpreter : public DataInterpreter<cv::Mat>,
 
   //==========================================================================
   // P R I V A T E   M E M B E R S
-
-  CoordinateSystems::Ptr cs_;
 
   DetectionMode mode_;
 
