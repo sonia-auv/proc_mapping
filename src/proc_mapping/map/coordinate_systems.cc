@@ -100,7 +100,6 @@ void CoordinateSystems::OdomCallback(
 cv::Point2i CoordinateSystems::WorldToPixelCoordinates(
     const cv::Point2d &p) const noexcept {
   cv::Point2d pix = p * pixel_.m_to_pixel;
-//  pix.x = (pixel_.width / 2) - pix.x + (pixel_.width / 2);
   return pix;
 }
 
@@ -152,11 +151,25 @@ cv::Point2d CoordinateSystems::PixelToWorldCoordinates(
   return world_point;
 }
 
+sonia_msgs::MapObject CoordinateSystems::PixelToWorldCoordinates(
+    const sonia_msgs::MapObject &p) const {
+
+  // The operator/ does not exist for Point2i, we must assign members one by
+  // one.
+  sonia_msgs::MapObject world_object;
+  world_object.name = p.name;
+  world_object.size = p.size;
+  world_object.type = p.type;
+  world_object.pose.x = p.pose.x / pixel_.m_to_pixel;
+  world_object.pose.y = p.pose.y / pixel_.m_to_pixel;
+  return world_object;
+}
+
 //------------------------------------------------------------------------------
 //
 double CoordinateSystems::PixelToWorldCoordinates(double p) const noexcept {
   std::lock_guard<std::mutex> lock(data_mutex);
-  return static_cast<double>(p) / pixel_.m_to_pixel;
+  return p / pixel_.m_to_pixel;
 }
 
 //------------------------------------------------------------------------------

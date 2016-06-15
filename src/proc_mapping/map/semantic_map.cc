@@ -44,9 +44,9 @@ namespace proc_mapping {
 SemanticMap::SemanticMap(const CoordinateSystems::Ptr &cs)
     : cs_(cs),
       object_registery_(),
-      new_objects_available_(false),
+      new_objects_available_(false)
 #ifdef DEBUG
-      display_map_()
+      , display_map_()
 #endif
       {
   InsertRegionOfInterest("regions_of_interest.yaml");
@@ -69,8 +69,7 @@ void SemanticMap::OnSubjectNotify(atlas::Subject<> &subject) {
   for (auto &object : map_objects) {
     if (dynamic_cast<Buoy *>(object.get())) {
 #ifdef DEBUG
-      object->DrawToMap(display_map_,
-                        cs_->GetWorldToPixelFunction<cv::Point2d>());
+      object->DrawToMap(display_map_);
 #endif
     } else if (dynamic_cast<Fence *>(object.get())) {
       // Todo: How to treat fences objects ?
@@ -153,7 +152,8 @@ void SemanticMap::InsertRegionOfInterest(
 sonia_msgs::SemanticMap SemanticMap::GenerateSemanticMapMessage() {
   sonia_msgs::SemanticMap map_msg;
   for (const auto &obj : GetMapObjects()) {
-    map_msg.objects.push_back(obj->GenerateToMapObjectMessge());
+    map_msg.objects.push_back(
+        cs_->PixelToWorldCoordinates( obj->GenerateToMapObjectMessge()));
   }
   return map_msg;
 }
@@ -240,7 +240,6 @@ void SemanticMap::ResetSemanticMap() {
 //------------------------------------------------------------------------------
 //
 void SemanticMap::PrintMap() {
-  // Inverting the odom position value to transform the map in NED
   auto sub = cv::Point2d(cs_->GetSub().position.x, cs_->GetSub().position.y);
   sub += cs_->GetPositionOffset();
 
