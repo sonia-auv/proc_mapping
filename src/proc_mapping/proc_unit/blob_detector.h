@@ -161,7 +161,14 @@ class BlobDetector : public ProcUnit {
       cv::drawKeypoints(map, keyPoints, output, cv::Scalar(0, 0, 255),
                         cv::DrawMatchesFlags::DRAW_RICH_KEYPOINTS);
 
-      cv::imshow("Blob Detector", output);
+      // To fit in OpenCv coordinate system, we have to made a rotation of
+      // 90 degrees on the display map
+      cv::Point2f src_center(output.cols/2.0f, output.rows/2.0f);
+      cv::Mat rot_mat = getRotationMatrix2D(src_center, 90, 1.0);
+      cv::Mat dst;
+      cv::warpAffine(output, dst, rot_mat, output.size());
+
+      cv::imshow("Blob Detector", dst);
       cv::waitKey(1);
     }
     return boost::any(keyPoints);

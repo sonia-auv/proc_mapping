@@ -44,10 +44,11 @@ namespace proc_mapping {
 SemanticMap::SemanticMap(const CoordinateSystems::Ptr &cs)
     : cs_(cs),
       object_registery_(),
+      new_objects_available_(false),
 #ifdef DEBUG
-      display_map_(),
+      display_map_()
 #endif
-      new_objects_available_(false) {
+      {
   InsertRegionOfInterest("regions_of_interest.yaml");
 
 #ifdef DEBUG
@@ -240,7 +241,7 @@ void SemanticMap::ResetSemanticMap() {
 //
 void SemanticMap::PrintMap() {
   // Inverting the odom position value to transform the map in NED
-  auto sub = cv::Point2d(cs_->GetSub().position.y, cs_->GetSub().position.x);
+  auto sub = cv::Point2d(cs_->GetSub().position.x, cs_->GetSub().position.y);
   sub += cs_->GetPositionOffset();
 
   auto pixel = cs_->GetPixel();
@@ -257,8 +258,19 @@ void SemanticMap::PrintMap() {
 
   sub = cs_->WorldToPixelCoordinates(sub);
 
+  // Draw the sub in the map
   cv::circle(display_map_, sub, 5, cv::Scalar(255), -1);
-  cv::imshow("Semantic Map", display_map_);
+
+  // To fit in OpenCv coordinate system, we have to made a rotation of
+  // 90 degrees on the display map
+  cv::Point2f src_center(display_map_.cols/2.0f, display_map_.rows/2.0f);
+  cv::Mat rot_mat = getRotationMatrix2D(src_center, 90, 1.0);
+  cv::Mat dst;
+  cv::warpAffine(display_map_, dst, rot_mat, display_map_.size());
+
+  cv::imshow("Semantic Map", dst);
+
+  // Remove the old sub position
   cv::circle(display_map_, sub, 5, cv::Scalar(0), -1);
 
   cv::waitKey(1);

@@ -100,7 +100,7 @@ void CoordinateSystems::OdomCallback(
 cv::Point2i CoordinateSystems::WorldToPixelCoordinates(
     const cv::Point2d &p) const noexcept {
   cv::Point2d pix = p * pixel_.m_to_pixel;
-//  pix.y = (pixel_.height / 2) - pix.y + (pixel_.height / 2);
+//  pix.x = (pixel_.width / 2) - pix.x + (pixel_.width / 2);
   return pix;
 }
 
@@ -193,7 +193,7 @@ cv::Point2d CoordinateSystems::GetPositionOffset() const {
 void CoordinateSystems::ResetPosition() {
   std::lock_guard<std::mutex> lock(data_mutex);
   // Inverting the sub position value to transform the map in NED
-  auto pose2d = cv::Point2d(sub_.position.y, sub_.position.x);
+  auto pose2d = cv::Point2d(sub_.position.x, sub_.position.y);
   cv::Point2d delta = world_.origin - pose2d;
   SetPositionOffset(delta);
 }

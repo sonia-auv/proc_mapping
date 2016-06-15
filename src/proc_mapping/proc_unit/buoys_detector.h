@@ -83,7 +83,7 @@ class BuoysDetector : public ProcUnit {
         for (size_t j = 0; j < trigged_keypoint_list_.size(); ++j) {
           AddWeightToCorrespondingTriggedKeypoint(
               trigged_keypoint_list_[j].trigged_keypoint.pt, 1);
-          if (HasBlobInGoodRange(trigged_keypoint_list_[j], 0.8, 1.6)) {
+          if (HasBlobInGoodRange(trigged_keypoint_list_[j], 32, 64)) {
             if (!IsAlreadyCandidate(trigged_keypoint_list_[j])) {
               for (const auto &roi : rois) {
                 if (roi->IsInZone(

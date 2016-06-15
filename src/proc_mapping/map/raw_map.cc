@@ -24,9 +24,6 @@
  */
 
 #include "raw_map.h"
-#include <opencv/cv.h>
-#include <pcl/common/transforms.h>
-#include <opencv2/highgui/highgui.hpp>
 
 namespace proc_mapping {
 
@@ -117,8 +114,9 @@ void RawMap::ProcessPointCloud(const sensor_msgs::PointCloud2::ConstPtr &msg) {
 
   uint32_t max_size = static_cast<uint32_t>(msg->data.size() / msg->point_step);
   cv::Point2i bin_coordinate;
+
   // Inverting the sub position value to transform the map in NED
-  auto pose2d = cv::Point2d(cs_->GetSub().position.y, cs_->GetSub().position.x);
+  auto pose2d = cv::Point2d(cs_->GetSub().position.x, cs_->GetSub().position.y);
   cv::Point2d sub_position = pose2d + cs_->GetPositionOffset();
 
   intensity_map.resize(max_size);
@@ -139,21 +137,19 @@ void RawMap::ProcessPointCloud(const sensor_msgs::PointCloud2::ConstPtr &msg) {
     out = cs_->GetSub().rotation * in;
 
     // Adding the sub_position to position the point cloud in the world map.
-    cv::Point2d coordinate_transformed(cv::Point2d(out.y(), out.x()) +
-                                       sub_position);
+    cv::Point2d coordinate_transformed(cv::Point2d(out.x(), out.y()) +
+        sub_position);
     bin_coordinate = cs_->WorldToPixelCoordinates(coordinate_transformed);
 
     // Check if bin_coordinate are in the map boundary
     if ((bin_coordinate.x < cs_->GetPixel().width and bin_coordinate.x > 0) and
         (bin_coordinate.y < cs_->GetPixel().height and bin_coordinate.y > 0)) {
 
-      // Invert the y axe value to fit in opencv Mat coodinate
-      bin_coordinate.y = (cs_->GetPixel().height / 2) - bin_coordinate.y +
-                         (cs_->GetPixel().height / 2);
-
       uint8_t buffed_intensity = static_cast<uint8_t>(255.0f * intensity);
-      if (buffed_intensity > 10) {
+      if (buffed_intensity > 20) {
         buffed_intensity = 255;
+      } else {
+        buffed_intensity = 0;
       }
 
       // Filling the two maps without thresholded data
@@ -168,60 +164,19 @@ void RawMap::ProcessPointCloud(const sensor_msgs::PointCloud2::ConstPtr &msg) {
   // Update the world Mat
   for (size_t j = 0; j < intensity_map.size() - 1; j++) {
     UpdateMat(coordinate_map[j], intensity_map[j]);
-  }
-//  cv::Point2d sub = WorldToPixelCoordinates(sub_position);
-//  sub.y = (pixel_.width/2) - sub.y + (pixel_.width/2);
-//
-//  cv::circle(pixel_.map, sub, 2, cv::Scalar::all(255), -1);
 
-//  cv::imshow("Original", pixel_.map);
-//  cv::waitKey(1);
+    // Send a command when enough scanline is arrived
+    scanline_counter_++;
 
-#ifdef DEBUG
-  // Create sub heading, sonar_scan left and rigth limit
-  cv::Point2d heading(cos(sub_.yaw) * sonar_range_,
-                      sin(sub_.yaw) * sonar_range_);
-  heading += GetPositionOffset();
-  heading = WorldToPixelCoordinates(heading);
+    if (scanline_counter_ > 2) {
+      is_first_scan_complete_ = true;
+    }
 
-  cv::Point2d left_limit(cos(sub_.yaw - 0.785398) * sonar_range_,
-                         sin(sub_.yaw - 0.785398) * sonar_range_);
-  left_limit += GetPositionOffset();
-  left_limit = WorldToPixelCoordinates(left_limit);
-
-  cv::Point2d rigth_limit(cos(sub_.yaw + 0.785398) * sonar_range_,
-                          sin(sub_.yaw + 0.785398) * sonar_range_);
-  rigth_limit += GetPositionOffset();
-  rigth_limit = WorldToPixelCoordinates(rigth_limit);
-
-  cv::Mat debug_mat(pixel_.width, pixel_.height, CV_8UC1);
-  cv::line(pixel_.map, cv::Point2d(pixel_.width / 2, pixel_.height / 2),
-           cv::Point2d(pixel_.width / 2, 0), cv::Scalar::all(255));
-  cv::line(pixel_.map, cv::Point2d(pixel_.width / 2, pixel_.height / 2),
-           cv::Point2d(pixel_.height, pixel_.height / 2), cv::Scalar::all(255));
-
-  cv::Point2d sub = WorldToPixelCoordinates(sub_position);
-  sub.y = (pixel_.width / 2) - sub.y + (pixel_.width / 2);
-
-  cv::circle(debug_mat, sub, 2, cv::Scalar::all(255), -1);
-  cv::circle(pixel_.map, sub, 2, cv::Scalar::all(255), -1);
-  cv::line(debug_mat, sub, heading, cv::Scalar::all(255));
-  cv::line(debug_mat, sub, left_limit, cv::Scalar::all(100));
-  cv::line(debug_mat, sub, rigth_limit, cv::Scalar::all(100));
-  cv::imshow("Debug", debug_mat);
-#endif
-
-  // Send a command when enough scanline is arrived
-  scanline_counter_++;
-
-  if (scanline_counter_ > 2) {
-    is_first_scan_complete_ = true;
-  }
-
-  if (is_first_scan_complete_) {
-    if (scanline_counter_ >= scanlines_for_process_) {
-      is_map_ready_for_process_ = true;
-      scanline_counter_ = 0;
+    if (is_first_scan_complete_) {
+      if (scanline_counter_ >= scanlines_for_process_) {
+        is_map_ready_for_process_ = true;
+        scanline_counter_ = 0;
+      }
     }
   }
 }

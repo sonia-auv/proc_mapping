@@ -120,6 +120,9 @@ typename ProcUnit::Ptr ProcTree::ProcUnitFactory(const YAML::Node &node) const {
     } else if (proc_unit_name == "dilate") {
       auto debug = node["debug"].as<bool>();
       return std::make_shared<Dilate>(debug);
+    } else if (proc_unit_name == "morphology") {
+      auto debug = node["debug"].as<bool>();
+      return std::make_shared<Morphology>(debug);
     } else if (proc_unit_name == "blob_detector") {
       auto debug = node["debug"].as<bool>();
       auto target = node["target"].as<int>();

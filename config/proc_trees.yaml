@@ -4,8 +4,8 @@ proc_trees:
       - name: blur
         blur_type: 1
         debug: false
-#      - name: dilate
-#        debug: false
+      - name: morphology
+        debug: false
       - name: blob_detector
         target: 0
         debug: true
