@@ -71,6 +71,9 @@ class MapObject {
   const std::string &GetName() const;
   void SetName(const std::string &name);
 
+  const float &GetSize() const;
+  void SetSize(const float &size);
+
   const Pose &GetPose() const;
   void SetPose(const Pose &pose);
 
@@ -90,9 +93,7 @@ class MapObject {
   virtual visualization_msgs::Marker GenerateVisualizationMarker(
       int id) const = 0;
 
-  virtual void DrawToMap(cv::Mat,
-                         const std::function<cv::Point2i(const cv::Point2d &p)>
-                             &convert) const = 0;
+  virtual void DrawToMap(cv::Mat) const = 0;
 
  protected:
   //==========================================================================
@@ -105,6 +106,7 @@ class MapObject {
 
   std::string name_;
   Pose pose_;
+  float size_;
   Orientation orientation_;
 
   cv::KeyPoint trigged_keypoint_;

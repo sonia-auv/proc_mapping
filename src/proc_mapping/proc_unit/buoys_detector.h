@@ -127,6 +127,7 @@ class BuoysDetector : public ProcUnit {
             MapObject::Ptr map_object =
                 std::make_shared<Buoy>(candidate_list_[j].trigged_keypoint);
             map_object->SetName("Buoy [" + std::to_string(j) + "]");
+            map_object->SetSize(candidate_list_[j].trigged_keypoint.size);
             object_registery_->AddMapObject(std::move(map_object));
             candidate_list_[j].is_object_send = true;
             added_new_object = true;

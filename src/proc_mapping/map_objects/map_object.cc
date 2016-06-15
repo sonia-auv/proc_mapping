@@ -51,6 +51,14 @@ void MapObject::SetName(const std::string &name) { name_ = name; }
 
 //------------------------------------------------------------------------------
 //
+const float &MapObject::GetSize() const { return size_; }
+
+//------------------------------------------------------------------------------
+//
+void MapObject::SetSize(const float &size) { size_ = size; }
+
+//------------------------------------------------------------------------------
+//
 const MapObject::Pose &MapObject::GetPose() const { return pose_; }
 
 //------------------------------------------------------------------------------

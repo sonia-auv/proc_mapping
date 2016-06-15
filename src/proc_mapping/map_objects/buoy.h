@@ -52,9 +52,7 @@ class Buoy : public MapObject {
   //==========================================================================
   // P U B L I C   M E T H O D S
 
-  virtual void DrawToMap(cv::Mat,
-                         const std::function<cv::Point2i(const cv::Point2d &p)>
-                             &convert) const override;
+  virtual void DrawToMap(cv::Mat) const override;
 
   virtual visualization_msgs::Marker GenerateVisualizationMarker(
       int id) const override;

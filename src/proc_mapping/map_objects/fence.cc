@@ -43,9 +43,7 @@ Fence::~Fence() = default;
 
 //------------------------------------------------------------------------------
 //
-void Fence::DrawToMap(
-    cv::Mat,
-    const std::function<cv::Point2i(const cv::Point2d &p)> &convert) const {}
+void Fence::DrawToMap(cv::Mat) const {}
 
 //------------------------------------------------------------------------------
 //
