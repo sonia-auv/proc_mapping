@@ -152,8 +152,10 @@ void SemanticMap::InsertRegionOfInterest(
 sonia_msgs::SemanticMap SemanticMap::GenerateSemanticMapMessage() {
   sonia_msgs::SemanticMap map_msg;
   for (const auto &obj : GetMapObjects()) {
-    map_msg.objects.push_back(
-        cs_->PixelToWorldCoordinates( obj->GenerateToMapObjectMessge()));
+    sonia_msgs::MapObject map_object = cs_->PixelToWorldCoordinates(obj->GenerateToMapObjectMessge());
+    map_object.pose.x -= cs_->GetPositionOffset().x;
+    map_object.pose.y -= cs_->GetPositionOffset().y;
+    map_msg.objects.push_back(map_object);
   }
   return map_msg;
 }
@@ -259,6 +261,11 @@ void SemanticMap::PrintMap() {
 
   // Draw the sub in the map
   cv::circle(display_map_, sub, 5, cv::Scalar(255), -1);
+
+  // Draw the origin in the map
+  auto origin = cs_->GetWorld().origin;
+  origin = cs_->WorldToPixelCoordinates(origin);
+  cv::circle(display_map_, origin, 8, cv::Scalar(255), -1);
 
   // To fit in OpenCv coordinate system, we have to made a rotation of
   // 90 degrees on the display map

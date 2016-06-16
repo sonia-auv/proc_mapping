@@ -54,7 +54,7 @@ class Morphology : public ProcUnit {
   virtual boost::any ProcessData(boost::any input) override {
     cv::Mat map = boost::any_cast<cv::Mat>(input);
     cv::Mat element = cv::getStructuringElement(
-        0, cv::Size(3 * 2 + 1, 3 * 2 + 1), cv::Point(3, 3));
+        0, cv::Size(2 * 2 + 1, 2 * 2 + 1), cv::Point(2, 2));
 
     cv::morphologyEx(map, map, cv::MORPH_OPEN, element);
 
