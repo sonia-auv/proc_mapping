@@ -10,6 +10,7 @@ proc_trees:
         target: 0
         debug: true
       - name: buoys_detector
+        roi : false
 #  - name: fence
 #    proc_units:
 #      - name: blur
@@ -28,13 +29,13 @@ proc_trees:
 #      - name: blur
 #        blur_type: 1
 #        debug: false
-#      - name: threshold
-#        threshold_type: 0
+#      - name: morphology
 #        debug: false
-#      - name: dilate
-#        debug: false
-#      - name: blob_detector
-#        target: 0
+##      - name: threshold
+##        threshold_type: 0
+##        debug: true
+#      - name: find_contour
+#        target: 1
 #        debug: true
 
 # Comment this line in order to have no default proc tree

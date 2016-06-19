@@ -55,22 +55,22 @@ class BlobDetector : public ProcUnit {
     static const int max_area_max;
     static int filter_circularity_off;
     static const int filter_circularity_on;
-    static int min_circularity;
-    static const int min_circularity_max;
-    static int max_circularity;
-    static const int max_circularity_max;
+    static float min_circularity;
+    static const float min_circularity_max;
+    static float max_circularity;
+    static const float max_circularity_max;
     static int filter_convexity_off;
     static const int filter_convexity_on;
-    static int min_convexity;
-    static const int min_convexity_max;
-    static int max_convexity;
-    static const int max_convexity_max;
+    static float min_convexity;
+    static const float min_convexity_max;
+    static float max_convexity;
+    static const float max_convexity_max;
     static int filter_inertial_off;
     static const int filter_inertial_on;
     static int min_inertia_ratio;
-    static const int min_inertia_ratio_max;
+    static const float min_inertia_ratio_max;
     static int max_inertia_ratio;
-    static const int max_inertia_ratio_max;
+    static const float max_inertia_ratio_max;
   };
 
   //==========================================================================
@@ -95,7 +95,22 @@ class BlobDetector : public ProcUnit {
       params_.filterByCircularity = false;
       params_.filterByColor = true;
       params_.filterByConvexity = false;
+      params_.filterByInertia = true;
+      params_.minInertiaRatio = 0.1f;
+      params_.maxInertiaRatio = 0.3f;
+    } else if (target_ == 1) {
+      params_.minThreshold = 200;
+      params_.maxThreshold = 255;
+      params_.filterByArea = true;
+      params_.blobColor = 255;
+      params_.minArea = 500;
+      params_.maxArea;
+      params_.filterByCircularity = false;
+      params_.filterByColor = false;
+      params_.filterByConvexity = false;
       params_.filterByInertia = false;
+      params_.minInertiaRatio = 0.1f;
+      params_.maxInertiaRatio = 0.3f;
     } else {
       params_.minThreshold = 0;
       params_.maxThreshold = 255;
@@ -122,13 +137,13 @@ class BlobDetector : public ProcUnit {
     detector.detect(map, keyPoints);
 
     if (debug_) {
-      cv::createTrackbar("area filter", "Blob Detector",
-                         &Parameters::filter_area_off,
-                         Parameters::filter_area_on);
-      cv::createTrackbar("min area", "Blob Detector", &Parameters::min_area,
-                         Parameters::min_area_max);
-      cv::createTrackbar("max area", "Blob Detector", &Parameters::max_area,
-                         Parameters::max_area_max);
+//      cv::createTrackbar("area filter", "Blob Detector",
+//                         &Parameters::filter_area_off,
+//                         Parameters::filter_area_on);
+//      cv::createTrackbar("min area", "Blob Detector", &Parameters::min_area,
+//                         Parameters::min_area_max);
+//      cv::createTrackbar("max area", "Blob Detector", &Parameters::max_area,
+//                         Parameters::max_area_max);
       //      cv::createTrackbar("circularity filter", "Blob Detector",
       //                         &Parameters::filter_circularity_off,
       //                         Parameters::filter_circularity_on);
@@ -150,12 +165,12 @@ class BlobDetector : public ProcUnit {
       //      cv::createTrackbar("inertia filter", "Blob Detector",
       //                         &Parameters::filter_inertial_off,
       //                         Parameters::filter_inertial_on);
-      //      cv::createTrackbar("min inertia", "Blob Detector",
-      //                         &Parameters::min_inertia_ratio,
-      //                         Parameters::min_inertia_ratio_max);
-      //      cv::createTrackbar("max inertia", "Blob Detector",
-      //                         &Parameters::max_inertia_ratio,
-      //                         Parameters::max_inertia_ratio_max);
+//            cv::createTrackbar("min inertia", "Blob Detector",
+//                               &Parameters::min_inertia_ratio,
+//                               static_cast<int>(Parameters::min_inertia_ratio_max));
+//            cv::createTrackbar("max inertia", "Blob Detector",
+//                               &Parameters::max_inertia_ratio,
+//                               static_cast<int>(Parameters::max_inertia_ratio_max));
 
       cv::Mat output;
       cv::drawKeypoints(map, keyPoints, output, cv::Scalar(0, 0, 255),

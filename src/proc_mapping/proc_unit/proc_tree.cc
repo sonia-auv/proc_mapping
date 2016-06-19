@@ -30,6 +30,7 @@
 #include "proc_mapping/proc_unit/dilate.h"
 #include "proc_mapping/proc_unit/morphology.h"
 #include "proc_mapping/proc_unit/threshold.h"
+#include "proc_mapping/proc_unit/find_contour.h"
 
 namespace proc_mapping {
 
@@ -41,25 +42,25 @@ int BlobDetector::Parameters::max_area = 0;
 const int BlobDetector::Parameters::max_area_max = 3000;
 int BlobDetector::Parameters::filter_circularity_off = 0;
 const int BlobDetector::Parameters::filter_circularity_on = 1;
-int BlobDetector::Parameters::min_circularity = 0;
-const int BlobDetector::Parameters::min_circularity_max = 100;
-int BlobDetector::Parameters::max_circularity = 0;
-const int BlobDetector::Parameters::max_circularity_max = 100;
+float BlobDetector::Parameters::min_circularity = 0;
+const float BlobDetector::Parameters::min_circularity_max = 100.f;
+float BlobDetector::Parameters::max_circularity = 0;
+const float BlobDetector::Parameters::max_circularity_max = 100.f;
 int BlobDetector::Parameters::filter_convexity_off = 0;
 const int BlobDetector::Parameters::filter_convexity_on = 1;
-int BlobDetector::Parameters::min_convexity = 0;
-const int BlobDetector::Parameters::min_convexity_max = 10;
-int BlobDetector::Parameters::max_convexity = 0;
-const int BlobDetector::Parameters::max_convexity_max = 10;
+float BlobDetector::Parameters::min_convexity = 0;
+const float BlobDetector::Parameters::min_convexity_max = 10.f;
+float BlobDetector::Parameters::max_convexity = 0;
+const float BlobDetector::Parameters::max_convexity_max = 10.f;
 int BlobDetector::Parameters::filter_inertial_off = 0;
 const int BlobDetector::Parameters::filter_inertial_on = 1;
 int BlobDetector::Parameters::min_inertia_ratio = 0;
-const int BlobDetector::Parameters::min_inertia_ratio_max = 10;
+const float BlobDetector::Parameters::min_inertia_ratio_max = 10.f;
 int BlobDetector::Parameters::max_inertia_ratio = 0;
-const int BlobDetector::Parameters::max_inertia_ratio_max = 10;
+const float BlobDetector::Parameters::max_inertia_ratio_max = 10.f;
 
 const int Blur::Parameters::kernel_size_max = 15;
-int Blur::Parameters::kernel_size = 5;
+int Blur::Parameters::kernel_size = 1;
 
 const int Dilate::Parameters::kernel_size_x_max = 32;
 const int Dilate::Parameters::kernel_size_y_max = 32;
@@ -67,7 +68,7 @@ int Dilate::Parameters::kernel_size_x = 5;
 int Dilate::Parameters::kernel_size_y = 5;
 
 const int Threshold::Parameters::thresh_value_max = 255;
-int Threshold::Parameters::thresh_value = 0;
+int Threshold::Parameters::thresh_value = 70;
 
 //==============================================================================
 // C / D T O R S   S E C T I O N
@@ -127,8 +128,12 @@ typename ProcUnit::Ptr ProcTree::ProcUnitFactory(const YAML::Node &node) const {
       auto debug = node["debug"].as<bool>();
       auto target = node["target"].as<int>();
       return std::make_shared<BlobDetector>(target, debug);
-    } else if (proc_unit_name == "buoys_detector") {
-      return std::make_shared<BuoysDetector>(object_registery_);
+    } else if (proc_unit_name == "find_contour") {
+      auto debug = node["debug"].as<bool>();
+      return std::make_shared<FindContour>(debug);
+    }else if (proc_unit_name == "buoys_detector") {
+      auto roi = node["roi"].as<bool>();
+      return std::make_shared<BuoysDetector>(object_registery_, roi);
     }
 
   } else {

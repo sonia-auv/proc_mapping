@@ -2,7 +2,8 @@ regions_of_interest:
   - object_type: buoys
     roi_type: rotated_rectangle
     name: BUOY_ROI
-    center: [8, 13]
+    # center is define from bottom left
+    center: [13, 5]
     size: [2, 4]
     angle: -45
 #  - object_type: fence

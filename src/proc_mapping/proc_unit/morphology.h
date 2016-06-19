@@ -56,7 +56,7 @@ class Morphology : public ProcUnit {
     cv::Mat element = cv::getStructuringElement(
         0, cv::Size(2 * 2 + 1, 2 * 2 + 1), cv::Point(2, 2));
 
-    cv::morphologyEx(map, map, cv::MORPH_OPEN, element);
+    cv::morphologyEx(map, map, cv::MORPH_CLOSE, element);
 
     if (debug) {
       cv::imshow("Morphology", map);

@@ -46,6 +46,7 @@ class BuoysDetector : public ProcUnit {
   struct TriggedKeypoint {
     cv::KeyPoint trigged_keypoint;
     cv::Rect bounding_box;
+    cv::Scalar mean;
     uint8_t weight;
   };
 
@@ -59,8 +60,8 @@ class BuoysDetector : public ProcUnit {
   //==========================================================================
   // P U B L I C   C / D T O R S
 
-  explicit BuoysDetector(const ObjectRegistery::Ptr &object_registery)
-      : weight_goal_(0), object_registery_(object_registery) {}
+  explicit BuoysDetector(const ObjectRegistery::Ptr &object_registery, bool roi)
+      : weight_goal_(0), object_registery_(object_registery), roi_needed_(roi) {}
 
   virtual ~BuoysDetector() = default;
 
@@ -84,22 +85,26 @@ class BuoysDetector : public ProcUnit {
           AddWeightToCorrespondingTriggedKeypoint(
               trigged_keypoint_list_[j].trigged_keypoint.pt, 1);
           if (HasBlobInGoodRange(trigged_keypoint_list_[j], 0.8, 1.6)) {
-            if (!IsAlreadyCandidate(trigged_keypoint_list_[j])) {
-              for (const auto &roi : rois) {
-                if (roi->IsInZone(
-                        trigged_keypoint_list_[j].trigged_keypoint.pt)) {
-                  AddToCandidateList(trigged_keypoint_list_[j]);
-                  AddWeightToCorrespondingCandidate(
-                      trigged_keypoint_list_[j].trigged_keypoint.pt, 5);
-                } else {
-                  AddToCandidateList(trigged_keypoint_list_[j]);
-                  AddWeightToCorrespondingCandidate(
-                      trigged_keypoint_list_[j].trigged_keypoint.pt, 1);
+            if (BoxMean(trigged_keypoint_list_[j], 2)) {
+              if (!IsAlreadyCandidate(trigged_keypoint_list_[j])) {
+                for (const auto &roi : rois) {
+                  if (roi->IsInZone(
+                      trigged_keypoint_list_[j].trigged_keypoint.pt)) {
+                    AddToCandidateList(trigged_keypoint_list_[j]);
+                    AddWeightToCorrespondingCandidate(
+                        trigged_keypoint_list_[j].trigged_keypoint.pt, 5);
+                  } else {
+                    if (!roi_needed_) {
+                      AddToCandidateList(trigged_keypoint_list_[j]);
+                      AddWeightToCorrespondingCandidate(
+                          trigged_keypoint_list_[j].trigged_keypoint.pt, 1);
+                    }
+                  }
                 }
+              } else {
+                AddWeightToCorrespondingCandidate(
+                    trigged_keypoint_list_[j].trigged_keypoint.pt, 1);
               }
-            } else {
-              AddWeightToCorrespondingCandidate(
-                  trigged_keypoint_list_[j].trigged_keypoint.pt, 1);
             }
           } else {
             if (IsAlreadyCandidate(trigged_keypoint_list_[j])) {
@@ -174,6 +179,10 @@ class BuoysDetector : public ProcUnit {
     TriggedKeypoint trigged_keypoint;
     trigged_keypoint.trigged_keypoint = keypoint;
     trigged_keypoint.bounding_box = SetBoundingBox(keypoint.pt, 20);
+    cv::Mat box(
+        trigged_keypoint.bounding_box.height,
+        trigged_keypoint.bounding_box.width, CV_8UC1);
+    trigged_keypoint.mean = cv::mean(box);
     trigged_keypoint.weight = 0;
     trigged_keypoint_list_.push_back(trigged_keypoint);
   }
@@ -220,6 +229,21 @@ class BuoysDetector : public ProcUnit {
         return true;
       }
     }
+    return false;
+  }
+
+  inline bool BoxMean(TriggedKeypoint trigged_keypoint, double reached_mean) {
+    cv::Mat box(
+        trigged_keypoint.bounding_box.height,
+        trigged_keypoint.bounding_box.width, CV_8UC1);
+    cv::Scalar actual_mean = cv::mean(box);
+
+    if (actual_mean[0] <= reached_mean) {
+      trigged_keypoint.mean = actual_mean;
+      return true;
+    }
+
+    trigged_keypoint.mean = actual_mean;
     return false;
   }
 
@@ -294,6 +318,7 @@ class BuoysDetector : public ProcUnit {
   std::vector<TriggedKeypoint> trigged_keypoint_list_;
   std::vector<Candidate> candidate_list_;
   int weight_goal_;
+  bool roi_needed_;
   ObjectRegistery::Ptr object_registery_;
 };
 

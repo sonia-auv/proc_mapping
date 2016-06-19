@@ -1,5 +1,5 @@
 /**
- * \file	vision_interpreter.h
+ * \file	coordinate_system.h
  * \author	Thibaut Mattio <thibaut.mattio@gmail.com>
  * \date	09/06/2016
  *

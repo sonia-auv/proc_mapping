@@ -127,6 +127,8 @@ void MapInterpreter::InstanciateProcTrees(
           SetDetectionMode(DetectionMode::BUOYS);
         } else if (default_pt == "fence") {
           SetDetectionMode(DetectionMode::FENCE);
+        } else if (default_pt == "wall") {
+          SetDetectionMode(DetectionMode::WALL);
         } else {
           ROS_ERROR(
               "Trying to set default proc tree: There is no proc tree "

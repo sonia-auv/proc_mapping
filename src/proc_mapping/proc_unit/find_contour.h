@@ -1,7 +1,7 @@
 /**
- * \file	dilate.h
+ * \file	find_contour.h
  * \author	Francis Masse <francis.masse05@gmail.com>
- * \date	18/05/2016
+ * \date	19/06/2016
  *
  * \copyright Copyright (c) 2015 S.O.N.I.A. All rights reserved.
  *
@@ -23,51 +23,60 @@
  * along with S.O.N.I.A. software. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef PROC_MAPPING_PROC_UNIT_DILATE_H_
-#define PROC_MAPPING_PROC_UNIT_DILATE_H_
+#ifndef PROC_MAPPING_FIND_CONTOUR_H_
+#define PROC_MAPPING_FIND_CONTOUR_H_
+
+using namespace cv;
+using namespace std;
 
 namespace proc_mapping {
 
-class Dilate : public ProcUnit {
+class FindContour : public ProcUnit {
  public:
   //==========================================================================
   // T Y P E D E F   A N D   E N U M
 
-  using Ptr = std::shared_ptr<Dilate>;
-  using ConstPtr = std::shared_ptr<const Dilate>;
-  using PtrList = std::vector<Dilate::Ptr>;
-  using ConstPtrList = std::vector<Dilate::ConstPtr>;
-
-  struct Parameters {
-    static const int kernel_size_x_max;
-    static const int kernel_size_y_max;
-    static int kernel_size_x;
-    static int kernel_size_y;
-  };
+  using Ptr = std::shared_ptr<FindContour>;
+  using ConstPtr = std::shared_ptr<const FindContour>;
+  using PtrList = std::vector<FindContour::Ptr>;
+  using ConstPtrList = std::vector<FindContour::ConstPtr>;
 
   //==========================================================================
   // P U B L I C   C / D T O R S
 
-  Dilate(bool debug = false) : debug_(debug){};
+  FindContour(bool debug = false) : debug_(debug){};
 
-  virtual ~Dilate() = default;
+  virtual ~FindContour() = default;
 
   //==========================================================================
   // P U B L I C   M E T H O D S
 
   virtual boost::any ProcessData(boost::any input) override {
     cv::Mat map = boost::any_cast<cv::Mat>(input);
-    cv::Size size =
-        cv::Size(Parameters::kernel_size_x, Parameters::kernel_size_y);
-    cv::Mat kernel_ = cv::getStructuringElement(kernelType, size, anchor_);
-    cv::dilate(map, map, kernel_, anchor_, iteration);
-    if (debug_) {
-      cv::createTrackbar("Kernel Size X", "Dilate", &Parameters::kernel_size_x,
-                         Parameters::kernel_size_x_max);
-      cv::createTrackbar("Kernel Size Y", "Dilate", &Parameters::kernel_size_y,
-                         Parameters::kernel_size_y_max);
 
-      cv::imshow("Dilate", map);
+    Mat canny_output;
+    vector<vector<Point> > contours;
+    vector<Vec4i> hierarchy;
+
+    int thresh = 200;
+    int max_thresh = 255;
+    RNG rng(12345);
+
+    /// Detect edges using canny
+    Canny( map, canny_output, thresh, thresh*2, 3 );
+    /// Find contours
+    findContours( canny_output, contours, hierarchy, CV_RETR_EXTERNAL, CV_CHAIN_APPROX_TC89_KCOS, Point(0, 0) );
+
+    /// Draw contours
+    Mat drawing = Mat::zeros( canny_output.size(), CV_8UC1 );
+    for( int i = 0; i< contours.size(); i++ ) {
+        Scalar color =
+            Scalar(rng.uniform(0, 255), rng.uniform(0, 255), rng.uniform(0, 255));
+        drawContours(drawing, contours, i, color, 2, 8, hierarchy, 0, Point());
+    }
+
+    if (debug_) {
+      cv::imshow("Find Contour", drawing);
       cv::waitKey(1);
     }
     return boost::any(map);
@@ -75,11 +84,10 @@ class Dilate : public ProcUnit {
 
  private:
   bool debug_;
-  const cv::Point anchor_ = cv::Point(-1, -1);
-  int iteration = 1;
-  int kernelType = cv::MORPH_RECT;
 };
 
 }  // namespace proc_mapping
 
-#endif  // PROC_MAPPING_PROC_UNIT_DILATE_H_
+#endif //PROC_MAPPING_FIND_CONTOUR_H_
+
+
