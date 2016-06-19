@@ -1,14 +1,19 @@
 proc_trees:
   - name: buoys
     proc_units:
+#      - name: wall_remover
+#        debug: true
       - name: blur
         blur_type: 1
+        debug: false
+      - name: threshold
+        threshold_type: 0
         debug: false
       - name: morphology
         debug: false
       - name: blob_detector
         target: 0
-        debug: true
+        debug: false
       - name: buoys_detector
         roi : false
 #  - name: fence
@@ -24,19 +29,18 @@ proc_trees:
 #      - name: blob_detector
 #        target: 0
 #        debug: false
-#  - name: wall
-#    proc_units:
-#      - name: blur
-#        blur_type: 1
-#        debug: false
-#      - name: morphology
-#        debug: false
-##      - name: threshold
-##        threshold_type: 0
-##        debug: true
-#      - name: find_contour
-#        target: 1
-#        debug: true
+  - name: wall
+    proc_units:
+      - name: blur
+        blur_type: 1
+        debug: true
+      - name: morphology
+        debug: false
+      - name: threshold
+        threshold_type: 0
+        debug: true
+      - name: find_contour
+        debug: true
 
 # Comment this line in order to have no default proc tree
 default: "buoys"

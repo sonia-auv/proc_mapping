@@ -58,22 +58,42 @@ class FindContour : public ProcUnit {
     vector<vector<Point> > contours;
     vector<Vec4i> hierarchy;
 
-    int thresh = 200;
+    int thresh = 150;
     int max_thresh = 255;
     RNG rng(12345);
 
     /// Detect edges using canny
-    Canny( map, canny_output, thresh, thresh*2, 3 );
+//    Canny( map, canny_output, thresh, thresh*2, 3 );
     /// Find contours
-    findContours( canny_output, contours, hierarchy, CV_RETR_EXTERNAL, CV_CHAIN_APPROX_TC89_KCOS, Point(0, 0) );
+    findContours(map, contours, hierarchy, CV_RETR_EXTERNAL, CV_CHAIN_APPROX_SIMPLE);
 
-    /// Draw contours
-    Mat drawing = Mat::zeros( canny_output.size(), CV_8UC1 );
-    for( int i = 0; i< contours.size(); i++ ) {
-        Scalar color =
-            Scalar(rng.uniform(0, 255), rng.uniform(0, 255), rng.uniform(0, 255));
-        drawContours(drawing, contours, i, color, 2, 8, hierarchy, 0, Point());
+//    static vector<Point> wall_contour;
+//    /// Draw contours
+    Mat drawing = Mat::zeros( map.size(), CV_8UC3 );
+//    for( int i = 0; i < contours.size(); i++ ) {
+//      if (contours[i].size() > 100) {
+//        for (int j = 0; j < contours[i].size(); j++) {
+//          wall_contour.push_back(contours[i][j]);
+//        }
+//      }
+//    }
+//
+    for (int i = 0; i < contours.size(); i++) {
+      double arc_length = 10;//0.1 * cv::arcLength(contours[i], true);
+      std::vector<cv::Point> output;
+      cv::approxPolyDP(contours[i], output, arc_length, false);
+      std::swap(contours[i], output);
+//      convexHull(contours[i], contours[i]);
+      cv::Scalar area = contourArea(contours[i]);
+      if (area[0] > 50) {
+        cv::drawContours(drawing, contours, i, CV_RGB(255,255,255));
+      }
     }
+//    if (wall_contour.size() > 200) {
+//      for (int i = 0; i < wall_contour.size(); i += 2) {
+//        line(drawing, wall_contour[i], wall_contour[i+1], 255);
+//      }
+//    }
 
     if (debug_) {
       cv::imshow("Find Contour", drawing);

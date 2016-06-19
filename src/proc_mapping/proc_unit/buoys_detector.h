@@ -72,7 +72,7 @@ class BuoysDetector : public ProcUnit {
     auto keypoint = boost::any_cast<std::vector<cv::KeyPoint>>(input);
     auto rois =
         object_registery_->GetRegionOfInterestOfType(DetectionMode::BUOYS);
-    SetWeigthGoal(100);
+    SetWeigthGoal(150);
 
     bool added_new_object = false;
     for (size_t i = 0; i < keypoint.size(); i++) {
@@ -85,25 +85,32 @@ class BuoysDetector : public ProcUnit {
           AddWeightToCorrespondingTriggedKeypoint(
               trigged_keypoint_list_[j].trigged_keypoint.pt, 1);
           if (HasBlobInGoodRange(trigged_keypoint_list_[j], 0.8, 1.6)) {
-            if (BoxMean(trigged_keypoint_list_[j], 2)) {
-              if (!IsAlreadyCandidate(trigged_keypoint_list_[j])) {
-                for (const auto &roi : rois) {
-                  if (roi->IsInZone(
-                      trigged_keypoint_list_[j].trigged_keypoint.pt)) {
+            if (!IsAlreadyCandidate(trigged_keypoint_list_[j])) {
+              for (const auto &roi : rois) {
+                if (roi->IsInZone(
+                    trigged_keypoint_list_[j].trigged_keypoint.pt)) {
+                  AddToCandidateList(trigged_keypoint_list_[j]);
+                  AddWeightToCorrespondingCandidate(
+                      trigged_keypoint_list_[j].trigged_keypoint.pt, 5);
+                } else {
+                  if (!roi_needed_) {
                     AddToCandidateList(trigged_keypoint_list_[j]);
                     AddWeightToCorrespondingCandidate(
-                        trigged_keypoint_list_[j].trigged_keypoint.pt, 5);
-                  } else {
-                    if (!roi_needed_) {
-                      AddToCandidateList(trigged_keypoint_list_[j]);
-                      AddWeightToCorrespondingCandidate(
-                          trigged_keypoint_list_[j].trigged_keypoint.pt, 1);
-                    }
+                        trigged_keypoint_list_[j].trigged_keypoint.pt, 1);
                   }
                 }
-              } else {
+              }
+            } else {
+              if (HasTwoBlobInGoodRange(trigged_keypoint_list_[j], 0.8, 2.6)) {
                 AddWeightToCorrespondingCandidate(
                     trigged_keypoint_list_[j].trigged_keypoint.pt, 1);
+              } else {
+                RemoveWeightToCorrespondingCandidate(
+                    trigged_keypoint_list_[j].trigged_keypoint.pt, 1);
+                if (trigged_keypoint_list_[j].weight == 0) {
+                  RemoveToCandidateList(
+                      trigged_keypoint_list_[j].trigged_keypoint);
+                }
               }
             }
           } else {
@@ -161,7 +168,7 @@ class BuoysDetector : public ProcUnit {
   inline bool IsAlreadyCandidate(TriggedKeypoint trigged_keypoint) {
     for (size_t i = 0; i < candidate_list_.size(); ++i) {
       if (trigged_keypoint.trigged_keypoint.pt.inside(
-              candidate_list_.at(i).bounding_box)) {
+          candidate_list_.at(i).bounding_box)) {
         return true;
       }
     }
@@ -227,6 +234,31 @@ class BuoysDetector : public ProcUnit {
           trigged_keypoint_list_[i].trigged_keypoint.pt);
       if (distance >= low_range * 40 and distance <= high_range * 40) {
         return true;
+      }
+    }
+    return false;
+  }
+
+  inline bool HasTwoBlobInGoodRange(TriggedKeypoint trigged_keypoint,
+                                    double low_range, double high_range) {
+    if (candidate_list_.size() > 2) {
+      for (size_t i = 0; i < candidate_list_.size(); ++i) {
+        double distance = GetDistanceBewteenKeypoint(
+            trigged_keypoint.trigged_keypoint.pt,
+            candidate_list_[i].trigged_keypoint.pt);
+        if (distance >= low_range * 40 and distance <= high_range * 40) {
+          for (size_t j = 0; j < candidate_list_.size(); ++j) {
+            if (j != i) {
+              double distance2 = GetDistanceBewteenKeypoint(
+                  trigged_keypoint.trigged_keypoint.pt,
+                  candidate_list_[j].trigged_keypoint.pt);
+              if (distance2 >= low_range * 40
+                  and distance2 <= high_range * 40) {
+                return true;
+              }
+            }
+          }
+        }
       }
     }
     return false;

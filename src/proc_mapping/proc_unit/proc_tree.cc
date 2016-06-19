@@ -31,6 +31,7 @@
 #include "proc_mapping/proc_unit/morphology.h"
 #include "proc_mapping/proc_unit/threshold.h"
 #include "proc_mapping/proc_unit/find_contour.h"
+#include "proc_mapping/proc_unit/wall_remover.h"
 
 namespace proc_mapping {
 
@@ -60,7 +61,7 @@ int BlobDetector::Parameters::max_inertia_ratio = 0;
 const float BlobDetector::Parameters::max_inertia_ratio_max = 10.f;
 
 const int Blur::Parameters::kernel_size_max = 15;
-int Blur::Parameters::kernel_size = 1;
+int Blur::Parameters::kernel_size = 3;
 
 const int Dilate::Parameters::kernel_size_x_max = 32;
 const int Dilate::Parameters::kernel_size_y_max = 32;
@@ -68,7 +69,7 @@ int Dilate::Parameters::kernel_size_x = 5;
 int Dilate::Parameters::kernel_size_y = 5;
 
 const int Threshold::Parameters::thresh_value_max = 255;
-int Threshold::Parameters::thresh_value = 70;
+int Threshold::Parameters::thresh_value = 50;
 
 //==============================================================================
 // C / D T O R S   S E C T I O N
@@ -118,6 +119,9 @@ typename ProcUnit::Ptr ProcTree::ProcUnitFactory(const YAML::Node &node) const {
       auto debug = node["debug"].as<bool>();
       auto threshold_type = node["threshold_type"].as<int>();
       return std::make_shared<Threshold>(threshold_type, debug);
+    } else if (proc_unit_name == "wall_remover") {
+      auto debug = node["debug"].as<bool>();
+      return std::make_shared<WallRemover>(debug);
     } else if (proc_unit_name == "dilate") {
       auto debug = node["debug"].as<bool>();
       return std::make_shared<Dilate>(debug);
