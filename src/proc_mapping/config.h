@@ -28,11 +28,11 @@
 
 #include <lib_atlas/config.h>
 
- #define DEBUG 1
+// #define DEBUG 1
 
 const std::string kConfigFilePath =
     atlas::kWorkspaceRoot + "/src/proc_mapping/config/";
 
-enum class DetectionMode { NONE = 0, BUOYS, FENCE, WALL };
+enum class DetectionMode { NONE = 0, FAR_BUOYS, BUOYS, FENCE, WALL };
 
 #endif  // PROC_MAPPING_CONFIG_H_

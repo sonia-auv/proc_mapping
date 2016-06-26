@@ -53,38 +53,43 @@ class WallRemover : public ProcUnit {
 
   virtual boost::any ProcessData(boost::any input) override {
     cv::Mat map = boost::any_cast<cv::Mat>(input);
-    cv::Mat wall_map;
-    map.copyTo(wall_map);
-    cv::Size2i kernel(2 * 2 + 1, 2 * 2 + 1);
-    cv::GaussianBlur(wall_map, wall_map, kernel, 0, 0);
-    cv::Mat element = cv::getStructuringElement(
-        0, cv::Size(2 * 2 + 1, 2 * 2 + 1), cv::Point(2, 2));
-    cv::morphologyEx(wall_map, wall_map, cv::MORPH_CLOSE, element);
-    cv::threshold(wall_map, wall_map, 40, 255, 0);
 
-    vector<vector<Point> > contours;
-    vector<Vec4i> hierarchy;
+    std::vector<std::vector<cv::Point>> contour_list, final_contour_list;
+    std::vector<cv::Vec4i> hierarchy;
+    cv::findContours(map.clone(), contour_list, hierarchy, CV_RETR_EXTERNAL,
+                     CV_CHAIN_APPROX_SIMPLE);
 
-    findContours(wall_map, contours, hierarchy, CV_RETR_EXTERNAL, CV_CHAIN_APPROX_SIMPLE);
-
-    Mat drawing = Mat::zeros(wall_map.size(), CV_8UC1);
-
-    for (int i = 0; i < contours.size(); i++) {
-      double arc_length = 10;//0.1 * cv::arcLength(contours[i], true);
-      std::vector<cv::Point> output;
-      cv::approxPolyDP(contours[i], output, arc_length, false);
-      std::swap(contours[i], output);
-      cv::Scalar area = contourArea(contours[i]);
-      if (area[0] > 200) {
-        cv::drawContours(drawing, contours, i, 255);
-        cv::fillPoly(drawing, contours, 255);
+    for(int i = 0; i < contour_list.size(); i++)
+    {
+      double area = cv::contourArea(contour_list[i]);
+      // Is enough big
+      if( area < 100)
+      {
+        continue;
       }
+
+      cv::RotatedRect rotatedRect = cv::minAreaRect(contour_list[i]);
+      // RotatedRect does not guarantee that the height is longer than
+      // the width, so we decide that height is for the longer side.
+      if( rotatedRect.size.width > rotatedRect.size.height)
+      {
+        std::swap(rotatedRect.size.width, rotatedRect.size.height);
+      }
+
+      // Is thin enough
+      if( rotatedRect.size.width > 50)
+      {
+        continue;
+      }
+      // Keep it if it matches
+      final_contour_list.push_back(contour_list[i]);
     }
 
-    cv::subtract(map, drawing, map);
+    map.setTo(cv::Scalar(0));
+    cv::drawContours(map, final_contour_list, -1, CV_RGB(255,255,255), -1);
 
     if (debug) {
-      cv::imshow("Wall Remover", drawing);
+      cv::imshow("Wall Remover", map);
       cv::waitKey(1);
     }
     return boost::any(map);

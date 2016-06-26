@@ -103,7 +103,9 @@ bool ProcMappingNode::SendMapCallback(
 bool ProcMappingNode::ChangeProcTreeCallback(
     sonia_msgs::ChangeProcTree::Request &req,
     sonia_msgs::ChangeProcTree::Response &res) {
-  if (req.target == req.BUOYS) {
+  if (req.target == req.FAR_BUOYS) {
+    map_interpreter_.SetDetectionMode(DetectionMode::FAR_BUOYS);
+  } else if (req.target == req.BUOYS) {
     map_interpreter_.SetDetectionMode(DetectionMode::BUOYS);
   } else if (req.target == req.FENCE) {
     map_interpreter_.SetDetectionMode(DetectionMode::FENCE);

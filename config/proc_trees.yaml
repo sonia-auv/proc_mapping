@@ -1,8 +1,6 @@
 proc_trees:
   - name: buoys
     proc_units:
-#      - name: wall_remover
-#        debug: true
       - name: blur
         blur_type: 1
         debug: false
@@ -11,9 +9,11 @@ proc_trees:
         debug: false
       - name: morphology
         debug: false
+#      - name: wall_remover
+#        debug: false
       - name: blob_detector
         target: 0
-        debug: false
+        debug: true
       - name: buoys_detector
         roi : false
 #  - name: fence

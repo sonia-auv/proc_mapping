@@ -69,7 +69,7 @@ int Dilate::Parameters::kernel_size_x = 5;
 int Dilate::Parameters::kernel_size_y = 5;
 
 const int Threshold::Parameters::thresh_value_max = 255;
-int Threshold::Parameters::thresh_value = 50;
+int Threshold::Parameters::thresh_value = 10;
 
 //==============================================================================
 // C / D T O R S   S E C T I O N
