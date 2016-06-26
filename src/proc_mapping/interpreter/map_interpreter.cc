@@ -24,7 +24,6 @@
  */
 
 #include "proc_mapping/interpreter/map_interpreter.h"
-#include <ros/console.h>
 #include <tf/transform_datatypes.h>
 #include "proc_mapping/config.h"
 
@@ -88,7 +87,9 @@ bool MapInterpreter::ProcessData() {
 //------------------------------------------------------------------------------
 //
 void MapInterpreter::SetDetectionMode(const DetectionMode &mode) {
-  if (mode == DetectionMode::BUOYS) {
+  if (mode == DetectionMode::FAR_BUOYS) {
+    SetCurrentProcTree("far_buoys");
+  } else if (mode == DetectionMode::BUOYS) {
     SetCurrentProcTree("buoys");
   } else if (mode == DetectionMode::FENCE) {
     SetCurrentProcTree("fence");
@@ -123,7 +124,9 @@ void MapInterpreter::InstanciateProcTrees(
       all_proc_trees_.push_back(proc_tree);
       if (!default_pt.empty() &&
           default_pt == proc_trees[i]["name"].as<std::string>()) {
-        if (default_pt == "buoys") {
+        if (default_pt == "far_buoys") {
+          SetDetectionMode(DetectionMode::FAR_BUOYS);
+        } else if (default_pt == "buoys") {
           SetDetectionMode(DetectionMode::BUOYS);
         } else if (default_pt == "fence") {
           SetDetectionMode(DetectionMode::FENCE);

@@ -61,7 +61,7 @@ class BuoysDetector : public ProcUnit {
   // P U B L I C   C / D T O R S
 
   explicit BuoysDetector(const ObjectRegistery::Ptr &object_registery, bool roi)
-      : weight_goal_(0), object_registery_(object_registery), roi_needed_(roi) {}
+      : weight_goal_(0), roi_needed_(roi), object_registery_(object_registery) {}
 
   virtual ~BuoysDetector() = default;
 

@@ -30,7 +30,6 @@
 #include "proc_mapping/proc_unit/dilate.h"
 #include "proc_mapping/proc_unit/morphology.h"
 #include "proc_mapping/proc_unit/threshold.h"
-#include "proc_mapping/proc_unit/find_contour.h"
 #include "proc_mapping/proc_unit/wall_remover.h"
 
 namespace proc_mapping {
@@ -38,9 +37,9 @@ namespace proc_mapping {
 int BlobDetector::Parameters::filter_area_off = 1;
 const int BlobDetector::Parameters::filter_area_on = 1;
 int BlobDetector::Parameters::min_area = 0;
-const int BlobDetector::Parameters::min_area_max = 3000;
+const int BlobDetector::Parameters::min_area_max = 10000;
 int BlobDetector::Parameters::max_area = 0;
-const int BlobDetector::Parameters::max_area_max = 3000;
+const int BlobDetector::Parameters::max_area_max = 10000;
 int BlobDetector::Parameters::filter_circularity_off = 0;
 const int BlobDetector::Parameters::filter_circularity_on = 1;
 float BlobDetector::Parameters::min_circularity = 0;
@@ -132,10 +131,7 @@ typename ProcUnit::Ptr ProcTree::ProcUnitFactory(const YAML::Node &node) const {
       auto debug = node["debug"].as<bool>();
       auto target = node["target"].as<int>();
       return std::make_shared<BlobDetector>(target, debug);
-    } else if (proc_unit_name == "find_contour") {
-      auto debug = node["debug"].as<bool>();
-      return std::make_shared<FindContour>(debug);
-    }else if (proc_unit_name == "buoys_detector") {
+    } else if (proc_unit_name == "buoys_detector") {
       auto roi = node["roi"].as<bool>();
       return std::make_shared<BuoysDetector>(object_registery_, roi);
     }

@@ -59,11 +59,11 @@ class WallRemover : public ProcUnit {
     cv::findContours(map.clone(), contour_list, hierarchy, CV_RETR_EXTERNAL,
                      CV_CHAIN_APPROX_SIMPLE);
 
-    for(int i = 0; i < contour_list.size(); i++)
+    for(size_t i = 0; i < contour_list.size(); i++)
     {
       double area = cv::contourArea(contour_list[i]);
       // Is enough big
-      if( area < 100)
+      if( area < 50)
       {
         continue;
       }
