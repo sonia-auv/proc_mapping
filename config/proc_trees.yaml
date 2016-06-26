@@ -14,6 +14,7 @@ proc_trees:
       - name: blob_detector
         target: 1
         debug: true
+      - name: far_buoys_detector
   - name: buoys
     proc_units:
       - name: blur

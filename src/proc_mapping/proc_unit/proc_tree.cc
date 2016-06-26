@@ -27,6 +27,7 @@
 #include "proc_mapping/proc_unit/blob_detector.h"
 #include "proc_mapping/proc_unit/blur.h"
 #include "proc_mapping/proc_unit/buoys_detector.h"
+#include "proc_mapping/proc_unit/far_buoys_detector.h"
 #include "proc_mapping/proc_unit/dilate.h"
 #include "proc_mapping/proc_unit/morphology.h"
 #include "proc_mapping/proc_unit/threshold.h"
@@ -131,6 +132,8 @@ typename ProcUnit::Ptr ProcTree::ProcUnitFactory(const YAML::Node &node) const {
       auto debug = node["debug"].as<bool>();
       auto target = node["target"].as<int>();
       return std::make_shared<BlobDetector>(target, debug);
+    } else if (proc_unit_name == "far_buoys_detector") {
+      return std::make_shared<FarBuoysDetector>(object_registery_);
     } else if (proc_unit_name == "buoys_detector") {
       auto roi = node["roi"].as<bool>();
       return std::make_shared<BuoysDetector>(object_registery_, roi);
