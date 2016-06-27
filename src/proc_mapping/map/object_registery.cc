@@ -32,7 +32,8 @@ namespace proc_mapping {
 
 //------------------------------------------------------------------------------
 //
-ObjectRegistery::ObjectRegistery() : objects_({}), object_mutex_() {}
+ObjectRegistery::ObjectRegistery() :
+    objects_({}), is_registry_cleared_(false), object_mutex_() {}
 
 //==============================================================================
 // M E T H O D   S E C T I O N
@@ -42,6 +43,7 @@ ObjectRegistery::ObjectRegistery() : objects_({}), object_mutex_() {}
 void ObjectRegistery::AddMapObject(const MapObject::Ptr &obj) {
   std::lock_guard<std::mutex> guard(object_mutex_);
   objects_.push_back(obj);
+  is_registry_cleared_ = false;
 }
 
 //------------------------------------------------------------------------------
@@ -130,7 +132,14 @@ std::vector<std::shared_ptr<Tp_>> ObjectRegistery::GetObjectsOfType() const {
 //
 void ObjectRegistery::ClearRegistery() {
   std::lock_guard<std::mutex> guard(object_mutex_);
+  is_registry_cleared_ = true;
   objects_.clear();
 }
+
+bool ObjectRegistery::IsRegisteryCleared() {
+  return is_registry_cleared_;
+}
+
+void ObjectRegistery::ResetRegisteryClearedFlag() { is_registry_cleared_ = false; }
 
 }  // namespace proc_mapping

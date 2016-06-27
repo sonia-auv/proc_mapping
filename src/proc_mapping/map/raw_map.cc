@@ -202,6 +202,7 @@ bool RawMap::IsMapReadyForProcess() { return is_map_ready_for_process_; }
 //
 void RawMap::ResetRawMap() {
   display_map_.setTo(cv::Scalar(0));
+  std::fill(number_of_hits_.begin(), number_of_hits_.end(), 0);
   scanline_counter_ = 0;
   is_first_scan_complete_ = false;
 }

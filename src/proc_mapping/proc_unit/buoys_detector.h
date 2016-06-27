@@ -74,6 +74,12 @@ class BuoysDetector : public ProcUnit {
         object_registery_->GetRegionOfInterestOfType(DetectionMode::BUOYS);
     SetWeigthGoal(150);
 
+    if (object_registery_->IsRegisteryCleared()) {
+      trigged_keypoint_list_.clear();
+      candidate_list_.clear();
+      object_registery_->ResetRegisteryClearedFlag();
+    }
+
     bool added_new_object = false;
     for (size_t i = 0; i < keypoint.size(); i++) {
       bool is_already_trigged = IsAlreadyTrigged(keypoint[i]);

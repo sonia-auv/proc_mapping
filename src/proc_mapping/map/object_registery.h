@@ -73,12 +73,17 @@ class ObjectRegistery {
 
   void ClearRegistery();
 
+  bool IsRegisteryCleared();
+
+  void ResetRegisteryClearedFlag();
+
  private:
   //==========================================================================
   // P R I V A T E   M E M B E R S
 
   MapObjectList objects_;
   RegionOfInterestList rois_;
+  bool is_registry_cleared_;
 
   /// We access the registry from the main thread as well as the processing
   /// thread (when we receive a scanline or an odometry). Thus, we must

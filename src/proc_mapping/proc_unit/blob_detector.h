@@ -103,8 +103,8 @@ class BlobDetector : public ProcUnit {
       params_.maxThreshold = 255;
       params_.filterByArea = true;
       params_.blobColor = 255;
-      params_.minArea = 2500;
-      params_.maxArea = 3500;
+      params_.minArea = 2000;
+      params_.maxArea = 4000;
       params_.filterByCircularity = false;
       params_.filterByColor = false;
       params_.filterByConvexity = false;
@@ -137,13 +137,13 @@ class BlobDetector : public ProcUnit {
     detector.detect(map, keyPoints);
 
     if (debug_) {
-      cv::createTrackbar("area filter", "Blob Detector",
-                         &Parameters::filter_area_off,
-                         Parameters::filter_area_on);
-      cv::createTrackbar("min area", "Blob Detector", &Parameters::min_area,
-                         Parameters::min_area_max);
-      cv::createTrackbar("max area", "Blob Detector", &Parameters::max_area,
-                         Parameters::max_area_max);
+//      cv::createTrackbar("area filter", "Blob Detector",
+//                         &Parameters::filter_area_off,
+//                         Parameters::filter_area_on);
+//      cv::createTrackbar("min area", "Blob Detector", &Parameters::min_area,
+//                         Parameters::min_area_max);
+//      cv::createTrackbar("max area", "Blob Detector", &Parameters::max_area,
+//                         Parameters::max_area_max);
       //      cv::createTrackbar("circularity filter", "Blob Detector",
       //                         &Parameters::filter_circularity_off,
       //                         Parameters::filter_circularity_on);
