@@ -59,26 +59,22 @@ class WallRemover : public ProcUnit {
     cv::findContours(map.clone(), contour_list, hierarchy, CV_RETR_EXTERNAL,
                      CV_CHAIN_APPROX_SIMPLE);
 
-    for(size_t i = 0; i < contour_list.size(); i++)
-    {
+    for(size_t i = 0; i < contour_list.size(); i++) {
       double area = cv::contourArea(contour_list[i]);
       // Is enough big
-      if( area < 50)
-      {
+      if( area < 30) {
         continue;
       }
 
       cv::RotatedRect rotatedRect = cv::minAreaRect(contour_list[i]);
       // RotatedRect does not guarantee that the height is longer than
       // the width, so we decide that height is for the longer side.
-      if( rotatedRect.size.width > rotatedRect.size.height)
-      {
+      if( rotatedRect.size.width > rotatedRect.size.height) {
         std::swap(rotatedRect.size.width, rotatedRect.size.height);
       }
 
       // Is thin enough
-      if( rotatedRect.size.width > 50)
-      {
+      if( rotatedRect.size.width > 50) {
         continue;
       }
       // Keep it if it matches
