@@ -3,7 +3,7 @@
  * \author	Etienne Pilon <etienne.b.pilon@gmail.com>
  * \date	06/02/2016
  *
- * \copyright Copyright (c) 2015 S.O.N.I.A. All rights reserved.
+ * \copyright Copyright (c) 2016 S.O.N.I.A. All rights reserved.
  *
  * \section LICENSE
  *

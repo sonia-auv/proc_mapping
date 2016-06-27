@@ -3,7 +3,7 @@
  * \author	Francis Masse <francis.masse05@gmail.com>
  * \date	31/05/2016
  *
- * \copyright Copyright (c) 2015 S.O.N.I.A. All rights reserved.
+ * \copyright Copyright (c) 2016 S.O.N.I.A. All rights reserved.
  *
  * \section LICENSE
  *
