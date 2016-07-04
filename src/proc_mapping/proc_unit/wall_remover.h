@@ -62,7 +62,7 @@ class WallRemover : public ProcUnit {
     for(size_t i = 0; i < contour_list.size(); i++) {
       double area = cv::contourArea(contour_list[i]);
       // Is enough big
-      if( area < 30) {
+      if(area < 30) {
         continue;
       }
 
@@ -74,7 +74,7 @@ class WallRemover : public ProcUnit {
       }
 
       // Is thin enough
-      if( rotatedRect.size.width > 50) {
+      if(rotatedRect.size.width > 50 /*&& rotatedRect.size.width < 100*/) {
         continue;
       }
       // Keep it if it matches

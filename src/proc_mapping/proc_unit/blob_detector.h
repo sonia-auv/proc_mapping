@@ -33,6 +33,8 @@
 #include "proc_mapping/map/object_registery.h"
 #include "proc_mapping/map_objects/buoy.h"
 #include "proc_mapping/proc_unit/proc_unit.h"
+#include <lib_atlas/ros/image_publisher.h>
+#include "proc_mapping/config.h"
 
 namespace proc_mapping {
 
@@ -77,7 +79,12 @@ class BlobDetector : public ProcUnit {
   // P U B L I C   C / D T O R S
 
   BlobDetector(uint8_t target = 0, bool debug = false)
-      : target_(target), debug_(debug) {}
+      : target_(target),
+        debug_(debug),
+        image_publisher_(kRosNodeName + "_image_") {
+    image_publisher_.Start();
+  }
+
   virtual ~BlobDetector() = default;
 
   //==========================================================================
@@ -183,9 +190,12 @@ class BlobDetector : public ProcUnit {
       cv::Mat dst;
       cv::warpAffine(output, dst, rot_mat, output.size());
 
+//      image_publisher_.Write(dst);
+
       cv::imshow("Blob Detector", dst);
       cv::waitKey(1);
     }
+
     return boost::any(keyPoints);
   }
 
@@ -196,6 +206,7 @@ class BlobDetector : public ProcUnit {
   uint8_t target_;
   bool debug_;
   cv::SimpleBlobDetector::Params params_;
+  atlas::ImagePublisher image_publisher_;
 };
 
 }  // namespace proc_mapping

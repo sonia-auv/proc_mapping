@@ -34,6 +34,8 @@ find_package(
     geometry_msgs
     sensor_msgs
     nav_msgs
+    image_transport
+    cv_bridge
     pcl_ros
     pcl_conversions
     lib_atlas
@@ -57,6 +59,8 @@ catkin_package(
     geometry_msgs
     sensor_msgs
     nav_msgs
+    image_transport
+    cv_bridge
     pcl_ros
     pcl_conversions
     lib_atlas

@@ -32,6 +32,7 @@
 
 const std::string kConfigFilePath =
     atlas::kWorkspaceRoot + "/src/proc_mapping/config/";
+const std::string kRosNodeName = "/proc_mapping/";
 
 enum class DetectionMode { NONE = 0, FAR_BUOYS, BUOYS, FENCE, WALL };
 
