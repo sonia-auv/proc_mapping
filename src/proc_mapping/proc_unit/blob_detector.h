@@ -78,10 +78,10 @@ class BlobDetector : public ProcUnit {
   //==========================================================================
   // P U B L I C   C / D T O R S
 
-  BlobDetector(uint8_t target = 0, bool debug = false)
+  BlobDetector(uint8_t target = 0, std::string proc_tree_name = "", bool debug = false)
       : target_(target),
         debug_(debug),
-        image_publisher_(kRosNodeName + "_image_") {
+        image_publisher_(kRosNodeName + "_image_" + proc_tree_name) {
     image_publisher_.Start();
   }
 
@@ -144,41 +144,6 @@ class BlobDetector : public ProcUnit {
     detector.detect(map, keyPoints);
 
     if (debug_) {
-//      cv::createTrackbar("area filter", "Blob Detector",
-//                         &Parameters::filter_area_off,
-//                         Parameters::filter_area_on);
-//      cv::createTrackbar("min area", "Blob Detector", &Parameters::min_area,
-//                         Parameters::min_area_max);
-//      cv::createTrackbar("max area", "Blob Detector", &Parameters::max_area,
-//                         Parameters::max_area_max);
-      //      cv::createTrackbar("circularity filter", "Blob Detector",
-      //                         &Parameters::filter_circularity_off,
-      //                         Parameters::filter_circularity_on);
-      //      cv::createTrackbar("min circularity", "Blob Detector",
-      //                         &Parameters::min_circularity,
-      //                         Parameters::min_circularity_max);
-      //      cv::createTrackbar("max circularity", "Blob Detector",
-      //                         &Parameters::max_circularity,
-      //                         Parameters::max_circularity_max);
-      //      cv::createTrackbar("convexity filter", "Blob Detector",
-      //                         &Parameters::filter_convexity_off,
-      //                         Parameters::filter_convexity_on);
-      //      cv::createTrackbar("min convexity", "Blob Detector",
-      //                         &Parameters::min_convexity,
-      //                         Parameters::min_convexity_max);
-      //      cv::createTrackbar("max convexity", "Blob Detector",
-      //                         &Parameters::max_convexity,
-      //                         Parameters::max_convexity_max);
-      //      cv::createTrackbar("inertia filter", "Blob Detector",
-      //                         &Parameters::filter_inertial_off,
-      //                         Parameters::filter_inertial_on);
-//            cv::createTrackbar("min inertia", "Blob Detector",
-//                               &Parameters::min_inertia_ratio,
-//                               static_cast<int>(Parameters::min_inertia_ratio_max));
-//            cv::createTrackbar("max inertia", "Blob Detector",
-//                               &Parameters::max_inertia_ratio,
-//                               static_cast<int>(Parameters::max_inertia_ratio_max));
-
       cv::Mat output;
       cv::drawKeypoints(map, keyPoints, output, cv::Scalar(0, 0, 255),
                         cv::DrawMatchesFlags::DRAW_RICH_KEYPOINTS);
@@ -190,10 +155,10 @@ class BlobDetector : public ProcUnit {
       cv::Mat dst;
       cv::warpAffine(output, dst, rot_mat, output.size());
 
-//      image_publisher_.Write(dst);
+      image_publisher_.Write(dst);
 
-      cv::imshow("Blob Detector", dst);
-      cv::waitKey(1);
+//      cv::imshow("Blob Detector", dst);
+//      cv::waitKey(1);
     }
 
     return boost::any(keyPoints);

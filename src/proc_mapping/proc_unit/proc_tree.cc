@@ -132,7 +132,7 @@ typename ProcUnit::Ptr ProcTree::ProcUnitFactory(const YAML::Node &node) const {
     } else if (proc_unit_name == "blob_detector") {
       auto debug = node["debug"].as<bool>();
       auto target = node["target"].as<int>();
-      return std::make_shared<BlobDetector>(target, debug);
+      return std::make_shared<BlobDetector>(target, name_, debug);
     } else if (proc_unit_name == "far_buoys_detector") {
       return std::make_shared<FarBuoysDetector>(object_registery_);
     } else if (proc_unit_name == "buoys_detector") {
