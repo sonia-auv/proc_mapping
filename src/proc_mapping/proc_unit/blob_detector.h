@@ -78,10 +78,10 @@ class BlobDetector : public ProcUnit {
   //==========================================================================
   // P U B L I C   C / D T O R S
 
-  BlobDetector(uint8_t target = 0, std::string proc_tree_name = "", bool debug = false)
+  BlobDetector(std::string proc_tree_name = "", uint8_t target = 0, bool debug = false)
       : target_(target),
         debug_(debug),
-        image_publisher_(kRosNodeName + "_image_" + proc_tree_name) {
+        image_publisher_(kRosNodeName + "_blob_detector_" + proc_tree_name) {
     image_publisher_.Start();
   }
 
@@ -156,9 +156,6 @@ class BlobDetector : public ProcUnit {
       cv::warpAffine(output, dst, rot_mat, output.size());
 
       image_publisher_.Write(dst);
-
-//      cv::imshow("Blob Detector", dst);
-//      cv::waitKey(1);
     }
 
     return boost::any(keyPoints);

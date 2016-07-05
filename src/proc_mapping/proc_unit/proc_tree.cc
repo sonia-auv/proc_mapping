@@ -61,16 +61,10 @@ const float BlobDetector::Parameters::min_inertia_ratio_max = 10.f;
 int BlobDetector::Parameters::max_inertia_ratio = 0;
 const float BlobDetector::Parameters::max_inertia_ratio_max = 10.f;
 
-const int Blur::Parameters::kernel_size_max = 15;
-int Blur::Parameters::kernel_size = 3;
-
 const int Dilate::Parameters::kernel_size_x_max = 32;
 const int Dilate::Parameters::kernel_size_y_max = 32;
 int Dilate::Parameters::kernel_size_x = 5;
 int Dilate::Parameters::kernel_size_y = 5;
-
-const int Threshold::Parameters::thresh_value_max = 255;
-int Threshold::Parameters::thresh_value = 10;
 
 //==============================================================================
 // C / D T O R S   S E C T I O N
@@ -115,11 +109,13 @@ typename ProcUnit::Ptr ProcTree::ProcUnitFactory(const YAML::Node &node) const {
     if (proc_unit_name == "blur") {
       auto debug = node["debug"].as<bool>();
       auto blur_type = node["blur_type"].as<int>();
-      return std::make_shared<Blur>(blur_type, debug);
+      auto kernel_size = node["kernel_size"].as<int>();
+      return std::make_shared<Blur>(name_, blur_type, kernel_size, debug);
     } else if (proc_unit_name == "threshold") {
       auto debug = node["debug"].as<bool>();
       auto threshold_type = node["threshold_type"].as<int>();
-      return std::make_shared<Threshold>(threshold_type, debug);
+      auto thresh_value = node["thresh_value"].as<int>();
+      return std::make_shared<Threshold>(name_, threshold_type, thresh_value, debug);
     } else if (proc_unit_name == "wall_remover") {
       auto debug = node["debug"].as<bool>();
       return std::make_shared<WallRemover>(debug);
@@ -132,7 +128,7 @@ typename ProcUnit::Ptr ProcTree::ProcUnitFactory(const YAML::Node &node) const {
     } else if (proc_unit_name == "blob_detector") {
       auto debug = node["debug"].as<bool>();
       auto target = node["target"].as<int>();
-      return std::make_shared<BlobDetector>(target, name_, debug);
+      return std::make_shared<BlobDetector>(name_, target, debug);
     } else if (proc_unit_name == "far_buoys_detector") {
       return std::make_shared<FarBuoysDetector>(object_registery_);
     } else if (proc_unit_name == "buoys_detector") {

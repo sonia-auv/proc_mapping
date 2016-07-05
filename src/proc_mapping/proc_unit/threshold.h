@@ -41,16 +41,17 @@ class Threshold : public ProcUnit {
   using PtrList = std::vector<Threshold::Ptr>;
   using ConstPtrList = std::vector<Threshold::ConstPtr>;
 
-  struct Parameters {
-    static const int thresh_value_max;
-    static int thresh_value;
-  };
-
   //==========================================================================
   // P U B L I C   C / D T O R S
 
-  explicit Threshold(int threshold_type = 0, bool debug = false)
-      : threshold_type(threshold_type), debug(debug) {}
+  explicit Threshold(std::string proc_tree_name = "", int threshold_type = 0,
+                     int thresh_value = 0, bool debug = false)
+      : threshold_type(threshold_type),
+        thresh_value_(thresh_value),
+        debug(debug),
+        image_publisher_(kRosNodeName + "_threshold_" + proc_tree_name) {
+    image_publisher_.Start();
+  }
 
   virtual ~Threshold() = default;
 
@@ -62,15 +63,20 @@ class Threshold : public ProcUnit {
     if ((threshold_type == 0) | (threshold_type == 1) | (threshold_type == 2) |
         (threshold_type == 3) | (threshold_type == 4) | (threshold_type == 7) |
         (threshold_type == 8)) {
-      cv::threshold(map, map, Parameters::thresh_value, 255, threshold_type);
+      cv::threshold(map, map, thresh_value_, 255, threshold_type);
     } else {
       ROS_ERROR("Threshold type is undefined");
     }
     if (debug) {
-      cv::createTrackbar("Thresh Value", "Threshold", &Parameters::thresh_value,
-                         Parameters::thresh_value_max);
-      cv::imshow("Threshold", map);
-      cv::waitKey(1);
+      // To fit in OpenCv coordinate system, we have to made a rotation of
+      // 90 degrees on the display map
+      cv::Point2f src_center(map.cols/2.0f, map.rows/2.0f);
+      cv::Mat rot_mat = getRotationMatrix2D(src_center, 90, 1.0);
+      cv::Mat dst;
+      cv::warpAffine(map, dst, rot_mat, map.size());
+
+      cvtColor(dst, dst, CV_GRAY2RGB);
+      image_publisher_.Write(dst);
     }
     return boost::any(map);
   }
@@ -86,7 +92,10 @@ class Threshold : public ProcUnit {
  * 8: Threshold OTSU
  */
   int threshold_type;
+  int thresh_value_;
   bool debug;
+
+  atlas::ImagePublisher image_publisher_;
 };
 
 }  // namespace proc_mapping
