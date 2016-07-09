@@ -74,6 +74,15 @@ void CoordinateSystems::OdomCallback(
     const nav_msgs::Odometry::ConstPtr &odo_in) {
   std::lock_guard<std::mutex> lock(data_mutex);
 
+  ros::Time previous = ros::Time::now();
+  ros::Time now = ros::Time::now();
+  ros::Duration desired(5, 0);
+
+  if ((now - previous) > desired) {
+    ROS_INFO("The new odom take too much time. Connection seem lost.");
+    previous = ros::Time::now();
+  }
+
   if(is_first_odom_) {
     is_first_odom_ = false;
   }
