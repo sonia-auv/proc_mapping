@@ -84,15 +84,23 @@ void RawMap::PointCloudCallback(
 //
 void RawMap::Run() {
   while (IsRunning()) {
+    ros::Time previous = ros::Time::now();
     if (cs_->IsCoordinateSystemReady()) {
-      if (new_pcl_ready_ && last_pcl_) {
-        ProcessPointCloud(last_pcl_);
-        new_pcl_ready_ = false;
-
-        if (IsMapReadyForProcess()) {
-          Notify(display_map_);
-          is_map_ready_for_process_ = false;
+      ros::Time now = ros::Time::now();
+      ros::Duration desired(1, 0);
+      if ((now - previous) < desired) {
+        if (new_pcl_ready_ && last_pcl_) {
+          ProcessPointCloud(last_pcl_);
+          new_pcl_ready_ = false;
         }
+        previous = ros::Time::now();
+      } else {
+        ROS_INFO("The new pcl take too much time. Connection seem lost.");
+        previous = ros::Time::now();
+      }
+      if (IsMapReadyForProcess()) {
+        Notify(display_map_);
+        is_map_ready_for_process_ = false;
       }
     }
   }
