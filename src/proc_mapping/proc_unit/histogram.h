@@ -78,21 +78,8 @@ class Histogram: public ProcUnit {
                cv::Scalar(255), 2, 8, 0);
     }
 
-    //    float thresh = (static_cast<float>(thresh_value) /
-    //                    static_cast<float>(thresh_value_max));
-    //
-    //    cv::line(hist_image, cv::Point(hist_w * thresh, 0),
-    //             cv::Point(hist_w * thresh, hist_h), cv::Scalar(255));
-
-    // To fit in OpenCv coordinate system, we have to made a rotation of
-    // 90 degrees on the display map
-    cv::Point2f src_center(hist_image.cols / 2.0f, hist_image.rows / 2.0f);
-    cv::Mat rot_mat = getRotationMatrix2D(src_center, 90, 1.0);
-    cv::Mat dst;
-    cv::warpAffine(hist_image, dst, rot_mat, hist_image.size());
-
-    cvtColor(dst, dst, CV_GRAY2RGB);
-    image_publisher_.Write(dst);
+    cvtColor(hist_image, hist_image, CV_GRAY2RGB);
+    image_publisher_.Write(hist_image);
 
     return boost::any(map);
   }

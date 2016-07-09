@@ -1,6 +1,7 @@
 proc_trees:
   - name: far_buoys
     proc_units:
+      - name: histogram
       - name: blur
         blur_type: 1
         kernel_size: 3
