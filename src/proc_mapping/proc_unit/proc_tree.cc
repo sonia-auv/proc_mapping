@@ -33,6 +33,7 @@
 #include "proc_mapping/proc_unit/morphology.h"
 #include "proc_mapping/proc_unit/threshold.h"
 #include "proc_mapping/proc_unit/wall_remover.h"
+#include "proc_mapping/proc_unit/histogram.h"
 
 namespace proc_mapping {
 
@@ -60,11 +61,6 @@ int BlobDetector::Parameters::min_inertia_ratio = 0;
 const float BlobDetector::Parameters::min_inertia_ratio_max = 10.f;
 int BlobDetector::Parameters::max_inertia_ratio = 0;
 const float BlobDetector::Parameters::max_inertia_ratio_max = 10.f;
-
-const int Dilate::Parameters::kernel_size_x_max = 32;
-const int Dilate::Parameters::kernel_size_y_max = 32;
-int Dilate::Parameters::kernel_size_x = 5;
-int Dilate::Parameters::kernel_size_y = 5;
 
 //==============================================================================
 // C / D T O R S   S E C T I O N
@@ -118,13 +114,19 @@ typename ProcUnit::Ptr ProcTree::ProcUnitFactory(const YAML::Node &node) const {
       return std::make_shared<Threshold>(name_, threshold_type, thresh_value, debug);
     } else if (proc_unit_name == "wall_remover") {
       auto debug = node["debug"].as<bool>();
-      return std::make_shared<WallRemover>(debug);
+      return std::make_shared<WallRemover>(name_, debug);
     } else if (proc_unit_name == "dilate") {
+      auto kernel_size_x = node["kernel_size_x"].as<int>();
+      auto kernel_size_y = node["kernel_size_y"].as<int>();
       auto debug = node["debug"].as<bool>();
-      return std::make_shared<Dilate>(debug);
+      return std::make_shared<Dilate>(name_, kernel_size_x, kernel_size_y, debug);
     } else if (proc_unit_name == "morphology") {
+      auto kernel_size_x = node["kernel_size_x"].as<int>();
+      auto kernel_size_y = node["kernel_size_y"].as<int>();
       auto debug = node["debug"].as<bool>();
-      return std::make_shared<Morphology>(debug);
+      return std::make_shared<Morphology>(name_, kernel_size_x, kernel_size_y, debug);
+    } else if (proc_unit_name == "histogram") {
+      return std::make_shared<Histogram>(name_);
     } else if (proc_unit_name == "blob_detector") {
       auto debug = node["debug"].as<bool>();
       auto target = node["target"].as<int>();

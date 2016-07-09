@@ -31,7 +31,7 @@
 
 namespace proc_mapping {
 
-class Histogram : public ProcUnit<cv::Mat> {
+class Histogram: public ProcUnit {
  public:
   //==========================================================================
   // T Y P E D E F   A N D   E N U M
@@ -44,7 +44,10 @@ class Histogram : public ProcUnit<cv::Mat> {
   //==========================================================================
   // P U B L I C   C / D T O R S
 
-  Histogram(){};
+  Histogram(std::string proc_tree_name = "") :
+      image_publisher_(kRosNodeName + "_histogram_" + proc_tree_name) {
+    image_publisher_.Start();
+  };
 
   virtual ~Histogram() = default;
 
@@ -81,9 +84,22 @@ class Histogram : public ProcUnit<cv::Mat> {
     //    cv::line(hist_image, cv::Point(hist_w * thresh, 0),
     //             cv::Point(hist_w * thresh, hist_h), cv::Scalar(255));
 
-    cv::imshow("Histogram", hist_image);
-    cv::waitKey(1);
+    // To fit in OpenCv coordinate system, we have to made a rotation of
+    // 90 degrees on the display map
+    cv::Point2f src_center(hist_image.cols / 2.0f, hist_image.rows / 2.0f);
+    cv::Mat rot_mat = getRotationMatrix2D(src_center, 90, 1.0);
+    cv::Mat dst;
+    cv::warpAffine(hist_image, dst, rot_mat, hist_image.size());
+
+    cvtColor(dst, dst, CV_GRAY2RGB);
+    image_publisher_.Write(dst);
+
+    return boost::any(map);
   }
+
+ private:
+
+  atlas::ImagePublisher image_publisher_;
 };
 
 }  // namespace proc_mapping

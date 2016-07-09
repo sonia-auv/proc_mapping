@@ -26,6 +26,9 @@
 #ifndef PROC_MAPPING_PROC_UNIT_DILATE_H_
 #define PROC_MAPPING_PROC_UNIT_DILATE_H_
 
+#include <opencv/cv.h>
+#include "proc_mapping/proc_unit/proc_unit.h"
+
 namespace proc_mapping {
 
 class Dilate : public ProcUnit {
@@ -38,17 +41,17 @@ class Dilate : public ProcUnit {
   using PtrList = std::vector<Dilate::Ptr>;
   using ConstPtrList = std::vector<Dilate::ConstPtr>;
 
-  struct Parameters {
-    static const int kernel_size_x_max;
-    static const int kernel_size_y_max;
-    static int kernel_size_x;
-    static int kernel_size_y;
-  };
-
   //==========================================================================
   // P U B L I C   C / D T O R S
 
-  Dilate(bool debug = false) : debug_(debug){};
+  Dilate(std::string proc_tree_name = "", int kernel_size_x = 5,
+         int kernel_size_y = 5, bool debug = false) :
+      debug_(debug),
+      kernel_size_x_(kernel_size_x),
+      kernel_size_y_(kernel_size_y),
+      image_publisher_(kRosNodeName + "_dilate_" + proc_tree_name) {
+    image_publisher_.Start();
+  };
 
   virtual ~Dilate() = default;
 
@@ -58,17 +61,19 @@ class Dilate : public ProcUnit {
   virtual boost::any ProcessData(boost::any input) override {
     cv::Mat map = boost::any_cast<cv::Mat>(input);
     cv::Size size =
-        cv::Size(Parameters::kernel_size_x, Parameters::kernel_size_y);
-    cv::Mat kernel_ = cv::getStructuringElement(kernelType, size, anchor_);
-    cv::dilate(map, map, kernel_, anchor_, iteration);
+        cv::Size(kernel_size_x_, kernel_size_y_);
+    cv::Mat kernel_ = cv::getStructuringElement(kernel_type_, size, anchor_);
+    cv::dilate(map, map, kernel_, anchor_, iteration_);
     if (debug_) {
-      cv::createTrackbar("Kernel Size X", "Dilate", &Parameters::kernel_size_x,
-                         Parameters::kernel_size_x_max);
-      cv::createTrackbar("Kernel Size Y", "Dilate", &Parameters::kernel_size_y,
-                         Parameters::kernel_size_y_max);
+      // To fit in OpenCv coordinate system, we have to made a rotation of
+      // 90 degrees on the display map
+      cv::Point2f src_center(map.cols/2.0f, map.rows/2.0f);
+      cv::Mat rot_mat = getRotationMatrix2D(src_center, 90, 1.0);
+      cv::Mat dst;
+      cv::warpAffine(map, dst, rot_mat, map.size());
 
-      cv::imshow("Dilate", map);
-      cv::waitKey(1);
+      cvtColor(dst, dst, CV_GRAY2RGB);
+      image_publisher_.Write(dst);
     }
     return boost::any(map);
   }
@@ -76,8 +81,13 @@ class Dilate : public ProcUnit {
  private:
   bool debug_;
   const cv::Point anchor_ = cv::Point(-1, -1);
-  int iteration = 1;
-  int kernelType = cv::MORPH_RECT;
+  int iteration_ = 1;
+  int kernel_type_ = cv::MORPH_RECT;
+
+  int kernel_size_x_;
+  int kernel_size_y_;
+
+  atlas::ImagePublisher image_publisher_;
 };
 
 }  // namespace proc_mapping

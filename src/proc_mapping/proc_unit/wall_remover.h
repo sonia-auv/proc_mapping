@@ -44,7 +44,11 @@ class WallRemover : public ProcUnit {
   //==========================================================================
   // P U B L I C   C / D T O R S
 
-  explicit WallRemover(bool debug = false) : debug(debug) {}
+  explicit WallRemover(std::string proc_tree_name = "", bool debug = false) :
+      debug_(debug),
+      image_publisher_(kRosNodeName + "_threshold_" + proc_tree_name) {
+    image_publisher_.Start();
+  }
 
   virtual ~WallRemover() = default;
 
@@ -84,15 +88,24 @@ class WallRemover : public ProcUnit {
     map.setTo(cv::Scalar(0));
     cv::drawContours(map, final_contour_list, -1, CV_RGB(255,255,255), -1);
 
-    if (debug) {
-      cv::imshow("Wall Remover", map);
-      cv::waitKey(1);
+    if (debug_) {
+      // To fit in OpenCv coordinate system, we have to made a rotation of
+      // 90 degrees on the display map
+      cv::Point2f src_center(map.cols/2.0f, map.rows/2.0f);
+      cv::Mat rot_mat = getRotationMatrix2D(src_center, 90, 1.0);
+      cv::Mat dst;
+      cv::warpAffine(map, dst, rot_mat, map.size());
+
+      cvtColor(dst, dst, CV_GRAY2RGB);
+      image_publisher_.Write(dst);
     }
     return boost::any(map);
   }
 
  private:
-  bool debug;
+  bool debug_;
+
+  atlas::ImagePublisher image_publisher_;
 };
 
 }  // namespace proc_mapping

@@ -44,7 +44,14 @@ class Morphology : public ProcUnit {
   //==========================================================================
   // P U B L I C   C / D T O R S
 
-  explicit Morphology(bool debug = false) : debug(debug) {}
+  explicit Morphology(std::string proc_tree_name = "", int kernel_size_x = 5,
+                      int kernel_size_y = 5, bool debug = false) :
+      debug_(debug),
+      kernel_size_x_(kernel_size_x),
+      kernel_size_y_(kernel_size_y),
+      image_publisher_(kRosNodeName + "_morphology_" + proc_tree_name) {
+    image_publisher_.Start();
+  }
 
   virtual ~Morphology() = default;
 
@@ -54,19 +61,30 @@ class Morphology : public ProcUnit {
   virtual boost::any ProcessData(boost::any input) override {
     cv::Mat map = boost::any_cast<cv::Mat>(input);
     cv::Mat element = cv::getStructuringElement(
-        0, cv::Size(4 * 2 + 1, 4 * 2 + 1));
+        0, cv::Size(kernel_size_x_ * 2 + 1, kernel_size_y_ * 2 + 1));
 
     cv::morphologyEx(map, map, cv::MORPH_CLOSE, element);
 
-    if (debug) {
-      cv::imshow("Morphology", map);
-      cv::waitKey(1);
+    if (debug_) {
+      // To fit in OpenCv coordinate system, we have to made a rotation of
+      // 90 degrees on the display map
+      cv::Point2f src_center(map.cols/2.0f, map.rows/2.0f);
+      cv::Mat rot_mat = getRotationMatrix2D(src_center, 90, 1.0);
+      cv::Mat dst;
+      cv::warpAffine(map, dst, rot_mat, map.size());
+
+      cvtColor(dst, dst, CV_GRAY2RGB);
+      image_publisher_.Write(dst);
     }
     return boost::any(map);
   }
 
  private:
-  bool debug;
+  bool debug_;
+  int kernel_size_x_;
+  int kernel_size_y_;
+
+  atlas::ImagePublisher image_publisher_;
 };
 
 }  // namespace proc_mapping

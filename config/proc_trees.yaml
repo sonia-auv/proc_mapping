@@ -10,6 +10,8 @@ proc_trees:
         thresh_value: 10
         debug: false
       - name: morphology
+        kernel_size_x: 4
+        kernel_size_y: 4
         debug: false
       - name: wall_remover
         debug: false
@@ -28,6 +30,8 @@ proc_trees:
         thresh_value: 10
         debug: true
       - name: morphology
+        kernel_size_x: 4
+        kernel_size_y: 4
         debug: false
       - name: wall_remover
         debug: false
@@ -47,6 +51,8 @@ proc_trees:
         thresh_value: 10
         debug: false
       - name: morphology
+        kernel_size_x: 4
+        kernel_size_y: 4
         debug: false
       - name: wall_remover
         debug: false
@@ -61,6 +67,8 @@ proc_trees:
         kernel_size: 3
         debug: false
       - name: morphology
+        kernel_size_x: 4
+        kernel_size_y: 4
         debug: false
       - name: threshold
         threshold_type: 0
