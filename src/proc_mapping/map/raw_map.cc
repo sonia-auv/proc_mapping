@@ -199,6 +199,12 @@ void RawMap::UpdateMat(const cv::Point2i &p, const uint8_t &intensity) {
     int n = number_of_hits_.at(static_cast<unsigned long>(position)) + 1;
     display_map_.at<uint8_t>(p.y, p.x) = static_cast<uint8_t>(
         intensity / n + display_map_.at<uint8_t>(p.y, p.x) * (n - 1) / n);
+//    // Simple mean
+//    // Pointer to prevent multiple calls to at.
+//    uint8_t *value = &(display_map_.at<uint8_t>(p.y, p.x));
+//    // 16 bit to prevent overflow. Compiler will prbly optimize all that...
+//    uint16_t total = *value + intensity;
+//    *value = static_cast<uint8_t>(total)/2;
   }
 }
 
