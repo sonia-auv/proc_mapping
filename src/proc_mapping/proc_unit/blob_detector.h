@@ -78,7 +78,8 @@ class BlobDetector : public ProcUnit {
   //==========================================================================
   // P U B L I C   C / D T O R S
 
-  BlobDetector(std::string proc_tree_name = "", uint8_t target = 0, bool debug = false)
+  BlobDetector(std::string proc_tree_name = "", uint8_t target = 0,
+               bool debug = false)
       : target_(target),
         debug_(debug),
         image_publisher_(kRosNodeName + "_blob_detector_" + proc_tree_name) {
@@ -97,8 +98,8 @@ class BlobDetector : public ProcUnit {
       params_.maxThreshold = 200;
       params_.filterByArea = true;
       params_.blobColor = 255;
-      params_.minArea = 80;
-      params_.maxArea = 500;
+      params_.minArea = 10;
+      params_.maxArea = 800;
       params_.filterByCircularity = false;
       params_.filterByColor = true;
       params_.filterByConvexity = false;
@@ -110,7 +111,7 @@ class BlobDetector : public ProcUnit {
       params_.maxThreshold = 255;
       params_.filterByArea = true;
       params_.blobColor = 255;
-      params_.minArea = 2000;
+      params_.minArea = 500;
       params_.maxArea = 4000;
       params_.filterByCircularity = false;
       params_.filterByColor = false;
@@ -150,7 +151,7 @@ class BlobDetector : public ProcUnit {
 
       // To fit in OpenCv coordinate system, we have to made a rotation of
       // 90 degrees on the display map
-      cv::Point2f src_center(output.cols/2.0f, output.rows/2.0f);
+      cv::Point2f src_center(output.cols / 2.0f, output.rows / 2.0f);
       cv::Mat rot_mat = getRotationMatrix2D(src_center, 90, 1.0);
       cv::Mat dst;
       cv::warpAffine(output, dst, rot_mat, output.size());
