@@ -146,7 +146,7 @@ void RawMap::ProcessPointCloud(const sensor_msgs::PointCloud2::ConstPtr &msg) {
 
     // Adding the sub_position to position the point cloud in the world map.
     cv::Point2d coordinate_transformed(cv::Point2d(out.x(), out.y()) +
-                                       sub_position);
+        sub_position);
     bin_coordinate = cs_->WorldToPixelCoordinates(coordinate_transformed);
 
     // Check if bin_coordinate are in the map boundary
@@ -171,20 +171,21 @@ void RawMap::ProcessPointCloud(const sensor_msgs::PointCloud2::ConstPtr &msg) {
   // Update the world Mat
   for (size_t j = 0; j < intensity_map.size() - 1; j++) {
     UpdateMat(coordinate_map[j], intensity_map[j]);
-  }
-  
-  // Send a command when enough scanline is arrived
-  scanline_counter_++;
 
-  if (scanline_counter_ > 300) {
-    is_first_scan_complete_ = true;
-  }
+    // Send a command when enough scanline is arrived
+    scanline_counter_++;
 
-  if (is_first_scan_complete_) {
-    if (scanline_counter_ >= scanlines_for_process_) {
-      is_map_ready_for_process_ = true;
-      scanline_counter_ = 0;
+    if (scanline_counter_ > 300) {
+      is_first_scan_complete_ = true;
     }
+
+    if (is_first_scan_complete_) {
+      if (scanline_counter_ >= scanlines_for_process_) {
+        is_map_ready_for_process_ = true;
+        scanline_counter_ = 0;
+      }
+    }
+  }
 }
 
 //------------------------------------------------------------------------------
