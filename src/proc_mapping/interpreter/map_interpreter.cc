@@ -175,4 +175,16 @@ bool MapInterpreter::SetCurrentProcTree(const ProcTree::Ptr &proc_tree) {
   return false;
 }
 
+//------------------------------------------------------------------------------
+//
+const std::vector<std::string> MapInterpreter::GetProcTreeList() const {
+  std::vector<std::string> proc_tree_list_;
+  for (const auto &pt : all_proc_trees_) {
+    if (&(*pt.get()) != nullptr) {
+      proc_tree_list_.push_back(pt->GetName());
+    }
+  }
+  return proc_tree_list_;
+}
+
 }  // namespace proc_mapping

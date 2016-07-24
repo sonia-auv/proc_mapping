@@ -37,31 +37,6 @@
 
 namespace proc_mapping {
 
-int BlobDetector::Parameters::filter_area_off = 1;
-const int BlobDetector::Parameters::filter_area_on = 1;
-int BlobDetector::Parameters::min_area = 0;
-const int BlobDetector::Parameters::min_area_max = 10000;
-int BlobDetector::Parameters::max_area = 0;
-const int BlobDetector::Parameters::max_area_max = 10000;
-int BlobDetector::Parameters::filter_circularity_off = 0;
-const int BlobDetector::Parameters::filter_circularity_on = 1;
-float BlobDetector::Parameters::min_circularity = 0;
-const float BlobDetector::Parameters::min_circularity_max = 100.f;
-float BlobDetector::Parameters::max_circularity = 0;
-const float BlobDetector::Parameters::max_circularity_max = 100.f;
-int BlobDetector::Parameters::filter_convexity_off = 0;
-const int BlobDetector::Parameters::filter_convexity_on = 1;
-float BlobDetector::Parameters::min_convexity = 0;
-const float BlobDetector::Parameters::min_convexity_max = 10.f;
-float BlobDetector::Parameters::max_convexity = 0;
-const float BlobDetector::Parameters::max_convexity_max = 10.f;
-int BlobDetector::Parameters::filter_inertial_off = 0;
-const int BlobDetector::Parameters::filter_inertial_on = 1;
-int BlobDetector::Parameters::min_inertia_ratio = 0;
-const float BlobDetector::Parameters::min_inertia_ratio_max = 10.f;
-int BlobDetector::Parameters::max_inertia_ratio = 0;
-const float BlobDetector::Parameters::max_inertia_ratio_max = 10.f;
-
 //==============================================================================
 // C / D T O R S   S E C T I O N
 
@@ -69,8 +44,16 @@ const float BlobDetector::Parameters::max_inertia_ratio_max = 10.f;
 //
 ProcTree::ProcTree(const YAML::Node &node, const ros::NodeHandlePtr &nh,
                    const ObjectRegistery::Ptr &object_registery)
-    : nh_(nh), proc_units_({}), object_registery_(object_registery) {
+    : nh_(nh),
+      blur_type_server_(),
+      name_(""),
+      proc_units_({}),
+      object_registery_(object_registery) {
   Deserialize(node);
+
+  blur_type_server_ =
+      nh_->advertiseService("blur_type_configuration" + name_,
+                            &ProcTree::BlurTypeConfiguration, this);
 }
 
 //==============================================================================
@@ -163,6 +146,30 @@ bool ProcTree::Deserialize(const YAML::Node &node) {
       proc_units_.push_back(std::move(proc_unit));
     }
   }
+  return true;
+}
+
+//------------------------------------------------------------------------------
+//
+void ProcTree::BuildRosMessage() {
+
+}
+
+//------------------------------------------------------------------------------
+//
+bool ProcTree::BlurTypeConfiguration(sonia_msgs::BlurTypeConfiguration::Request &req,
+                                     sonia_msgs::BlurTypeConfiguration::Response &resp) {
+  for (const auto &pu : proc_units_) {
+    if (pu->GetName() == "blur") {
+      auto blur = dynamic_cast<Blur *>(pu.get());
+      if (blur != nullptr) {
+        if (req.blur_type != blur->GetBlurType()) {
+          blur->SetBlurType(req.blur_type);
+        }
+      }
+    }
+  }
+
   return true;
 }
 

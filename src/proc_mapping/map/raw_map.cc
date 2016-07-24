@@ -172,7 +172,7 @@ void RawMap::ProcessPointCloud(const sensor_msgs::PointCloud2::ConstPtr &msg) {
   // Update the world Mat
   for (size_t j = 0; j < intensity_map.size() - 1; j++) {
     UpdateMat(coordinate_map[j], intensity_map[j]);
-
+  }
     // Send a command when enough scanline is arrived
     scanline_counter_++;
 
@@ -186,7 +186,6 @@ void RawMap::ProcessPointCloud(const sensor_msgs::PointCloud2::ConstPtr &msg) {
         scanline_counter_ = 0;
       }
     }
-  }
 }
 
 //------------------------------------------------------------------------------

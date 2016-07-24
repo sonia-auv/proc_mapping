@@ -48,33 +48,6 @@ class BlobDetector : public ProcUnit {
   using PtrList = std::vector<BlobDetector::Ptr>;
   using ConstPtrList = std::vector<BlobDetector::ConstPtr>;
 
-  struct Parameters {
-    static int filter_area_off;
-    static const int filter_area_on;
-    static int min_area;
-    static const int min_area_max;
-    static int max_area;
-    static const int max_area_max;
-    static int filter_circularity_off;
-    static const int filter_circularity_on;
-    static float min_circularity;
-    static const float min_circularity_max;
-    static float max_circularity;
-    static const float max_circularity_max;
-    static int filter_convexity_off;
-    static const int filter_convexity_on;
-    static float min_convexity;
-    static const float min_convexity_max;
-    static float max_convexity;
-    static const float max_convexity_max;
-    static int filter_inertial_off;
-    static const int filter_inertial_on;
-    static int min_inertia_ratio;
-    static const float min_inertia_ratio_max;
-    static int max_inertia_ratio;
-    static const float max_inertia_ratio_max;
-  };
-
   //==========================================================================
   // P U B L I C   C / D T O R S
 
@@ -119,25 +92,7 @@ class BlobDetector : public ProcUnit {
       params_.minInertiaRatio = 0.1f;
       params_.maxInertiaRatio = 0.3f;
     } else {
-      params_.minThreshold = 0;
-      params_.maxThreshold = 255;
-      // Filter by Area.
-      params_.filterByArea = Parameters::filter_area_off;
-      params_.minArea = Parameters::min_area;
-      params_.maxArea = Parameters::max_area;
-      //// Filter by Circularity
-      params_.filterByCircularity = Parameters::filter_circularity_off;
-      params_.minCircularity = Parameters::min_circularity / 100;
-      params_.maxCircularity = Parameters::max_circularity / 100;
-      params_.filterByColor = false;
-      // Filter by Convexity
-      params_.filterByConvexity = Parameters::filter_convexity_off;
-      params_.minConvexity = Parameters::min_convexity / 10;
-      params_.maxConvexity = Parameters::max_convexity / 10;
-      // Filter by Inertia
-      params_.filterByInertia = Parameters::filter_inertial_off;
-      params_.minInertiaRatio = Parameters::min_inertia_ratio / 10;
-      params_.maxInertiaRatio = Parameters::max_inertia_ratio / 10;
+      ROS_INFO("Wrong target.");
     }
     cv::SimpleBlobDetector detector(params_);
     std::vector<cv::KeyPoint> keyPoints;

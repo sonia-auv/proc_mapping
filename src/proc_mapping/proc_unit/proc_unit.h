@@ -60,6 +60,10 @@ class ProcUnit {
   // P U B L I C   M E T H O D S
 
   virtual boost::any ProcessData(boost::any input) = 0;
+
+  virtual const std::string GetName() const {
+    return "";
+  };
 };
 
 }  // namespace proc_mapping

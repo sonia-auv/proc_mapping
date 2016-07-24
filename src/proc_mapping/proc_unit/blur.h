@@ -46,7 +46,7 @@ class Blur : public ProcUnit {
 
   explicit Blur(std::string proc_tree_name = "", int blur_type = 1,
                 int kernel_size = 0, bool debug = false)
-      : blur_type(blur_type),
+      : blur_type_(blur_type),
         kernel_size_(kernel_size),
         debug(debug),
         image_publisher_(kRosNodeName + "_blur_" + proc_tree_name) {
@@ -63,15 +63,16 @@ class Blur : public ProcUnit {
     // To keep the kernel size odd, multiply by 2 and add 1
     cv::Size2i kernel(kernel_size_ * 2 + 1,
                       kernel_size_ * 2 + 1);
+
     // Bilateral Filter need another Mat to do algorithm
     cv::Mat dst = map.clone();
-    if (blur_type == 0) {
+    if (blur_type_ == 0) {
       cv::blur(map, map, kernel);
-    } else if (blur_type == 1) {
+    } else if (blur_type_ == 1) {
       cv::GaussianBlur(map, map, kernel, 0, 0);
-    } else if (blur_type == 2) {
+    } else if (blur_type_ == 2) {
       cv::medianBlur(map, map, kernel_size_ * 2 + 1);
-    } else if (blur_type == 3) {
+    } else if (blur_type_ == 3) {
       cv::bilateralFilter(map, dst, kernel_size_ * 2 + 1,
                           (kernel_size_ * 2 + 1) * 2,
                           (kernel_size_ * 2 + 1) / 2);
@@ -80,7 +81,7 @@ class Blur : public ProcUnit {
       ROS_ERROR("Blur Type is undefined");
     }
     if (debug) {
-      if (blur_type == 3) {
+      if (blur_type_ == 3) {
         // To fit in OpenCv coordinate system, we have to made a rotation of
         // 90 degrees on the display map
         cv::Point2f src_center(dst.cols/2.0f, dst.rows/2.0f);
@@ -105,14 +106,31 @@ class Blur : public ProcUnit {
     return boost::any(map);
   }
 
+  const std::string GetName() const override { return "blur"; }
+
+  inline int GetBlurType() { return blur_type_; }
+
+  inline void SetBlurType(int blur_type) {
+    blur_type_ = blur_type;
+  }
+
+  inline int GetKernelSize() { return kernel_size_; }
+
+  inline void SetKernelSize(int kernel_size) {
+    kernel_size_ = kernel_size;
+  }
+
  private:
+  //==========================================================================
+  // P U B L I C   M E M B B E R S
+
   /*
  * 0: Homogeneous Blur
  * 1: Gaussian Blur
  * 2: Median Blur
  * 3: Bilateral Blur
  */
-  int blur_type;
+  int blur_type_;
   int kernel_size_;
   bool debug;
 

@@ -41,7 +41,7 @@ ProcMappingNode::ProcMappingNode(const ros::NodeHandlePtr &nh)
     : nh_(nh),
       map_pub_(),
       markers_pub_(),
-      reset_odom_sub_(),
+      reset_map_sub_(),
       send_map_srv_(),
       cs_(std::make_shared<CoordinateSystems>(nh_)),
       raw_map_(nh_, cs_),
@@ -51,9 +51,13 @@ ProcMappingNode::ProcMappingNode(const ros::NodeHandlePtr &nh)
   markers_pub_ = nh_->advertise<visualization_msgs::MarkerArray>(
       "/proc_mapping/markers", 100);
 
-  reset_odom_sub_ =
-      nh_->subscribe("/proc_navigation/reset_odometry", 100,
-                     &ProcMappingNode::ResetOdometryCallback, this);
+  reset_map_sub_ =
+      nh_->subscribe("/proc_mapping/reset_map", 100,
+                     &ProcMappingNode::ResetMapCallback, this);
+
+  get_proc_tree_list_srv_ = nh_->advertiseService(
+      "get_proc_tree_list", &ProcMappingNode::GetProcTreeListCallback, this);
+
   send_map_srv_ = nh_->advertiseService(
       "send_map", &ProcMappingNode::SendMapCallback, this);
 
@@ -79,9 +83,8 @@ ProcMappingNode::~ProcMappingNode() {}
 
 //------------------------------------------------------------------------------
 //
-void ProcMappingNode::ResetOdometryCallback(
-    const sonia_msgs::ResetOdometry::ConstPtr &msg) {
-  // Todo: Clearing trigged_keypoint_list_ and candidate_list_ when reset map
+void ProcMappingNode::ResetMapCallback(
+    const sonia_msgs::ResetMap::ConstPtr &msg) {
   semantic_map_.ClearSemanticMap();
   raw_map_.ResetRawMap();
   semantic_map_.ResetSemanticMap();
@@ -95,6 +98,18 @@ bool ProcMappingNode::SendMapCallback(
     sonia_msgs::SendSemanticMap::Response &res) {
   auto map_msg = semantic_map_.GenerateSemanticMapMessage();
   map_pub_.publish(map_msg);
+  return true;
+}
+
+bool ProcMappingNode::GetProcTreeListCallback(sonia_msgs::GetProcTreeList::Request &req,
+                             sonia_msgs::GetProcTreeList::Response &res) {
+  std::vector<std::string> proc_tree_list = map_interpreter_.GetProcTreeList();
+  for (auto proc_tree_name : proc_tree_list) {
+    sonia_msgs::ProcTree pt;
+    pt.name = proc_tree_name;
+    res.proc_tree_list.push_back(pt);
+  }
+
   return true;
 }
 

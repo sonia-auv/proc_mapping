@@ -31,7 +31,7 @@
 #include <sonia_msgs/ChangeProcTree.h>
 #include <sonia_msgs/InsertCircleROI.h>
 #include <sonia_msgs/InsertRectROI.h>
-#include <sonia_msgs/ResetOdometry.h>
+#include <sonia_msgs/ResetMap.h>
 #include <sonia_msgs/SendSemanticMap.h>
 #include <memory>
 #include <vector>
@@ -64,7 +64,10 @@ class ProcMappingNode {
   /// registery, empty it and publish the objects.
   void Spin();
 
-  void ResetOdometryCallback(const sonia_msgs::ResetOdometry::ConstPtr &msg);
+  void ResetMapCallback(const sonia_msgs::ResetMap::ConstPtr &msg);
+
+  bool GetProcTreeListCallback(sonia_msgs::GetProcTreeList::Request &req,
+                               sonia_msgs::GetProcTreeList::Response &res);
 
   bool SendMapCallback(sonia_msgs::SendSemanticMap::Request &req,
                        sonia_msgs::SendSemanticMap::Response &res);
@@ -85,7 +88,8 @@ class ProcMappingNode {
   ros::NodeHandlePtr nh_;
   ros::Publisher map_pub_;
   ros::Publisher markers_pub_;
-  ros::Subscriber reset_odom_sub_;
+  ros::Subscriber reset_map_sub_;
+  ros::ServiceServer get_proc_tree_list_srv_;
   ros::ServiceServer send_map_srv_;
   ros::ServiceServer change_pt_srv_;
   ros::ServiceServer insert_rect_ROI_srv_;

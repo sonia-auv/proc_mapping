@@ -33,6 +33,8 @@
 #include <vector>
 #include "proc_mapping/map/object_registery.h"
 #include "proc_mapping/proc_unit/proc_unit.h"
+#include <sonia_msgs/BlurTypeConfiguration.h>
+#include <sonia_msgs/GetProcTreeList.h>
 
 namespace proc_mapping {
 
@@ -61,6 +63,12 @@ class ProcTree {
 
   const std::string &GetName() const;
 
+  void BuildRosMessage();
+
+  bool BlurTypeConfiguration(
+      sonia_msgs::BlurTypeConfiguration::Request &req,
+      sonia_msgs::BlurTypeConfiguration::Response &resp);
+
  private:
   //==========================================================================
   // P R I V A T E   M E T H O D S
@@ -73,6 +81,7 @@ class ProcTree {
   // P R I V A T E   M E M B E R S
 
   ros::NodeHandlePtr nh_;
+  ros::ServiceServer blur_type_server_;
 
   std::string name_;
 

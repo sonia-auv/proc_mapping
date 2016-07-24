@@ -68,6 +68,8 @@ class MapInterpreter : public DataInterpreter<cv::Mat>,
   bool SetCurrentProcTree(const std::string &name);
   bool SetCurrentProcTree(const ProcTree::Ptr &proc_tree);
 
+  const std::vector<std::string> GetProcTreeList() const;
+
  private:
   //==========================================================================
   // P R I V A T E   M E T H O D S
