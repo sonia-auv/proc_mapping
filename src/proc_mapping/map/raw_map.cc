@@ -146,13 +146,12 @@ void RawMap::ProcessPointCloud(const sensor_msgs::PointCloud2::ConstPtr &msg) {
 
     // Adding the sub_position to position the point cloud in the world map.
     cv::Point2d coordinate_transformed(cv::Point2d(out.x(), out.y()) +
-        sub_position);
+                                       sub_position);
     bin_coordinate = cs_->WorldToPixelCoordinates(coordinate_transformed);
 
     // Check if bin_coordinate are in the map boundary
     if ((bin_coordinate.x < cs_->GetPixel().width and bin_coordinate.x > 0) and
         (bin_coordinate.y < cs_->GetPixel().height and bin_coordinate.y > 0)) {
-
       uint8_t buffed_intensity = static_cast<uint8_t>(255.0f * intensity);
       if (buffed_intensity > 20) {
         buffed_intensity = 255;
@@ -173,18 +172,18 @@ void RawMap::ProcessPointCloud(const sensor_msgs::PointCloud2::ConstPtr &msg) {
   for (size_t j = 0; j < intensity_map.size() - 1; j++) {
     UpdateMat(coordinate_map[j], intensity_map[j]);
   }
-    // Send a command when enough scanline is arrived
-    scanline_counter_++;
+  
+  // Send a command when enough scanline is arrived
+  scanline_counter_++;
 
-    if (scanline_counter_ > 300) {
-      is_first_scan_complete_ = true;
-    }
+  if (scanline_counter_ > 300) {
+    is_first_scan_complete_ = true;
+  }
 
-    if (is_first_scan_complete_) {
-      if (scanline_counter_ >= scanlines_for_process_) {
-        is_map_ready_for_process_ = true;
-        scanline_counter_ = 0;
-      }
+  if (is_first_scan_complete_) {
+    if (scanline_counter_ >= scanlines_for_process_) {
+      is_map_ready_for_process_ = true;
+      scanline_counter_ = 0;
     }
 }
 
@@ -198,12 +197,13 @@ void RawMap::UpdateMat(const cv::Point2i &p, const uint8_t &intensity) {
     int n = number_of_hits_.at(static_cast<unsigned long>(position)) + 1;
     display_map_.at<uint8_t>(p.y, p.x) = static_cast<uint8_t>(
         intensity / n + display_map_.at<uint8_t>(p.y, p.x) * (n - 1) / n);
-//    // Simple mean
-//    // Pointer to prevent multiple calls to at.
-//    uint8_t *value = &(display_map_.at<uint8_t>(p.y, p.x));
-//    // 16 bit to prevent overflow. Compiler will prbly optimize all that...
-//    uint16_t total = *value + intensity;
-//    *value = static_cast<uint8_t>(total)/2;
+    //    // Simple mean
+    //    // Pointer to prevent multiple calls to at.
+    //    uint8_t *value = &(display_map_.at<uint8_t>(p.y, p.x));
+    //    // 16 bit to prevent overflow. Compiler will prbly optimize all
+    //    that...
+    //    uint16_t total = *value + intensity;
+    //    *value = static_cast<uint8_t>(total)/2;
   }
 }
 
@@ -214,6 +214,7 @@ bool RawMap::IsMapReadyForProcess() { return is_map_ready_for_process_; }
 //------------------------------------------------------------------------------
 //
 void RawMap::ResetRawMap() {
+  ROS_INFO("Resetting the raw map");
   display_map_.setTo(cv::Scalar(0));
   std::fill(number_of_hits_.begin(), number_of_hits_.end(), 0);
   scanline_counter_ = 0;

@@ -96,6 +96,7 @@ void ProcMappingNode::ResetMapCallback(
 bool ProcMappingNode::SendMapCallback(
     sonia_msgs::SendSemanticMap::Request &req,
     sonia_msgs::SendSemanticMap::Response &res) {
+  ROS_INFO("Sending maps!");
   auto map_msg = semantic_map_.GenerateSemanticMapMessage();
   map_pub_.publish(map_msg);
   return true;
@@ -118,12 +119,16 @@ bool ProcMappingNode::GetProcTreeListCallback(sonia_msgs::GetProcTreeList::Reque
 bool ProcMappingNode::ChangeProcTreeCallback(
     sonia_msgs::ChangeProcTree::Request &req,
     sonia_msgs::ChangeProcTree::Response &res) {
+  ROS_INFO("Changing the proc tree");
   if (req.target == req.FAR_BUOYS) {
     map_interpreter_.SetDetectionMode(DetectionMode::FAR_BUOYS);
+    ROS_INFO("Changing to far buoys");
   } else if (req.target == req.BUOYS) {
     map_interpreter_.SetDetectionMode(DetectionMode::BUOYS);
+    ROS_INFO("Changing to buoys");
   } else if (req.target == req.FENCE) {
     map_interpreter_.SetDetectionMode(DetectionMode::FENCE);
+    ROS_INFO("Changing to fence");
   } else if (req.target == req.WALL) {
     map_interpreter_.SetDetectionMode(DetectionMode::WALL);
   } else {
