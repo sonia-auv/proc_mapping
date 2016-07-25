@@ -78,6 +78,8 @@ class Dilate : public ProcUnit {
     return boost::any(map);
   }
 
+  const std::string GetName() const override { return "dilate"; }
+
  private:
   bool debug_;
   const cv::Point anchor_ = cv::Point(-1, -1);

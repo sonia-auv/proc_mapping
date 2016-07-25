@@ -81,6 +81,8 @@ class Threshold : public ProcUnit {
     return boost::any(map);
   }
 
+  const std::string GetName() const override { return "threshold"; }
+
  private:
   /*
  * 0: Binary

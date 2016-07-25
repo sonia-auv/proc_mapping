@@ -102,6 +102,8 @@ class WallRemover : public ProcUnit {
     return boost::any(map);
   }
 
+  const std::string GetName() const override { return "wall_remover"; }
+
  private:
   bool debug_;
 

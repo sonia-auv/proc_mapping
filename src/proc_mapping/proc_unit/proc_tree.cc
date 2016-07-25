@@ -151,8 +151,18 @@ bool ProcTree::Deserialize(const YAML::Node &node) {
 
 //------------------------------------------------------------------------------
 //
-void ProcTree::BuildRosMessage() {
+sonia_msgs::ProcTree ProcTree::BuildRosMessage() {
+  sonia_msgs::ProcTree proc_tree_msg;
+  proc_tree_msg.name = name_;
 
+  std::vector<sonia_msgs::ProcUnit> proc_unit_list;
+  sonia_msgs::ProcUnit proc_unit;
+  for (const auto &pu : proc_units_) {
+    proc_unit.name = pu->GetName();
+    proc_unit_list.push_back(proc_unit);
+  }
+
+  return proc_tree_msg;
 }
 
 //------------------------------------------------------------------------------

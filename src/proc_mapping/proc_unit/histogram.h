@@ -84,6 +84,8 @@ class Histogram: public ProcUnit {
     return boost::any(map);
   }
 
+  const std::string GetName() const override { return "histogram"; }
+
  private:
 
   atlas::ImagePublisher image_publisher_;

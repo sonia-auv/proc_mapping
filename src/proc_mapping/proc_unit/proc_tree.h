@@ -35,6 +35,7 @@
 #include "proc_mapping/proc_unit/proc_unit.h"
 #include <sonia_msgs/BlurTypeConfiguration.h>
 #include <sonia_msgs/GetProcTreeList.h>
+//#include <sonia_msgs/ProcUnit.h>
 
 namespace proc_mapping {
 
@@ -63,7 +64,7 @@ class ProcTree {
 
   const std::string &GetName() const;
 
-  void BuildRosMessage();
+  sonia_msgs::ProcTree BuildRosMessage();
 
   bool BlurTypeConfiguration(
       sonia_msgs::BlurTypeConfiguration::Request &req,

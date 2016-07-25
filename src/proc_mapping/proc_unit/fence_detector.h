@@ -105,6 +105,8 @@ class FenceDetector : public ProcUnit {
     return boost::any(added_new_object);
   }
 
+  const std::string GetName() const override { return "fence_detector"; }
+
  private:
   //==========================================================================
   // PRIVATE   M E T H O D S

@@ -79,6 +79,8 @@ class Morphology : public ProcUnit {
     return boost::any(map);
   }
 
+  const std::string GetName() const override { return "morphology"; }
+
  private:
   bool debug_;
   int kernel_size_x_;

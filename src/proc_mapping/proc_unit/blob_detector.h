@@ -117,6 +117,8 @@ class BlobDetector : public ProcUnit {
     return boost::any(keyPoints);
   }
 
+  const std::string GetName() const override { return "blob_detection"; }
+
  private:
   //==========================================================================
   // P R I V A T E   M E M B E R S

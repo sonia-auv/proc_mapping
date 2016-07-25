@@ -104,11 +104,11 @@ bool ProcMappingNode::SendMapCallback(
 
 bool ProcMappingNode::GetProcTreeListCallback(sonia_msgs::GetProcTreeList::Request &req,
                              sonia_msgs::GetProcTreeList::Response &res) {
-  std::vector<std::string> proc_tree_list = map_interpreter_.GetProcTreeList();
-  for (auto proc_tree_name : proc_tree_list) {
-    sonia_msgs::ProcTree pt;
-    pt.name = proc_tree_name;
-    res.proc_tree_list.push_back(pt);
+
+  std::vector<ProcTree::Ptr> proc_tree_list = map_interpreter_.GetProcTreeList();
+
+  for (const auto pt : proc_tree_list) {
+    res.proc_tree_list.push_back(pt->BuildRosMessage());
   }
 
   return true;
