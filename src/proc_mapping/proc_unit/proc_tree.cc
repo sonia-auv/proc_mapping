@@ -156,11 +156,13 @@ sonia_msgs::ProcTree ProcTree::BuildRosMessage() {
   proc_tree_msg.name = name_;
 
   std::vector<sonia_msgs::ProcUnit> proc_unit_list;
-  sonia_msgs::ProcUnit proc_unit;
   for (const auto &pu : proc_units_) {
+    sonia_msgs::ProcUnit proc_unit;
     proc_unit.name = pu->GetName();
     proc_unit_list.push_back(proc_unit);
   }
+
+  proc_tree_msg.proc_unit_list = proc_unit_list;
 
   return proc_tree_msg;
 }
