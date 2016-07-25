@@ -45,15 +45,10 @@ namespace proc_mapping {
 ProcTree::ProcTree(const YAML::Node &node, const ros::NodeHandlePtr &nh,
                    const ObjectRegistery::Ptr &object_registery)
     : nh_(nh),
-      blur_type_server_(),
       name_(""),
       proc_units_({}),
       object_registery_(object_registery) {
   Deserialize(node);
-
-  blur_type_server_ =
-      nh_->advertiseService("blur_type_configuration" + name_ + "_",
-                            &ProcTree::BlurTypeConfiguration, this);
 }
 
 //==============================================================================
@@ -92,7 +87,7 @@ typename ProcUnit::Ptr ProcTree::ProcUnitFactory(const YAML::Node &node) const {
       return std::make_shared<Blur>(name_, blur_type, kernel_size, debug);
     } else if (proc_unit_name == "threshold") {
       auto debug = node["debug"].as<bool>();
-      auto threshold_type = node["threshold_type"].as<int>();
+      auto threshold_type = node["threshold_type_"].as<int>();
       auto thresh_value = node["thresh_value"].as<int>();
       return std::make_shared<Threshold>(name_, threshold_type, thresh_value,
                                          debug);
@@ -154,6 +149,18 @@ bool ProcTree::Deserialize(const YAML::Node &node) {
 
 //------------------------------------------------------------------------------
 //
+ProcUnit::Ptr ProcTree::GetProcUnit(std::string &name) {
+  for (const auto &pu : proc_units_) {
+    if (pu->GetName() == name) {
+      return pu;
+    }
+  }
+
+  return nullptr;
+}
+
+//------------------------------------------------------------------------------
+//
 sonia_msgs::ProcTree ProcTree::BuildRosMessage() {
   sonia_msgs::ProcTree proc_tree_msg;
   proc_tree_msg.name = name_;
@@ -175,25 +182,6 @@ sonia_msgs::ProcTree ProcTree::BuildRosMessage() {
   proc_tree_msg.proc_unit_list = proc_unit_list;
 
   return proc_tree_msg;
-}
-
-//------------------------------------------------------------------------------
-//
-bool ProcTree::BlurTypeConfiguration(
-    sonia_msgs::BlurTypeConfiguration::Request &req,
-    sonia_msgs::BlurTypeConfiguration::Response &resp) {
-  for (const auto &pu : proc_units_) {
-    if (pu->GetName() == "blur") {
-      auto blur = dynamic_cast<Blur *>(pu.get());
-      if (blur != nullptr) {
-        if (req.blur_type != blur->GetBlurType()) {
-          blur->SetBlurType(req.blur_type);
-        }
-      }
-    }
-  }
-
-  return true;
 }
 
 }  // namespace proc_mapping

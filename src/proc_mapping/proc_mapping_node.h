@@ -33,6 +33,7 @@
 #include <sonia_msgs/InsertRectROI.h>
 #include <sonia_msgs/ResetMap.h>
 #include <sonia_msgs/SendSemanticMap.h>
+#include <sonia_msgs/ChangeParameter.h>
 #include <memory>
 #include <vector>
 #include "proc_mapping/config.h"
@@ -69,6 +70,9 @@ class ProcMappingNode {
   bool GetProcTreeListCallback(sonia_msgs::GetProcTreeList::Request &req,
                                sonia_msgs::GetProcTreeList::Response &res);
 
+  bool ChangeParameterCallback(sonia_msgs::ChangeParameter::Request &req,
+                             sonia_msgs::ChangeParameter::Response &resp);
+
   bool SendMapCallback(sonia_msgs::SendSemanticMap::Request &req,
                        sonia_msgs::SendSemanticMap::Response &res);
 
@@ -90,6 +94,7 @@ class ProcMappingNode {
   ros::Publisher markers_pub_;
   ros::Subscriber reset_map_sub_;
   ros::ServiceServer get_proc_tree_list_srv_;
+  ros::ServiceServer change_parameter_srv_;
   ros::ServiceServer send_map_srv_;
   ros::ServiceServer change_pt_srv_;
   ros::ServiceServer insert_rect_ROI_srv_;

@@ -28,7 +28,6 @@
 
 #include <proc_mapping/map/coordinate_systems.h>
 #include <ros/forwards.h>
-#include <sonia_msgs/BlurTypeConfiguration.h>
 #include <sonia_msgs/GetProcTreeList.h>
 #include <yaml-cpp/yaml.h>
 #include <memory>
@@ -63,10 +62,9 @@ class ProcTree {
 
   const std::string &GetName() const;
 
-  sonia_msgs::ProcTree BuildRosMessage();
+  ProcUnit::Ptr GetProcUnit(std::string &name);
 
-  bool BlurTypeConfiguration(sonia_msgs::BlurTypeConfiguration::Request &req,
-                             sonia_msgs::BlurTypeConfiguration::Response &resp);
+  sonia_msgs::ProcTree BuildRosMessage();
 
  private:
   //==========================================================================
@@ -80,7 +78,6 @@ class ProcTree {
   // P R I V A T E   M E M B E R S
 
   ros::NodeHandlePtr nh_;
-  ros::ServiceServer blur_type_server_;
 
   std::string name_;
 

@@ -7,7 +7,7 @@ proc_trees:
         kernel_size: 3
         debug: true
       - name: threshold
-        threshold_type: 0
+        threshold_type_: 0
         thresh_value: 10
         debug: true
 #      - name: morphology
@@ -27,7 +27,7 @@ proc_trees:
         kernel_size: 3
         debug: true
       - name: threshold
-        threshold_type: 0
+        threshold_type_: 0
         thresh_value: 10
         debug: true
      # - name: morphology
@@ -48,7 +48,7 @@ proc_trees:
         kernel_size: 3
         debug: false
       - name: threshold
-        threshold_type: 0
+        threshold_type_: 0
         thresh_value: 10
         debug: false
       - name: morphology
@@ -72,7 +72,7 @@ proc_trees:
         kernel_size_y: 4
         debug: false
       - name: threshold
-        threshold_type: 0
+        threshold_type_: 0
         thresh_value: 10
         debug: false
 

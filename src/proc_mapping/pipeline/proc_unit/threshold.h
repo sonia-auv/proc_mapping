@@ -46,7 +46,7 @@ class Threshold : public ProcUnit {
 
   explicit Threshold(std::string proc_tree_name = "", int threshold_type = 0,
                      int thresh_value = 0, bool debug = false)
-      : threshold_type("Threshold Type", threshold_type, parameters_),
+      : threshold_type_("Threshold Type", threshold_type, parameters_),
         thresh_value_("Threshold Value", thresh_value, parameters_),
         debug("Debug", debug, parameters_),
         image_publisher_(kRosNodeName + "_threshold_" + proc_tree_name) {
@@ -60,12 +60,12 @@ class Threshold : public ProcUnit {
 
   virtual boost::any ProcessData(boost::any input) override {
     cv::Mat map = boost::any_cast<cv::Mat>(input);
-    if ((threshold_type.GetValue() == 0) | (threshold_type.GetValue() == 1) |
-        (threshold_type.GetValue() == 2) | (threshold_type.GetValue() == 3) |
-        (threshold_type.GetValue() == 4) | (threshold_type.GetValue() == 7) |
-        (threshold_type.GetValue() == 8)) {
+    if ((threshold_type_.GetValue() == 0) | (threshold_type_.GetValue() == 1) |
+        (threshold_type_.GetValue() == 2) | (threshold_type_.GetValue() == 3) |
+        (threshold_type_.GetValue() == 4) | (threshold_type_.GetValue() == 7) |
+        (threshold_type_.GetValue() == 8)) {
       cv::threshold(map, map, thresh_value_.GetValue(), 255,
-                    threshold_type.GetValue());
+                    threshold_type_.GetValue());
     } else {
       ROS_ERROR("Threshold type is undefined");
     }
@@ -95,7 +95,7 @@ class Threshold : public ProcUnit {
  * 7: Threshold Mask
  * 8: Threshold OTSU
  */
-  Parameter<int> threshold_type;
+  Parameter<int> threshold_type_;
   Parameter<int> thresh_value_;
   Parameter<bool> debug;
 

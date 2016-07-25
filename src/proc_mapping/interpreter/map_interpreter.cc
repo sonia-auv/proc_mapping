@@ -181,4 +181,16 @@ const std::vector<ProcTree::Ptr> MapInterpreter::GetProcTreeList() const {
   return all_proc_trees_;
 }
 
+//------------------------------------------------------------------------------
+//
+ProcTree::Ptr MapInterpreter::GetProcTree(const std::string &name) {
+  for (const auto &pt : all_proc_trees_) {
+    if (pt->GetName() == name) {
+      return pt;
+    }
+  }
+
+  return nullptr;
+}
+
 }  // namespace proc_mapping

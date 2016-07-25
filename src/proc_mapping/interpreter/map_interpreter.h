@@ -70,6 +70,8 @@ class MapInterpreter : public DataInterpreter<cv::Mat>,
 
   const std::vector<ProcTree::Ptr> GetProcTreeList() const;
 
+  ProcTree::Ptr GetProcTree(const std::string &name);
+
  private:
   //==========================================================================
   // P R I V A T E   M E T H O D S
