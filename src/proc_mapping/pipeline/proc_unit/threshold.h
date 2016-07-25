@@ -46,9 +46,9 @@ class Threshold : public ProcUnit {
 
   explicit Threshold(std::string proc_tree_name = "", int threshold_type = 0,
                      int thresh_value = 0, bool debug = false)
-      : threshold_type(threshold_type),
-        thresh_value_(thresh_value),
-        debug(debug),
+      : threshold_type("Threshold Type", threshold_type, parameters_),
+        thresh_value_("Threshold Value", thresh_value, parameters_),
+        debug("Debug", debug, parameters_),
         image_publisher_(kRosNodeName + "_threshold_" + proc_tree_name) {
     image_publisher_.Start();
   }
@@ -60,14 +60,16 @@ class Threshold : public ProcUnit {
 
   virtual boost::any ProcessData(boost::any input) override {
     cv::Mat map = boost::any_cast<cv::Mat>(input);
-    if ((threshold_type == 0) | (threshold_type == 1) | (threshold_type == 2) |
-        (threshold_type == 3) | (threshold_type == 4) | (threshold_type == 7) |
-        (threshold_type == 8)) {
-      cv::threshold(map, map, thresh_value_, 255, threshold_type);
+    if ((threshold_type.GetValue() == 0) | (threshold_type.GetValue() == 1) |
+        (threshold_type.GetValue() == 2) | (threshold_type.GetValue() == 3) |
+        (threshold_type.GetValue() == 4) | (threshold_type.GetValue() == 7) |
+        (threshold_type.GetValue() == 8)) {
+      cv::threshold(map, map, thresh_value_.GetValue(), 255,
+                    threshold_type.GetValue());
     } else {
       ROS_ERROR("Threshold type is undefined");
     }
-    if (debug) {
+    if (debug.GetValue()) {
       // To fit in OpenCv coordinate system, we have to made a rotation of
       // 90 degrees on the display map
       cv::Point2f src_center(map.cols / 2.0f, map.rows / 2.0f);
@@ -93,9 +95,9 @@ class Threshold : public ProcUnit {
  * 7: Threshold Mask
  * 8: Threshold OTSU
  */
-  int threshold_type;
-  int thresh_value_;
-  bool debug;
+  Parameter<int> threshold_type;
+  Parameter<int> thresh_value_;
+  Parameter<bool> debug;
 
   atlas::ImagePublisher image_publisher_;
 };

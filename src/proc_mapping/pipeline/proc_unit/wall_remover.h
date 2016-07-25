@@ -45,7 +45,7 @@ class WallRemover : public ProcUnit {
   // P U B L I C   C / D T O R S
 
   explicit WallRemover(std::string proc_tree_name = "", bool debug = false)
-      : debug_(debug),
+      : debug_("Debug", debug, parameters_),
         image_publisher_(kRosNodeName + "_threshold_" + proc_tree_name) {
     image_publisher_.Start();
   }
@@ -88,7 +88,7 @@ class WallRemover : public ProcUnit {
     map.setTo(cv::Scalar(0));
     cv::drawContours(map, final_contour_list, -1, CV_RGB(255, 255, 255), -1);
 
-    if (debug_) {
+    if (debug_.GetValue()) {
       // To fit in OpenCv coordinate system, we have to made a rotation of
       // 90 degrees on the display map
       cv::Point2f src_center(map.cols / 2.0f, map.rows / 2.0f);
@@ -105,7 +105,7 @@ class WallRemover : public ProcUnit {
   std::string GetName() const override { return "wall_remover"; }
 
  private:
-  bool debug_;
+  Parameter<bool> debug_;
 
   atlas::ImagePublisher image_publisher_;
 };

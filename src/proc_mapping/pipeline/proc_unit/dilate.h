@@ -46,12 +46,12 @@ class Dilate : public ProcUnit {
 
   Dilate(std::string proc_tree_name = "", int kernel_size_x = 5,
          int kernel_size_y = 5, bool debug = false)
-      : debug_(debug),
-        kernel_size_x_(kernel_size_x),
-        kernel_size_y_(kernel_size_y),
+      : debug_("Debug", debug, parameters_),
+        kernel_size_x_("Kernel Size X", kernel_size_x, parameters_),
+        kernel_size_y_("Kernel Size Y", kernel_size_y, parameters_),
         image_publisher_(kRosNodeName + "_dilate_" + proc_tree_name) {
     image_publisher_.Start();
-  };
+  }
 
   virtual ~Dilate() = default;
 
@@ -60,10 +60,11 @@ class Dilate : public ProcUnit {
 
   virtual boost::any ProcessData(boost::any input) override {
     cv::Mat map = boost::any_cast<cv::Mat>(input);
-    cv::Size size = cv::Size(kernel_size_x_, kernel_size_y_);
+    cv::Size size =
+        cv::Size(kernel_size_x_.GetValue(), kernel_size_y_.GetValue());
     cv::Mat kernel_ = cv::getStructuringElement(kernel_type_, size, anchor_);
     cv::dilate(map, map, kernel_, anchor_, iteration_);
-    if (debug_) {
+    if (debug_.GetValue()) {
       // To fit in OpenCv coordinate system, we have to made a rotation of
       // 90 degrees on the display map
       cv::Point2f src_center(map.cols / 2.0f, map.rows / 2.0f);
@@ -80,14 +81,14 @@ class Dilate : public ProcUnit {
   std::string GetName() const override { return "dilate"; }
 
  private:
-  bool debug_;
-  const cv::Point anchor_ = cv::Point(-1, -1);
+  Parameter<bool> debug_;
+  Parameter<int> kernel_size_x_;
+  Parameter<int> kernel_size_y_;
+
   int iteration_ = 1;
   int kernel_type_ = cv::MORPH_RECT;
 
-  int kernel_size_x_;
-  int kernel_size_y_;
-
+  const cv::Point anchor_ = cv::Point(-1, -1);
   atlas::ImagePublisher image_publisher_;
 };
 

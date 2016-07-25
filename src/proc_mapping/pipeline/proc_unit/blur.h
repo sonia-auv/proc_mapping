@@ -46,12 +46,12 @@ class Blur : public ProcUnit {
 
   explicit Blur(std::string proc_tree_name = "", int blur_type = 1,
                 int kernel_size = 0, bool debug = false)
-      : blur_type_(blur_type),
-        kernel_size_(kernel_size),
-        debug(debug),
+      : blur_type_("Blur Type", blur_type, parameters_),
+        kernel_size_("Kernel Size", kernel_size, parameters_),
+        debug_("Debug, ", debug, parameters_),
         image_publisher_(kRosNodeName + "_blur_" + proc_tree_name) {
     image_publisher_.Start();
-  };
+  }
 
   virtual ~Blur() = default;
 
@@ -61,26 +61,27 @@ class Blur : public ProcUnit {
   virtual boost::any ProcessData(boost::any input) override {
     cv::Mat map = boost::any_cast<cv::Mat>(input);
     // To keep the kernel size odd, multiply by 2 and add 1
-    cv::Size2i kernel(kernel_size_ * 2 + 1, kernel_size_ * 2 + 1);
+    cv::Size2i kernel(kernel_size_.GetValue() * 2 + 1,
+                      kernel_size_.GetValue() * 2 + 1);
 
     // Bilateral Filter need another Mat to do algorithm
     cv::Mat dst = map.clone();
-    if (blur_type_ == 0) {
+    if (blur_type_.GetValue() == 0) {
       cv::blur(map, map, kernel);
-    } else if (blur_type_ == 1) {
+    } else if (blur_type_.GetValue() == 1) {
       cv::GaussianBlur(map, map, kernel, 0, 0);
-    } else if (blur_type_ == 2) {
-      cv::medianBlur(map, map, kernel_size_ * 2 + 1);
-    } else if (blur_type_ == 3) {
-      cv::bilateralFilter(map, dst, kernel_size_ * 2 + 1,
-                          (kernel_size_ * 2 + 1) * 2,
-                          (kernel_size_ * 2 + 1) / 2);
+    } else if (blur_type_.GetValue() == 2) {
+      cv::medianBlur(map, map, kernel_size_.GetValue() * 2 + 1);
+    } else if (blur_type_.GetValue() == 3) {
+      cv::bilateralFilter(map, dst, kernel_size_.GetValue() * 2 + 1,
+                          (kernel_size_.GetValue() * 2 + 1) * 2,
+                          (kernel_size_.GetValue() * 2 + 1) / 2);
       input = dst;
     } else {
       ROS_ERROR("Blur Type is undefined");
     }
-    if (debug) {
-      if (blur_type_ == 3) {
+    if (debug_.GetValue()) {
+      if (blur_type_.GetValue() == 3) {
         // To fit in OpenCv coordinate system, we have to made a rotation of
         // 90 degrees on the display map
         cv::Point2f src_center(dst.cols / 2.0f, dst.rows / 2.0f);
@@ -107,13 +108,15 @@ class Blur : public ProcUnit {
 
   std::string GetName() const override { return "blur"; }
 
-  inline int GetBlurType() { return blur_type_; }
+  inline int GetBlurType() { return blur_type_.GetValue(); }
 
-  inline void SetBlurType(int blur_type) { blur_type_ = blur_type; }
+  inline void SetBlurType(int blur_type) { blur_type_.SetValue(blur_type); }
 
-  inline int GetKernelSize() { return kernel_size_; }
+  inline int GetKernelSize() { return kernel_size_.GetValue(); }
 
-  inline void SetKernelSize(int kernel_size) { kernel_size_ = kernel_size; }
+  inline void SetKernelSize(int kernel_size) {
+    kernel_size_.SetValue(kernel_size);
+  }
 
  private:
   //==========================================================================
@@ -125,9 +128,9 @@ class Blur : public ProcUnit {
  * 2: Median Blur
  * 3: Bilateral Blur
  */
-  int blur_type_;
-  int kernel_size_;
-  bool debug;
+  Parameter<int> blur_type_;
+  Parameter<int> kernel_size_;
+  Parameter<bool> debug_;
 
   atlas::ImagePublisher image_publisher_;
 };

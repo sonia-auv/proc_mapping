@@ -46,9 +46,9 @@ class Morphology : public ProcUnit {
 
   explicit Morphology(std::string proc_tree_name = "", int kernel_size_x = 5,
                       int kernel_size_y = 5, bool debug = false)
-      : debug_(debug),
-        kernel_size_x_(kernel_size_x),
-        kernel_size_y_(kernel_size_y),
+      : debug_("Debug", debug, parameters_),
+        kernel_size_x_("Kernel Size X", kernel_size_x, parameters_),
+        kernel_size_y_("Kernel Size X", kernel_size_y, parameters_),
         image_publisher_(kRosNodeName + "_morphology_" + proc_tree_name) {
     image_publisher_.Start();
   }
@@ -61,11 +61,12 @@ class Morphology : public ProcUnit {
   virtual boost::any ProcessData(boost::any input) override {
     cv::Mat map = boost::any_cast<cv::Mat>(input);
     cv::Mat element = cv::getStructuringElement(
-        0, cv::Size(kernel_size_x_ * 2 + 1, kernel_size_y_ * 2 + 1));
+        0, cv::Size(kernel_size_x_.GetValue() * 2 + 1,
+                    kernel_size_y_.GetValue() * 2 + 1));
 
     cv::morphologyEx(map, map, cv::MORPH_CLOSE, element);
 
-    if (debug_) {
+    if (debug_.GetValue()) {
       // To fit in OpenCv coordinate system, we have to made a rotation of
       // 90 degrees on the display map
       cv::Point2f src_center(map.cols / 2.0f, map.rows / 2.0f);
@@ -82,9 +83,9 @@ class Morphology : public ProcUnit {
   std::string GetName() const override { return "morphology"; }
 
  private:
-  bool debug_;
-  int kernel_size_x_;
-  int kernel_size_y_;
+  Parameter<bool> debug_;
+  Parameter<int> kernel_size_x_;
+  Parameter<int> kernel_size_y_;
 
   atlas::ImagePublisher image_publisher_;
 };

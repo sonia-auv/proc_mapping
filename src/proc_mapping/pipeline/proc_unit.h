@@ -66,7 +66,7 @@ class ProcUnit {
 
   std::vector<ParameterInterface *> GetParameters() const;
 
- private:
+ protected:
   std::vector<ParameterInterface *> parameters_;
 };
 

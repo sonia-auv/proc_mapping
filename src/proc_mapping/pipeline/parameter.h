@@ -54,6 +54,7 @@ class ParameterInterface {
   // P U B L I C   M E T H O D S
 
   std::string GetName() const;
+  void SetName(const std::string &name);
 
   virtual std::string GetStringValue() const = 0;
 
@@ -96,10 +97,14 @@ class Parameter : public ParameterInterface {
 
   void SetValue(const Tp_ &value);
 
+  virtual std::string GetStringValue() const override;
+
   virtual void SetFromRosMessage(
       const sonia_msgs::ProcUnitParameter &parameter) override;
 
   virtual sonia_msgs::ProcUnitParameter BuildRosMessage() const override;
+
+  uint32_t GetRosParameterType() const;
 
  private:
   //==========================================================================
@@ -119,6 +124,12 @@ inline ParameterInterface::ParameterInterface(const std::string &name)
 //------------------------------------------------------------------------------
 //
 inline std::string ParameterInterface::GetName() const { return name_; }
+
+//------------------------------------------------------------------------------
+//
+inline void ParameterInterface::SetName(const std::string &name) {
+  name_ = name;
+}
 
 //------------------------------------------------------------------------------
 //
@@ -142,25 +153,96 @@ inline Parameter<Tp_>::Parameter(const std::string &name, const Tp_ &value,
 //
 template <class Tp_>
 inline sonia_msgs::ProcUnitParameter Parameter<Tp_>::BuildRosMessage() const {
-  return sonia_msgs::ProcUnitParameter();
+  sonia_msgs::ProcUnitParameter msg{};
+  msg.name = GetName();
+  msg.value = std::to_string(value_);
+  msg.type = GetRosParameterType();
+  return msg;
+}
+
+//------------------------------------------------------------------------------
+//
+template <>
+inline uint32_t Parameter<int>::GetRosParameterType() const {
+  return sonia_msgs::ProcUnitParameter::TYPE_INT;
+}
+
+//------------------------------------------------------------------------------
+//
+template <>
+inline uint32_t Parameter<double>::GetRosParameterType() const {
+  return sonia_msgs::ProcUnitParameter::TYPE_DOUBLE;
+}
+
+//------------------------------------------------------------------------------
+//
+template <>
+inline uint32_t Parameter<std::string>::GetRosParameterType() const {
+  return sonia_msgs::ProcUnitParameter::TYPE_STRING;
+}
+
+//------------------------------------------------------------------------------
+//
+template <>
+inline uint32_t Parameter<bool>::GetRosParameterType() const {
+  return sonia_msgs::ProcUnitParameter::TYPE_BOOL;
 }
 
 //------------------------------------------------------------------------------
 //
 template <class Tp_>
 inline void Parameter<Tp_>::SetFromRosMessage(
-    const sonia_msgs::ProcUnitParameter &parameter) {}
+    const sonia_msgs::ProcUnitParameter &parameter) {
+  if (parameter.type == sonia_msgs::ProcUnitParameter::TYPE_INT) {
+    value_ = std::stoi(parameter.value);
+  } else if (parameter.type == sonia_msgs::ProcUnitParameter::TYPE_DOUBLE) {
+    value_ = std::stod(parameter.value);
+  } else if (parameter.type == sonia_msgs::ProcUnitParameter::TYPE_BOOL) {
+    auto value = parameter.value;
+    std::transform(value.begin(), value.end(), value.begin(), ::tolower);
+    if (value == "true") {
+      value_ = true;
+    } else if (value == "false") {
+      value_ = false;
+    } else {
+      throw std::logic_error("Cannot parse the value of the boolean type");
+    }
+  }
+
+  SetName(parameter.name);
+}
+
+//------------------------------------------------------------------------------
+//
+template <>
+inline void Parameter<std::string>::SetFromRosMessage(
+    const sonia_msgs::ProcUnitParameter &parameter) {
+  if (parameter.type == sonia_msgs::ProcUnitParameter::TYPE_STRING) {
+    value_ = std::string{parameter.value};
+  }
+
+  SetName(parameter.name);
+}
 
 //------------------------------------------------------------------------------
 //
 template <class Tp_>
-inline void Parameter<Tp_>::SetValue(const Tp_ &value) {}
+inline void Parameter<Tp_>::SetValue(const Tp_ &value) {
+  value_ = value;
+}
 
 //------------------------------------------------------------------------------
 //
 template <class Tp_>
 inline Tp_ Parameter<Tp_>::GetValue() const {
-  return nullptr;
+  return value_;
+}
+
+//------------------------------------------------------------------------------
+//
+template <class Tp_>
+inline std::string Parameter<Tp_>::GetStringValue() const {
+  return std::to_string(GetValue());
 }
 
 }  // namespace proc_mapping

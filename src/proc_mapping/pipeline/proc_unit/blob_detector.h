@@ -53,8 +53,8 @@ class BlobDetector : public ProcUnit {
 
   BlobDetector(std::string proc_tree_name = "", uint8_t target = 0,
                bool debug = false)
-      : target_(target),
-        debug_(debug),
+      : target_("Target", target, parameters_),
+        debug_("Debug", debug, parameters_),
         image_publisher_(kRosNodeName + "_blob_detector_" + proc_tree_name) {
     image_publisher_.Start();
   }
@@ -66,7 +66,7 @@ class BlobDetector : public ProcUnit {
 
   virtual boost::any ProcessData(boost::any input) override {
     cv::Mat map = boost::any_cast<cv::Mat>(input);
-    if (target_ == 0) {
+    if (target_.GetValue() == 0) {
       params_.minThreshold = 30;
       params_.maxThreshold = 200;
       params_.filterByArea = true;
@@ -79,7 +79,7 @@ class BlobDetector : public ProcUnit {
       params_.filterByInertia = false;
       params_.minInertiaRatio = 0.1f;
       params_.maxInertiaRatio = 0.3f;
-    } else if (target_ == 1) {
+    } else if (target_.GetValue() == 1) {
       params_.minThreshold = 200;
       params_.maxThreshold = 255;
       params_.filterByArea = true;
@@ -99,7 +99,7 @@ class BlobDetector : public ProcUnit {
     std::vector<cv::KeyPoint> keyPoints;
     detector.detect(map, keyPoints);
 
-    if (debug_) {
+    if (debug_.GetValue()) {
       cv::Mat output;
       cv::drawKeypoints(map, keyPoints, output, cv::Scalar(0, 0, 255),
                         cv::DrawMatchesFlags::DRAW_RICH_KEYPOINTS);
@@ -123,8 +123,9 @@ class BlobDetector : public ProcUnit {
   //==========================================================================
   // P R I V A T E   M E M B E R S
 
-  uint8_t target_;
-  bool debug_;
+  Parameter<int> target_;
+  Parameter<bool> debug_;
+
   cv::SimpleBlobDetector::Params params_;
   atlas::ImagePublisher image_publisher_;
 };

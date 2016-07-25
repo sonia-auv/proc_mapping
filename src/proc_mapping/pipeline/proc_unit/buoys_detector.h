@@ -60,9 +60,11 @@ class BuoysDetector : public ProcUnit {
   //==========================================================================
   // P U B L I C   C / D T O R S
 
-  explicit BuoysDetector(const ObjectRegistery::Ptr &object_registery, bool roi)
-      : weight_goal_(0),
-        roi_needed_(roi),
+  explicit BuoysDetector(const ObjectRegistery::Ptr &object_registery, bool roi,
+                         bool debug = false)
+      : debug_("Debug", debug, parameters_),
+        weight_goal_("Weight Goal", 0, parameters_),
+        roi_needed_("ROI Needed", roi, parameters_),
         object_registery_(object_registery) {}
 
   virtual ~BuoysDetector() = default;
@@ -101,7 +103,7 @@ class BuoysDetector : public ProcUnit {
                   AddWeightToCorrespondingCandidate(
                       trigged_keypoint_list_[j].trigged_keypoint.pt, 5);
                 } else {
-                  if (!roi_needed_) {
+                  if (!roi_needed_.GetValue()) {
                     AddToCandidateList(trigged_keypoint_list_[j]);
                     AddWeightToCorrespondingCandidate(
                         trigged_keypoint_list_[j].trigged_keypoint.pt, 1);
@@ -186,7 +188,7 @@ class BuoysDetector : public ProcUnit {
   }
 
   inline bool IsCandidateHasEnoughWeight(Candidate candidate) {
-    if (candidate.weight > weight_goal_) {
+    if (candidate.weight > weight_goal_.GetValue()) {
       return true;
     }
     return false;
@@ -291,11 +293,13 @@ class BuoysDetector : public ProcUnit {
       cv::Point2d trigged_keypoint, int weight) {
     for (size_t i = 0; i < trigged_keypoint_list_.size(); ++i) {
       if (trigged_keypoint.inside(trigged_keypoint_list_[i].bounding_box)) {
-        if (trigged_keypoint_list_[i].weight + weight <= weight_goal_) {
+        if (trigged_keypoint_list_[i].weight + weight <=
+            weight_goal_.GetValue()) {
           trigged_keypoint_list_[i].weight += weight;
         } else {
           trigged_keypoint_list_[i].weight +=
-              (trigged_keypoint_list_[i].weight + weight) - weight_goal_;
+              (trigged_keypoint_list_[i].weight + weight) -
+              weight_goal_.GetValue();
         }
       }
     }
@@ -318,11 +322,11 @@ class BuoysDetector : public ProcUnit {
                                                 int weight) {
     for (size_t i = 0; i < candidate_list_.size(); ++i) {
       if (candidate.inside(candidate_list_[i].bounding_box)) {
-        if (candidate_list_[i].weight + weight <= weight_goal_) {
+        if (candidate_list_[i].weight + weight <= weight_goal_.GetValue()) {
           candidate_list_[i].weight += weight;
         } else {
           candidate_list_[i].weight +=
-              (candidate_list_[i].weight + weight) - weight_goal_;
+              (candidate_list_[i].weight + weight) - weight_goal_.GetValue();
         }
       }
     }
@@ -341,7 +345,9 @@ class BuoysDetector : public ProcUnit {
     }
   }
 
-  inline void SetWeigthGoal(int weight_goal) { weight_goal_ = weight_goal; }
+  inline void SetWeigthGoal(int weight_goal) {
+    weight_goal_.SetValue(weight_goal);
+  }
 
   inline cv::Rect SetBoundingBox(cv::Point2d keypoint, int box_size) {
     std::vector<cv::Point> rect;
@@ -355,10 +361,12 @@ class BuoysDetector : public ProcUnit {
   //==========================================================================
   // P R I V A T E   M E M B E R S
 
+  Parameter<bool> debug_;
+  Parameter<int> weight_goal_;
+  Parameter<bool> roi_needed_;
+
   std::vector<TriggedKeypoint> trigged_keypoint_list_;
   std::vector<Candidate> candidate_list_;
-  int weight_goal_;
-  bool roi_needed_;
   ObjectRegistery::Ptr object_registery_;
 };
 

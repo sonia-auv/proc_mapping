@@ -54,7 +54,8 @@ class FenceDetector : public ProcUnit {
   // P U B L I C   C / D T O R S
 
   explicit FenceDetector(const ObjectRegistery::Ptr &object_registery)
-      : weight_goal_(0), object_registery_(object_registery) {}
+      : weight_goal_("Weight Goal", 0, parameters_),
+        object_registery_(object_registery) {}
 
   virtual ~FenceDetector() = default;
 
@@ -141,11 +142,13 @@ class FenceDetector : public ProcUnit {
       cv::Point2d trigged_keypoint, int weight) {
     for (size_t i = 0; i < trigged_keypoint_list_.size(); ++i) {
       if (trigged_keypoint.inside(trigged_keypoint_list_[i].bounding_box)) {
-        if (trigged_keypoint_list_[i].weight + weight <= weight_goal_) {
+        if (trigged_keypoint_list_[i].weight + weight <=
+            weight_goal_.GetValue()) {
           trigged_keypoint_list_[i].weight += weight;
         } else {
           trigged_keypoint_list_[i].weight +=
-              (trigged_keypoint_list_[i].weight + weight) - weight_goal_;
+              (trigged_keypoint_list_[i].weight + weight) -
+              weight_goal_.GetValue();
         }
       }
     }
@@ -165,13 +168,15 @@ class FenceDetector : public ProcUnit {
   }
 
   inline bool IsKeypointHasEnoughWeight(TriggedKeypoint keypoint) {
-    if (keypoint.weight > weight_goal_) {
+    if (keypoint.weight > weight_goal_.GetValue()) {
       return true;
     }
     return false;
   }
 
-  inline void SetWeigthGoal(int weight_goal) { weight_goal_ = weight_goal; }
+  inline void SetWeigthGoal(int weight_goal) {
+    weight_goal_.SetValue(weight_goal);
+  }
 
   inline cv::Rect SetBoundingBox(cv::Point2d keypoint, int box_size) {
     std::vector<cv::Point> rect;
@@ -185,8 +190,9 @@ class FenceDetector : public ProcUnit {
   //==========================================================================
   // P R I V A T E   M E M B E R S
 
+  Parameter<int> weight_goal_;
+
   std::vector<TriggedKeypoint> trigged_keypoint_list_;
-  int weight_goal_;
   ObjectRegistery::Ptr object_registery_;
 };
 
