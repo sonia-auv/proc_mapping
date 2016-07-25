@@ -13,7 +13,7 @@ proc_trees:
 #      - name: morphology
 #        kernel_size_x: 4
 #        kernel_size_y: 4
-        debug: true
+#        debug: true
       - name: wall_remover
         debug: false
       - name: blob_detector

@@ -52,7 +52,7 @@ ProcTree::ProcTree(const YAML::Node &node, const ros::NodeHandlePtr &nh,
   Deserialize(node);
 
   blur_type_server_ =
-      nh_->advertiseService("blur_type_configuration" + name_,
+      nh_->advertiseService("blur_type_configuration" + name_ + "_",
                             &ProcTree::BlurTypeConfiguration, this);
 }
 
@@ -159,9 +159,16 @@ sonia_msgs::ProcTree ProcTree::BuildRosMessage() {
   proc_tree_msg.name = name_;
 
   std::vector<sonia_msgs::ProcUnit> proc_unit_list;
+  std::vector<sonia_msgs::ProcUnitParameter> proc_unit_parameter_list;
   for (const auto &pu : proc_units_) {
     sonia_msgs::ProcUnit proc_unit;
     proc_unit.name = pu->GetName();
+    for (const auto &pup : pu->GetParameters()) {
+      sonia_msgs::ProcUnitParameter proc_unit_parameter;
+      proc_unit_parameter = pup->BuildRosMessage();
+      proc_unit_parameter_list.push_back(proc_unit_parameter);
+    }
+    proc_unit.proc_unit_parameter_list = proc_unit_parameter_list;
     proc_unit_list.push_back(proc_unit);
   }
 

@@ -42,6 +42,7 @@ ProcMappingNode::ProcMappingNode(const ros::NodeHandlePtr &nh)
       map_pub_(),
       markers_pub_(),
       reset_map_sub_(),
+      get_proc_tree_list_srv_(),
       send_map_srv_(),
       cs_(std::make_shared<CoordinateSystems>(nh_)),
       raw_map_(nh_, cs_),
