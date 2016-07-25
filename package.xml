@@ -1,11 +1,18 @@
 <?xml version="1.0"?>
 <package>
   <name>proc_mapping</name>
-  <version>0.0.0</version>
-  <description>The proc_mapping package</description>
+  <version>1.0.0</version>
+  <description>
+    The proc_mapping package is responsible for integrating all the information from the navigation, sonar
+    and vision to dynamically create a map of its environment
+  </description>
 
-  <maintainer email="etienne@todo.todo">etienne</maintainer>
-  <maintainer email="francis.masse05@gmail.com">Francis</maintainer>
+
+  <author>Thibaut Mattio</author>
+  <author>Francis Massé</author>
+
+  <maintainer email="thibaut.mattio@gmail.com">Thibaut Mattio</maintainer>
+  <maintainer email="francis.masse05@gmail.com">Francis Massé</maintainer>
 
   <license>GPLv3</license>
 
