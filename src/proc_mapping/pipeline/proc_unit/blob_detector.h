@@ -23,18 +23,18 @@
  * along with S.O.N.I.A. software. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef PROC_MAPPING_PROC_UNIT_BLOB_DETECTOR_H_
-#define PROC_MAPPING_PROC_UNIT_BLOB_DETECTOR_H_
+#ifndef PROC_MAPPING_PIPELINE_PROC_UNIT_BLOB_DETECTOR_H_
+#define PROC_MAPPING_PIPELINE_PROC_UNIT_BLOB_DETECTOR_H_
 
 #include <highgui.h>
+#include <lib_atlas/ros/image_publisher.h>
 #include <opencv/cv.h>
 #include <ros/ros.h>
 #include <memory>
+#include "proc_mapping/config.h"
 #include "proc_mapping/map/object_registery.h"
 #include "proc_mapping/map_objects/buoy.h"
-#include "proc_mapping/proc_unit/proc_unit.h"
-#include <lib_atlas/ros/image_publisher.h>
-#include "proc_mapping/config.h"
+#include "proc_mapping/pipeline/proc_unit.h"
 
 namespace proc_mapping {
 
@@ -117,7 +117,7 @@ class BlobDetector : public ProcUnit {
     return boost::any(keyPoints);
   }
 
-  const std::string GetName() const override { return "blob_detection"; }
+  std::string GetName() const override { return "blob_detection"; }
 
  private:
   //==========================================================================
@@ -131,4 +131,4 @@ class BlobDetector : public ProcUnit {
 
 }  // namespace proc_mapping
 
-#endif  // PROC_MAPPING_PROC_UNIT_BLOB_DETECTOR_H_
+#endif  // PROC_MAPPING_PIPELINE_PROC_UNIT_BLOB_DETECTOR_H_

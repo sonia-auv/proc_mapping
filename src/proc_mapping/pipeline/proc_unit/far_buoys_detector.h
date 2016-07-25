@@ -1,7 +1,7 @@
 /**
- * \file	fence_detector.h
+ * \file	far_buoys_detector.h
  * \author	Francis Masse <francis.masse05@gmail.com>
- * \date	27/06/2016
+ * \date	19/06/2016
  *
  * \copyright Copyright (c) 2016 S.O.N.I.A. All rights reserved.
  *
@@ -23,25 +23,25 @@
  * along with S.O.N.I.A. software. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef PROC_MAPPING_FENCE_DETECTOR_H_
-#define PROC_MAPPING_FENCE_DETECTOR_H_
+#ifndef PROC_MAPPING_PIPELINE_PROC_UNIT_FAR_BUOYS_DETECTOR_H_
+#define PROC_MAPPING_PIPELINE_PROC_UNIT_FAR_BUOYS_DETECTOR_H_
 
 #include <opencv/cv.h>
 #include <proc_mapping/map/coordinate_systems.h>
 #include <proc_mapping/region_of_interest/rotated_rectangle.h>
-#include "proc_mapping/proc_unit/proc_unit.h"
+#include "proc_mapping/pipeline/proc_unit.h"
 
 namespace proc_mapping {
 
-class FenceDetector : public ProcUnit {
+class FarBuoysDetector : public ProcUnit {
  public:
   //==========================================================================
   // T Y P E D E F   A N D   E N U M
 
-  using Ptr = std::shared_ptr<FenceDetector>;
-  using ConstPtr = std::shared_ptr<const FenceDetector>;
-  using PtrList = std::vector<FenceDetector::Ptr>;
-  using ConstPtrList = std::vector<FenceDetector::ConstPtr>;
+  using Ptr = std::shared_ptr<FarBuoysDetector>;
+  using ConstPtr = std::shared_ptr<const FarBuoysDetector>;
+  using PtrList = std::vector<FarBuoysDetector::Ptr>;
+  using ConstPtrList = std::vector<FarBuoysDetector::ConstPtr>;
 
   struct TriggedKeypoint {
     cv::KeyPoint trigged_keypoint;
@@ -53,18 +53,18 @@ class FenceDetector : public ProcUnit {
   //==========================================================================
   // P U B L I C   C / D T O R S
 
-  explicit FenceDetector(const ObjectRegistery::Ptr &object_registery)
+  explicit FarBuoysDetector(const ObjectRegistery::Ptr &object_registery)
       : weight_goal_(0), object_registery_(object_registery) {}
 
-  virtual ~FenceDetector() = default;
+  virtual ~FarBuoysDetector() = default;
 
   //==========================================================================
   // P U B L I C   M E T H O D S
 
   virtual boost::any ProcessData(boost::any input) override {
-    auto keypoint = boost::any_cast < std::vector < cv::KeyPoint >> (input);
+    auto keypoint = boost::any_cast<std::vector<cv::KeyPoint>>(input);
     auto rois =
-        object_registery_->GetRegionOfInterestOfType(DetectionMode::FENCE);
+        object_registery_->GetRegionOfInterestOfType(DetectionMode::BUOYS);
     SetWeigthGoal(150);
 
     if (object_registery_->IsRegisteryCleared()) {
@@ -89,9 +89,9 @@ class FenceDetector : public ProcUnit {
     for (size_t j = 0; j < trigged_keypoint_list_.size(); ++j) {
       if (IsKeypointHasEnoughWeight(trigged_keypoint_list_[j])) {
         if (!trigged_keypoint_list_[j].is_object_send) {
-          MapObject::Ptr map_object =
-              std::make_shared<Buoy>(trigged_keypoint_list_[j].trigged_keypoint);
-          map_object->SetName("Fence [" + std::to_string(j) + "]");
+          MapObject::Ptr map_object = std::make_shared<Buoy>(
+              trigged_keypoint_list_[j].trigged_keypoint);
+          map_object->SetName("Buoy [" + std::to_string(j) + "]");
           map_object->SetSize(trigged_keypoint_list_[j].trigged_keypoint.size);
           object_registery_->AddMapObject(std::move(map_object));
           trigged_keypoint_list_[j].is_object_send = true;
@@ -105,7 +105,7 @@ class FenceDetector : public ProcUnit {
     return boost::any(added_new_object);
   }
 
-  const std::string GetName() const override { return "fence_detector"; }
+  std::string GetName() const override { return "far_buoys_detector"; }
 
  private:
   //==========================================================================
@@ -192,4 +192,4 @@ class FenceDetector : public ProcUnit {
 
 }  // namespace proc_mapping
 
-#endif //PROC_MAPPING_FENCE_DETECTOR_H
+#endif  // PROC_MAPPING_PIPELINE_PROC_UNIT_FAR_BUOYS_DETECTOR_H

@@ -119,8 +119,8 @@ void MapInterpreter::InstanciateProcTrees(
     assert(proc_trees.Type() == YAML::NodeType::Sequence);
 
     for (std::size_t i = 0; i < proc_trees.size(); i++) {
-      auto proc_tree = std::make_shared<ProcTree>(proc_trees[i], nh_,
-                                                  object_registery_);
+      auto proc_tree =
+          std::make_shared<ProcTree>(proc_trees[i], nh_, object_registery_);
       all_proc_trees_.push_back(proc_tree);
       if (!default_pt.empty() &&
           default_pt == proc_trees[i]["name"].as<std::string>()) {

@@ -46,9 +46,10 @@ SemanticMap::SemanticMap(const CoordinateSystems::Ptr &cs)
       object_registery_(),
       new_objects_available_(false)
 #ifdef DEBUG
-      , display_map_()
+      ,
+      display_map_()
 #endif
-      {
+{
   InsertRegionOfInterest("regions_of_interest.yaml");
 
 #ifdef DEBUG
@@ -137,7 +138,7 @@ void SemanticMap::InsertRegionOfInterest(
 
   assert(node["regions_of_interest"]);
   auto regions_of_interests = node["regions_of_interest"];
-//  assert(regions_of_interests.Type() == YAML::NodeType::Sequence);
+  //  assert(regions_of_interests.Type() == YAML::NodeType::Sequence);
 
   for (size_t i = 0; i < regions_of_interests.size(); ++i) {
     auto roi = RegionOfInterestFactory(regions_of_interests[i]);
@@ -152,7 +153,8 @@ void SemanticMap::InsertRegionOfInterest(
 sonia_msgs::SemanticMap SemanticMap::GenerateSemanticMapMessage() {
   sonia_msgs::SemanticMap map_msg;
   for (const auto &obj : GetMapObjects()) {
-    sonia_msgs::MapObject map_object = cs_->PixelToWorldCoordinates(obj->GenerateToMapObjectMessge());
+    sonia_msgs::MapObject map_object =
+        cs_->PixelToWorldCoordinates(obj->GenerateToMapObjectMessge());
     map_object.pose.x -= cs_->GetPositionOffset().x;
     map_object.pose.y -= cs_->GetPositionOffset().y;
     map_msg.objects.push_back(map_object);
@@ -269,7 +271,7 @@ void SemanticMap::PrintMap() {
 
   // To fit in OpenCv coordinate system, we have to made a rotation of
   // 90 degrees on the display map
-  cv::Point2f src_center(display_map_.cols/2.0f, display_map_.rows/2.0f);
+  cv::Point2f src_center(display_map_.cols / 2.0f, display_map_.rows / 2.0f);
   cv::Mat rot_mat = getRotationMatrix2D(src_center, 90, 1.0);
   cv::Mat dst;
   cv::warpAffine(display_map_, dst, rot_mat, display_map_.size());
@@ -280,7 +282,6 @@ void SemanticMap::PrintMap() {
   cv::circle(display_map_, sub, 5, cv::Scalar(0), -1);
 
   cv::waitKey(1);
-
 }
 #endif
 

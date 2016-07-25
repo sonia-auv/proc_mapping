@@ -34,7 +34,7 @@
 #include "proc_mapping/config.h"
 #include "proc_mapping/interpreter/data_interpreter.h"
 #include "proc_mapping/map/object_registery.h"
-#include "proc_mapping/proc_unit/proc_tree.h"
+#include "proc_mapping/pipeline/proc_tree.h"
 
 namespace proc_mapping {
 

@@ -23,19 +23,18 @@
  * along with S.O.N.I.A. software. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef PROC_MAPPING_PROC_UNIT_PROC_TREE_H_
-#define PROC_MAPPING_PROC_UNIT_PROC_TREE_H_
+#ifndef PROC_MAPPING_PIPELINE_PROC_TREE_H_
+#define PROC_MAPPING_PIPELINE_PROC_TREE_H_
 
 #include <proc_mapping/map/coordinate_systems.h>
 #include <ros/forwards.h>
+#include <sonia_msgs/BlurTypeConfiguration.h>
+#include <sonia_msgs/GetProcTreeList.h>
 #include <yaml-cpp/yaml.h>
 #include <memory>
 #include <vector>
 #include "proc_mapping/map/object_registery.h"
-#include "proc_mapping/proc_unit/proc_unit.h"
-#include <sonia_msgs/BlurTypeConfiguration.h>
-#include <sonia_msgs/GetProcTreeList.h>
-//#include <sonia_msgs/ProcUnit.h>
+#include "proc_mapping/pipeline/proc_unit.h"
 
 namespace proc_mapping {
 
@@ -66,9 +65,8 @@ class ProcTree {
 
   sonia_msgs::ProcTree BuildRosMessage();
 
-  bool BlurTypeConfiguration(
-      sonia_msgs::BlurTypeConfiguration::Request &req,
-      sonia_msgs::BlurTypeConfiguration::Response &resp);
+  bool BlurTypeConfiguration(sonia_msgs::BlurTypeConfiguration::Request &req,
+                             sonia_msgs::BlurTypeConfiguration::Response &resp);
 
  private:
   //==========================================================================
@@ -92,4 +90,4 @@ class ProcTree {
 
 }  // namespace proc_mapping
 
-#endif  // PROC_MAPPING_PROC_UNIT_PROC_TREE_H_
+#endif  // PROC_MAPPING_PIPELINE_PROC_TREE_H_

@@ -32,8 +32,8 @@ namespace proc_mapping {
 
 //------------------------------------------------------------------------------
 //
-ObjectRegistery::ObjectRegistery() :
-    objects_({}), is_registry_cleared_(false), object_mutex_() {}
+ObjectRegistery::ObjectRegistery()
+    : objects_({}), is_registry_cleared_(false), object_mutex_() {}
 
 //==============================================================================
 // M E T H O D   S E C T I O N
@@ -136,10 +136,10 @@ void ObjectRegistery::ClearRegistery() {
   objects_.clear();
 }
 
-bool ObjectRegistery::IsRegisteryCleared() {
-  return is_registry_cleared_;
-}
+bool ObjectRegistery::IsRegisteryCleared() { return is_registry_cleared_; }
 
-void ObjectRegistery::ResetRegisteryClearedFlag() { is_registry_cleared_ = false; }
+void ObjectRegistery::ResetRegisteryClearedFlag() {
+  is_registry_cleared_ = false;
+}
 
 }  // namespace proc_mapping

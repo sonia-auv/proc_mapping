@@ -1,5 +1,5 @@
 /**
- * \file	dilate.h
+ * \file	threshold.h
  * \author	Francis Masse <francis.masse05@gmail.com>
  * \date	18/05/2016
  *
@@ -23,51 +23,75 @@
  * along with S.O.N.I.A. software. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef PROC_MAPPING_PROC_UNIT_DILATE_H_
-#define PROC_MAPPING_PROC_UNIT_DILATE_H_
+#ifndef PROC_MAPPING_PIPELINE_PROC_UNIT_WALL_REMOVER_H_
+#define PROC_MAPPING_PIPELINE_PROC_UNIT_WALL_REMOVER_H_
 
 #include <opencv/cv.h>
-#include "proc_mapping/proc_unit/proc_unit.h"
+#include "proc_mapping/pipeline/proc_unit.h"
 
 namespace proc_mapping {
 
-class Dilate : public ProcUnit {
+class WallRemover : public ProcUnit {
  public:
   //==========================================================================
   // T Y P E D E F   A N D   E N U M
 
-  using Ptr = std::shared_ptr<Dilate>;
-  using ConstPtr = std::shared_ptr<const Dilate>;
-  using PtrList = std::vector<Dilate::Ptr>;
-  using ConstPtrList = std::vector<Dilate::ConstPtr>;
+  using Ptr = std::shared_ptr<WallRemover>;
+  using ConstPtr = std::shared_ptr<const WallRemover>;
+  using PtrList = std::vector<WallRemover::Ptr>;
+  using ConstPtrList = std::vector<WallRemover::ConstPtr>;
 
   //==========================================================================
   // P U B L I C   C / D T O R S
 
-  Dilate(std::string proc_tree_name = "", int kernel_size_x = 5,
-         int kernel_size_y = 5, bool debug = false) :
-      debug_(debug),
-      kernel_size_x_(kernel_size_x),
-      kernel_size_y_(kernel_size_y),
-      image_publisher_(kRosNodeName + "_dilate_" + proc_tree_name) {
+  explicit WallRemover(std::string proc_tree_name = "", bool debug = false)
+      : debug_(debug),
+        image_publisher_(kRosNodeName + "_threshold_" + proc_tree_name) {
     image_publisher_.Start();
-  };
+  }
 
-  virtual ~Dilate() = default;
+  virtual ~WallRemover() = default;
 
   //==========================================================================
   // P U B L I C   M E T H O D S
 
   virtual boost::any ProcessData(boost::any input) override {
     cv::Mat map = boost::any_cast<cv::Mat>(input);
-    cv::Size size =
-        cv::Size(kernel_size_x_, kernel_size_y_);
-    cv::Mat kernel_ = cv::getStructuringElement(kernel_type_, size, anchor_);
-    cv::dilate(map, map, kernel_, anchor_, iteration_);
+
+    std::vector<std::vector<cv::Point>> contour_list, final_contour_list;
+    std::vector<cv::Vec4i> hierarchy;
+    cv::findContours(map.clone(), contour_list, hierarchy, CV_RETR_EXTERNAL,
+                     CV_CHAIN_APPROX_SIMPLE);
+
+    for (size_t i = 0; i < contour_list.size(); i++) {
+      double area = cv::contourArea(contour_list[i]);
+      // Is enough big
+      if (area < 30) {
+        continue;
+      }
+
+      cv::RotatedRect rotatedRect = cv::minAreaRect(contour_list[i]);
+      // RotatedRect does not guarantee that the height is longer than
+      // the width, so we decide that height is for the longer side.
+      if (rotatedRect.size.width > rotatedRect.size.height) {
+        std::swap(rotatedRect.size.width, rotatedRect.size.height);
+      }
+
+      // Is thin enough
+      if (rotatedRect.size.width > 50 /*&& rotatedRect.size.width < 100*/) {
+        continue;
+      }
+      // Keep it if it matches
+      final_contour_list.push_back(contour_list[i]);
+    }
+
+    map.setTo(cv::Scalar(0));
+    cv::drawContours(map, final_contour_list, -1, CV_RGB(255, 255, 255), -1);
+
     if (debug_) {
       // To fit in OpenCv coordinate system, we have to made a rotation of
       // 90 degrees on the display map
-      cv::Point2f src_center(map.cols/2.0f, map.rows/2.0f);
+      cv::Point2f src_center(map.cols / 2.0f, map.rows / 2.0f);
       cv::Mat rot_mat = getRotationMatrix2D(src_center, 90, 1.0);
       cv::Mat dst;
       cv::warpAffine(map, dst, rot_mat, map.size());
@@ -78,20 +102,14 @@ class Dilate : public ProcUnit {
     return boost::any(map);
   }
 
-  const std::string GetName() const override { return "dilate"; }
+  std::string GetName() const override { return "wall_remover"; }
 
  private:
   bool debug_;
-  const cv::Point anchor_ = cv::Point(-1, -1);
-  int iteration_ = 1;
-  int kernel_type_ = cv::MORPH_RECT;
-
-  int kernel_size_x_;
-  int kernel_size_y_;
 
   atlas::ImagePublisher image_publisher_;
 };
 
 }  // namespace proc_mapping
 
-#endif  // PROC_MAPPING_PROC_UNIT_DILATE_H_
+#endif  // PROC_MAPPING_PIPELINE_PROC_UNIT_WALL_REMOVER_H_

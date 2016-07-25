@@ -23,11 +23,11 @@
  * along with S.O.N.I.A. software. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef PROC_MAPPING_PROC_UNIT_BLUR_H_
-#define PROC_MAPPING_PROC_UNIT_BLUR_H_
+#ifndef PROC_MAPPING_PIPELINE_PROC_UNIT_BLUR_H_
+#define PROC_MAPPING_PIPELINE_PROC_UNIT_BLUR_H_
 
 #include <opencv/cv.h>
-#include "proc_mapping/proc_unit/proc_unit.h"
+#include "proc_mapping/pipeline/proc_unit.h"
 
 namespace proc_mapping {
 
@@ -61,8 +61,7 @@ class Blur : public ProcUnit {
   virtual boost::any ProcessData(boost::any input) override {
     cv::Mat map = boost::any_cast<cv::Mat>(input);
     // To keep the kernel size odd, multiply by 2 and add 1
-    cv::Size2i kernel(kernel_size_ * 2 + 1,
-                      kernel_size_ * 2 + 1);
+    cv::Size2i kernel(kernel_size_ * 2 + 1, kernel_size_ * 2 + 1);
 
     // Bilateral Filter need another Mat to do algorithm
     cv::Mat dst = map.clone();
@@ -84,7 +83,7 @@ class Blur : public ProcUnit {
       if (blur_type_ == 3) {
         // To fit in OpenCv coordinate system, we have to made a rotation of
         // 90 degrees on the display map
-        cv::Point2f src_center(dst.cols/2.0f, dst.rows/2.0f);
+        cv::Point2f src_center(dst.cols / 2.0f, dst.rows / 2.0f);
         cv::Mat rot_mat = getRotationMatrix2D(src_center, 90, 1.0);
         cv::Mat blur_dst;
         cv::warpAffine(map, blur_dst, rot_mat, map.size());
@@ -94,7 +93,7 @@ class Blur : public ProcUnit {
       } else {
         // To fit in OpenCv coordinate system, we have to made a rotation of
         // 90 degrees on the display map
-        cv::Point2f src_center(map.cols/2.0f, map.rows/2.0f);
+        cv::Point2f src_center(map.cols / 2.0f, map.rows / 2.0f);
         cv::Mat rot_mat = getRotationMatrix2D(src_center, 90, 1.0);
         cv::Mat blur_dst;
         cv::warpAffine(map, blur_dst, rot_mat, map.size());
@@ -106,19 +105,15 @@ class Blur : public ProcUnit {
     return boost::any(map);
   }
 
-  const std::string GetName() const override { return "blur"; }
+  std::string GetName() const override { return "blur"; }
 
   inline int GetBlurType() { return blur_type_; }
 
-  inline void SetBlurType(int blur_type) {
-    blur_type_ = blur_type;
-  }
+  inline void SetBlurType(int blur_type) { blur_type_ = blur_type; }
 
   inline int GetKernelSize() { return kernel_size_; }
 
-  inline void SetKernelSize(int kernel_size) {
-    kernel_size_ = kernel_size;
-  }
+  inline void SetKernelSize(int kernel_size) { kernel_size_ = kernel_size; }
 
  private:
   //==========================================================================
@@ -139,4 +134,4 @@ class Blur : public ProcUnit {
 
 }  // namespace proc_mapping
 
-#endif  // PROC_MAPPING_PROC_UNIT_BLUR_H_
+#endif  // PROC_MAPPING_PIPELINE_PROC_UNIT_BLUR_H_

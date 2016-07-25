@@ -146,7 +146,7 @@ void RawMap::ProcessPointCloud(const sensor_msgs::PointCloud2::ConstPtr &msg) {
 
     // Adding the sub_position to position the point cloud in the world map.
     cv::Point2d coordinate_transformed(cv::Point2d(out.x(), out.y()) +
-        sub_position);
+                                       sub_position);
     bin_coordinate = cs_->WorldToPixelCoordinates(coordinate_transformed);
 
     // Check if bin_coordinate are in the map boundary

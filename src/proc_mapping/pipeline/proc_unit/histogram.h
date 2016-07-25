@@ -22,16 +22,16 @@
  * You should have received a copy of the GNU General Public License
  * along with S.O.N.I.A. software. If not, see <http://www.gnu.org/licenses/>.
  */
-#ifndef PROC_MAPPING_PROC_UNIT_HISTOGRAM_H_
-#define PROC_MAPPING_PROC_UNIT_HISTOGRAM_H_
+#ifndef PROC_MAPPING_PIPELINE_PROC_UNIT_HISTOGRAM_H_
+#define PROC_MAPPING_PIPELINE_PROC_UNIT_HISTOGRAM_H_
 
 #include <opencv/cv.h>
 #include "proc_mapping/config.h"
-#include "proc_mapping/proc_unit/proc_unit.h"
+#include "proc_mapping/pipeline/proc_unit.h"
 
 namespace proc_mapping {
 
-class Histogram: public ProcUnit {
+class Histogram : public ProcUnit {
  public:
   //==========================================================================
   // T Y P E D E F   A N D   E N U M
@@ -44,8 +44,8 @@ class Histogram: public ProcUnit {
   //==========================================================================
   // P U B L I C   C / D T O R S
 
-  Histogram(std::string proc_tree_name = "") :
-      image_publisher_(kRosNodeName + "_histogram_" + proc_tree_name) {
+  Histogram(std::string proc_tree_name = "")
+      : image_publisher_(kRosNodeName + "_histogram_" + proc_tree_name) {
     image_publisher_.Start();
   };
 
@@ -84,13 +84,12 @@ class Histogram: public ProcUnit {
     return boost::any(map);
   }
 
-  const std::string GetName() const override { return "histogram"; }
+  std::string GetName() const override { return "histogram"; }
 
  private:
-
   atlas::ImagePublisher image_publisher_;
 };
 
 }  // namespace proc_mapping
 
-#endif  // PROC_MAPPING_PROC_UNIT_HISTOGRAM_H_
+#endif  // PROC_MAPPING_PIPELINE_PROC_UNIT_HISTOGRAM_H_

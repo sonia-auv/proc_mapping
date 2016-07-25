@@ -51,9 +51,8 @@ ProcMappingNode::ProcMappingNode(const ros::NodeHandlePtr &nh)
   markers_pub_ = nh_->advertise<visualization_msgs::MarkerArray>(
       "/proc_mapping/markers", 100);
 
-  reset_map_sub_ =
-      nh_->subscribe("/proc_mapping/reset_map", 100,
-                     &ProcMappingNode::ResetMapCallback, this);
+  reset_map_sub_ = nh_->subscribe("/proc_mapping/reset_map", 100,
+                                  &ProcMappingNode::ResetMapCallback, this);
 
   get_proc_tree_list_srv_ = nh_->advertiseService(
       "get_proc_tree_list", &ProcMappingNode::GetProcTreeListCallback, this);
@@ -102,10 +101,11 @@ bool ProcMappingNode::SendMapCallback(
   return true;
 }
 
-bool ProcMappingNode::GetProcTreeListCallback(sonia_msgs::GetProcTreeList::Request &req,
-                             sonia_msgs::GetProcTreeList::Response &res) {
-
-  std::vector<ProcTree::Ptr> proc_tree_list = map_interpreter_.GetProcTreeList();
+bool ProcMappingNode::GetProcTreeListCallback(
+    sonia_msgs::GetProcTreeList::Request &req,
+    sonia_msgs::GetProcTreeList::Response &res) {
+  std::vector<ProcTree::Ptr> proc_tree_list =
+      map_interpreter_.GetProcTreeList();
 
   for (const auto pt : proc_tree_list) {
     res.proc_tree_list.push_back(pt->BuildRosMessage());

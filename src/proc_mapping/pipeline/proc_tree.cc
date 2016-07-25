@@ -23,17 +23,17 @@
  * along with S.O.N.I.A. software. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "proc_mapping/proc_unit/proc_tree.h"
-#include "proc_mapping/proc_unit/blob_detector.h"
-#include "proc_mapping/proc_unit/blur.h"
-#include "proc_mapping/proc_unit/buoys_detector.h"
-#include "proc_mapping/proc_unit/far_buoys_detector.h"
-#include "proc_mapping/proc_unit/fence_detector.h"
-#include "proc_mapping/proc_unit/dilate.h"
-#include "proc_mapping/proc_unit/morphology.h"
-#include "proc_mapping/proc_unit/threshold.h"
-#include "proc_mapping/proc_unit/wall_remover.h"
-#include "proc_mapping/proc_unit/histogram.h"
+#include "proc_mapping/pipeline/proc_tree.h"
+#include "proc_mapping/pipeline/proc_unit/blob_detector.h"
+#include "proc_mapping/pipeline/proc_unit/blur.h"
+#include "proc_mapping/pipeline/proc_unit/buoys_detector.h"
+#include "proc_mapping/pipeline/proc_unit/dilate.h"
+#include "proc_mapping/pipeline/proc_unit/far_buoys_detector.h"
+#include "proc_mapping/pipeline/proc_unit/fence_detector.h"
+#include "proc_mapping/pipeline/proc_unit/histogram.h"
+#include "proc_mapping/pipeline/proc_unit/morphology.h"
+#include "proc_mapping/pipeline/proc_unit/threshold.h"
+#include "proc_mapping/pipeline/proc_unit/wall_remover.h"
 
 namespace proc_mapping {
 
@@ -94,7 +94,8 @@ typename ProcUnit::Ptr ProcTree::ProcUnitFactory(const YAML::Node &node) const {
       auto debug = node["debug"].as<bool>();
       auto threshold_type = node["threshold_type"].as<int>();
       auto thresh_value = node["thresh_value"].as<int>();
-      return std::make_shared<Threshold>(name_, threshold_type, thresh_value, debug);
+      return std::make_shared<Threshold>(name_, threshold_type, thresh_value,
+                                         debug);
     } else if (proc_unit_name == "wall_remover") {
       auto debug = node["debug"].as<bool>();
       return std::make_shared<WallRemover>(name_, debug);
@@ -102,12 +103,14 @@ typename ProcUnit::Ptr ProcTree::ProcUnitFactory(const YAML::Node &node) const {
       auto kernel_size_x = node["kernel_size_x"].as<int>();
       auto kernel_size_y = node["kernel_size_y"].as<int>();
       auto debug = node["debug"].as<bool>();
-      return std::make_shared<Dilate>(name_, kernel_size_x, kernel_size_y, debug);
+      return std::make_shared<Dilate>(name_, kernel_size_x, kernel_size_y,
+                                      debug);
     } else if (proc_unit_name == "morphology") {
       auto kernel_size_x = node["kernel_size_x"].as<int>();
       auto kernel_size_y = node["kernel_size_y"].as<int>();
       auto debug = node["debug"].as<bool>();
-      return std::make_shared<Morphology>(name_, kernel_size_x, kernel_size_y, debug);
+      return std::make_shared<Morphology>(name_, kernel_size_x, kernel_size_y,
+                                          debug);
     } else if (proc_unit_name == "histogram") {
       return std::make_shared<Histogram>(name_);
     } else if (proc_unit_name == "blob_detector") {
@@ -169,8 +172,9 @@ sonia_msgs::ProcTree ProcTree::BuildRosMessage() {
 
 //------------------------------------------------------------------------------
 //
-bool ProcTree::BlurTypeConfiguration(sonia_msgs::BlurTypeConfiguration::Request &req,
-                                     sonia_msgs::BlurTypeConfiguration::Response &resp) {
+bool ProcTree::BlurTypeConfiguration(
+    sonia_msgs::BlurTypeConfiguration::Request &req,
+    sonia_msgs::BlurTypeConfiguration::Response &resp) {
   for (const auto &pu : proc_units_) {
     if (pu->GetName() == "blur") {
       auto blur = dynamic_cast<Blur *>(pu.get());

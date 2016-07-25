@@ -1,7 +1,7 @@
 /**
- * \file	morphology.h
+ * \file	threshold.h
  * \author	Francis Masse <francis.masse05@gmail.com>
- * \date	06/06/2016
+ * \date	18/05/2016
  *
  * \copyright Copyright (c) 2016 S.O.N.I.A. All rights reserved.
  *
@@ -23,52 +23,54 @@
  * along with S.O.N.I.A. software. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef PROC_MAPPING_MORPHOLOGY_H
-#define PROC_MAPPING_MORPHOLOGY_H
+#ifndef PROC_MAPPING_PIPELINE_PROC_UNIT_THRESHOLD_H_
+#define PROC_MAPPING_PIPELINE_PROC_UNIT_THRESHOLD_H_
 
 #include <opencv/cv.h>
-#include "proc_mapping/proc_unit/proc_unit.h"
+#include "proc_mapping/pipeline/proc_unit.h"
 
 namespace proc_mapping {
 
-class Morphology : public ProcUnit {
+class Threshold : public ProcUnit {
  public:
   //==========================================================================
   // T Y P E D E F   A N D   E N U M
 
-  using Ptr = std::shared_ptr<Morphology>;
-  using ConstPtr = std::shared_ptr<const Morphology>;
-  using PtrList = std::vector<Morphology::Ptr>;
-  using ConstPtrList = std::vector<Morphology::ConstPtr>;
+  using Ptr = std::shared_ptr<Threshold>;
+  using ConstPtr = std::shared_ptr<const Threshold>;
+  using PtrList = std::vector<Threshold::Ptr>;
+  using ConstPtrList = std::vector<Threshold::ConstPtr>;
 
   //==========================================================================
   // P U B L I C   C / D T O R S
 
-  explicit Morphology(std::string proc_tree_name = "", int kernel_size_x = 5,
-                      int kernel_size_y = 5, bool debug = false) :
-      debug_(debug),
-      kernel_size_x_(kernel_size_x),
-      kernel_size_y_(kernel_size_y),
-      image_publisher_(kRosNodeName + "_morphology_" + proc_tree_name) {
+  explicit Threshold(std::string proc_tree_name = "", int threshold_type = 0,
+                     int thresh_value = 0, bool debug = false)
+      : threshold_type(threshold_type),
+        thresh_value_(thresh_value),
+        debug(debug),
+        image_publisher_(kRosNodeName + "_threshold_" + proc_tree_name) {
     image_publisher_.Start();
   }
 
-  virtual ~Morphology() = default;
+  virtual ~Threshold() = default;
 
   //==========================================================================
   // P U B L I C   M E T H O D S
 
   virtual boost::any ProcessData(boost::any input) override {
     cv::Mat map = boost::any_cast<cv::Mat>(input);
-    cv::Mat element = cv::getStructuringElement(
-        0, cv::Size(kernel_size_x_ * 2 + 1, kernel_size_y_ * 2 + 1));
-
-    cv::morphologyEx(map, map, cv::MORPH_CLOSE, element);
-
-    if (debug_) {
+    if ((threshold_type == 0) | (threshold_type == 1) | (threshold_type == 2) |
+        (threshold_type == 3) | (threshold_type == 4) | (threshold_type == 7) |
+        (threshold_type == 8)) {
+      cv::threshold(map, map, thresh_value_, 255, threshold_type);
+    } else {
+      ROS_ERROR("Threshold type is undefined");
+    }
+    if (debug) {
       // To fit in OpenCv coordinate system, we have to made a rotation of
       // 90 degrees on the display map
-      cv::Point2f src_center(map.cols/2.0f, map.rows/2.0f);
+      cv::Point2f src_center(map.cols / 2.0f, map.rows / 2.0f);
       cv::Mat rot_mat = getRotationMatrix2D(src_center, 90, 1.0);
       cv::Mat dst;
       cv::warpAffine(map, dst, rot_mat, map.size());
@@ -79,16 +81,25 @@ class Morphology : public ProcUnit {
     return boost::any(map);
   }
 
-  const std::string GetName() const override { return "morphology"; }
+  std::string GetName() const override { return "threshold"; }
 
  private:
-  bool debug_;
-  int kernel_size_x_;
-  int kernel_size_y_;
+  /*
+ * 0: Binary
+ * 1: Binary Inverted
+ * 2: Threshold Truncated
+ * 3: Threshold to Zero
+ * 4: Threshold to Zero Inverted
+ * 7: Threshold Mask
+ * 8: Threshold OTSU
+ */
+  int threshold_type;
+  int thresh_value_;
+  bool debug;
 
   atlas::ImagePublisher image_publisher_;
 };
 
 }  // namespace proc_mapping
 
-#endif  // PROC_MAPPING_MORPHOLOGY_H
+#endif  // PROC_MAPPING_PIPELINE_PROC_UNIT_THRESHOLD_H_

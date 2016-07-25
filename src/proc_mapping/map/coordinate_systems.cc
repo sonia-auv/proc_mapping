@@ -83,7 +83,7 @@ void CoordinateSystems::OdomCallback(
     previous = ros::Time::now();
   }
 
-  if(is_first_odom_) {
+  if (is_first_odom_) {
     is_first_odom_ = false;
   }
 
@@ -162,7 +162,6 @@ cv::Point2d CoordinateSystems::PixelToWorldCoordinates(
 
 sonia_msgs::MapObject CoordinateSystems::PixelToWorldCoordinates(
     const sonia_msgs::MapObject &p) const {
-
   // The operator/ does not exist for Point2i, we must assign members one by
   // one.
   sonia_msgs::MapObject world_object;

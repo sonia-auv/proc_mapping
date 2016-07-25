@@ -27,8 +27,8 @@
 #define PROC_MAPPING_COORDINATE_SYSTEM_CONVERTOR_H_
 
 #include <nav_msgs/Odometry.h>
-#include <sonia_msgs/MapObject.h>
 #include <ros/ros.h>
+#include <sonia_msgs/MapObject.h>
 #include <atomic>
 #include <eigen3/Eigen/Eigen>
 #include <memory>
@@ -100,7 +100,8 @@ class CoordinateSystems {
   /// Apply the opposite convetion that WorldToPixelCoordinates does.
   cv::Point2d PixelToWorldCoordinates(const cv::Point2i &p) const noexcept;
   cv::Point2d PixelToWorldCoordinates(const cv::Point2f &p) const noexcept;
-  sonia_msgs::MapObject PixelToWorldCoordinates(const sonia_msgs::MapObject &p) const;
+  sonia_msgs::MapObject PixelToWorldCoordinates(
+      const sonia_msgs::MapObject &p) const;
   double PixelToWorldCoordinates(double p) const noexcept;
 
   /**

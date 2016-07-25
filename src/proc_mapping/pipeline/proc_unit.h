@@ -23,12 +23,13 @@
  * along with S.O.N.I.A. software. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef PROC_MAPPING_PROC_UNIT_PROC_UNIT_H_
-#define PROC_MAPPING_PROC_UNIT_PROC_UNIT_H_
+#ifndef PROC_MAPPING_PIPELINE_PROC_UNIT_H_
+#define PROC_MAPPING_PIPELINE_PROC_UNIT_H_
 
 #include <boost/any.hpp>
 #include <memory>
 #include <vector>
+#include "proc_mapping/pipeline/parameter.h"
 
 namespace proc_mapping {
 
@@ -61,11 +62,23 @@ class ProcUnit {
 
   virtual boost::any ProcessData(boost::any input) = 0;
 
-  virtual const std::string GetName() const { return ""; };
+  virtual std::string GetName() const = 0;
 
+  std::vector<ParameterInterface *> GetParameters() const;
 
+ private:
+  std::vector<ParameterInterface *> parameters_;
 };
+
+//==============================================================================
+// I N L I N E   M E T H O D S
+
+//------------------------------------------------------------------------------
+//
+inline std::vector<ParameterInterface *> ProcUnit::GetParameters() const {
+  return parameters_;
+}
 
 }  // namespace proc_mapping
 
-#endif  // PROC_MAPPING_PROC_UNIT_PROC_UNIT_H_
+#endif  // PROC_MAPPING_PIPELINE_PROC_UNIT_H_

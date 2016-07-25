@@ -23,13 +23,13 @@
  * along with S.O.N.I.A. software. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef PROC_MAPPING_BUOYS_DETECTOR_H_
-#define PROC_MAPPING_BUOYS_DETECTOR_H_
+#ifndef PROC_MAPPING_PIPELINE_PROC_UNIT_BUOYS_DETECTOR_H_
+#define PROC_MAPPING_PIPELINE_PROC_UNIT_BUOYS_DETECTOR_H_
 
 #include <opencv/cv.h>
 #include <proc_mapping/map/coordinate_systems.h>
 #include <proc_mapping/region_of_interest/rotated_rectangle.h>
-#include "proc_mapping/proc_unit/proc_unit.h"
+#include "proc_mapping/pipeline/proc_unit.h"
 
 namespace proc_mapping {
 
@@ -61,7 +61,9 @@ class BuoysDetector : public ProcUnit {
   // P U B L I C   C / D T O R S
 
   explicit BuoysDetector(const ObjectRegistery::Ptr &object_registery, bool roi)
-      : weight_goal_(0), roi_needed_(roi), object_registery_(object_registery) {}
+      : weight_goal_(0),
+        roi_needed_(roi),
+        object_registery_(object_registery) {}
 
   virtual ~BuoysDetector() = default;
 
@@ -94,7 +96,7 @@ class BuoysDetector : public ProcUnit {
             if (!IsAlreadyCandidate(trigged_keypoint_list_[j])) {
               for (const auto &roi : rois) {
                 if (roi->IsInZone(
-                    trigged_keypoint_list_[j].trigged_keypoint.pt)) {
+                        trigged_keypoint_list_[j].trigged_keypoint.pt)) {
                   AddToCandidateList(trigged_keypoint_list_[j]);
                   AddWeightToCorrespondingCandidate(
                       trigged_keypoint_list_[j].trigged_keypoint.pt, 5);
@@ -158,7 +160,7 @@ class BuoysDetector : public ProcUnit {
     return boost::any(added_new_object);
   }
 
-  const std::string GetName() const override { return "buoys_detector"; }
+  std::string GetName() const override { return "buoys_detector"; }
 
  private:
   //==========================================================================
@@ -176,7 +178,7 @@ class BuoysDetector : public ProcUnit {
   inline bool IsAlreadyCandidate(TriggedKeypoint trigged_keypoint) {
     for (size_t i = 0; i < candidate_list_.size(); ++i) {
       if (trigged_keypoint.trigged_keypoint.pt.inside(
-          candidate_list_.at(i).bounding_box)) {
+              candidate_list_.at(i).bounding_box)) {
         return true;
       }
     }
@@ -194,9 +196,8 @@ class BuoysDetector : public ProcUnit {
     TriggedKeypoint trigged_keypoint;
     trigged_keypoint.trigged_keypoint = keypoint;
     trigged_keypoint.bounding_box = SetBoundingBox(keypoint.pt, 20);
-    cv::Mat box(
-        trigged_keypoint.bounding_box.height,
-        trigged_keypoint.bounding_box.width, CV_8UC1);
+    cv::Mat box(trigged_keypoint.bounding_box.height,
+                trigged_keypoint.bounding_box.width, CV_8UC1);
     trigged_keypoint.mean = cv::mean(box);
     trigged_keypoint.weight = 0;
     trigged_keypoint_list_.push_back(trigged_keypoint);
@@ -251,17 +252,17 @@ class BuoysDetector : public ProcUnit {
                                     double low_range, double high_range) {
     if (candidate_list_.size() > 2) {
       for (size_t i = 0; i < candidate_list_.size(); ++i) {
-        double distance = GetDistanceBewteenKeypoint(
-            trigged_keypoint.trigged_keypoint.pt,
-            candidate_list_[i].trigged_keypoint.pt);
+        double distance =
+            GetDistanceBewteenKeypoint(trigged_keypoint.trigged_keypoint.pt,
+                                       candidate_list_[i].trigged_keypoint.pt);
         if (distance >= low_range * 40 and distance <= high_range * 40) {
           for (size_t j = 0; j < candidate_list_.size(); ++j) {
             if (j != i) {
               double distance2 = GetDistanceBewteenKeypoint(
                   trigged_keypoint.trigged_keypoint.pt,
                   candidate_list_[j].trigged_keypoint.pt);
-              if (distance2 >= low_range * 40
-                  and distance2 <= high_range * 40) {
+              if (distance2 >= low_range * 40 and
+                  distance2 <= high_range * 40) {
                 return true;
               }
             }
@@ -273,9 +274,8 @@ class BuoysDetector : public ProcUnit {
   }
 
   inline bool BoxMean(TriggedKeypoint trigged_keypoint, double reached_mean) {
-    cv::Mat box(
-        trigged_keypoint.bounding_box.height,
-        trigged_keypoint.bounding_box.width, CV_8UC1);
+    cv::Mat box(trigged_keypoint.bounding_box.height,
+                trigged_keypoint.bounding_box.width, CV_8UC1);
     cv::Scalar actual_mean = cv::mean(box);
 
     if (actual_mean[0] <= reached_mean) {
