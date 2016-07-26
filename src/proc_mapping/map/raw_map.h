@@ -29,6 +29,7 @@
 #include <lib_atlas/macros.h>
 #include <lib_atlas/pattern/runnable.h>
 #include <lib_atlas/pattern/subject.h>
+#include <lib_atlas/ros/image_publisher.h>
 #include <nav_msgs/Odometry.h>
 #include <opencv/cv.h>
 #include <pcl/point_cloud.h>
@@ -112,6 +113,7 @@ class RawMap : public atlas::Subject<cv::Mat>, public atlas::Runnable {
 
   CoordinateSystems::Ptr cs_;
   cv::Mat display_map_;
+  atlas::ImagePublisher image_publisher_;
 
   /// The first data of the sonar may be scrap. Keeping a threshold and starting
   /// to process data after it

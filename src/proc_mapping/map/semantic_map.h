@@ -27,6 +27,7 @@
 #define PROC_MAPPING_SEMANTIC_MAP_H_
 
 #include <lib_atlas/pattern/observer.h>
+#include <lib_atlas/ros/image_publisher.h>
 #include <opencv/cv.h>
 #include <sonia_msgs/MapObject.h>
 #include <sonia_msgs/SemanticMap.h>
@@ -102,6 +103,7 @@ class SemanticMap : public atlas::Observer<> {
 
 #ifdef DEBUG
   cv::Mat display_map_;
+  atlas::ImagePublisher image_publisher_;
 #endif
 };
 

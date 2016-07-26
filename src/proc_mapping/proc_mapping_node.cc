@@ -53,7 +53,7 @@ ProcMappingNode::ProcMappingNode(const ros::NodeHandlePtr &nh)
   markers_pub_ = nh_->advertise<visualization_msgs::MarkerArray>(
       "/proc_mapping/markers", 100);
 
-  reset_map_sub_ = nh_->subscribe("/proc_mapping/reset_map", 100,
+  reset_map_sub_ = nh_->subscribe("reset_map", 100,
                                   &ProcMappingNode::ResetMapCallback, this);
 
   get_proc_tree_list_srv_ = nh_->advertiseService(

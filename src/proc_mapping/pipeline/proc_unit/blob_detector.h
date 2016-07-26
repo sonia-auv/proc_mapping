@@ -71,8 +71,8 @@ class BlobDetector : public ProcUnit {
       params_.maxThreshold = 200;
       params_.filterByArea = true;
       params_.blobColor = 255;
-      params_.minArea = 10;
-      params_.maxArea = 800;
+      params_.minArea = 120;
+      params_.maxArea = 350;
       params_.filterByCircularity = false;
       params_.filterByColor = true;
       params_.filterByConvexity = false;
