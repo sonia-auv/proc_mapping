@@ -2,7 +2,7 @@
 	<node name="proc_mapping"
 	    pkg="proc_mapping"
 	    type="proc_mapping_node"
-	    output="screen" />
+	    output="log" />
 
     <rosparam command="load"
         file="$(find proc_mapping)/config/proc_mapping_conf.yaml"/>
