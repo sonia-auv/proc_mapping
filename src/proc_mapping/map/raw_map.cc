@@ -40,7 +40,7 @@ RawMap::RawMap(const ros::NodeHandlePtr &nh, const CoordinateSystems::Ptr &cs)
       number_of_hits_({}),
       cs_(cs),
       display_map_(),
-      image_publisher_(kRosNodeName + "_raw_map_"),
+      image_publisher_(kRosNodeName + "raw_map"),
       point_cloud_threshold_(0),
       new_pcl_ready_(false),
       last_pcl_(nullptr),

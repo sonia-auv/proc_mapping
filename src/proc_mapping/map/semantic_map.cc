@@ -48,7 +48,7 @@ SemanticMap::SemanticMap(const CoordinateSystems::Ptr &cs)
 #ifdef DEBUG
       ,
       display_map_(),
-      image_publisher_(kRosNodeName + "_semantic_map_")
+      image_publisher_(kRosNodeName + "semantic_map")
 #endif
 {
   InsertRegionOfInterest("regions_of_interest.yaml");
