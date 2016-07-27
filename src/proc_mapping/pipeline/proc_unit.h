@@ -26,10 +26,10 @@
 #ifndef PROC_MAPPING_PIPELINE_PROC_UNIT_H_
 #define PROC_MAPPING_PIPELINE_PROC_UNIT_H_
 
+#include <lib_atlas/ros/image_publisher.h>
 #include <boost/any.hpp>
 #include <memory>
 #include <vector>
-#include <lib_atlas/ros/image_publisher.h>
 #include "proc_mapping/pipeline/parameter.h"
 
 namespace proc_mapping {
@@ -55,10 +55,8 @@ class ProcUnit {
   //==========================================================================
   // P U B L I C   C / D T O R S
 
-  ProcUnit(const std::string &topic_namespace) :
-      topic_namespace_(topic_namespace),
-      image_publisher_(nullptr) {
-  }
+  ProcUnit(const std::string &topic_namespace)
+      : topic_namespace_(topic_namespace), image_publisher_(nullptr) {}
 
   virtual ~ProcUnit() = default;
 
@@ -97,8 +95,8 @@ inline std::vector<ParameterInterface *> ProcUnit::GetParameters() const {
 //------------------------------------------------------------------------------
 //
 inline void ProcUnit::Initialize(const YAML::Node &node) {
-  image_publisher_.reset(new atlas::ImagePublisher{topic_namespace_ + GetName
-      ()});
+  image_publisher_.reset(
+      new atlas::ImagePublisher{topic_namespace_ + GetName()});
   image_publisher_->Start();
   ConfigureFromYamlNode(node);
 }

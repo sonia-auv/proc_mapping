@@ -59,9 +59,8 @@ ProcMappingNode::ProcMappingNode(const ros::NodeHandlePtr &nh)
   get_proc_tree_list_srv_ = nh_->advertiseService(
       "get_proc_tree_list", &ProcMappingNode::GetProcTreeListCallback, this);
 
-  change_parameter_srv_ =
-      nh_->advertiseService("change_parameter",
-                            &ProcMappingNode::ChangeParameterCallback, this);
+  change_parameter_srv_ = nh_->advertiseService(
+      "change_parameter", &ProcMappingNode::ChangeParameterCallback, this);
 
   send_map_srv_ = nh_->advertiseService(
       "send_map", &ProcMappingNode::SendMapCallback, this);
@@ -110,7 +109,8 @@ bool ProcMappingNode::SendMapCallback(
 bool ProcMappingNode::GetProcTreeListCallback(
     sonia_msgs::GetProcTreeList::Request &req,
     sonia_msgs::GetProcTreeList::Response &res) {
-  std::vector<ProcTree::Ptr> proc_tree_list = map_interpreter_.GetProcTreeList();
+  std::vector<ProcTree::Ptr> proc_tree_list =
+      map_interpreter_.GetProcTreeList();
 
   for (const auto pt : proc_tree_list) {
     res.proc_tree_list.push_back(pt->BuildRosMessage());
@@ -124,7 +124,6 @@ bool ProcMappingNode::GetProcTreeListCallback(
 bool ProcMappingNode::ChangeParameterCallback(
     sonia_msgs::ChangeParameter::Request &req,
     sonia_msgs::ChangeParameter::Response &resp) {
-
   ProcTree::Ptr pt = map_interpreter_.GetProcTree(req.proc_tree_name);
   ProcUnit::Ptr pu = pt->GetProcUnit(req.proc_unit_name);
 

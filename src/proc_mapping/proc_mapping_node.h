@@ -28,12 +28,12 @@
 
 #include <lib_atlas/macros.h>
 #include <ros/node_handle.h>
+#include <sonia_msgs/ChangeParameter.h>
 #include <sonia_msgs/ChangeProcTree.h>
 #include <sonia_msgs/InsertCircleROI.h>
 #include <sonia_msgs/InsertRectROI.h>
 #include <sonia_msgs/ResetMap.h>
 #include <sonia_msgs/SendSemanticMap.h>
-#include <sonia_msgs/ChangeParameter.h>
 #include <memory>
 #include <vector>
 #include "proc_mapping/config.h"
@@ -71,7 +71,7 @@ class ProcMappingNode {
                                sonia_msgs::GetProcTreeList::Response &res);
 
   bool ChangeParameterCallback(sonia_msgs::ChangeParameter::Request &req,
-                             sonia_msgs::ChangeParameter::Response &resp);
+                               sonia_msgs::ChangeParameter::Response &resp);
 
   bool SendMapCallback(sonia_msgs::SendSemanticMap::Request &req,
                        sonia_msgs::SendSemanticMap::Response &res);

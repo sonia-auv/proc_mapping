@@ -79,8 +79,7 @@ class Threshold : public ProcUnit {
 inline Threshold::Threshold(const std::string &topic_namespace)
     : ProcUnit(topic_namespace),
       threshold_type_("Threshold Type", 0, parameters_),
-      thresh_value_("Threshold Value", 0, parameters_) {
-}
+      thresh_value_("Threshold Value", 0, parameters_) {}
 
 //------------------------------------------------------------------------------
 //

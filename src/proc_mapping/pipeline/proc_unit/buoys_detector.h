@@ -60,8 +60,8 @@ class BuoysDetector : public ProcUnit {
   //==========================================================================
   // P U B L I C   C / D T O R S
 
-  explicit BuoysDetector(const std::string &topic_namespace, const
-                         ObjectRegistery::Ptr &object_registery);
+  explicit BuoysDetector(const std::string &topic_namespace,
+                         const ObjectRegistery::Ptr &object_registery);
 
   virtual ~BuoysDetector() = default;
 
@@ -141,17 +141,18 @@ inline void BuoysDetector::ConfigureFromYamlNode(const YAML::Node &node) {
 
 //------------------------------------------------------------------------------
 //
-inline BuoysDetector::BuoysDetector(const std::string &topic_namespace, const
-ObjectRegistery::Ptr &object_registery)
+inline BuoysDetector::BuoysDetector(
+    const std::string &topic_namespace,
+    const ObjectRegistery::Ptr &object_registery)
     : ProcUnit(topic_namespace),
       weight_goal_("Weight Goal", 0, parameters_),
       roi_needed_("ROI Needed", false, parameters_),
       object_registery_(object_registery) {}
 
-
 //------------------------------------------------------------------------------
 //
-inline cv::Rect BuoysDetector::SetBoundingBox(cv::Point2d keypoint, int box_size) {
+inline cv::Rect BuoysDetector::SetBoundingBox(cv::Point2d keypoint,
+                                              int box_size) {
   std::vector<cv::Point> rect;
   rect.push_back(cv::Point2d(keypoint.x + box_size, keypoint.y + box_size));
   rect.push_back(cv::Point2d(keypoint.x + box_size, keypoint.y - box_size));
@@ -168,9 +169,8 @@ inline void BuoysDetector::SetWeigthGoal(int weight_goal) {
 
 //------------------------------------------------------------------------------
 //
-inline void
-BuoysDetector::RemoveWeightToCorrespondingCandidate(cv::Point2d trigged_keypoint,
-                                                    int weight) {
+inline void BuoysDetector::RemoveWeightToCorrespondingCandidate(
+    cv::Point2d trigged_keypoint, int weight) {
   for (size_t i = 0; i < candidate_list_.size(); ++i) {
     if (trigged_keypoint.inside(candidate_list_[i].bounding_box)) {
       if (candidate_list_[i].weight - weight > 0) {
@@ -184,9 +184,8 @@ BuoysDetector::RemoveWeightToCorrespondingCandidate(cv::Point2d trigged_keypoint
 
 //------------------------------------------------------------------------------
 //
-inline void BuoysDetector::AddWeightToCorrespondingCandidate(cv::Point2d
-                                                             candidate,
-                                                      int weight) {
+inline void BuoysDetector::AddWeightToCorrespondingCandidate(
+    cv::Point2d candidate, int weight) {
   for (size_t i = 0; i < candidate_list_.size(); ++i) {
     if (candidate.inside(candidate_list_[i].bounding_box)) {
       if (candidate_list_[i].weight + weight <= weight_goal_.GetValue()) {
@@ -201,9 +200,8 @@ inline void BuoysDetector::AddWeightToCorrespondingCandidate(cv::Point2d
 
 //------------------------------------------------------------------------------
 //
-inline void
-BuoysDetector::RemoveWeightToCorrespondingTriggedKeypoint(cv::Point2d trigged_keypoint,
-                                                          int weight) {
+inline void BuoysDetector::RemoveWeightToCorrespondingTriggedKeypoint(
+    cv::Point2d trigged_keypoint, int weight) {
   for (size_t i = 0; i < trigged_keypoint_list_.size(); ++i) {
     if (trigged_keypoint.inside(trigged_keypoint_list_[i].bounding_box)) {
       if (trigged_keypoint_list_[i].weight - weight > 0) {
@@ -217,9 +215,8 @@ BuoysDetector::RemoveWeightToCorrespondingTriggedKeypoint(cv::Point2d trigged_ke
 
 //------------------------------------------------------------------------------
 //
-inline void
-BuoysDetector::AddWeightToCorrespondingTriggedKeypoint(cv::Point2d trigged_keypoint,
-                                                       int weight) {
+inline void BuoysDetector::AddWeightToCorrespondingTriggedKeypoint(
+    cv::Point2d trigged_keypoint, int weight) {
   for (size_t i = 0; i < trigged_keypoint_list_.size(); ++i) {
     if (trigged_keypoint.inside(trigged_keypoint_list_[i].bounding_box)) {
       if (trigged_keypoint_list_[i].weight + weight <=
@@ -228,7 +225,7 @@ BuoysDetector::AddWeightToCorrespondingTriggedKeypoint(cv::Point2d trigged_keypo
       } else {
         trigged_keypoint_list_[i].weight +=
             (trigged_keypoint_list_[i].weight + weight) -
-                weight_goal_.GetValue();
+            weight_goal_.GetValue();
       }
     }
   }
@@ -236,8 +233,8 @@ BuoysDetector::AddWeightToCorrespondingTriggedKeypoint(cv::Point2d trigged_keypo
 
 //------------------------------------------------------------------------------
 //
-inline bool BuoysDetector::BoxMean(BuoysDetector::TriggedKeypoint trigged_keypoint,
-                            double reached_mean) {
+inline bool BuoysDetector::BoxMean(
+    BuoysDetector::TriggedKeypoint trigged_keypoint, double reached_mean) {
   cv::Mat box(trigged_keypoint.bounding_box.height,
               trigged_keypoint.bounding_box.width, CV_8UC1);
   cv::Scalar actual_mean = cv::mean(box);
@@ -253,10 +250,9 @@ inline bool BuoysDetector::BoxMean(BuoysDetector::TriggedKeypoint trigged_keypoi
 
 //------------------------------------------------------------------------------
 //
-inline bool
-BuoysDetector::HasTwoBlobInGoodRange(BuoysDetector::TriggedKeypoint trigged_keypoint,
-                                     double low_range,
-                                     double high_range) {
+inline bool BuoysDetector::HasTwoBlobInGoodRange(
+    BuoysDetector::TriggedKeypoint trigged_keypoint, double low_range,
+    double high_range) {
   if (candidate_list_.size() > 2) {
     for (size_t i = 0; i < candidate_list_.size(); ++i) {
       double distance =
@@ -268,8 +264,7 @@ BuoysDetector::HasTwoBlobInGoodRange(BuoysDetector::TriggedKeypoint trigged_keyp
             double distance2 = GetDistanceBewteenKeypoint(
                 trigged_keypoint.trigged_keypoint.pt,
                 candidate_list_[j].trigged_keypoint.pt);
-            if (distance2 >= low_range * 40 and
-                distance2 <= high_range * 40) {
+            if (distance2 >= low_range * 40 and distance2 <= high_range * 40) {
               return true;
             }
           }
@@ -282,10 +277,9 @@ BuoysDetector::HasTwoBlobInGoodRange(BuoysDetector::TriggedKeypoint trigged_keyp
 
 //------------------------------------------------------------------------------
 //
-inline bool
-BuoysDetector::HasBlobInGoodRange(BuoysDetector::TriggedKeypoint trigged_keypoint,
-                                  double low_range,
-                                  double high_range) {
+inline bool BuoysDetector::HasBlobInGoodRange(
+    BuoysDetector::TriggedKeypoint trigged_keypoint, double low_range,
+    double high_range) {
   for (size_t i = 0; i < trigged_keypoint_list_.size(); ++i) {
     double distance = GetDistanceBewteenKeypoint(
         trigged_keypoint.trigged_keypoint.pt,
@@ -299,7 +293,8 @@ BuoysDetector::HasBlobInGoodRange(BuoysDetector::TriggedKeypoint trigged_keypoin
 
 //------------------------------------------------------------------------------
 //
-inline double BuoysDetector::GetDistanceBewteenKeypoint(cv::Point2d p1, cv::Point2d p2) {
+inline double BuoysDetector::GetDistanceBewteenKeypoint(cv::Point2d p1,
+                                                        cv::Point2d p2) {
   double delta_x = (p1.x - p2.x);
   double delta_y = (p1.y - p2.y);
   return sqrt((delta_x * delta_x) + (delta_y * delta_y));
@@ -317,8 +312,8 @@ inline void BuoysDetector::RemoveToCandidateList(cv::KeyPoint keypoint) {
 
 //------------------------------------------------------------------------------
 //
-inline void
-BuoysDetector::AddToCandidateList(BuoysDetector::TriggedKeypoint trigged_keypoint) {
+inline void BuoysDetector::AddToCandidateList(
+    BuoysDetector::TriggedKeypoint trigged_keypoint) {
   Candidate candidate;
   candidate.trigged_keypoint = trigged_keypoint.trigged_keypoint;
   candidate.bounding_box =
@@ -353,8 +348,8 @@ inline void BuoysDetector::AddToTriggeredList(cv::KeyPoint keypoint) {
 
 //------------------------------------------------------------------------------
 //
-inline bool
-BuoysDetector::IsCandidateHasEnoughWeight(BuoysDetector::Candidate candidate) {
+inline bool BuoysDetector::IsCandidateHasEnoughWeight(
+    BuoysDetector::Candidate candidate) {
   if (candidate.weight > weight_goal_.GetValue()) {
     return true;
   }
@@ -363,11 +358,11 @@ BuoysDetector::IsCandidateHasEnoughWeight(BuoysDetector::Candidate candidate) {
 
 //------------------------------------------------------------------------------
 //
-inline bool
-BuoysDetector::IsAlreadyCandidate(BuoysDetector::TriggedKeypoint trigged_keypoint) {
+inline bool BuoysDetector::IsAlreadyCandidate(
+    BuoysDetector::TriggedKeypoint trigged_keypoint) {
   for (size_t i = 0; i < candidate_list_.size(); ++i) {
     if (trigged_keypoint.trigged_keypoint.pt.inside(
-        candidate_list_.at(i).bounding_box)) {
+            candidate_list_.at(i).bounding_box)) {
       return true;
     }
   }
@@ -417,7 +412,7 @@ inline boost::any BuoysDetector::ProcessData(boost::any input) {
           if (!IsAlreadyCandidate(trigged_keypoint_list_[j])) {
             for (const auto &roi : rois) {
               if (roi->IsInZone(
-                  trigged_keypoint_list_[j].trigged_keypoint.pt)) {
+                      trigged_keypoint_list_[j].trigged_keypoint.pt)) {
                 AddToCandidateList(trigged_keypoint_list_[j]);
                 AddWeightToCorrespondingCandidate(
                     trigged_keypoint_list_[j].trigged_keypoint.pt, 5);
@@ -447,15 +442,13 @@ inline boost::any BuoysDetector::ProcessData(boost::any input) {
             RemoveWeightToCorrespondingCandidate(
                 trigged_keypoint_list_[j].trigged_keypoint.pt, 5);
             if (trigged_keypoint_list_[j].weight == 0) {
-              RemoveToCandidateList(
-                  trigged_keypoint_list_[j].trigged_keypoint);
+              RemoveToCandidateList(trigged_keypoint_list_[j].trigged_keypoint);
             }
           } else {
             RemoveWeightToCorrespondingTriggedKeypoint(
                 trigged_keypoint_list_[j].trigged_keypoint.pt, 5);
             if (trigged_keypoint_list_[j].weight == 0) {
-              RemoveToTriggeredList(
-                  trigged_keypoint_list_[j].trigged_keypoint);
+              RemoveToTriggeredList(trigged_keypoint_list_[j].trigged_keypoint);
             }
           }
         }

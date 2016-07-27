@@ -94,7 +94,7 @@ class Parameter : public ParameterInterface {
   // P U B L I C   M E T H O D S
 
   operator Tp_() { return value_; }
-  void operator = (const Tp_ &value) { value_ = value; }
+  void operator=(const Tp_ &value) { value_ = value; }
 
   Tp_ GetValue() const;
 

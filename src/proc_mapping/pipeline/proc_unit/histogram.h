@@ -68,39 +68,38 @@ inline Histogram::Histogram(const std::string &topic_namespace)
 
 //------------------------------------------------------------------------------
 //
-inline void Histogram::ConfigureFromYamlNode(const YAML::Node &node) {
-}
+inline void Histogram::ConfigureFromYamlNode(const YAML::Node &node) {}
 
 //------------------------------------------------------------------------------
 //
 inline boost::any Histogram::ProcessData(boost::any input) {
-    cv::Mat map = boost::any_cast<cv::Mat>(input);
-    int hist_size = 256;
-    float range[] = {0, 255};
-    const float *hist_range = {range};
+  cv::Mat map = boost::any_cast<cv::Mat>(input);
+  int hist_size = 256;
+  float range[] = {0, 255};
+  const float *hist_range = {range};
 
-    cv::Mat hist;
+  cv::Mat hist;
 
-    cv::calcHist(&map, 1, 0, cv::Mat(), hist, 1, &hist_size, &hist_range, true,
-                 false);
+  cv::calcHist(&map, 1, 0, cv::Mat(), hist, 1, &hist_size, &hist_range, true,
+               false);
 
-    int hist_w = 1024;
-    int hist_h = 400;
-    int bin_w = cvRound(static_cast<double>(hist_w / hist_size));
+  int hist_w = 1024;
+  int hist_h = 400;
+  int bin_w = cvRound(static_cast<double>(hist_w / hist_size));
 
-    cv::Mat hist_image(hist_h, hist_w, CV_8UC1, cv::Scalar(0));
+  cv::Mat hist_image(hist_h, hist_w, CV_8UC1, cv::Scalar(0));
 
-    for (int i = 1; i < hist_size; i++) {
-        cv::line(hist_image, cv::Point(bin_w * (i - 1),
-                                       hist_h - cvRound(hist.at<float>(i - 1))),
-                 cv::Point(bin_w * (i), hist_h - cvRound(hist.at<float>(i))),
-                 cv::Scalar(255), 2, 8, 0);
-    }
+  for (int i = 1; i < hist_size; i++) {
+    cv::line(hist_image, cv::Point(bin_w * (i - 1),
+                                   hist_h - cvRound(hist.at<float>(i - 1))),
+             cv::Point(bin_w * (i), hist_h - cvRound(hist.at<float>(i))),
+             cv::Scalar(255), 2, 8, 0);
+  }
 
-    cvtColor(hist_image, hist_image, CV_GRAY2RGB);
-    PublishImage(hist_image);
+  cvtColor(hist_image, hist_image, CV_GRAY2RGB);
+  PublishImage(hist_image);
 
-    return boost::any(map);
+  return boost::any(map);
 }
 
 //------------------------------------------------------------------------------

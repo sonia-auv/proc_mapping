@@ -53,8 +53,8 @@ class FarBuoysDetector : public ProcUnit {
   //==========================================================================
   // P U B L I C   C / D T O R S
 
-  explicit FarBuoysDetector(const std::string &topic_namespace, const
-  ObjectRegistery::Ptr &object_registery);
+  explicit FarBuoysDetector(const std::string &topic_namespace,
+                            const ObjectRegistery::Ptr &object_registery);
 
   virtual ~FarBuoysDetector() = default;
 
@@ -103,8 +103,9 @@ class FarBuoysDetector : public ProcUnit {
 
 //------------------------------------------------------------------------------
 //
-inline FarBuoysDetector::FarBuoysDetector(const std::string &topic_namespace, const
-ObjectRegistery::Ptr &object_registery)
+inline FarBuoysDetector::FarBuoysDetector(
+    const std::string &topic_namespace,
+    const ObjectRegistery::Ptr &object_registery)
     : ProcUnit(topic_namespace),
       weight_goal_("Weight Goal", 0, parameters_),
       object_registery_(object_registery) {}
@@ -145,8 +146,8 @@ inline boost::any FarBuoysDetector::ProcessData(boost::any input) {
   for (size_t j = 0; j < trigged_keypoint_list_.size(); ++j) {
     if (IsKeypointHasEnoughWeight(trigged_keypoint_list_[j])) {
       if (!trigged_keypoint_list_[j].is_object_send) {
-        MapObject::Ptr map_object = std::make_shared<Buoy>(
-            trigged_keypoint_list_[j].trigged_keypoint);
+        MapObject::Ptr map_object =
+            std::make_shared<Buoy>(trigged_keypoint_list_[j].trigged_keypoint);
         map_object->SetName("Buoy [" + std::to_string(j) + "]");
         map_object->SetSize(trigged_keypoint_list_[j].trigged_keypoint.size);
         object_registery_->AddMapObject(std::move(map_object));
@@ -163,7 +164,9 @@ inline boost::any FarBuoysDetector::ProcessData(boost::any input) {
 
 //------------------------------------------------------------------------------
 //
-inline std::string FarBuoysDetector::GetName() const { return "far_buoys_detector"; }
+inline std::string FarBuoysDetector::GetName() const {
+  return "far_buoys_detector";
+}
 
 //------------------------------------------------------------------------------
 //
@@ -199,9 +202,8 @@ inline void FarBuoysDetector::RemoveToTriggeredList(cv::KeyPoint keypoint) {
 
 //------------------------------------------------------------------------------
 //
-inline void
-FarBuoysDetector::AddWeightToCorrespondingTriggedKeypoint(cv::Point2d trigged_keypoint,
-                                                          int weight) {
+inline void FarBuoysDetector::AddWeightToCorrespondingTriggedKeypoint(
+    cv::Point2d trigged_keypoint, int weight) {
   for (size_t i = 0; i < trigged_keypoint_list_.size(); ++i) {
     if (trigged_keypoint.inside(trigged_keypoint_list_[i].bounding_box)) {
       if (trigged_keypoint_list_[i].weight + weight <=
@@ -210,7 +212,7 @@ FarBuoysDetector::AddWeightToCorrespondingTriggedKeypoint(cv::Point2d trigged_ke
       } else {
         trigged_keypoint_list_[i].weight +=
             (trigged_keypoint_list_[i].weight + weight) -
-                weight_goal_.GetValue();
+            weight_goal_.GetValue();
       }
     }
   }
@@ -218,9 +220,8 @@ FarBuoysDetector::AddWeightToCorrespondingTriggedKeypoint(cv::Point2d trigged_ke
 
 //------------------------------------------------------------------------------
 //
-inline void
-FarBuoysDetector::RemoveWeightToCorrespondingTriggedKeypoint(cv::Point2d trigged_keypoint,
-                                                             int weight) {
+inline void FarBuoysDetector::RemoveWeightToCorrespondingTriggedKeypoint(
+    cv::Point2d trigged_keypoint, int weight) {
   for (size_t i = 0; i < trigged_keypoint_list_.size(); ++i) {
     if (trigged_keypoint.inside(trigged_keypoint_list_[i].bounding_box)) {
       if (trigged_keypoint_list_[i].weight - weight > 0) {
@@ -234,8 +235,8 @@ FarBuoysDetector::RemoveWeightToCorrespondingTriggedKeypoint(cv::Point2d trigged
 
 //------------------------------------------------------------------------------
 //
-inline bool
-FarBuoysDetector::IsKeypointHasEnoughWeight(FarBuoysDetector::TriggedKeypoint keypoint) {
+inline bool FarBuoysDetector::IsKeypointHasEnoughWeight(
+    FarBuoysDetector::TriggedKeypoint keypoint) {
   if (keypoint.weight > weight_goal_.GetValue()) {
     return true;
   }
@@ -250,7 +251,8 @@ inline void FarBuoysDetector::SetWeigthGoal(int weight_goal) {
 
 //------------------------------------------------------------------------------
 //
-inline cv::Rect FarBuoysDetector::SetBoundingBox(cv::Point2d keypoint, int box_size) {
+inline cv::Rect FarBuoysDetector::SetBoundingBox(cv::Point2d keypoint,
+                                                 int box_size) {
   std::vector<cv::Point> rect;
   rect.push_back(cv::Point2d(keypoint.x + box_size, keypoint.y + box_size));
   rect.push_back(cv::Point2d(keypoint.x + box_size, keypoint.y - box_size));

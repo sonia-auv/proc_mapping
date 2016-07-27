@@ -89,8 +89,7 @@ class Morphology : public ProcUnit {
 inline Morphology::Morphology(const std::string &topic_namespace)
     : ProcUnit(topic_namespace),
       kernel_size_x_("Kernel Size X", 5, parameters_),
-      kernel_size_y_("Kernel Size X", 5, parameters_) {
-}
+      kernel_size_y_("Kernel Size X", 5, parameters_) {}
 
 //------------------------------------------------------------------------------
 //

@@ -105,7 +105,8 @@ void RawMap::Run() {
         Notify(display_map_);
         // To fit in OpenCv coordinate system, we have to made a rotation of
         // 90 degrees on the display map
-        cv::Point2f src_center(display_map_.cols / 2.0f, display_map_.rows / 2.0f);
+        cv::Point2f src_center(display_map_.cols / 2.0f,
+                               display_map_.rows / 2.0f);
         cv::Mat rot_mat = getRotationMatrix2D(src_center, 90, 1.0);
         cv::Mat dst;
         cv::warpAffine(display_map_, dst, rot_mat, display_map_.size());
@@ -184,19 +185,19 @@ void RawMap::ProcessPointCloud(const sensor_msgs::PointCloud2::ConstPtr &msg) {
   for (size_t j = 0; j < intensity_map.size() - 1; j++) {
     UpdateMat(coordinate_map[j], intensity_map[j]);
   }
-    // Send a command when enough scanline is arrived
-    scanline_counter_++;
+  // Send a command when enough scanline is arrived
+  scanline_counter_++;
 
-    if (scanline_counter_ > 300) {
-      is_first_scan_complete_ = true;
-    }
+  if (scanline_counter_ > 300) {
+    is_first_scan_complete_ = true;
+  }
 
-    if (is_first_scan_complete_) {
-      if (scanline_counter_ >= scanlines_for_process_) {
-        is_map_ready_for_process_ = true;
-        scanline_counter_ = 0;
-      }
+  if (is_first_scan_complete_) {
+    if (scanline_counter_ >= scanlines_for_process_) {
+      is_map_ready_for_process_ = true;
+      scanline_counter_ = 0;
     }
+  }
 }
 
 //------------------------------------------------------------------------------

@@ -68,8 +68,7 @@ inline WallRemover::WallRemover(const std::string &topic_namespace)
 
 //------------------------------------------------------------------------------
 //
-inline void WallRemover::ConfigureFromYamlNode(const YAML::Node &node) {
-}
+inline void WallRemover::ConfigureFromYamlNode(const YAML::Node &node) {}
 
 //------------------------------------------------------------------------------
 //

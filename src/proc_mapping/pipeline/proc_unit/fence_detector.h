@@ -53,8 +53,8 @@ class FenceDetector : public ProcUnit {
   //==========================================================================
   // P U B L I C   C / D T O R S
 
-  explicit FenceDetector(const std::string &topic_namespace, const
-  ObjectRegistery::Ptr &object_registery);
+  explicit FenceDetector(const std::string &topic_namespace,
+                         const ObjectRegistery::Ptr &object_registery);
 
   virtual ~FenceDetector() = default;
 
@@ -103,8 +103,9 @@ class FenceDetector : public ProcUnit {
 
 //------------------------------------------------------------------------------
 //
-inline FenceDetector::FenceDetector(const std::string &topic_namespace, const
-ObjectRegistery::Ptr &object_registery)
+inline FenceDetector::FenceDetector(
+    const std::string &topic_namespace,
+    const ObjectRegistery::Ptr &object_registery)
     : ProcUnit(topic_namespace),
       weight_goal_("Weight Goal", 0, parameters_),
       object_registery_(object_registery) {}
@@ -145,8 +146,8 @@ inline boost::any FenceDetector::ProcessData(boost::any input) {
   for (size_t j = 0; j < trigged_keypoint_list_.size(); ++j) {
     if (IsKeypointHasEnoughWeight(trigged_keypoint_list_[j])) {
       if (!trigged_keypoint_list_[j].is_object_send) {
-        MapObject::Ptr map_object = std::make_shared<Buoy>(
-            trigged_keypoint_list_[j].trigged_keypoint);
+        MapObject::Ptr map_object =
+            std::make_shared<Buoy>(trigged_keypoint_list_[j].trigged_keypoint);
         map_object->SetName("Fence [" + std::to_string(j) + "]");
         map_object->SetSize(trigged_keypoint_list_[j].trigged_keypoint.size);
         object_registery_->AddMapObject(std::move(map_object));
@@ -199,9 +200,8 @@ inline void FenceDetector::RemoveToTriggeredList(cv::KeyPoint keypoint) {
 
 //------------------------------------------------------------------------------
 //
-inline void
-FenceDetector::AddWeightToCorrespondingTriggedKeypoint(cv::Point2d trigged_keypoint,
-                                                       int weight) {
+inline void FenceDetector::AddWeightToCorrespondingTriggedKeypoint(
+    cv::Point2d trigged_keypoint, int weight) {
   for (size_t i = 0; i < trigged_keypoint_list_.size(); ++i) {
     if (trigged_keypoint.inside(trigged_keypoint_list_[i].bounding_box)) {
       if (trigged_keypoint_list_[i].weight + weight <=
@@ -210,7 +210,7 @@ FenceDetector::AddWeightToCorrespondingTriggedKeypoint(cv::Point2d trigged_keypo
       } else {
         trigged_keypoint_list_[i].weight +=
             (trigged_keypoint_list_[i].weight + weight) -
-                weight_goal_.GetValue();
+            weight_goal_.GetValue();
       }
     }
   }
@@ -218,9 +218,8 @@ FenceDetector::AddWeightToCorrespondingTriggedKeypoint(cv::Point2d trigged_keypo
 
 //------------------------------------------------------------------------------
 //
-inline void
-FenceDetector::RemoveWeightToCorrespondingTriggedKeypoint(cv::Point2d trigged_keypoint,
-                                                          int weight) {
+inline void FenceDetector::RemoveWeightToCorrespondingTriggedKeypoint(
+    cv::Point2d trigged_keypoint, int weight) {
   for (size_t i = 0; i < trigged_keypoint_list_.size(); ++i) {
     if (trigged_keypoint.inside(trigged_keypoint_list_[i].bounding_box)) {
       if (trigged_keypoint_list_[i].weight - weight > 0) {
@@ -234,8 +233,8 @@ FenceDetector::RemoveWeightToCorrespondingTriggedKeypoint(cv::Point2d trigged_ke
 
 //------------------------------------------------------------------------------
 //
-inline bool
-FenceDetector::IsKeypointHasEnoughWeight(FenceDetector::TriggedKeypoint keypoint) {
+inline bool FenceDetector::IsKeypointHasEnoughWeight(
+    FenceDetector::TriggedKeypoint keypoint) {
   if (keypoint.weight > weight_goal_.GetValue()) {
     return true;
   }
@@ -250,7 +249,8 @@ inline void FenceDetector::SetWeigthGoal(int weight_goal) {
 
 //------------------------------------------------------------------------------
 //
-inline cv::Rect FenceDetector::SetBoundingBox(cv::Point2d keypoint, int box_size) {
+inline cv::Rect FenceDetector::SetBoundingBox(cv::Point2d keypoint,
+                                              int box_size) {
   std::vector<cv::Point> rect;
   rect.push_back(cv::Point2d(keypoint.x + box_size, keypoint.y + box_size));
   rect.push_back(cv::Point2d(keypoint.x + box_size, keypoint.y - box_size));

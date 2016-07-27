@@ -121,28 +121,29 @@ inline boost::any Blur::ProcessData(boost::any input) {
 
 //------------------------------------------------------------------------------
 //
-inline void Blur::GenerateImageToPublish(const cv::Mat &map, const cv::Mat &dst) {
+inline void Blur::GenerateImageToPublish(const cv::Mat &map,
+                                         const cv::Mat &dst) {
   if (blur_type_.GetValue() == 3) {
-      // To fit in OpenCv coordinate system, we have to made a rotation of
-      // 90 degrees on the display map
-      cv::Point2f src_center(dst.cols / 2.0f, dst.rows / 2.0f);
-      cv::Mat rot_mat = getRotationMatrix2D(src_center, 90, 1.0);
-      cv::Mat blur_dst;
-      warpAffine(map, blur_dst, rot_mat, map.size());
+    // To fit in OpenCv coordinate system, we have to made a rotation of
+    // 90 degrees on the display map
+    cv::Point2f src_center(dst.cols / 2.0f, dst.rows / 2.0f);
+    cv::Mat rot_mat = getRotationMatrix2D(src_center, 90, 1.0);
+    cv::Mat blur_dst;
+    warpAffine(map, blur_dst, rot_mat, map.size());
 
-      cvtColor(blur_dst, blur_dst, CV_GRAY2RGB);
-      PublishImage(blur_dst);
-    } else {
-      // To fit in OpenCv coordinate system, we have to made a rotation of
-      // 90 degrees on the display map
-      cv::Point2f src_center(map.cols / 2.0f, map.rows / 2.0f);
-      cv::Mat rot_mat = getRotationMatrix2D(src_center, 90, 1.0);
-      cv::Mat blur_dst;
-      warpAffine(map, blur_dst, rot_mat, map.size());
+    cvtColor(blur_dst, blur_dst, CV_GRAY2RGB);
+    PublishImage(blur_dst);
+  } else {
+    // To fit in OpenCv coordinate system, we have to made a rotation of
+    // 90 degrees on the display map
+    cv::Point2f src_center(map.cols / 2.0f, map.rows / 2.0f);
+    cv::Mat rot_mat = getRotationMatrix2D(src_center, 90, 1.0);
+    cv::Mat blur_dst;
+    warpAffine(map, blur_dst, rot_mat, map.size());
 
-      cvtColor(blur_dst, blur_dst, CV_GRAY2RGB);
-      PublishImage(blur_dst);
-    }
+    cvtColor(blur_dst, blur_dst, CV_GRAY2RGB);
+    PublishImage(blur_dst);
+  }
 }
 
 //------------------------------------------------------------------------------

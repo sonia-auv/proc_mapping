@@ -44,10 +44,7 @@ namespace proc_mapping {
 //
 ProcTree::ProcTree(const YAML::Node &node, const ros::NodeHandlePtr &nh,
                    const ObjectRegistery::Ptr &object_registery)
-    : nh_(nh),
-      name_(""),
-      proc_units_({}),
-      object_registery_(object_registery) {
+    : nh_(nh), name_(""), proc_units_({}), object_registery_(object_registery) {
   Deserialize(node);
 }
 
@@ -98,11 +95,14 @@ typename ProcUnit::Ptr ProcTree::ProcUnitFactory(const YAML::Node &node) const {
     } else if (proc_unit_name == "blob_detector") {
       pu = std::make_shared<BlobDetector>(publisher_namespace);
     } else if (proc_unit_name == "far_buoys_detector") {
-      pu = std::make_shared<FarBuoysDetector>(publisher_namespace, object_registery_);
+      pu = std::make_shared<FarBuoysDetector>(publisher_namespace,
+                                              object_registery_);
     } else if (proc_unit_name == "buoys_detector") {
-      pu = std::make_shared<BuoysDetector>(publisher_namespace, object_registery_);
+      pu = std::make_shared<BuoysDetector>(publisher_namespace,
+                                           object_registery_);
     } else if (proc_unit_name == "fence_detector") {
-      pu = std::make_shared<FenceDetector>(publisher_namespace, object_registery_);
+      pu = std::make_shared<FenceDetector>(publisher_namespace,
+                                           object_registery_);
     } else {
       ROS_ERROR("There is no ProcUnit with such a name");
     }
