@@ -73,6 +73,9 @@ class ProcUnit {
 
   virtual void Initialize(const YAML::Node &node);
 
+  void Activate();
+  void Deactivate();
+
  protected:
   void PublishImage(const cv::Mat &img);
 
@@ -95,9 +98,6 @@ inline std::vector<ParameterInterface *> ProcUnit::GetParameters() const {
 //------------------------------------------------------------------------------
 //
 inline void ProcUnit::Initialize(const YAML::Node &node) {
-  image_publisher_.reset(
-      new atlas::ImagePublisher{topic_namespace_ + GetName()});
-  image_publisher_->Start();
   ConfigureFromYamlNode(node);
 }
 
@@ -105,6 +105,20 @@ inline void ProcUnit::Initialize(const YAML::Node &node) {
 //
 inline void ProcUnit::PublishImage(const cv::Mat &img) {
   image_publisher_->Write(img);
+}
+
+//------------------------------------------------------------------------------
+//
+inline void ProcUnit::Activate() {
+  image_publisher_.reset(
+      new atlas::ImagePublisher{topic_namespace_ + GetName()});
+  image_publisher_->Start();
+}
+
+//------------------------------------------------------------------------------
+//
+inline void ProcUnit::Deactivate() {
+  image_publisher_.reset(nullptr);
 }
 
 }  // namespace proc_mapping

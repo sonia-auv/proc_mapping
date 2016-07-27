@@ -170,4 +170,20 @@ sonia_msgs::ProcTree ProcTree::BuildRosMessage() {
   return proc_tree_msg;
 }
 
+//------------------------------------------------------------------------------
+//
+void ProcTree::Activate() {
+  for (auto &&unit : proc_units_) {
+    unit->Activate();
+  }
+}
+
+//------------------------------------------------------------------------------
+//
+void ProcTree::Deactivate() {
+  for (auto &&unit : proc_units_) {
+    unit->Deactivate();
+  }
+}
+
 }  // namespace proc_mapping
