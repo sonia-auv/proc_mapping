@@ -117,7 +117,11 @@ bool ProcMappingNode::GetCurrentProcTreeCallback
      sonia_msgs::GetCurrentProcTree::Response &res) {
   ProcTree::Ptr current_proc_tree;
   current_proc_tree = map_interpreter_.GetCurrentProcTree();
-  res.current_proc_tree = current_proc_tree->BuildRosMessage();
+  if(current_proc_tree) {
+    res.current_proc_tree = current_proc_tree->BuildRosMessage();
+  } else {
+    ROS_ERROR("Trying ty access the current proc tree, but there is none.");
+  }
 
   return true;
 }
