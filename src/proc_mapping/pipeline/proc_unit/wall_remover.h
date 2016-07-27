@@ -44,71 +44,80 @@ class WallRemover : public ProcUnit {
   //==========================================================================
   // P U B L I C   C / D T O R S
 
-  explicit WallRemover(std::string proc_tree_name = "", bool debug = false)
-      : debug_("Debug", debug, parameters_),
-        image_publisher_(kRosNodeName + "_threshold_" + proc_tree_name) {
-    image_publisher_.Start();
-  }
+  explicit WallRemover(const std::string &topic_namespace);
 
   virtual ~WallRemover() = default;
 
   //==========================================================================
   // P U B L I C   M E T H O D S
 
-  virtual boost::any ProcessData(boost::any input) override {
-    cv::Mat map = boost::any_cast<cv::Mat>(input);
+  virtual void ConfigureFromYamlNode(const YAML::Node &node) override;
 
-    std::vector<std::vector<cv::Point>> contour_list, final_contour_list;
-    std::vector<cv::Vec4i> hierarchy;
-    cv::findContours(map.clone(), contour_list, hierarchy, CV_RETR_EXTERNAL,
-                     CV_CHAIN_APPROX_SIMPLE);
-
-    for (size_t i = 0; i < contour_list.size(); i++) {
-      double area = cv::contourArea(contour_list[i]);
-      // Is enough big
-      if (area < 30) {
-        continue;
-      }
-
-      cv::RotatedRect rotatedRect = cv::minAreaRect(contour_list[i]);
-      // RotatedRect does not guarantee that the height is longer than
-      // the width, so we decide that height is for the longer side.
-      if (rotatedRect.size.width > rotatedRect.size.height) {
-        std::swap(rotatedRect.size.width, rotatedRect.size.height);
-      }
-
-      // Is thin enough
-      if (rotatedRect.size.width > 50 /*&& rotatedRect.size.width < 100*/) {
-        continue;
-      }
-      // Keep it if it matches
-      final_contour_list.push_back(contour_list[i]);
-    }
-
-    map.setTo(cv::Scalar(0));
-    cv::drawContours(map, final_contour_list, -1, CV_RGB(255, 255, 255), -1);
-
-    if (debug_.GetValue()) {
-      // To fit in OpenCv coordinate system, we have to made a rotation of
-      // 90 degrees on the display map
-      cv::Point2f src_center(map.cols / 2.0f, map.rows / 2.0f);
-      cv::Mat rot_mat = getRotationMatrix2D(src_center, 90, 1.0);
-      cv::Mat dst;
-      cv::warpAffine(map, dst, rot_mat, map.size());
-
-      cvtColor(dst, dst, CV_GRAY2RGB);
-      image_publisher_.Write(dst);
-    }
-    return boost::any(map);
-  }
+  virtual boost::any ProcessData(boost::any input) override;
 
   std::string GetName() const override { return "wall_remover"; }
-
- private:
-  Parameter<bool> debug_;
-
-  atlas::ImagePublisher image_publisher_;
 };
+
+//==============================================================================
+// I N L I N E   M E T H O D S
+
+//------------------------------------------------------------------------------
+//
+inline WallRemover::WallRemover(const std::string &topic_namespace)
+    : ProcUnit(topic_namespace) {}
+
+//------------------------------------------------------------------------------
+//
+inline void WallRemover::ConfigureFromYamlNode(const YAML::Node &node) {
+}
+
+//------------------------------------------------------------------------------
+//
+inline boost::any WallRemover::ProcessData(boost::any input) {
+  cv::Mat map = boost::any_cast<cv::Mat>(input);
+
+  std::vector<std::vector<cv::Point>> contour_list, final_contour_list;
+  std::vector<cv::Vec4i> hierarchy;
+  cv::findContours(map.clone(), contour_list, hierarchy, CV_RETR_EXTERNAL,
+                   CV_CHAIN_APPROX_SIMPLE);
+
+  for (size_t i = 0; i < contour_list.size(); i++) {
+    double area = cv::contourArea(contour_list[i]);
+    // Is enough big
+    if (area < 30) {
+      continue;
+    }
+
+    cv::RotatedRect rotatedRect = cv::minAreaRect(contour_list[i]);
+    // RotatedRect does not guarantee that the height is longer than
+    // the width, so we decide that height is for the longer side.
+    if (rotatedRect.size.width > rotatedRect.size.height) {
+      std::swap(rotatedRect.size.width, rotatedRect.size.height);
+    }
+
+    // Is thin enough
+    if (rotatedRect.size.width > 50 /*&& rotatedRect.size.width < 100*/) {
+      continue;
+    }
+    // Keep it if it matches
+    final_contour_list.push_back(contour_list[i]);
+  }
+
+  map.setTo(cv::Scalar(0));
+  cv::drawContours(map, final_contour_list, -1, CV_RGB(255, 255, 255), -1);
+
+  // To fit in OpenCv coordinate system, we have to made a rotation of
+  // 90 degrees on the display map
+  cv::Point2f src_center(map.cols / 2.0f, map.rows / 2.0f);
+  cv::Mat rot_mat = getRotationMatrix2D(src_center, 90, 1.0);
+  cv::Mat dst;
+  cv::warpAffine(map, dst, rot_mat, map.size());
+
+  cvtColor(dst, dst, CV_GRAY2RGB);
+  PublishImage(dst);
+
+  return boost::any(map);
+}
 
 }  // namespace proc_mapping
 

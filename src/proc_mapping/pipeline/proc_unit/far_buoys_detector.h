@@ -53,151 +53,211 @@ class FarBuoysDetector : public ProcUnit {
   //==========================================================================
   // P U B L I C   C / D T O R S
 
-  explicit FarBuoysDetector(const ObjectRegistery::Ptr &object_registery,
-                            bool debug = false)
-      : debug_("Debug", debug, parameters_),
-        weight_goal_("Weight Goal", 0, parameters_),
-        object_registery_(object_registery) {}
+  explicit FarBuoysDetector(const std::string &topic_namespace, const
+  ObjectRegistery::Ptr &object_registery);
 
   virtual ~FarBuoysDetector() = default;
 
   //==========================================================================
   // P U B L I C   M E T H O D S
 
-  virtual boost::any ProcessData(boost::any input) override {
-    auto keypoint = boost::any_cast<std::vector<cv::KeyPoint>>(input);
-    auto rois =
-        object_registery_->GetRegionOfInterestOfType(DetectionMode::BUOYS);
-    SetWeigthGoal(150);
+  virtual void ConfigureFromYamlNode(const YAML::Node &node) override;
 
-    if (object_registery_->IsRegisteryCleared()) {
-      trigged_keypoint_list_.clear();
-      object_registery_->ResetRegisteryClearedFlag();
-    }
+  virtual boost::any ProcessData(boost::any input) override;
 
-    bool added_new_object = false;
-    for (size_t i = 0; i < keypoint.size(); i++) {
-      bool is_already_trigged = IsAlreadyTrigged(keypoint[i]);
-
-      if (!is_already_trigged) {
-        AddToTriggeredList(keypoint[i]);
-      } else {
-        for (size_t j = 0; j < trigged_keypoint_list_.size(); ++j) {
-          AddWeightToCorrespondingTriggedKeypoint(
-              trigged_keypoint_list_[j].trigged_keypoint.pt, 1);
-        }
-      }
-    }
-
-    for (size_t j = 0; j < trigged_keypoint_list_.size(); ++j) {
-      if (IsKeypointHasEnoughWeight(trigged_keypoint_list_[j])) {
-        if (!trigged_keypoint_list_[j].is_object_send) {
-          MapObject::Ptr map_object = std::make_shared<Buoy>(
-              trigged_keypoint_list_[j].trigged_keypoint);
-          map_object->SetName("Buoy [" + std::to_string(j) + "]");
-          map_object->SetSize(trigged_keypoint_list_[j].trigged_keypoint.size);
-          object_registery_->AddMapObject(std::move(map_object));
-          trigged_keypoint_list_[j].is_object_send = true;
-          added_new_object = true;
-        }
-      }
-    }
-
-    // We are supposed to be the last PU in the pipeline, so let's return a
-    // void boost any.
-    return boost::any(added_new_object);
-  }
-
-  std::string GetName() const override { return "far_buoys_detector"; }
+  std::string GetName() const override;
 
  private:
   //==========================================================================
-  // PRIVATE   M E T H O D S
+  // P R I V A T E   M E T H O D S
 
-  inline bool IsAlreadyTrigged(cv::KeyPoint keypoint) {
-    for (size_t i = 0; i < trigged_keypoint_list_.size(); ++i) {
-      if (keypoint.pt.inside(trigged_keypoint_list_.at(i).bounding_box)) {
-        return true;
-      }
-    }
-    return false;
-  }
+  inline bool IsAlreadyTrigged(cv::KeyPoint keypoint);
 
-  inline void AddToTriggeredList(cv::KeyPoint keypoint) {
-    TriggedKeypoint trigged_keypoint;
-    trigged_keypoint.trigged_keypoint = keypoint;
-    trigged_keypoint.bounding_box = SetBoundingBox(keypoint.pt, 20);
-    trigged_keypoint.is_object_send = false;
-    trigged_keypoint.weight = 0;
-    trigged_keypoint_list_.push_back(trigged_keypoint);
-  }
+  inline void AddToTriggeredList(cv::KeyPoint keypoint);
 
-  inline void RemoveToTriggeredList(cv::KeyPoint keypoint) {
-    for (size_t i = 0; i < trigged_keypoint_list_.size(); ++i) {
-      if (keypoint.pt.inside(trigged_keypoint_list_[i].bounding_box)) {
-        trigged_keypoint_list_.erase(trigged_keypoint_list_.begin() + i);
-      }
-    }
-  }
+  inline void RemoveToTriggeredList(cv::KeyPoint keypoint);
 
   inline void AddWeightToCorrespondingTriggedKeypoint(
-      cv::Point2d trigged_keypoint, int weight) {
-    for (size_t i = 0; i < trigged_keypoint_list_.size(); ++i) {
-      if (trigged_keypoint.inside(trigged_keypoint_list_[i].bounding_box)) {
-        if (trigged_keypoint_list_[i].weight + weight <=
-            weight_goal_.GetValue()) {
-          trigged_keypoint_list_[i].weight += weight;
-        } else {
-          trigged_keypoint_list_[i].weight +=
-              (trigged_keypoint_list_[i].weight + weight) -
-              weight_goal_.GetValue();
-        }
-      }
-    }
-  }
+      cv::Point2d trigged_keypoint, int weight);
 
   inline void RemoveWeightToCorrespondingTriggedKeypoint(
-      cv::Point2d trigged_keypoint, int weight) {
-    for (size_t i = 0; i < trigged_keypoint_list_.size(); ++i) {
-      if (trigged_keypoint.inside(trigged_keypoint_list_[i].bounding_box)) {
-        if (trigged_keypoint_list_[i].weight - weight > 0) {
-          trigged_keypoint_list_[i].weight -= weight;
-        } else {
-          trigged_keypoint_list_[i].weight = 0;
-        }
-      }
-    }
-  }
+      cv::Point2d trigged_keypoint, int weight);
 
-  inline bool IsKeypointHasEnoughWeight(TriggedKeypoint keypoint) {
-    if (keypoint.weight > weight_goal_.GetValue()) {
-      return true;
-    }
-    return false;
-  }
+  inline bool IsKeypointHasEnoughWeight(TriggedKeypoint keypoint);
 
-  inline void SetWeigthGoal(int weight_goal) {
-    weight_goal_.SetValue(weight_goal);
-  }
+  inline void SetWeigthGoal(int weight_goal);
 
-  inline cv::Rect SetBoundingBox(cv::Point2d keypoint, int box_size) {
-    std::vector<cv::Point> rect;
-    rect.push_back(cv::Point2d(keypoint.x + box_size, keypoint.y + box_size));
-    rect.push_back(cv::Point2d(keypoint.x + box_size, keypoint.y - box_size));
-    rect.push_back(cv::Point2d(keypoint.x - box_size, keypoint.y + box_size));
-    rect.push_back(cv::Point2d(keypoint.x - box_size, keypoint.y - box_size));
-    return cv::boundingRect(rect);
-  }
+  inline cv::Rect SetBoundingBox(cv::Point2d keypoint, int box_size);
 
   //==========================================================================
   // P R I V A T E   M E M B E R S
 
-  Parameter<bool> debug_;
   Parameter<int> weight_goal_;
 
   std::vector<TriggedKeypoint> trigged_keypoint_list_;
   ObjectRegistery::Ptr object_registery_;
 };
+
+//==============================================================================
+// I N L I N E   M E T H O D S
+
+//------------------------------------------------------------------------------
+//
+inline FarBuoysDetector::FarBuoysDetector(const std::string &topic_namespace, const
+ObjectRegistery::Ptr &object_registery)
+    : ProcUnit(topic_namespace),
+      weight_goal_("Weight Goal", 0, parameters_),
+      object_registery_(object_registery) {}
+
+//------------------------------------------------------------------------------
+//
+inline void FarBuoysDetector::ConfigureFromYamlNode(const YAML::Node &node) {
+  weight_goal_ = node["weight_goal"].as<int>();
+}
+
+//------------------------------------------------------------------------------
+//
+inline boost::any FarBuoysDetector::ProcessData(boost::any input) {
+  auto keypoint = boost::any_cast<std::vector<cv::KeyPoint>>(input);
+  auto rois =
+      object_registery_->GetRegionOfInterestOfType(DetectionMode::BUOYS);
+  SetWeigthGoal(150);
+
+  if (object_registery_->IsRegisteryCleared()) {
+    trigged_keypoint_list_.clear();
+    object_registery_->ResetRegisteryClearedFlag();
+  }
+
+  bool added_new_object = false;
+  for (size_t i = 0; i < keypoint.size(); i++) {
+    bool is_already_trigged = IsAlreadyTrigged(keypoint[i]);
+
+    if (!is_already_trigged) {
+      AddToTriggeredList(keypoint[i]);
+    } else {
+      for (size_t j = 0; j < trigged_keypoint_list_.size(); ++j) {
+        AddWeightToCorrespondingTriggedKeypoint(
+            trigged_keypoint_list_[j].trigged_keypoint.pt, 1);
+      }
+    }
+  }
+
+  for (size_t j = 0; j < trigged_keypoint_list_.size(); ++j) {
+    if (IsKeypointHasEnoughWeight(trigged_keypoint_list_[j])) {
+      if (!trigged_keypoint_list_[j].is_object_send) {
+        MapObject::Ptr map_object = std::make_shared<Buoy>(
+            trigged_keypoint_list_[j].trigged_keypoint);
+        map_object->SetName("Buoy [" + std::to_string(j) + "]");
+        map_object->SetSize(trigged_keypoint_list_[j].trigged_keypoint.size);
+        object_registery_->AddMapObject(std::move(map_object));
+        trigged_keypoint_list_[j].is_object_send = true;
+        added_new_object = true;
+      }
+    }
+  }
+
+  // We are supposed to be the last PU in the pipeline, so let's return a
+  // void boost any.
+  return boost::any(added_new_object);
+}
+
+//------------------------------------------------------------------------------
+//
+inline std::string FarBuoysDetector::GetName() const { return "far_buoys_detector"; }
+
+//------------------------------------------------------------------------------
+//
+bool FarBuoysDetector::IsAlreadyTrigged(cv::KeyPoint keypoint) {
+  for (size_t i = 0; i < trigged_keypoint_list_.size(); ++i) {
+    if (keypoint.pt.inside(trigged_keypoint_list_.at(i).bounding_box)) {
+      return true;
+    }
+  }
+  return false;
+}
+
+//------------------------------------------------------------------------------
+//
+inline void FarBuoysDetector::AddToTriggeredList(cv::KeyPoint keypoint) {
+  TriggedKeypoint trigged_keypoint;
+  trigged_keypoint.trigged_keypoint = keypoint;
+  trigged_keypoint.bounding_box = SetBoundingBox(keypoint.pt, 20);
+  trigged_keypoint.is_object_send = false;
+  trigged_keypoint.weight = 0;
+  trigged_keypoint_list_.push_back(trigged_keypoint);
+}
+
+//------------------------------------------------------------------------------
+//
+inline void FarBuoysDetector::RemoveToTriggeredList(cv::KeyPoint keypoint) {
+  for (size_t i = 0; i < trigged_keypoint_list_.size(); ++i) {
+    if (keypoint.pt.inside(trigged_keypoint_list_[i].bounding_box)) {
+      trigged_keypoint_list_.erase(trigged_keypoint_list_.begin() + i);
+    }
+  }
+}
+
+//------------------------------------------------------------------------------
+//
+inline void
+FarBuoysDetector::AddWeightToCorrespondingTriggedKeypoint(cv::Point2d trigged_keypoint,
+                                                          int weight) {
+  for (size_t i = 0; i < trigged_keypoint_list_.size(); ++i) {
+    if (trigged_keypoint.inside(trigged_keypoint_list_[i].bounding_box)) {
+      if (trigged_keypoint_list_[i].weight + weight <=
+          weight_goal_.GetValue()) {
+        trigged_keypoint_list_[i].weight += weight;
+      } else {
+        trigged_keypoint_list_[i].weight +=
+            (trigged_keypoint_list_[i].weight + weight) -
+                weight_goal_.GetValue();
+      }
+    }
+  }
+}
+
+//------------------------------------------------------------------------------
+//
+inline void
+FarBuoysDetector::RemoveWeightToCorrespondingTriggedKeypoint(cv::Point2d trigged_keypoint,
+                                                             int weight) {
+  for (size_t i = 0; i < trigged_keypoint_list_.size(); ++i) {
+    if (trigged_keypoint.inside(trigged_keypoint_list_[i].bounding_box)) {
+      if (trigged_keypoint_list_[i].weight - weight > 0) {
+        trigged_keypoint_list_[i].weight -= weight;
+      } else {
+        trigged_keypoint_list_[i].weight = 0;
+      }
+    }
+  }
+}
+
+//------------------------------------------------------------------------------
+//
+inline bool
+FarBuoysDetector::IsKeypointHasEnoughWeight(FarBuoysDetector::TriggedKeypoint keypoint) {
+  if (keypoint.weight > weight_goal_.GetValue()) {
+    return true;
+  }
+  return false;
+}
+
+//------------------------------------------------------------------------------
+//
+inline void FarBuoysDetector::SetWeigthGoal(int weight_goal) {
+  weight_goal_.SetValue(weight_goal);
+}
+
+//------------------------------------------------------------------------------
+//
+inline cv::Rect FarBuoysDetector::SetBoundingBox(cv::Point2d keypoint, int box_size) {
+  std::vector<cv::Point> rect;
+  rect.push_back(cv::Point2d(keypoint.x + box_size, keypoint.y + box_size));
+  rect.push_back(cv::Point2d(keypoint.x + box_size, keypoint.y - box_size));
+  rect.push_back(cv::Point2d(keypoint.x - box_size, keypoint.y + box_size));
+  rect.push_back(cv::Point2d(keypoint.x - box_size, keypoint.y - box_size));
+  return cv::boundingRect(rect);
+}
 
 }  // namespace proc_mapping
 

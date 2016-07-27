@@ -51,84 +51,110 @@ class BlobDetector : public ProcUnit {
   //==========================================================================
   // P U B L I C   C / D T O R S
 
-  BlobDetector(std::string proc_tree_name = "", uint8_t target = 0,
-               bool debug = false)
-      : target_("Target", target, parameters_),
-        debug_("Debug", debug, parameters_),
-        image_publisher_(kRosNodeName + "_blob_detector_" + proc_tree_name) {
-    image_publisher_.Start();
-  }
+  explicit BlobDetector(const std::string &topic_namespace);
 
   virtual ~BlobDetector() = default;
 
   //==========================================================================
   // P U B L I C   M E T H O D S
 
-  virtual boost::any ProcessData(boost::any input) override {
-    cv::Mat map = boost::any_cast<cv::Mat>(input);
-    if (target_.GetValue() == 0) {
-      params_.minThreshold = 30;
-      params_.maxThreshold = 200;
-      params_.filterByArea = true;
-      params_.blobColor = 255;
-      params_.minArea = 10;
-      params_.maxArea = 800;
-      params_.filterByCircularity = false;
-      params_.filterByColor = true;
-      params_.filterByConvexity = false;
-      params_.filterByInertia = false;
-      params_.minInertiaRatio = 0.1f;
-      params_.maxInertiaRatio = 0.3f;
-    } else if (target_.GetValue() == 1) {
-      params_.minThreshold = 200;
-      params_.maxThreshold = 255;
-      params_.filterByArea = true;
-      params_.blobColor = 255;
-      params_.minArea = 500;
-      params_.maxArea = 4000;
-      params_.filterByCircularity = false;
-      params_.filterByColor = false;
-      params_.filterByConvexity = false;
-      params_.filterByInertia = false;
-      params_.minInertiaRatio = 0.1f;
-      params_.maxInertiaRatio = 0.3f;
-    } else {
-      ROS_INFO("Wrong target.");
-    }
-    cv::SimpleBlobDetector detector(params_);
-    std::vector<cv::KeyPoint> keyPoints;
-    detector.detect(map, keyPoints);
+  virtual void ConfigureFromYamlNode(const YAML::Node &node) override;
 
-    if (debug_.GetValue()) {
-      cv::Mat output;
-      cv::drawKeypoints(map, keyPoints, output, cv::Scalar(0, 0, 255),
-                        cv::DrawMatchesFlags::DRAW_RICH_KEYPOINTS);
+  virtual boost::any ProcessData(boost::any input) override;
 
-      // To fit in OpenCv coordinate system, we have to made a rotation of
-      // 90 degrees on the display map
-      cv::Point2f src_center(output.cols / 2.0f, output.rows / 2.0f);
-      cv::Mat rot_mat = getRotationMatrix2D(src_center, 90, 1.0);
-      cv::Mat dst;
-      cv::warpAffine(output, dst, rot_mat, output.size());
+  void GenerateImageToPublish(const cv::Mat &map,
+                              const std::vector<cv::KeyPoint> &keyPoints);
 
-      image_publisher_.Write(dst);
-    }
-
-    return boost::any(keyPoints);
-  }
-
-  std::string GetName() const override { return "blob_detection"; }
+  std::string GetName() const override;
 
  private:
   //==========================================================================
   // P R I V A T E   M E M B E R S
 
   Parameter<int> target_;
-  Parameter<bool> debug_;
 
   cv::SimpleBlobDetector::Params params_;
-  atlas::ImagePublisher image_publisher_;
 };
+
+//==============================================================================
+// I N L I N E   M E T H O D S
+
+//------------------------------------------------------------------------------
+//
+inline BlobDetector::BlobDetector(const std::string &topic_namespace)
+    : ProcUnit(topic_namespace),
+      target_("Target", 0, parameters_) {}
+
+//------------------------------------------------------------------------------
+//
+inline std::string BlobDetector::GetName() const { return "blob_detection"; }
+
+//------------------------------------------------------------------------------
+//
+inline void BlobDetector::GenerateImageToPublish(const cv::Mat &map,
+                                          const std::vector<cv::KeyPoint> &keyPoints) {
+  cv::Mat output;
+  drawKeypoints(map, keyPoints, output, cv::Scalar(0, 0, 255),
+                cv::DrawMatchesFlags::DRAW_RICH_KEYPOINTS);
+
+  // To fit in OpenCv coordinate system, we have to made a rotation of
+  // 90 degrees on the display map
+  cv::Point2f src_center(output.cols / 2.0f, output.rows / 2.0f);
+  cv::Mat rot_mat = getRotationMatrix2D(src_center, 90, 1.0);
+  cv::Mat dst;
+  warpAffine(output, dst, rot_mat, output.size());
+
+  PublishImage(dst);
+}
+
+//------------------------------------------------------------------------------
+//
+inline boost::any BlobDetector::ProcessData(boost::any input) {
+  cv::Mat map = boost::any_cast<cv::Mat>(input);
+  if (target_.GetValue() == 0) {
+    params_.minThreshold = 30;
+    params_.maxThreshold = 200;
+    params_.filterByArea = true;
+    params_.blobColor = 255;
+    params_.minArea = 10;
+    params_.maxArea = 800;
+    params_.filterByCircularity = false;
+    params_.filterByColor = true;
+    params_.filterByConvexity = false;
+    params_.filterByInertia = false;
+    params_.minInertiaRatio = 0.1f;
+    params_.maxInertiaRatio = 0.3f;
+  } else if (target_.GetValue() == 1) {
+    params_.minThreshold = 200;
+    params_.maxThreshold = 255;
+    params_.filterByArea = true;
+    params_.blobColor = 255;
+    params_.minArea = 500;
+    params_.maxArea = 4000;
+    params_.filterByCircularity = false;
+    params_.filterByColor = false;
+    params_.filterByConvexity = false;
+    params_.filterByInertia = false;
+    params_.minInertiaRatio = 0.1f;
+    params_.maxInertiaRatio = 0.3f;
+  } else {
+    ROS_INFO("Wrong target.");
+  }
+
+  cv::SimpleBlobDetector detector(params_);
+  std::vector<cv::KeyPoint> keyPoints;
+  detector.detect(map, keyPoints);
+
+  GenerateImageToPublish(map, keyPoints);
+
+  return boost::any(keyPoints);
+}
+
+//------------------------------------------------------------------------------
+//
+inline void BlobDetector::ConfigureFromYamlNode(const YAML::Node &node) {
+  target_ = node["target"].as<int>();
+}
 
 }  // namespace proc_mapping
 

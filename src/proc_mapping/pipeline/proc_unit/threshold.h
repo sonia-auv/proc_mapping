@@ -44,46 +44,18 @@ class Threshold : public ProcUnit {
   //==========================================================================
   // P U B L I C   C / D T O R S
 
-  explicit Threshold(std::string proc_tree_name = "", int threshold_type = 0,
-                     int thresh_value = 0, bool debug = false)
-      : threshold_type_("Threshold Type", threshold_type, parameters_),
-        thresh_value_("Threshold Value", thresh_value, parameters_),
-        debug("Debug", debug, parameters_),
-        image_publisher_(kRosNodeName + "_threshold_" + proc_tree_name) {
-    image_publisher_.Start();
-  }
+  explicit Threshold(const std::string &topic_namespace);
 
   virtual ~Threshold() = default;
 
   //==========================================================================
   // P U B L I C   M E T H O D S
 
-  virtual boost::any ProcessData(boost::any input) override {
-    cv::Mat map = boost::any_cast<cv::Mat>(input);
-    if ((threshold_type_.GetValue() == 0) | (threshold_type_.GetValue() == 1) |
-        (threshold_type_.GetValue() == 2) | (threshold_type_.GetValue() == 3) |
-        (threshold_type_.GetValue() == 4) | (threshold_type_.GetValue() == 7) |
-        (threshold_type_.GetValue() == 8)) {
-      cv::threshold(map, map, thresh_value_.GetValue(), 255,
-                    threshold_type_.GetValue());
-    } else {
-      ROS_ERROR("Threshold type is undefined");
-    }
-    if (debug.GetValue()) {
-      // To fit in OpenCv coordinate system, we have to made a rotation of
-      // 90 degrees on the display map
-      cv::Point2f src_center(map.cols / 2.0f, map.rows / 2.0f);
-      cv::Mat rot_mat = getRotationMatrix2D(src_center, 90, 1.0);
-      cv::Mat dst;
-      cv::warpAffine(map, dst, rot_mat, map.size());
+  virtual void ConfigureFromYamlNode(const YAML::Node &node) override;
 
-      cvtColor(dst, dst, CV_GRAY2RGB);
-      image_publisher_.Write(dst);
-    }
-    return boost::any(map);
-  }
+  virtual boost::any ProcessData(boost::any input) override;
 
-  std::string GetName() const override { return "threshold"; }
+  std::string GetName() const override;
 
  private:
   /*
@@ -97,10 +69,56 @@ class Threshold : public ProcUnit {
  */
   Parameter<int> threshold_type_;
   Parameter<int> thresh_value_;
-  Parameter<bool> debug;
-
-  atlas::ImagePublisher image_publisher_;
 };
+
+//==============================================================================
+// I N L I N E   M E T H O D S
+
+//------------------------------------------------------------------------------
+//
+inline Threshold::Threshold(const std::string &topic_namespace)
+    : ProcUnit(topic_namespace),
+      threshold_type_("Threshold Type", 0, parameters_),
+      thresh_value_("Threshold Value", 0, parameters_) {
+}
+
+//------------------------------------------------------------------------------
+//
+inline void Threshold::ConfigureFromYamlNode(const YAML::Node &node) {
+  threshold_type_ = node["threshold_type"].as<int>();
+  thresh_value_ = node["thresh_value"].as<int>();
+}
+
+//------------------------------------------------------------------------------
+//
+inline boost::any Threshold::ProcessData(boost::any input) {
+  cv::Mat map = boost::any_cast<cv::Mat>(input);
+  if ((threshold_type_.GetValue() == 0) | (threshold_type_.GetValue() == 1) |
+      (threshold_type_.GetValue() == 2) | (threshold_type_.GetValue() == 3) |
+      (threshold_type_.GetValue() == 4) | (threshold_type_.GetValue() == 7) |
+      (threshold_type_.GetValue() == 8)) {
+    cv::threshold(map, map, thresh_value_.GetValue(), 255,
+                  threshold_type_.GetValue());
+  } else {
+    ROS_ERROR("Threshold type is undefined");
+  }
+
+  // To fit in OpenCv coordinate system, we have to made a rotation of
+  // 90 degrees on the display map
+  cv::Point2f src_center(map.cols / 2.0f, map.rows / 2.0f);
+  cv::Mat rot_mat = getRotationMatrix2D(src_center, 90, 1.0);
+  cv::Mat dst;
+  cv::warpAffine(map, dst, rot_mat, map.size());
+
+  cvtColor(dst, dst, CV_GRAY2RGB);
+  PublishImage(dst);
+
+  return boost::any(map);
+}
+
+//------------------------------------------------------------------------------
+//
+inline std::string Threshold::GetName() const { return "threshold"; }
 
 }  // namespace proc_mapping
 

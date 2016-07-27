@@ -29,6 +29,7 @@
 #include <boost/any.hpp>
 #include <memory>
 #include <vector>
+#include <lib_atlas/ros/image_publisher.h>
 #include "proc_mapping/pipeline/parameter.h"
 
 namespace proc_mapping {
@@ -54,7 +55,11 @@ class ProcUnit {
   //==========================================================================
   // P U B L I C   C / D T O R S
 
-  ProcUnit() = default;
+  ProcUnit(const std::string &topic_namespace) :
+      topic_namespace_(topic_namespace),
+      image_publisher_(nullptr) {
+  }
+
   virtual ~ProcUnit() = default;
 
   //==========================================================================
@@ -64,10 +69,20 @@ class ProcUnit {
 
   virtual std::string GetName() const = 0;
 
+  virtual void ConfigureFromYamlNode(const YAML::Node &node) = 0;
+
   std::vector<ParameterInterface *> GetParameters() const;
 
+  virtual void Initialize(const YAML::Node &node);
+
  protected:
+  void PublishImage(const cv::Mat &img);
+
   std::vector<ParameterInterface *> parameters_;
+
+ private:
+  std::string topic_namespace_;
+  std::unique_ptr<atlas::ImagePublisher> image_publisher_;
 };
 
 //==============================================================================
@@ -77,6 +92,21 @@ class ProcUnit {
 //
 inline std::vector<ParameterInterface *> ProcUnit::GetParameters() const {
   return parameters_;
+}
+
+//------------------------------------------------------------------------------
+//
+inline void ProcUnit::Initialize(const YAML::Node &node) {
+  image_publisher_.reset(new atlas::ImagePublisher{topic_namespace_ + GetName
+      ()});
+  image_publisher_->Start();
+  ConfigureFromYamlNode(node);
+}
+
+//------------------------------------------------------------------------------
+//
+inline void ProcUnit::PublishImage(const cv::Mat &img) {
+  image_publisher_->Write(img);
 }
 
 }  // namespace proc_mapping

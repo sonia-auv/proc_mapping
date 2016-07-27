@@ -44,19 +44,14 @@ class Morphology : public ProcUnit {
   //==========================================================================
   // P U B L I C   C / D T O R S
 
-  explicit Morphology(std::string proc_tree_name = "", int kernel_size_x = 5,
-                      int kernel_size_y = 5, bool debug = false)
-      : debug_("Debug", debug, parameters_),
-        kernel_size_x_("Kernel Size X", kernel_size_x, parameters_),
-        kernel_size_y_("Kernel Size X", kernel_size_y, parameters_),
-        image_publisher_(kRosNodeName + "_morphology_" + proc_tree_name) {
-    image_publisher_.Start();
-  }
+  explicit Morphology(const std::string &topic_namespace);
 
   virtual ~Morphology() = default;
 
   //==========================================================================
   // P U B L I C   M E T H O D S
+
+  virtual void ConfigureFromYamlNode(const YAML::Node &node) override;
 
   virtual boost::any ProcessData(boost::any input) override {
     cv::Mat map = boost::any_cast<cv::Mat>(input);
@@ -66,29 +61,47 @@ class Morphology : public ProcUnit {
 
     cv::morphologyEx(map, map, cv::MORPH_CLOSE, element);
 
-    if (debug_.GetValue()) {
-      // To fit in OpenCv coordinate system, we have to made a rotation of
-      // 90 degrees on the display map
-      cv::Point2f src_center(map.cols / 2.0f, map.rows / 2.0f);
-      cv::Mat rot_mat = getRotationMatrix2D(src_center, 90, 1.0);
-      cv::Mat dst;
-      cv::warpAffine(map, dst, rot_mat, map.size());
+    // To fit in OpenCv coordinate system, we have to made a rotation of
+    // 90 degrees on the display map
+    cv::Point2f src_center(map.cols / 2.0f, map.rows / 2.0f);
+    cv::Mat rot_mat = getRotationMatrix2D(src_center, 90, 1.0);
+    cv::Mat dst;
+    cv::warpAffine(map, dst, rot_mat, map.size());
 
-      cvtColor(dst, dst, CV_GRAY2RGB);
-      image_publisher_.Write(dst);
-    }
+    cvtColor(dst, dst, CV_GRAY2RGB);
+    PublishImage(dst);
+
     return boost::any(map);
   }
 
-  std::string GetName() const override { return "morphology"; }
+  std::string GetName() const override;
 
  private:
-  Parameter<bool> debug_;
   Parameter<int> kernel_size_x_;
   Parameter<int> kernel_size_y_;
-
-  atlas::ImagePublisher image_publisher_;
 };
+
+//==============================================================================
+// I N L I N E   M E T H O D S
+
+//------------------------------------------------------------------------------
+//
+inline Morphology::Morphology(const std::string &topic_namespace)
+    : ProcUnit(topic_namespace),
+      kernel_size_x_("Kernel Size X", 5, parameters_),
+      kernel_size_y_("Kernel Size X", 5, parameters_) {
+}
+
+//------------------------------------------------------------------------------
+//
+inline void Morphology::ConfigureFromYamlNode(const YAML::Node &node) {
+  kernel_size_x_ = node["kernel_size_x"].as<int>();
+  kernel_size_y_ = node["kernel_size_y"].as<int>();
+}
+
+//------------------------------------------------------------------------------
+//
+inline std::string Morphology::GetName() const { return "morphology"; }
 
 }  // namespace proc_mapping
 

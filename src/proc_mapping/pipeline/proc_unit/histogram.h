@@ -44,17 +44,36 @@ class Histogram : public ProcUnit {
   //==========================================================================
   // P U B L I C   C / D T O R S
 
-  Histogram(std::string proc_tree_name = "")
-      : image_publisher_(kRosNodeName + "_histogram_" + proc_tree_name) {
-    image_publisher_.Start();
-  };
+  Histogram(const std::string &topic_namespace);
 
   virtual ~Histogram() = default;
 
   //==========================================================================
   // P U B L I C   M E T H O D S
 
-  virtual boost::any ProcessData(boost::any input) override {
+  virtual void ConfigureFromYamlNode(const YAML::Node &node) override;
+
+  virtual boost::any ProcessData(boost::any input) override;
+
+  std::string GetName() const override;
+};
+
+//==============================================================================
+// I N L I N E   M E T H O D S
+
+//------------------------------------------------------------------------------
+//
+inline Histogram::Histogram(const std::string &topic_namespace)
+    : ProcUnit(topic_namespace) {}
+
+//------------------------------------------------------------------------------
+//
+inline void Histogram::ConfigureFromYamlNode(const YAML::Node &node) {
+}
+
+//------------------------------------------------------------------------------
+//
+inline boost::any Histogram::ProcessData(boost::any input) {
     cv::Mat map = boost::any_cast<cv::Mat>(input);
     int hist_size = 256;
     float range[] = {0, 255};
@@ -72,23 +91,21 @@ class Histogram : public ProcUnit {
     cv::Mat hist_image(hist_h, hist_w, CV_8UC1, cv::Scalar(0));
 
     for (int i = 1; i < hist_size; i++) {
-      cv::line(hist_image, cv::Point(bin_w * (i - 1),
-                                     hist_h - cvRound(hist.at<float>(i - 1))),
-               cv::Point(bin_w * (i), hist_h - cvRound(hist.at<float>(i))),
-               cv::Scalar(255), 2, 8, 0);
+        cv::line(hist_image, cv::Point(bin_w * (i - 1),
+                                       hist_h - cvRound(hist.at<float>(i - 1))),
+                 cv::Point(bin_w * (i), hist_h - cvRound(hist.at<float>(i))),
+                 cv::Scalar(255), 2, 8, 0);
     }
 
     cvtColor(hist_image, hist_image, CV_GRAY2RGB);
-    image_publisher_.Write(hist_image);
+    PublishImage(hist_image);
 
     return boost::any(map);
-  }
+}
 
-  std::string GetName() const override { return "histogram"; }
-
- private:
-  atlas::ImagePublisher image_publisher_;
-};
+//------------------------------------------------------------------------------
+//
+inline std::string Histogram::GetName() const { return "histogram"; }
 
 }  // namespace proc_mapping
 

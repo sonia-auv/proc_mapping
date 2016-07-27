@@ -27,6 +27,7 @@
 #define PROC_MAPPING_CONFIG_H_
 
 #include <lib_atlas/config.h>
+#include <string>
 
 // #define DEBUG 1
 

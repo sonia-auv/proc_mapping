@@ -77,55 +77,41 @@ const std::string &ProcTree::GetName() const { return name_; }
 //------------------------------------------------------------------------------
 //
 typename ProcUnit::Ptr ProcTree::ProcUnitFactory(const YAML::Node &node) const {
+  ProcUnit::Ptr pu{nullptr};
+
   if (node["name"]) {
     auto proc_unit_name = node["name"].as<std::string>();
+    auto publisher_namespace = kRosNodeName + name_ + "/";
 
     if (proc_unit_name == "blur") {
-      auto debug = node["debug"].as<bool>();
-      auto blur_type = node["blur_type"].as<int>();
-      auto kernel_size = node["kernel_size"].as<int>();
-      return std::make_shared<Blur>(name_, blur_type, kernel_size, debug);
+      pu = std::make_shared<Blur>(publisher_namespace);
     } else if (proc_unit_name == "threshold") {
-      auto debug = node["debug"].as<bool>();
-      auto threshold_type = node["threshold_type_"].as<int>();
-      auto thresh_value = node["thresh_value"].as<int>();
-      return std::make_shared<Threshold>(name_, threshold_type, thresh_value,
-                                         debug);
+      pu = std::make_shared<Threshold>(publisher_namespace);
     } else if (proc_unit_name == "wall_remover") {
-      auto debug = node["debug"].as<bool>();
-      return std::make_shared<WallRemover>(name_, debug);
+      pu = std::make_shared<WallRemover>(publisher_namespace);
     } else if (proc_unit_name == "dilate") {
-      auto kernel_size_x = node["kernel_size_x"].as<int>();
-      auto kernel_size_y = node["kernel_size_y"].as<int>();
-      auto debug = node["debug"].as<bool>();
-      return std::make_shared<Dilate>(name_, kernel_size_x, kernel_size_y,
-                                      debug);
+      pu = std::make_shared<Dilate>(publisher_namespace);
     } else if (proc_unit_name == "morphology") {
-      auto kernel_size_x = node["kernel_size_x"].as<int>();
-      auto kernel_size_y = node["kernel_size_y"].as<int>();
-      auto debug = node["debug"].as<bool>();
-      return std::make_shared<Morphology>(name_, kernel_size_x, kernel_size_y,
-                                          debug);
+      pu = std::make_shared<Morphology>(publisher_namespace);
     } else if (proc_unit_name == "histogram") {
-      return std::make_shared<Histogram>(name_);
+      pu = std::make_shared<Histogram>(publisher_namespace);
     } else if (proc_unit_name == "blob_detector") {
-      auto debug = node["debug"].as<bool>();
-      auto target = node["target"].as<int>();
-      return std::make_shared<BlobDetector>(name_, target, debug);
+      pu = std::make_shared<BlobDetector>(publisher_namespace);
     } else if (proc_unit_name == "far_buoys_detector") {
-      return std::make_shared<FarBuoysDetector>(object_registery_);
+      pu = std::make_shared<FarBuoysDetector>(publisher_namespace, object_registery_);
     } else if (proc_unit_name == "buoys_detector") {
-      auto roi = node["roi"].as<bool>();
-      return std::make_shared<BuoysDetector>(object_registery_, roi);
+      pu = std::make_shared<BuoysDetector>(publisher_namespace, object_registery_);
     } else if (proc_unit_name == "fence_detector") {
-      return std::make_shared<FenceDetector>(object_registery_);
+      pu = std::make_shared<FenceDetector>(publisher_namespace, object_registery_);
+    } else {
+      ROS_ERROR("There is no ProcUnit with such a name");
     }
-
   } else {
     ROS_ERROR("The proc tree file is not formatted correcly");
   }
-  ROS_ERROR("There is no ProcUnit with such a name");
-  return nullptr;
+
+  pu->Initialize(node);
+  return pu;
 }
 
 //------------------------------------------------------------------------------
