@@ -83,7 +83,7 @@ inline boost::any WallRemover::ProcessData(boost::any input) {
   for (size_t i = 0; i < contour_list.size(); i++) {
     double area = cv::contourArea(contour_list[i]);
     // Is enough big
-    if (area < 30) {
+    if (area < 500) {
       continue;
     }
 

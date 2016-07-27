@@ -72,10 +72,12 @@ void SemanticMap::OnSubjectNotify(atlas::Subject<> &subject) {
     if (dynamic_cast<Buoy *>(object.get())) {
 #ifdef DEBUG
       object->DrawToMap(display_map_);
+      ROS_INFO("Buoys Detected");
 #endif
     } else if (dynamic_cast<Fence *>(object.get())) {
 #ifdef DEBUG
       object->DrawToMap(display_map_);
+      ROS_INFO("Fence Detected");
 #endif
     } else if (dynamic_cast<Wall *>(object.get())) {
       // Todo: How to treat walls ?
