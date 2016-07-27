@@ -69,10 +69,10 @@ ProcMappingNode::ProcMappingNode(const ros::NodeHandlePtr &nh)
       "change_proc_tree", &ProcMappingNode::ChangeProcTreeCallback, this);
 
   insert_rect_ROI_srv_ = nh_->advertiseService(
-      "insert_rect_ROI", &ProcMappingNode::InsertRectROICallback, this);
+      "insert_rect_roi", &ProcMappingNode::InsertRectROICallback, this);
 
   insert_circle_ROI_srv_ = nh_->advertiseService(
-      "insert_circle_ROI", &ProcMappingNode::InsertCircleROICallback, this);
+      "insert_circle_roi", &ProcMappingNode::InsertCircleROICallback, this);
 
   raw_map_.Attach(map_interpreter_);
   map_interpreter_.Attach(semantic_map_);
