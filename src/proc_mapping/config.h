@@ -29,7 +29,7 @@
 #include <lib_atlas/config.h>
 #include <string>
 
-// #define DEBUG 1
+ #define DEBUG 1
 
 const std::string kConfigFilePath =
     atlas::kWorkspaceRoot + "/src/proc_mapping/config/";

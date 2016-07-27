@@ -47,11 +47,12 @@ SemanticMap::SemanticMap(const CoordinateSystems::Ptr &cs)
       new_objects_available_(false)
 #ifdef DEBUG
       ,
-      display_map_()
+      display_map_(),
+      image_publisher_(kRosNodeName + "_semantic_map_")
 #endif
 {
   InsertRegionOfInterest("regions_of_interest.yaml");
-
+  image_publisher_.Start();
 #ifdef DEBUG
   display_map_ = cv::Mat(800, 800, CV_8UC1);
   display_map_.setTo(cv::Scalar(0));
@@ -276,12 +277,11 @@ void SemanticMap::PrintMap() {
   cv::Mat dst;
   cv::warpAffine(display_map_, dst, rot_mat, display_map_.size());
 
-  cv::imshow("Semantic Map", dst);
+  cvtColor(dst, dst, CV_GRAY2RGB);
+  image_publisher_.Write(dst);
 
   // Remove the old sub position
   cv::circle(display_map_, sub, 5, cv::Scalar(0), -1);
-
-  cv::waitKey(1);
 }
 #endif
 

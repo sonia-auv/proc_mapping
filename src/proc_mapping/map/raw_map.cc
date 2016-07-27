@@ -24,6 +24,7 @@
  */
 
 #include "raw_map.h"
+#include "proc_mapping/config.h"
 
 namespace proc_mapping {
 
@@ -39,6 +40,7 @@ RawMap::RawMap(const ros::NodeHandlePtr &nh, const CoordinateSystems::Ptr &cs)
       number_of_hits_({}),
       cs_(cs),
       display_map_(),
+      image_publisher_(kRosNodeName + "_raw_map_"),
       point_cloud_threshold_(0),
       new_pcl_ready_(false),
       last_pcl_(nullptr),
@@ -66,6 +68,7 @@ RawMap::RawMap(const ros::NodeHandlePtr &nh, const CoordinateSystems::Ptr &cs)
 
   points2_sub_ =
       nh_->subscribe(point_cloud_topic, 100, &RawMap::PointCloudCallback, this);
+  image_publisher_.Start();
   Start();
 }
 
@@ -100,6 +103,15 @@ void RawMap::Run() {
       }
       if (IsMapReadyForProcess()) {
         Notify(display_map_);
+        // To fit in OpenCv coordinate system, we have to made a rotation of
+        // 90 degrees on the display map
+        cv::Point2f src_center(display_map_.cols / 2.0f, display_map_.rows / 2.0f);
+        cv::Mat rot_mat = getRotationMatrix2D(src_center, 90, 1.0);
+        cv::Mat dst;
+        cv::warpAffine(display_map_, dst, rot_mat, display_map_.size());
+        cvtColor(dst, dst, CV_GRAY2RGB);
+        image_publisher_.Write(dst);
+
         is_map_ready_for_process_ = false;
       }
     }
@@ -171,7 +183,7 @@ void RawMap::ProcessPointCloud(const sensor_msgs::PointCloud2::ConstPtr &msg) {
   // Update the world Mat
   for (size_t j = 0; j < intensity_map.size() - 1; j++) {
     UpdateMat(coordinate_map[j], intensity_map[j]);
-
+  }
     // Send a command when enough scanline is arrived
     scanline_counter_++;
 
@@ -185,7 +197,6 @@ void RawMap::ProcessPointCloud(const sensor_msgs::PointCloud2::ConstPtr &msg) {
         scanline_counter_ = 0;
       }
     }
-  }
 }
 
 //------------------------------------------------------------------------------
