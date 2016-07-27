@@ -29,6 +29,7 @@
 #include <lib_atlas/macros.h>
 #include <ros/node_handle.h>
 #include <sonia_msgs/ChangeParameter.h>
+#include <sonia_msgs/GetCurrentProcTree.h>
 #include <sonia_msgs/ChangeProcTree.h>
 #include <sonia_msgs/InsertCircleROI.h>
 #include <sonia_msgs/InsertRectROI.h>
@@ -67,6 +68,9 @@ class ProcMappingNode {
 
   void ResetMapCallback(const sonia_msgs::ResetMap::ConstPtr &msg);
 
+  bool GetCurrentProcTreeCallback(sonia_msgs::GetCurrentProcTree::Request &req,
+                               sonia_msgs::GetCurrentProcTree::Response &res);
+
   bool GetProcTreeListCallback(sonia_msgs::GetProcTreeList::Request &req,
                                sonia_msgs::GetProcTreeList::Response &res);
 
@@ -93,6 +97,7 @@ class ProcMappingNode {
   ros::Publisher map_pub_;
   ros::Publisher markers_pub_;
   ros::Subscriber reset_map_sub_;
+  ros::ServiceServer get_current_proc_tree_srv_;
   ros::ServiceServer get_proc_tree_list_srv_;
   ros::ServiceServer change_parameter_srv_;
   ros::ServiceServer send_map_srv_;

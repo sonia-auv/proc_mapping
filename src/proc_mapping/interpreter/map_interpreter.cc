@@ -177,6 +177,12 @@ bool MapInterpreter::SetCurrentProcTree(const ProcTree::Ptr &proc_tree) {
 
 //------------------------------------------------------------------------------
 //
+ProcTree::Ptr MapInterpreter::GetCurrentProcTree() {
+  return current_proc_tree_;
+}
+
+//------------------------------------------------------------------------------
+//
 const std::vector<ProcTree::Ptr> MapInterpreter::GetProcTreeList() const {
   return all_proc_trees_;
 }

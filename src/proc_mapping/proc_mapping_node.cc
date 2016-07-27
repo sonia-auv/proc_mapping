@@ -42,6 +42,7 @@ ProcMappingNode::ProcMappingNode(const ros::NodeHandlePtr &nh)
       map_pub_(),
       markers_pub_(),
       reset_map_sub_(),
+      get_current_proc_tree_srv_(),
       get_proc_tree_list_srv_(),
       change_parameter_srv_(),
       send_map_srv_(),
@@ -55,6 +56,9 @@ ProcMappingNode::ProcMappingNode(const ros::NodeHandlePtr &nh)
 
   reset_map_sub_ = nh_->subscribe("reset_map", 100,
                                   &ProcMappingNode::ResetMapCallback, this);
+
+  get_current_proc_tree_srv_ = nh_->advertiseService(
+      "get_current_proc_tree", &ProcMappingNode::GetCurrentProcTreeCallback, this);
 
   get_proc_tree_list_srv_ = nh_->advertiseService(
       "get_proc_tree_list", &ProcMappingNode::GetProcTreeListCallback, this);
@@ -106,6 +110,20 @@ bool ProcMappingNode::SendMapCallback(
   return true;
 }
 
+//------------------------------------------------------------------------------
+//
+bool ProcMappingNode::GetCurrentProcTreeCallback
+    (sonia_msgs::GetCurrentProcTree::Request &req,
+     sonia_msgs::GetCurrentProcTree::Response &res) {
+  ProcTree::Ptr current_proc_tree;
+  current_proc_tree = map_interpreter_.GetCurrentProcTree();
+  res.current_proc_tree = current_proc_tree->BuildRosMessage();
+
+  return true;
+}
+
+//------------------------------------------------------------------------------
+//
 bool ProcMappingNode::GetProcTreeListCallback(
     sonia_msgs::GetProcTreeList::Request &req,
     sonia_msgs::GetProcTreeList::Response &res) {
