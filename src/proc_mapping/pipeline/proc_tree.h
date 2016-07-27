@@ -66,6 +66,9 @@ class ProcTree {
 
   sonia_msgs::ProcTree BuildRosMessage();
 
+  void Activate();
+  void Deactivate();
+
  private:
   //==========================================================================
   // P R I V A T E   M E T H O D S
