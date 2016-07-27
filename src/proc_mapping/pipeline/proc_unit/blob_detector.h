@@ -128,8 +128,21 @@ inline boost::any BlobDetector::ProcessData(boost::any input) {
     params_.maxThreshold = 255;
     params_.filterByArea = true;
     params_.blobColor = 255;
-    params_.minArea = 500;
+    params_.minArea = 1000;
     params_.maxArea = 4000;
+    params_.filterByCircularity = false;
+    params_.filterByColor = false;
+    params_.filterByConvexity = false;
+    params_.filterByInertia = false;
+    params_.minInertiaRatio = 0.1f;
+    params_.maxInertiaRatio = 0.3f;
+  } else if (target_.GetValue() == 2) {
+    params_.minThreshold = 200;
+    params_.maxThreshold = 255;
+    params_.filterByArea = true;
+    params_.blobColor = 255;
+    params_.minArea = 1000;
+    params_.maxArea = 3000;
     params_.filterByCircularity = false;
     params_.filterByColor = false;
     params_.filterByConvexity = false;

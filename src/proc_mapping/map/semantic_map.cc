@@ -74,7 +74,9 @@ void SemanticMap::OnSubjectNotify(atlas::Subject<> &subject) {
       object->DrawToMap(display_map_);
 #endif
     } else if (dynamic_cast<Fence *>(object.get())) {
-      // Todo: How to treat fences objects ?
+#ifdef DEBUG
+      object->DrawToMap(display_map_);
+#endif
     } else if (dynamic_cast<Wall *>(object.get())) {
       // Todo: How to treat walls ?
     } else {

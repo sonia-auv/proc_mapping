@@ -30,6 +30,7 @@
 #include <proc_mapping/map/coordinate_systems.h>
 #include <proc_mapping/region_of_interest/rotated_rectangle.h>
 #include "proc_mapping/pipeline/proc_unit.h"
+#include "proc_mapping/map_objects/fence.h"
 
 namespace proc_mapping {
 
@@ -122,7 +123,6 @@ inline boost::any FenceDetector::ProcessData(boost::any input) {
   auto keypoint = boost::any_cast<std::vector<cv::KeyPoint>>(input);
   auto rois =
       object_registery_->GetRegionOfInterestOfType(DetectionMode::FENCE);
-  SetWeigthGoal(150);
 
   if (object_registery_->IsRegisteryCleared()) {
     trigged_keypoint_list_.clear();
@@ -147,7 +147,7 @@ inline boost::any FenceDetector::ProcessData(boost::any input) {
     if (IsKeypointHasEnoughWeight(trigged_keypoint_list_[j])) {
       if (!trigged_keypoint_list_[j].is_object_send) {
         MapObject::Ptr map_object =
-            std::make_shared<Buoy>(trigged_keypoint_list_[j].trigged_keypoint);
+            std::make_shared<Fence>(trigged_keypoint_list_[j].trigged_keypoint);
         map_object->SetName("Fence [" + std::to_string(j) + "]");
         map_object->SetSize(trigged_keypoint_list_[j].trigged_keypoint.size);
         object_registery_->AddMapObject(std::move(map_object));

@@ -122,7 +122,6 @@ inline boost::any FarBuoysDetector::ProcessData(boost::any input) {
   auto keypoint = boost::any_cast<std::vector<cv::KeyPoint>>(input);
   auto rois =
       object_registery_->GetRegionOfInterestOfType(DetectionMode::BUOYS);
-  SetWeigthGoal(150);
 
   if (object_registery_->IsRegisteryCleared()) {
     trigged_keypoint_list_.clear();
