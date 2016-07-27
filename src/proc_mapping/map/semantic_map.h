@@ -32,6 +32,7 @@
 #include <sonia_msgs/MapObject.h>
 #include <sonia_msgs/SemanticMap.h>
 #include <visualization_msgs/MarkerArray.h>
+#include <proc_mapping/AsyncImagePublisher.h>
 #include "proc_mapping/config.h"
 #include "proc_mapping/map/coordinate_systems.h"
 #include "proc_mapping/map/object_registery.h"
@@ -103,7 +104,7 @@ class SemanticMap : public atlas::Observer<> {
 
 #ifdef DEBUG
   cv::Mat display_map_;
-  atlas::ImagePublisher image_publisher_;
+  AsyncImagePublisher image_publisher_;
 #endif
 };
 

@@ -68,7 +68,6 @@ RawMap::RawMap(const ros::NodeHandlePtr &nh, const CoordinateSystems::Ptr &cs)
 
   points2_sub_ =
       nh_->subscribe(point_cloud_topic, 100, &RawMap::PointCloudCallback, this);
-  image_publisher_.Start();
   Start();
 }
 
@@ -111,7 +110,7 @@ void RawMap::Run() {
         cv::Mat dst;
         cv::warpAffine(display_map_, dst, rot_mat, display_map_.size());
         cvtColor(dst, dst, CV_GRAY2RGB);
-        image_publisher_.Write(dst);
+        image_publisher_.Publish(dst);
 
         is_map_ready_for_process_ = false;
       }

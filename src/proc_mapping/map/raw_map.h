@@ -40,6 +40,7 @@
 #include <eigen3/Eigen/Geometry>
 #include <memory>
 #include <vector>
+#include <proc_mapping/AsyncImagePublisher.h>
 #include "proc_mapping/map/coordinate_systems.h"
 
 namespace proc_mapping {
@@ -113,7 +114,7 @@ class RawMap : public atlas::Subject<cv::Mat>, public atlas::Runnable {
 
   CoordinateSystems::Ptr cs_;
   cv::Mat display_map_;
-  atlas::ImagePublisher image_publisher_;
+  AsyncImagePublisher image_publisher_;
 
   /// The first data of the sonar may be scrap. Keeping a threshold and starting
   /// to process data after it
