@@ -12,7 +12,7 @@ proc_trees:
       - name: blob_detector
         target: 1
       - name: far_buoys_detector
-        weight_goal: 0
+        weight_goal: 100
   - name: buoys
     proc_units:
       - name: blur
