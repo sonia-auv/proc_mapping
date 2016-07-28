@@ -56,6 +56,13 @@ class WallRemover : public ProcUnit {
   virtual boost::any ProcessData(boost::any input) override;
 
   std::string GetName() const override { return "wall_remover"; }
+
+ private:
+  //==========================================================================
+  // P R I V A T E   M E M B B E R S
+
+  Parameter<int> area_size_;
+  Parameter<int> width_size_;
 };
 
 //==============================================================================
@@ -64,11 +71,16 @@ class WallRemover : public ProcUnit {
 //------------------------------------------------------------------------------
 //
 inline WallRemover::WallRemover(const std::string &topic_namespace)
-    : ProcUnit(topic_namespace) {}
+    : ProcUnit(topic_namespace),
+      area_size_("Area Size", 500, parameters_),
+      width_size_("Width Size", 50, parameters_) {}
 
 //------------------------------------------------------------------------------
 //
-inline void WallRemover::ConfigureFromYamlNode(const YAML::Node &node) {}
+inline void WallRemover::ConfigureFromYamlNode(const YAML::Node &node) {
+  area_size_ = node["area_size"].as<int>();
+  width_size_ = node["width_size"].as<int>();
+}
 
 //------------------------------------------------------------------------------
 //
@@ -83,7 +95,7 @@ inline boost::any WallRemover::ProcessData(boost::any input) {
   for (size_t i = 0; i < contour_list.size(); i++) {
     double area = cv::contourArea(contour_list[i]);
     // Is enough big
-    if (area < 30) {
+    if (area < area_size_ * 10) {
       continue;
     }
 
@@ -95,7 +107,7 @@ inline boost::any WallRemover::ProcessData(boost::any input) {
     }
 
     // Is thin enough
-    if (rotatedRect.size.width > 50 /*&& rotatedRect.size.width < 100*/) {
+    if (rotatedRect.size.width > width_size_ /*&& rotatedRect.size.width < 100*/) {
       continue;
     }
     // Keep it if it matches

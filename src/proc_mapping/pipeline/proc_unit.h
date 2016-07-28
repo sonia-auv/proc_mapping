@@ -30,6 +30,7 @@
 #include <boost/any.hpp>
 #include <memory>
 #include <vector>
+#include <proc_mapping/AsyncImagePublisher.h>
 #include "proc_mapping/pipeline/parameter.h"
 
 namespace proc_mapping {
@@ -83,7 +84,7 @@ class ProcUnit {
 
  private:
   std::string topic_namespace_;
-  std::unique_ptr<atlas::ImagePublisher> image_publisher_;
+  std::unique_ptr<AsyncImagePublisher> image_publisher_;
 };
 
 //==============================================================================
@@ -104,15 +105,14 @@ inline void ProcUnit::Initialize(const YAML::Node &node) {
 //------------------------------------------------------------------------------
 //
 inline void ProcUnit::PublishImage(const cv::Mat &img) {
-  image_publisher_->Write(img);
+  image_publisher_->Publish(img);
 }
 
 //------------------------------------------------------------------------------
 //
 inline void ProcUnit::Activate() {
   image_publisher_.reset(
-      new atlas::ImagePublisher{topic_namespace_ + GetName()});
-  image_publisher_->Start();
+      new AsyncImagePublisher{topic_namespace_ + GetName()});
 }
 
 //------------------------------------------------------------------------------

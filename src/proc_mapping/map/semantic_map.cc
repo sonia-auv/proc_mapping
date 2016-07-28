@@ -52,7 +52,6 @@ SemanticMap::SemanticMap(const CoordinateSystems::Ptr &cs)
 #endif
 {
   InsertRegionOfInterest("regions_of_interest.yaml");
-  image_publisher_.Start();
 #ifdef DEBUG
   display_map_ = cv::Mat(800, 800, CV_8UC1);
   display_map_.setTo(cv::Scalar(0));
@@ -72,9 +71,13 @@ void SemanticMap::OnSubjectNotify(atlas::Subject<> &subject) {
     if (dynamic_cast<Buoy *>(object.get())) {
 #ifdef DEBUG
       object->DrawToMap(display_map_);
+      ROS_INFO("Buoys Detected");
 #endif
     } else if (dynamic_cast<Fence *>(object.get())) {
-      // Todo: How to treat fences objects ?
+#ifdef DEBUG
+      object->DrawToMap(display_map_);
+      ROS_INFO("Fence Detected");
+#endif
     } else if (dynamic_cast<Wall *>(object.get())) {
       // Todo: How to treat walls ?
     } else {
@@ -279,7 +282,7 @@ void SemanticMap::PrintMap() {
   cv::warpAffine(display_map_, dst, rot_mat, display_map_.size());
 
   cvtColor(dst, dst, CV_GRAY2RGB);
-  image_publisher_.Write(dst);
+  image_publisher_.Publish(dst);
 
   // Remove the old sub position
   cv::circle(display_map_, sub, 5, cv::Scalar(0), -1);

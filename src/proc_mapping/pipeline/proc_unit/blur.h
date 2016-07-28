@@ -59,7 +59,7 @@ class Blur : public ProcUnit {
 
  private:
   //==========================================================================
-  // P U B L I C   M E M B B E R S
+  // P R I V A T E   M E M B B E R S
 
   /*
  * 0: Homogeneous Blur

@@ -32,7 +32,12 @@ namespace proc_mapping {
 
 //------------------------------------------------------------------------------
 //
-Fence::Fence() : MapObject() {}
+Fence::Fence(const cv::KeyPoint &key_point) : MapObject() {
+  SetCvKeyPoint(key_point);
+
+  pose_.x = key_point.pt.x;
+  pose_.y = key_point.pt.y;
+}
 
 //------------------------------------------------------------------------------
 //
@@ -43,7 +48,11 @@ Fence::~Fence() = default;
 
 //------------------------------------------------------------------------------
 //
-void Fence::DrawToMap(cv::Mat) const {}
+void Fence::DrawToMap(cv::Mat map) const {
+  cv::line(map, cv::Point2d(GetCvKeyPoint().pt.x - 10, GetCvKeyPoint().pt.y - 10),
+           cv::Point2d(GetCvKeyPoint().pt.x + 10, GetCvKeyPoint().pt.y + 10),
+           cv::Scalar(255), 4);
+}
 
 //------------------------------------------------------------------------------
 //

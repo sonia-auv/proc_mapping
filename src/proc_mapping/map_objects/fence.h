@@ -46,7 +46,7 @@ class Fence : public MapObject {
   //==========================================================================
   // P U B L I C   C / D T O R S
 
-  explicit Fence();
+  explicit Fence(const cv::KeyPoint &key_point);
   virtual ~Fence();
 
   //==========================================================================
