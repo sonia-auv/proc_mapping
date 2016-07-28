@@ -134,6 +134,7 @@ void ObjectRegistery::ClearRegistery() {
   std::lock_guard<std::mutex> guard(object_mutex_);
   is_registry_cleared_ = true;
   objects_.clear();
+  rois_.clear();
 }
 
 bool ObjectRegistery::IsRegisteryCleared() { return is_registry_cleared_; }

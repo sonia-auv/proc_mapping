@@ -140,7 +140,14 @@ inline boost::any FenceDetector::ProcessData(boost::any input) {
       AddToTriggeredList(keypoint[i]);
     } else {
       for (size_t j = 0; j < trigged_keypoint_list_.size(); ++j) {
-        if (!roi_needed_.GetValue()) {
+        if (roi_needed_.GetValue()) {
+          for (auto &roi : rois) {
+            if(roi->IsInZone(trigged_keypoint_list_[j].trigged_keypoint.pt)) {
+              AddWeightToCorrespondingTriggedKeypoint(
+                  trigged_keypoint_list_[j].trigged_keypoint.pt, 1);
+            }
+          }
+        } else {
           AddWeightToCorrespondingTriggedKeypoint(
               trigged_keypoint_list_[j].trigged_keypoint.pt, 1);
         }
