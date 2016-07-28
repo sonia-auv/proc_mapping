@@ -35,13 +35,13 @@
 #include <pcl/point_cloud.h>
 #include <pcl/point_types.h>
 #include <pcl_conversions/pcl_conversions.h>
+#include <proc_mapping/async_image_publisher.h>
 #include <sensor_msgs/PointCloud2.h>
 #include <array>
 #include <eigen3/Eigen/Geometry>
 #include <memory>
-#include <vector>
-#include <proc_mapping/AsyncImagePublisher.h>
 #include <mutex>
+#include <vector>
 #include "proc_mapping/map/coordinate_systems.h"
 #include "proc_mapping/pipeline/parameter.h"
 

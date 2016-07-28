@@ -235,7 +235,7 @@ bool ProcMappingNode::InsertCircleROICallback(
 //------------------------------------------------------------------------------
 //
 void ProcMappingNode::Spin() {
-  ros::Rate r(15); // 15 hz
+  ros::Rate r(15);  // 15 hz
   while (ros::ok()) {
     if (semantic_map_.IsNewDataAvailable()) {
       auto map_msg = semantic_map_.GenerateSemanticMapMessage();

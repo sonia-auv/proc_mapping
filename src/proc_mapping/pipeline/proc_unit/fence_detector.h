@@ -29,8 +29,8 @@
 #include <opencv/cv.h>
 #include <proc_mapping/map/coordinate_systems.h>
 #include <proc_mapping/region_of_interest/rotated_rectangle.h>
-#include "proc_mapping/pipeline/proc_unit.h"
 #include "proc_mapping/map_objects/fence.h"
+#include "proc_mapping/pipeline/proc_unit.h"
 
 namespace proc_mapping {
 

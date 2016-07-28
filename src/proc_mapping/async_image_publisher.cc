@@ -1,7 +1,7 @@
 /**
- * \file	vision_interpreter.cc
- * \author	Thibaut Mattio <thibaut.mattio@gmail.com>
- * \date	09/06/2016
+ * \file	async_image_publisher.cc
+ * \author	Jérémie St-Jules Prévôt <jeremie.st.jules.prevost@gmail.com>
+ * \date	27/07/2016
  *
  * \copyright Copyright (c) 2016 S.O.N.I.A. All rights reserved.
  *
@@ -23,48 +23,62 @@
  * along with S.O.N.I.A. software. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "proc_mapping/map_objects/fence.h"
-
-namespace proc_mapping {
+#include "async_image_publisher.h"
 
 //==============================================================================
 // C / D T O R S   S E C T I O N
 
 //------------------------------------------------------------------------------
 //
-Fence::Fence(const cv::KeyPoint &key_point) : MapObject() {
-  SetCvKeyPoint(key_point);
-
-  pose_.x = key_point.pt.x;
-  pose_.y = key_point.pt.y;
+AsyncImagePublisher::AsyncImagePublisher(const std::string &topic_name)
+    : topic_name_(topic_name), image_publisher_(topic_name) {
+  image_publisher_.Start();
+  Start();
 }
 
 //------------------------------------------------------------------------------
 //
-Fence::~Fence() = default;
+AsyncImagePublisher::~AsyncImagePublisher() {
+  Stop();
+  image_publisher_.Stop();
+}
 
 //==============================================================================
 // M E T H O D   S E C T I O N
 
 //------------------------------------------------------------------------------
 //
-void Fence::DrawToMap(cv::Mat map) const {
-  cv::line(map,
-           cv::Point2d(GetCvKeyPoint().pt.x - 10, GetCvKeyPoint().pt.y - 10),
-           cv::Point2d(GetCvKeyPoint().pt.x + 10, GetCvKeyPoint().pt.y + 10),
-           cv::Scalar(255), 4);
+void AsyncImagePublisher::Publish(const cv::Mat &image) {
+  image_queue_mutex_.lock();
+  images_to_publish_.push(image);
+  image_queue_mutex_.unlock();
 }
 
 //------------------------------------------------------------------------------
 //
-uint8_t Fence::GetMessageObjectType() const {
-  return sonia_msgs::MapObject::FENCE;
-}
+void AsyncImagePublisher::Run() {
+  while (!MustStop()) {
+    image_queue_mutex_.lock();
+    size_t size = images_to_publish_.size();
+    image_queue_mutex_.unlock();
+    // No image, wait a bit.
+    if (size == 0) {
+      usleep(1000);
+    } else if (size > 10) {
+      ROS_ERROR("Too much image to publish, clearing the buffer on %s",
+                topic_name_.c_str());
+      image_queue_mutex_.lock();
+      while (!images_to_publish_.empty()) {
+        images_to_publish_.pop();
+      }
+      image_queue_mutex_.unlock();
 
-//------------------------------------------------------------------------------
-//
-visualization_msgs::Marker Fence::GenerateVisualizationMarker(int id) const {
-  return visualization_msgs::Marker();
+    } else {
+      image_queue_mutex_.lock();
+      cv::Mat tmp_image(images_to_publish_.front());
+      images_to_publish_.pop();
+      image_queue_mutex_.unlock();
+      image_publisher_.Write(tmp_image);
+    }
+  }
 }
-
-}  // namespace proc_mapping

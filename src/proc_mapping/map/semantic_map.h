@@ -29,10 +29,10 @@
 #include <lib_atlas/pattern/observer.h>
 #include <lib_atlas/ros/image_publisher.h>
 #include <opencv/cv.h>
+#include <proc_mapping/async_image_publisher.h>
 #include <sonia_msgs/MapObject.h>
 #include <sonia_msgs/SemanticMap.h>
 #include <visualization_msgs/MarkerArray.h>
-#include <proc_mapping/AsyncImagePublisher.h>
 #include "proc_mapping/config.h"
 #include "proc_mapping/map/coordinate_systems.h"
 #include "proc_mapping/map/object_registery.h"
