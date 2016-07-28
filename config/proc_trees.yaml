@@ -7,19 +7,19 @@ proc_trees:
         kernel_size: 3
       - name: threshold
         threshold_type: 0
-        thresh_value: 10
+        thresh_value: 40
       - name: morphology
         kernel_size_x: 4
         kernel_size_y: 4
       - name: wall_remover
-        area_size: 500
-        width_size: 50
+        area_size: 90
+        width_size: 80
       - name: blob_detector
         min_threshold: 200
         max_threshold: 255
         filter_by_area: true
-        min_area: 1000
-        max_area: 4000
+        min_area: 6
+        max_area: 20
         filter_by_color: false
         blob_color: 255
         filter_by_circularity: false
@@ -42,14 +42,14 @@ proc_trees:
         threshold_type: 0
         thresh_value: 10
       - name: wall_remover
-        area_size: 500
+        area_size: 50
         width_size: 50
       - name: blob_detector
         min_threshold: 30
         max_threshold: 200
         filter_by_area: true
-        min_area: 120
-        max_area: 350
+        min_area: 1
+        max_area: 3
         filter_by_color: true
         blob_color: 255
         filter_by_circularity: false
@@ -76,14 +76,14 @@ proc_trees:
         kernel_size_x: 4
         kernel_size_y: 4
       - name: wall_remover
-        area_size: 500
+        area_size: 50
         width_size: 50
       - name: blob_detector
         min_threshold: 200
         max_threshold: 255
         filter_by_area: true
-        min_area: 1000
-        max_area: 3000
+        min_area: 10
+        max_area: 30
         filter_by_color: false
         blob_color: 255
         filter_by_circularity: false

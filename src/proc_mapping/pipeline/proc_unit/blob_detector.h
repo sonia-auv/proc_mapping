@@ -105,7 +105,7 @@ inline BlobDetector::BlobDetector(const std::string &topic_namespace)
     : ProcUnit(topic_namespace),
       min_threshold_("Min Threshold", 200, parameters_),
       max_threshold_("Max Threshold", 255, parameters_),
-      filter_by_area_("Filter by area", true, parameters_),
+      filter_by_area_("Filter by area", false, parameters_),
       min_area_("Min area", 100, parameters_),
       max_area_("Max area", 350, parameters_),
       filter_by_color_("Filter by color", false, parameters_),
@@ -150,8 +150,8 @@ inline boost::any BlobDetector::ProcessData(boost::any input) {
   params_.minThreshold = min_threshold_;
   params_.maxThreshold = max_threshold_;
   params_.filterByArea = filter_by_area_;
-  params_.minArea = min_area_;
-  params_.maxArea = max_area_;
+  params_.minArea = min_area_ * 100;
+  params_.maxArea = max_area_ * 100;
   params_.filterByColor = filter_by_color_;
   params_.blobColor = blob_color_;
   params_.filterByCircularity = filter_by_circularity_;

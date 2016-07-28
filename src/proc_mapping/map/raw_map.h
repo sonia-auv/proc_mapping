@@ -43,6 +43,7 @@
 #include <proc_mapping/AsyncImagePublisher.h>
 #include <mutex>
 #include "proc_mapping/map/coordinate_systems.h"
+#include "proc_mapping/pipeline/parameter.h"
 
 namespace proc_mapping {
 

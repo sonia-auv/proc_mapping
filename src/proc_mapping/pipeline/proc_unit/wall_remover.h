@@ -95,7 +95,7 @@ inline boost::any WallRemover::ProcessData(boost::any input) {
   for (size_t i = 0; i < contour_list.size(); i++) {
     double area = cv::contourArea(contour_list[i]);
     // Is enough big
-    if (area < 500) {
+    if (area < area_size_ * 10) {
       continue;
     }
 
@@ -107,7 +107,7 @@ inline boost::any WallRemover::ProcessData(boost::any input) {
     }
 
     // Is thin enough
-    if (rotatedRect.size.width > 50 /*&& rotatedRect.size.width < 100*/) {
+    if (rotatedRect.size.width > width_size_ /*&& rotatedRect.size.width < 100*/) {
       continue;
     }
     // Keep it if it matches
