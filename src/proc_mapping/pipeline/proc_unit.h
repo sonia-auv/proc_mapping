@@ -117,9 +117,7 @@ inline void ProcUnit::Activate() {
 
 //------------------------------------------------------------------------------
 //
-inline void ProcUnit::Deactivate() {
-  image_publisher_.reset(nullptr);
-}
+inline void ProcUnit::Deactivate() { image_publisher_.reset(nullptr); }
 
 }  // namespace proc_mapping
 

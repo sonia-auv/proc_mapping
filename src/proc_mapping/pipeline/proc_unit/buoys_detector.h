@@ -461,6 +461,9 @@ inline boost::any BuoysDetector::ProcessData(boost::any input) {
               std::make_shared<Buoy>(candidate_list_[j].trigged_keypoint);
           map_object->SetName("Buoy [" + std::to_string(j) + "]");
           map_object->SetSize(candidate_list_[j].trigged_keypoint.size);
+          ROS_INFO_STREAM("Detecting a BUOYS object at the position ["
+                          << candidate_list_[j].trigged_keypoint.pt.x << ";"
+                          << candidate_list_[j].trigged_keypoint.pt.x << "]");
           object_registery_->AddMapObject(std::move(map_object));
           candidate_list_[j].is_object_send = true;
           added_new_object = true;
