@@ -41,6 +41,7 @@
 #include <memory>
 #include <vector>
 #include <proc_mapping/AsyncImagePublisher.h>
+#include <mutex>
 #include "proc_mapping/map/coordinate_systems.h"
 
 namespace proc_mapping {
@@ -115,7 +116,7 @@ class RawMap : public atlas::Subject<cv::Mat>, public atlas::Runnable {
   CoordinateSystems::Ptr cs_;
   cv::Mat display_map_;
   AsyncImagePublisher image_publisher_;
-
+  std::mutex map_mutex_;
   /// The first data of the sonar may be scrap. Keeping a threshold and starting
   /// to process data after it
   uint32_t point_cloud_threshold_;
