@@ -153,7 +153,7 @@ inline boost::any FenceDetector::ProcessData(boost::any input) {
         ROS_INFO_STREAM(
             "Detecting a FENCE object at the position ["
             << trigged_keypoint_list_[j].trigged_keypoint.pt.x << ";"
-            << trigged_keypoint_list_[j].trigged_keypoint.pt.x << "]");
+            << trigged_keypoint_list_[j].trigged_keypoint.pt.y << "]");
         object_registery_->AddMapObject(std::move(map_object));
         trigged_keypoint_list_[j].is_object_send = true;
         added_new_object = true;
