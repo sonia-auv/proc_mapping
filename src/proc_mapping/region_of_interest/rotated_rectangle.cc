@@ -41,7 +41,7 @@ RotatedRectangle::RotatedRectangle(const YAML::Node &node)
 //
 RotatedRectangle::RotatedRectangle(const std::string &name,
                                    const cv::Point2d &center,
-                                   const cv::Size2f &size, double angle,
+                                   const cv::Size2f &size, int angle,
                                    const DetectionMode &mode)
     : RegionOfInterest(name, mode),
       center_(center),
@@ -69,7 +69,7 @@ bool RotatedRectangle::Deserialize(const YAML::Node &node) {
   center_ = cv::Point2d(node["center"][0].as<double>(),
                         node["center"][1].as<double>());
   size_ = cv::Size(node["size"][0].as<int>(), node["size"][1].as<int>());
-  angle_ = node["angle"].as<double>();
+  angle_ = node["angle"].as<int>();
 
   return true;
 }

@@ -33,6 +33,7 @@
 #include <sonia_msgs/SemanticMap.h>
 #include <visualization_msgs/MarkerArray.h>
 #include <proc_mapping/AsyncImagePublisher.h>
+#include <proc_mapping/region_of_interest/rotated_rectangle.h>
 #include "proc_mapping/config.h"
 #include "proc_mapping/map/coordinate_systems.h"
 #include "proc_mapping/map/object_registery.h"
@@ -70,6 +71,7 @@ class SemanticMap : public atlas::Observer<> {
   const ObjectRegistery::MapObjectList &GetMapObjects();
   const ObjectRegistery::RegionOfInterestList &GetRegionOfInterest() const;
   void InsertRegionOfInterest(const std::string &proc_tree_file_name);
+  void InsertRegionOfInterest(const RegionOfInterest::Ptr roi);
   void ClearSemanticMap();
 
   sonia_msgs::SemanticMap GenerateSemanticMapMessage();

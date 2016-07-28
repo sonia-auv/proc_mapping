@@ -185,9 +185,18 @@ bool ProcMappingNode::ChangeProcTreeCallback(
 bool ProcMappingNode::InsertRectROICallback(
     sonia_msgs::InsertRectROI::Request &req,
     sonia_msgs::InsertRectROI::Response &res) {
-  // Todo: Reimplement this method
-  // auto roi = std::make_shared<RotatedRectangle>(req.name, rect_point);
-  // semantic_map_.InsertRegionOfInterest(std::move(roi));
+  cv::Point2d center;
+  cv::Point2f size;
+  center.x = req.center.x;
+  center.y = req.center.y;
+  size.x = req.size.x;
+  size.y = req.size.y;
+
+  RegionOfInterest *r = nullptr;
+  r = new RotatedRectangle(req.name, center, size, req.angle);
+  if (r) {
+    semantic_map_.InsertRegionOfInterest(std::move(RegionOfInterest::Ptr{r}));
+  }
   return true;
 }
 

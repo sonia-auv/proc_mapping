@@ -4,8 +4,8 @@ regions_of_interest:
 #    name: BUOY_ROI
 #    # center is define from bottom left
 #    center: [13, 5]
-#    size: [2, 4]
-#    angle: -45
+#    size: [20, 4]
+#    angle: 270
 #  - object_type: fence
 #    roi_type: contour
 #    name: FENCE_ROI

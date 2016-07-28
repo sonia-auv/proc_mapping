@@ -41,6 +41,9 @@ proc_trees:
       - name: threshold
         threshold_type: 0
         thresh_value: 10
+      - name: morphology
+        kernel_size_x: 4
+        kernel_size_y: 4
       - name: wall_remover
         area_size: 50
         width_size: 50
