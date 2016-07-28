@@ -94,6 +94,7 @@ class FenceDetector : public ProcUnit {
   // P R I V A T E   M E M B E R S
 
   Parameter<int> weight_goal_;
+  Parameter<bool> roi_needed_;
 
   std::vector<TriggedKeypoint> trigged_keypoint_list_;
   ObjectRegistery::Ptr object_registery_;
@@ -109,12 +110,14 @@ inline FenceDetector::FenceDetector(
     const ObjectRegistery::Ptr &object_registery)
     : ProcUnit(topic_namespace),
       weight_goal_("Weight Goal", 0, parameters_),
+      roi_needed_("ROI Needed", false, parameters_),
       object_registery_(object_registery) {}
 
 //------------------------------------------------------------------------------
 //
 inline void FenceDetector::ConfigureFromYamlNode(const YAML::Node &node) {
   weight_goal_ = node["weight_goal"].as<int>();
+  roi_needed_ = node["roi_needed"].as<bool>();
 }
 
 //------------------------------------------------------------------------------
@@ -137,8 +140,10 @@ inline boost::any FenceDetector::ProcessData(boost::any input) {
       AddToTriggeredList(keypoint[i]);
     } else {
       for (size_t j = 0; j < trigged_keypoint_list_.size(); ++j) {
-        AddWeightToCorrespondingTriggedKeypoint(
-            trigged_keypoint_list_[j].trigged_keypoint.pt, 1);
+        if (!roi_needed_.GetValue()) {
+          AddWeightToCorrespondingTriggedKeypoint(
+              trigged_keypoint_list_[j].trigged_keypoint.pt, 1);
+        }
       }
     }
   }
