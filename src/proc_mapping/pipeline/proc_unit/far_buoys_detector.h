@@ -129,6 +129,9 @@ inline boost::any FarBuoysDetector::ProcessData(boost::any input) {
   if (object_registery_->IsRegisteryCleared()) {
     trigged_keypoint_list_.clear();
     object_registery_->ResetRegisteryClearedFlag();
+    for (auto &roi : rois) {
+      object_registery_->DeleteRegionOfInterest(roi);
+    }
   }
 
   bool added_new_object = false;
@@ -139,7 +142,14 @@ inline boost::any FarBuoysDetector::ProcessData(boost::any input) {
       AddToTriggeredList(keypoint[i]);
     } else {
       for (size_t j = 0; j < trigged_keypoint_list_.size(); ++j) {
-        if (!roi_needed_.GetValue()) {
+        if (roi_needed_.GetValue()) {
+          for (auto &roi : rois) {
+            if(roi->IsInZone(trigged_keypoint_list_[j].trigged_keypoint.pt)) {
+              AddWeightToCorrespondingTriggedKeypoint(
+                  trigged_keypoint_list_[j].trigged_keypoint.pt, 1);
+            }
+          }
+        } else {
           AddWeightToCorrespondingTriggedKeypoint(
               trigged_keypoint_list_[j].trigged_keypoint.pt, 1);
         }
@@ -223,6 +233,7 @@ inline void FarBuoysDetector::AddWeightToCorrespondingTriggedKeypoint(
                 weight_goal_.GetValue();
       }
     }
+    ROS_INFO("Triggered_keypoint[%zu] weight : %u", i, trigged_keypoint_list_[i].weight);
   }
 }
 
@@ -238,6 +249,7 @@ inline void FarBuoysDetector::RemoveWeightToCorrespondingTriggedKeypoint(
         trigged_keypoint_list_[i].weight = 0;
       }
     }
+    ROS_INFO("Triggered_keypoint[%zu] weight : %u", i, trigged_keypoint_list_[i].weight);
   }
 }
 

@@ -225,7 +225,7 @@ bool ProcMappingNode::InsertRectROICallback(
   size.y = req.size.y;
 
   RegionOfInterest *r = nullptr;
-  r = new RotatedRectangle(req.name, center, size, req.angle);
+  r = new RotatedRectangle(req.name, center, size, req.angle, DetectionMode::BUOYS);
   if (r) {
     semantic_map_.InsertRegionOfInterest(std::move(RegionOfInterest::Ptr{r}));
     ROS_INFO("Adding Rectangle ROI");
