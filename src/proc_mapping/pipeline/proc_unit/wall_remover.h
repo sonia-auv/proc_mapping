@@ -56,6 +56,13 @@ class WallRemover : public ProcUnit {
   virtual boost::any ProcessData(boost::any input) override;
 
   std::string GetName() const override { return "wall_remover"; }
+
+ private:
+  //==========================================================================
+  // P R I V A T E   M E M B B E R S
+
+  Parameter<int> area_size_;
+  Parameter<int> width_size_;
 };
 
 //==============================================================================
@@ -64,11 +71,16 @@ class WallRemover : public ProcUnit {
 //------------------------------------------------------------------------------
 //
 inline WallRemover::WallRemover(const std::string &topic_namespace)
-    : ProcUnit(topic_namespace) {}
+    : ProcUnit(topic_namespace),
+      area_size_("Area Size", 500, parameters_),
+      width_size_("Width Size", 50, parameters_) {}
 
 //------------------------------------------------------------------------------
 //
-inline void WallRemover::ConfigureFromYamlNode(const YAML::Node &node) {}
+inline void WallRemover::ConfigureFromYamlNode(const YAML::Node &node) {
+  area_size_ = node["area_size"].as<int>();
+  width_size_ = node["width_size"].as<int>();
+}
 
 //------------------------------------------------------------------------------
 //

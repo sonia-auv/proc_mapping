@@ -12,8 +12,25 @@ proc_trees:
         kernel_size_x: 4
         kernel_size_y: 4
       - name: wall_remover
+        area_size: 500
+        width_size: 50
       - name: blob_detector
-        target: 1
+        min_threshold: 200
+        max_threshold: 255
+        filter_by_area: true
+        min_area: 1000
+        max_area: 4000
+        filter_by_color: false
+        blob_color: 255
+        filter_by_circularity: false
+        min_circularity: 1
+        max_circularity: 2
+        filter_by_convexity: false
+        min_convexity: 1
+        max_convexity: 2
+        filter_by_inertia: false
+        min_inertia: 1
+        max_inertia: 2
       - name: far_buoys_detector
         weight_goal: 20
   - name: buoys
@@ -25,8 +42,25 @@ proc_trees:
         threshold_type: 0
         thresh_value: 10
       - name: wall_remover
+        area_size: 500
+        width_size: 50
       - name: blob_detector
-        target: 0
+        min_threshold: 30
+        max_threshold: 200
+        filter_by_area: true
+        min_area: 120
+        max_area: 350
+        filter_by_color: true
+        blob_color: 255
+        filter_by_circularity: false
+        min_circularity: 1
+        max_circularity: 2
+        filter_by_convexity: false
+        min_convexity: 1
+        max_convexity: 2
+        filter_by_inertia: false
+        min_inertia: 1
+        max_inertia: 2
       - name: buoys_detector
         roi_needed: false
         weight_goal: 100
@@ -42,21 +76,27 @@ proc_trees:
         kernel_size_x: 4
         kernel_size_y: 4
       - name: wall_remover
+        area_size: 500
+        width_size: 50
       - name: blob_detector
-        target: 2
+        min_threshold: 200
+        max_threshold: 255
+        filter_by_area: true
+        min_area: 1000
+        max_area: 3000
+        filter_by_color: false
+        blob_color: 255
+        filter_by_circularity: false
+        min_circularity: 1
+        max_circularity: 2
+        filter_by_convexity: false
+        min_convexity: 1
+        max_convexity: 2
+        filter_by_inertia: false
+        min_inertia: 1
+        max_inertia: 2
       - name: fence_detector
         weight_goal: 20
-  - name: wall
-    proc_units:
-      - name: blur
-        blur_type: 1
-        kernel_size: 3
-      - name: morphology
-        kernel_size_x: 4
-        kernel_size_y: 4
-      - name: threshold
-        threshold_type: 0
-        thresh_value: 10
 
 # Comment this line in order to have no default proc tree
 default: "buoys"
