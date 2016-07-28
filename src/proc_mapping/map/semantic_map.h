@@ -33,7 +33,7 @@
 #include <sonia_msgs/MapObject.h>
 #include <sonia_msgs/SemanticMap.h>
 #include <visualization_msgs/MarkerArray.h>
-#include <proc_mapping/AsyncImagePublisher.h>
+#include <proc_mapping/async_image_publisher.h>
 #include <proc_mapping/region_of_interest/rotated_rectangle.h>
 #include "proc_mapping/config.h"
 #include "proc_mapping/map/coordinate_systems.h"
