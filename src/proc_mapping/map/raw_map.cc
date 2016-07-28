@@ -23,6 +23,7 @@
  * along with S.O.N.I.A. software. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <mutex>
 #include "raw_map.h"
 #include "proc_mapping/config.h"
 
@@ -104,6 +105,7 @@ void RawMap::Run() {
         Notify(display_map_);
         // To fit in OpenCv coordinate system, we have to made a rotation of
         // 90 degrees on the display map
+        std::lock_guard<std::mutex> guard(map_mutex_);
         cv::Point2f src_center(display_map_.cols / 2.0f,
                                display_map_.rows / 2.0f);
         cv::Mat rot_mat = getRotationMatrix2D(src_center, 90, 1.0);
@@ -184,6 +186,7 @@ void RawMap::ProcessPointCloud(const sensor_msgs::PointCloud2::ConstPtr &msg) {
   for (size_t j = 0; j < intensity_map.size() - 1; j++) {
     UpdateMat(coordinate_map[j], intensity_map[j]);
   }
+  std::lock_guard<std::mutex> guard(map_mutex_);
   // Send a command when enough scanline is arrived
   scanline_counter_++;
 
@@ -204,6 +207,7 @@ void RawMap::ProcessPointCloud(const sensor_msgs::PointCloud2::ConstPtr &msg) {
 //------------------------------------------------------------------------------
 //
 void RawMap::UpdateMat(const cv::Point2i &p, const uint8_t &intensity) {
+  std::lock_guard<std::mutex> guard(map_mutex_);
   if (p.x < cs_->GetPixel().width && p.y < cs_->GetPixel().height) {
     //  Infinite mean
     int position = p.x + p.y * cs_->GetPixel().width;
@@ -229,6 +233,7 @@ bool RawMap::IsMapReadyForProcess() { return is_map_ready_for_process_; }
 //
 void RawMap::ResetRawMap() {
   ROS_INFO("Resetting the raw map");
+  std::lock_guard<std::mutex> guard(map_mutex_);
   display_map_.setTo(cv::Scalar(0));
   std::fill(number_of_hits_.begin(), number_of_hits_.end(), 0);
   scanline_counter_ = 0;
