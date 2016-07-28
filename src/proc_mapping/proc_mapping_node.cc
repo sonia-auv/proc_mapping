@@ -216,6 +216,7 @@ void ProcMappingNode::Spin() {
 #endif
 
     ros::spinOnce();
+    usleep(1000);
   }
 }
 
