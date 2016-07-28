@@ -19,7 +19,7 @@ proc_trees:
         max_threshold: 255
         filter_by_area: true
         min_area: 6
-        max_area: 20
+        max_area: 25
         filter_by_color: false
         blob_color: 255
         filter_by_circularity: false
