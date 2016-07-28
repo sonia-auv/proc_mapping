@@ -149,6 +149,10 @@ inline boost::any FarBuoysDetector::ProcessData(boost::any input) {
             std::make_shared<Buoy>(trigged_keypoint_list_[j].trigged_keypoint);
         map_object->SetName("Buoy [" + std::to_string(j) + "]");
         map_object->SetSize(trigged_keypoint_list_[j].trigged_keypoint.size);
+        ROS_INFO_STREAM(
+            "Detecting a BUOYS object at the position ["
+            << trigged_keypoint_list_[j].trigged_keypoint.pt.x << ";"
+            << trigged_keypoint_list_[j].trigged_keypoint.pt.x << "]");
         object_registery_->AddMapObject(std::move(map_object));
         trigged_keypoint_list_[j].is_object_send = true;
         added_new_object = true;

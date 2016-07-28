@@ -27,10 +27,10 @@
 #define PROC_MAPPING_PIPELINE_PROC_UNIT_H_
 
 #include <lib_atlas/ros/image_publisher.h>
+#include <proc_mapping/async_image_publisher.h>
 #include <boost/any.hpp>
 #include <memory>
 #include <vector>
-#include <proc_mapping/AsyncImagePublisher.h>
 #include "proc_mapping/pipeline/parameter.h"
 
 namespace proc_mapping {
@@ -111,15 +111,12 @@ inline void ProcUnit::PublishImage(const cv::Mat &img) {
 //------------------------------------------------------------------------------
 //
 inline void ProcUnit::Activate() {
-  image_publisher_.reset(
-      new AsyncImagePublisher{topic_namespace_ + GetName()});
+  image_publisher_.reset(new AsyncImagePublisher{topic_namespace_ + GetName()});
 }
 
 //------------------------------------------------------------------------------
 //
-inline void ProcUnit::Deactivate() {
-  image_publisher_.reset(nullptr);
-}
+inline void ProcUnit::Deactivate() { image_publisher_.reset(nullptr); }
 
 }  // namespace proc_mapping
 

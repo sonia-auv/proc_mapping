@@ -23,8 +23,8 @@
  * along with S.O.N.I.A. software. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <mutex>
 #include "raw_map.h"
+#include <mutex>
 #include "proc_mapping/config.h"
 
 namespace proc_mapping {

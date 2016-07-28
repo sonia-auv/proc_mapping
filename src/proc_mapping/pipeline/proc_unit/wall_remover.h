@@ -107,7 +107,8 @@ inline boost::any WallRemover::ProcessData(boost::any input) {
     }
 
     // Is thin enough
-    if (rotatedRect.size.width > width_size_ /*&& rotatedRect.size.width < 100*/) {
+    if (rotatedRect.size.width >
+        width_size_ /*&& rotatedRect.size.width < 100*/) {
       continue;
     }
     // Keep it if it matches

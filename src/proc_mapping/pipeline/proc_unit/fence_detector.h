@@ -29,8 +29,8 @@
 #include <opencv/cv.h>
 #include <proc_mapping/map/coordinate_systems.h>
 #include <proc_mapping/region_of_interest/rotated_rectangle.h>
-#include "proc_mapping/pipeline/proc_unit.h"
 #include "proc_mapping/map_objects/fence.h"
+#include "proc_mapping/pipeline/proc_unit.h"
 
 namespace proc_mapping {
 
@@ -150,6 +150,10 @@ inline boost::any FenceDetector::ProcessData(boost::any input) {
             std::make_shared<Fence>(trigged_keypoint_list_[j].trigged_keypoint);
         map_object->SetName("Fence [" + std::to_string(j) + "]");
         map_object->SetSize(trigged_keypoint_list_[j].trigged_keypoint.size);
+        ROS_INFO_STREAM(
+            "Detecting a FENCE object at the position ["
+            << trigged_keypoint_list_[j].trigged_keypoint.pt.x << ";"
+            << trigged_keypoint_list_[j].trigged_keypoint.pt.x << "]");
         object_registery_->AddMapObject(std::move(map_object));
         trigged_keypoint_list_[j].is_object_send = true;
         added_new_object = true;

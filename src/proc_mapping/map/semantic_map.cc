@@ -79,7 +79,8 @@ void SemanticMap::OnSubjectNotify(atlas::Subject<> &subject) {
     } else if (dynamic_cast<Wall *>(object.get())) {
       // Todo: How to treat walls ?
     } else {
-      ROS_WARN("The map object is not recognized.");
+      ROS_WARN(
+          "The semantic map received a new object that is not recognized.");
     }
   }
 }

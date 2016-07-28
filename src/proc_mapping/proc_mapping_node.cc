@@ -57,8 +57,9 @@ ProcMappingNode::ProcMappingNode(const ros::NodeHandlePtr &nh)
   reset_map_sub_ = nh_->subscribe("reset_map", 100,
                                   &ProcMappingNode::ResetMapCallback, this);
 
-  get_current_proc_tree_srv_ = nh_->advertiseService(
-      "get_current_proc_tree", &ProcMappingNode::GetCurrentProcTreeCallback, this);
+  get_current_proc_tree_srv_ =
+      nh_->advertiseService("get_current_proc_tree",
+                            &ProcMappingNode::GetCurrentProcTreeCallback, this);
 
   get_proc_tree_list_srv_ = nh_->advertiseService(
       "get_proc_tree_list", &ProcMappingNode::GetProcTreeListCallback, this);
@@ -93,6 +94,7 @@ ProcMappingNode::~ProcMappingNode() {}
 //
 void ProcMappingNode::ResetMapCallback(
     const sonia_msgs::ResetMap::ConstPtr &msg) {
+  ROS_INFO("Resetting the semantic map object.");
   semantic_map_.ClearSemanticMap();
   raw_map_.ResetRawMap();
   semantic_map_.ResetSemanticMap();
@@ -104,7 +106,10 @@ void ProcMappingNode::ResetMapCallback(
 bool ProcMappingNode::SendMapCallback(
     sonia_msgs::SendSemanticMap::Request &req,
     sonia_msgs::SendSemanticMap::Response &res) {
-  ROS_INFO("Sending maps!");
+  ROS_INFO_STREAM(
+      "Sending the semantic map objects to as ROS messages on "
+      "topic "
+      << map_pub_.getTopic());
   auto map_msg = semantic_map_.GenerateSemanticMapMessage();
   map_pub_.publish(map_msg);
   return true;
@@ -112,12 +117,13 @@ bool ProcMappingNode::SendMapCallback(
 
 //------------------------------------------------------------------------------
 //
-bool ProcMappingNode::GetCurrentProcTreeCallback
-    (sonia_msgs::GetCurrentProcTree::Request &req,
-     sonia_msgs::GetCurrentProcTree::Response &res) {
+bool ProcMappingNode::GetCurrentProcTreeCallback(
+    sonia_msgs::GetCurrentProcTree::Request &req,
+    sonia_msgs::GetCurrentProcTree::Response &res) {
   ProcTree::Ptr current_proc_tree;
   current_proc_tree = map_interpreter_.GetCurrentProcTree();
-  if(current_proc_tree) {
+  if (current_proc_tree) {
+    ROS_INFO("Sending the current proc tree to the service client.");
     res.current_proc_tree = current_proc_tree->BuildRosMessage();
   } else {
     ROS_ERROR("Trying ty access the current proc tree, but there is none.");
@@ -138,6 +144,15 @@ bool ProcMappingNode::GetProcTreeListCallback(
     res.proc_tree_list.push_back(pt->BuildRosMessage());
   }
 
+  if (!res.proc_tree_list.size()) {
+    ROS_ERROR(
+        "Enable to get the list of the proc tree, sending an empty "
+        "message");
+    return false;
+  } else {
+    ROS_INFO("Sending the list of all the proc tree");
+  }
+
   return true;
 }
 
@@ -151,9 +166,19 @@ bool ProcMappingNode::ChangeParameterCallback(
 
   for (auto pup : pu->GetParameters()) {
     if (pup->GetName() == req.proc_unit_parameter.name) {
+      ROS_INFO_STREAM("Setting the parameter of the pu "
+                      << req.proc_unit_name << " with the name "
+                      << req.proc_unit_parameter.name << " in the proc tree "
+                      << req.proc_tree_name << " to the value "
+                      << req.proc_unit_parameter.value);
       pup->SetFromRosMessage(req.proc_unit_parameter);
+      return true;
     }
   }
+  ROS_ERROR_STREAM("Enable to find a parameter with the pu "
+                   << req.proc_unit_name << " with the name "
+                   << req.proc_unit_parameter.name << " in the proc tree "
+                   << req.proc_tree_name);
   return true;
 }
 
@@ -162,22 +187,29 @@ bool ProcMappingNode::ChangeParameterCallback(
 bool ProcMappingNode::ChangeProcTreeCallback(
     sonia_msgs::ChangeProcTree::Request &req,
     sonia_msgs::ChangeProcTree::Response &res) {
-  ROS_INFO("Changing the proc tree");
   if (req.target == req.FAR_BUOYS) {
     map_interpreter_.SetDetectionMode(DetectionMode::FAR_BUOYS);
-    ROS_INFO("Changing to far buoys");
+    ROS_INFO("Changing the proc tree to far_buoys");
+    return true;
   } else if (req.target == req.BUOYS) {
     map_interpreter_.SetDetectionMode(DetectionMode::BUOYS);
-    ROS_INFO("Changing to buoys");
+    ROS_INFO("Changing the proc tree to buoys");
+    return true;
   } else if (req.target == req.FENCE) {
     map_interpreter_.SetDetectionMode(DetectionMode::FENCE);
-    ROS_INFO("Changing to fence");
+    ROS_INFO("Changing the proc tree to fence");
+    return true;
   } else if (req.target == req.WALL) {
     map_interpreter_.SetDetectionMode(DetectionMode::WALL);
+    ROS_INFO("Changing the proc tree to wall");
+    return true;
   } else {
     map_interpreter_.SetDetectionMode(DetectionMode::NONE);
   }
-  return true;
+  ROS_ERROR(
+      "Could no find a proc tree corresponding to the message, setting "
+      "to no proc tree");
+  return false;
 }
 
 //------------------------------------------------------------------------------
@@ -212,7 +244,7 @@ bool ProcMappingNode::InsertCircleROICallback(
 //------------------------------------------------------------------------------
 //
 void ProcMappingNode::Spin() {
-  ros::Rate r(15); // 15 hz
+  ros::Rate r(15);  // 15 hz
   while (ros::ok()) {
     if (semantic_map_.IsNewDataAvailable()) {
       auto map_msg = semantic_map_.GenerateSemanticMapMessage();

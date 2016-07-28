@@ -146,7 +146,7 @@ void MapInterpreter::InstanciateProcTrees(
 //
 bool MapInterpreter::SetCurrentProcTree(const std::string &name) {
   std::lock_guard<std::mutex> guard(proc_tree_mutex_);
-  if(current_proc_tree_) {
+  if (current_proc_tree_) {
     current_proc_tree_->Deactivate();
   }
   for (const auto &pt : all_proc_trees_) {
