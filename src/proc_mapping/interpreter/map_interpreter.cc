@@ -133,6 +133,7 @@ void MapInterpreter::InstanciateProcTrees(
         } else if (default_pt == "wall") {
           SetDetectionMode(DetectionMode::WALL);
         } else {
+          SetDetectionMode(DetectionMode::NONE);
           ROS_ERROR(
               "Trying to set default proc tree: There is no proc tree "
               "with this name");

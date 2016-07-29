@@ -130,6 +130,9 @@ inline boost::any FenceDetector::ProcessData(boost::any input) {
   if (object_registery_->IsRegisteryCleared()) {
     trigged_keypoint_list_.clear();
     object_registery_->ResetRegisteryClearedFlag();
+    for (auto &roi : rois) {
+      object_registery_->DeleteRegionOfInterest(roi);
+    }
   }
 
   bool added_new_object = false;

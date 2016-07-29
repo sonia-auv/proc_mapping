@@ -118,6 +118,7 @@ sonia_msgs::MapObject MapObject::GenerateToMapObjectMessge() const {
   msg.name = GetName();
   msg.pose.x = pose_.x;
   msg.pose.y = pose_.y;
+  msg.size = size_;
   msg.type = GetMessageObjectType();
   return msg;
 }
