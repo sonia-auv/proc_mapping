@@ -219,8 +219,8 @@ bool ProcMappingNode::InsertRectROICallback(
     sonia_msgs::InsertRectROI::Response &res) {
   cv::Point2d center;
   cv::Point2f size;
-  center.x = req.center.x + cs_->GetSub().position.x;
-  center.y = req.center.y + cs_->GetSub().position.y;
+  center.x = req.center.x;
+  center.y = req.center.y;
   size.x = req.size.x;
   size.y = req.size.y;
 
@@ -228,8 +228,10 @@ bool ProcMappingNode::InsertRectROICallback(
 
   if (req.type == req.BUOYS) {
     type = DetectionMode::BUOYS;
+    ROS_INFO("Adding Rectangle ROI : BUOY");
   } else if (req.type == req.FENCE) {
     type = DetectionMode::FENCE;
+    ROS_INFO("Adding Rectangle ROI : FENCE");
   } else {
     ROS_INFO_STREAM("Wrong ROI type");
   }
