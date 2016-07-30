@@ -197,7 +197,6 @@ void RawMap::ProcessPointCloud(const sensor_msgs::PointCloud2::ConstPtr &msg) {
 
   if (is_first_scan_complete_) {
     if (scanline_counter_ >= scanlines_for_process_) {
-      ROS_INFO("Map is ready to process");
       is_map_ready_for_process_ = true;
       scanline_counter_ = 0;
     }

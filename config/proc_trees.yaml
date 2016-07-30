@@ -7,7 +7,7 @@ proc_trees:
         kernel_size: 3
       - name: threshold
         threshold_type: 0
-        thresh_value: 40
+        thresh_value: 35
       - name: morphology
         kernel_size_x: 4
         kernel_size_y: 4
@@ -18,8 +18,8 @@ proc_trees:
         min_threshold: 200
         max_threshold: 255
         filter_by_area: true
-        min_area: 6
-        max_area: 25
+        min_area: 8
+        max_area: 24
         filter_by_color: false
         blob_color: 255
         filter_by_circularity: false
@@ -33,7 +33,7 @@ proc_trees:
         max_inertia: 2
       - name: far_buoys_detector
         roi_needed: false
-        weight_goal: 10
+        weight_goal: 5
   - name: buoys
     proc_units:
       - name: blur
@@ -101,7 +101,7 @@ proc_trees:
         max_inertia: 2
       - name: fence_detector
         roi_needed: false
-        weight_goal: 20
+        weight_goal: 5
 
 # Comment this line in order to have no default proc tree
 default: "buoys"
