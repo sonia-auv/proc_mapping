@@ -34,9 +34,9 @@ namespace proc_mapping {
 //
 Buoy::Buoy(const cv::KeyPoint &key_point) : MapObject() {
   SetCvKeyPoint(key_point);
-
   pose_.x = key_point.pt.x;
   pose_.y = key_point.pt.y;
+  size_ = key_point.size;
 }
 
 //------------------------------------------------------------------------------

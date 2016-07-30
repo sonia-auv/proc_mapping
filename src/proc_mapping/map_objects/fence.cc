@@ -37,6 +37,7 @@ Fence::Fence(const cv::KeyPoint &key_point) : MapObject() {
 
   pose_.x = key_point.pt.x;
   pose_.y = key_point.pt.y;
+  size_ = key_point.size;
 }
 
 //------------------------------------------------------------------------------
