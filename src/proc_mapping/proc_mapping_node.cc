@@ -219,8 +219,8 @@ bool ProcMappingNode::InsertRectROICallback(
     sonia_msgs::InsertRectROI::Response &res) {
   cv::Point2d center;
   cv::Point2f size;
-  center.x = req.center.x + cs_->GetPositionOffset().x;
-  center.y = req.center.y + cs_->GetPositionOffset().y;
+  center.x = req.center.x + cs_->GetSub().position.x;
+  center.y = req.center.y + cs_->GetSub().position.y;
   size.x = req.size.x;
   size.y = req.size.y;
 
