@@ -17,8 +17,8 @@ move_bindings = {
     's': (-0.5, 0, 0, 0),
     'a': (0, 0.5, 0, 0),
     'd': (0, -0.5, 0, 0),
-    'r': (0, 0, -0.5, 0),
-    'f': (0, 0, 0.5, 0),
+    'r': (0, 0, 0.5, 0),
+    'f': (0, 0, -0.5, 0),
     'q': (0, 0, 0, 0.5),
     'e': (0, 0, 0, -0.5),
 }
@@ -39,11 +39,13 @@ def clamp(n, minn, maxn):
 
 
 def get_odom_from_key():
-    global theta, x, y, type, flag_buoy
+    global theta, x, y, type, flag_buoy, size
     key = get_key()
     if key in move_bindings.keys():
         x += move_bindings[key][0]
         y += move_bindings[key][1]
+        size += move_bindings[key][2]
+
 
         theta += move_bindings[key][3]
         theta = clamp(theta, -math.pi, math.pi)
@@ -55,9 +57,10 @@ def get_odom_from_key():
         elif flag_buoy == False:
             type = MapObject.BUOYS
             flag_buoy = True
-            
+
     else:
         x = 0
+        size = 0
         y = 0
         theta = 0
 
@@ -75,6 +78,7 @@ if __name__ == "__main__":
     x = 0
     y = 1
     theta = 0
+    size = 0
     type = MapObject.BUOYS
     flag_buoy = True
 
@@ -88,6 +92,7 @@ if __name__ == "__main__":
 
         map_object = MapObject()
         map_object.name = "SIM"
+        map_object.size = size
         map_object.pose.x = x
         map_object.pose.y = y
         map_object.pose.theta = theta
