@@ -219,13 +219,23 @@ bool ProcMappingNode::InsertRectROICallback(
     sonia_msgs::InsertRectROI::Response &res) {
   cv::Point2d center;
   cv::Point2f size;
-  center.x = req.center.x;
-  center.y = req.center.y;
+  center.x = req.center.x + cs_->GetPositionOffset().x;
+  center.y = req.center.y + cs_->GetPositionOffset().y;
   size.x = req.size.x;
   size.y = req.size.y;
 
+  DetectionMode type;
+
+  if (req.type == req.BUOYS) {
+    type = DetectionMode::BUOYS;
+  } else if (req.type == req.FENCE) {
+    type = DetectionMode::FENCE;
+  } else {
+    ROS_INFO_STREAM("Wrong ROI type");
+  }
+
   RegionOfInterest *r = nullptr;
-  r = new RotatedRectangle(req.name, center, size, req.angle, DetectionMode::BUOYS);
+  r = new RotatedRectangle(req.name, center, size, req.angle, type);
   if (r) {
     semantic_map_.InsertRegionOfInterest(std::move(RegionOfInterest::Ptr{r}));
     ROS_INFO("Adding Rectangle ROI");
