@@ -32,7 +32,7 @@ proc_trees:
         min_inertia: 1
         max_inertia: 2
       - name: far_buoys_detector
-        roi_needed: false
+        roi_needed: true
         weight_goal: 5
   - name: buoys
     proc_units:
