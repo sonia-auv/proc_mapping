@@ -155,14 +155,14 @@ inline boost::any BlobDetector::ProcessData(boost::any input) {
   params_.filterByColor = filter_by_color_;
   params_.blobColor = blob_color_;
   params_.filterByCircularity = filter_by_circularity_;
-  params_.minCircularity = min_circularity_ / 100;
-  params_.maxCircularity = max_circularity_ / 100;
+  params_.minCircularity = min_circularity_ / 99;
+  params_.maxCircularity = max_circularity_ / 99;
   params_.filterByConvexity = filter_by_convexity_;
-  params_.minConvexity = min_convexity_ / 100;
-  params_.maxConvexity = max_convexity_ / 100;
+  params_.minConvexity = min_convexity_ / 99;
+  params_.maxConvexity = max_convexity_ / 99;
   params_.filterByInertia = filter_by_inertia_;
-  params_.minInertiaRatio = min_inertia_ratio_ / 100;
-  params_.maxInertiaRatio = max_inertia_ratio_ / 100;
+  params_.minInertiaRatio = min_inertia_ratio_ / 99;
+  params_.maxInertiaRatio = max_inertia_ratio_ / 99;
 
   cv::SimpleBlobDetector detector(params_);
   std::vector<cv::KeyPoint> keyPoints;

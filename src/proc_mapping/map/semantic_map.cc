@@ -166,6 +166,10 @@ sonia_msgs::SemanticMap SemanticMap::GenerateSemanticMapMessage() {
         cs_->PixelToWorldCoordinates(obj->GenerateToMapObjectMessge());
     map_object.pose.x -= cs_->GetPositionOffset().x;
     map_object.pose.y -= cs_->GetPositionOffset().y;
+    ROS_INFO_STREAM(
+        "Detecting a BUOYS object at the position ["
+            << map_object.pose.x << ";"
+            << map_object.pose.y << "]");
     map_msg.objects.push_back(map_object);
   }
   return map_msg;
@@ -256,6 +260,10 @@ void SemanticMap::PrintMap() {
   auto sub = cv::Point2d(cs_->GetSub().position.x, cs_->GetSub().position.y);
   sub += cs_->GetPositionOffset();
 
+  // Create sub heading
+  cv::Point2d heading(cos(cs_->GetSub().yaw), sin(cs_->GetSub().yaw));
+//  heading += cs_->GetPositionOffset();
+
   auto pixel = cs_->GetPixel();
   for (int i = 0; i < pixel.height; i += pixel.m_to_pixel) {
     cv::line(display_map_, cv::Point2d(i, 0), cv::Point2d(i, pixel.height),
@@ -269,9 +277,12 @@ void SemanticMap::PrintMap() {
   }
 
   sub = cs_->WorldToPixelCoordinates(sub);
+  heading = cs_->WorldToPixelCoordinates(heading);
 
   // Draw the sub in the map
   cv::circle(display_map_, sub, 5, cv::Scalar(255), -1);
+  // Draw heading
+  cv::line(display_map_,heading, sub, cv::Scalar::all(255));
 
   // Draw the origin in the map
   auto origin = cs_->GetWorld().origin;
@@ -290,6 +301,8 @@ void SemanticMap::PrintMap() {
 
   // Remove the old sub position
   cv::circle(display_map_, sub, 5, cv::Scalar(0), -1);
+  // Remove old heading
+  cv::line(display_map_,heading, sub, cv::Scalar::all(0));
 }
 #endif
 

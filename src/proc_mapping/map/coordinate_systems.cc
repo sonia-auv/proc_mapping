@@ -95,9 +95,16 @@ void CoordinateSystems::OdomCallback(
   //  undefined.
   quaterniond.normalized();
 
+
   Eigen::Matrix3d rotation;
   rotation = quaterniond.toRotationMatrix();
+  Eigen::Vector3d euler_vec = rotation.eulerAngles(0, 1, 2);
 
+  double roll = fmod(euler_vec.x() + M_PI / 2, 2 * M_PI);
+  double pitch = euler_vec.y();
+  double yaw = fmod(euler_vec.z() + M_PI, 2 * M_PI);
+
+  sub_.yaw = yaw;
   sub_.rotation = rotation;
   sub_.position.x = odo_in.get()->pose.pose.position.x;
   sub_.position.y = odo_in.get()->pose.pose.position.y;
