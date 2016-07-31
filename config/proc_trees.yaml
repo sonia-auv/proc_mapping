@@ -41,19 +41,19 @@ proc_trees:
         kernel_size: 3
       - name: threshold
         threshold_type: 0
-        thresh_value: 10
+        thresh_value: 35
       - name: morphology
         kernel_size_x: 4
         kernel_size_y: 4
       - name: wall_remover
-        area_size: 50
-        width_size: 50
+        area_size: 70
+        width_size: 80
       - name: blob_detector
         min_threshold: 30
         max_threshold: 200
         filter_by_area: true
-        min_area: 1
-        max_area: 3
+        min_area: 10
+        max_area: 65
         filter_by_color: true
         blob_color: 255
         filter_by_circularity: false
@@ -65,9 +65,9 @@ proc_trees:
         filter_by_inertia: false
         min_inertia: 1
         max_inertia: 2
-      - name: buoys_detector
-        roi_needed: true
-        weight_goal: 100
+      - name: far_buoys_detector
+        roi_needed: false
+        weight_goal: 10
   - name: fence
     proc_units:
       - name: blur
