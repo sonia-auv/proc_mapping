@@ -7,7 +7,7 @@ proc_trees:
         kernel_size: 3
       - name: threshold
         threshold_type: 0
-        thresh_value: 35
+        thresh_value: 20
       - name: morphology
         kernel_size_x: 4
         kernel_size_y: 4
@@ -100,7 +100,7 @@ proc_trees:
         min_inertia: 1
         max_inertia: 2
       - name: fence_detector
-        roi_needed: false
+        roi_needed: true
         weight_goal: 5
 
 # Comment this line in order to have no default proc tree
