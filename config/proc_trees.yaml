@@ -86,7 +86,7 @@ proc_trees:
         min_threshold: 200
         max_threshold: 255
         filter_by_area: true
-        min_area: 10
+        min_area: 5
         max_area: 30
         filter_by_color: false
         blob_color: 255
