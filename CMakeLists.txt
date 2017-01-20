@@ -40,9 +40,9 @@ find_package(
     pcl_conversions
     lib_atlas
     sonia_msgs
+    cmake_modules
 )
 
-find_package(catkin REQUIRED cmake_modules)
 find_package(Eigen REQUIRED)
 find_package(PCL REQUIRED)
 

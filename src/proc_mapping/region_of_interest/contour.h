@@ -32,6 +32,7 @@
 #include <vector>
 #include "proc_mapping/config.h"
 #include "proc_mapping/region_of_interest/region_of_interest.h"
+#include <opencv2/imgproc.hpp>
 
 namespace proc_mapping {
 

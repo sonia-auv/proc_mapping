@@ -28,7 +28,7 @@
 
 #include <highgui.h>
 #include <lib_atlas/ros/image_publisher.h>
-#include <opencv/cv.h>
+#include "opencv2/features2d.hpp"
 #include <ros/ros.h>
 #include <memory>
 #include "proc_mapping/config.h"
@@ -164,9 +164,9 @@ inline boost::any BlobDetector::ProcessData(boost::any input) {
   params_.minInertiaRatio = min_inertia_ratio_ / 99;
   params_.maxInertiaRatio = max_inertia_ratio_ / 99;
 
-  cv::SimpleBlobDetector detector(params_);
+  cv::Ptr<cv::SimpleBlobDetector> detector = cv::SimpleBlobDetector::create(params_);
   std::vector<cv::KeyPoint> keyPoints;
-  detector.detect(map, keyPoints);
+  detector.get()->detect(map, keyPoints);
 
   cv::Mat output;
   cv::drawKeypoints(map, keyPoints, output, cv::Scalar(0, 0, 255),

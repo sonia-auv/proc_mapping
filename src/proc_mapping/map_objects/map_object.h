@@ -30,7 +30,7 @@
 #include <sonia_msgs/MapObject.h>
 #include <visualization_msgs/Marker.h>
 #include <memory>
-#include <opencv2/features2d/features2d.hpp>
+#include <opencv2/imgproc.hpp>
 #include <string>
 #include <vector>
 #include "proc_mapping/map_objects/map_object.h"
