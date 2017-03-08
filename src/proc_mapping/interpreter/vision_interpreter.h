@@ -28,7 +28,7 @@
 
 #include <lib_atlas/pattern/subject.h>
 #include <ros/ros.h>
-#include <sonia_msgs/VisionTarget.h>
+#include <proc_image_processing/VisionTarget.h>
 #include <memory>
 #include <string>
 #include <vector>
@@ -36,7 +36,7 @@
 
 namespace proc_mapping {
 
-class VisionInterpreter : public DataInterpreter<sonia_msgs::VisionTarget> {
+class VisionInterpreter : public DataInterpreter<proc_image_processing::VisionTarget> {
  public:
   //==========================================================================
   // T Y P E D E F   A N D   E N U M

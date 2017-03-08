@@ -40,10 +40,11 @@ find_package(
     pcl_conversions
     lib_atlas
     sonia_msgs
+    proc_image_processing
     cmake_modules
 )
 
-find_package(Eigen REQUIRED)
+find_package(Eigen3 REQUIRED)
 find_package(PCL REQUIRED)
 
 #===============================================================================
@@ -65,7 +66,7 @@ catkin_package(
     pcl_conversions
     lib_atlas
     sonia_msgs
-    DEPENDS Eigen PCL
+    DEPENDS Eigen3 PCL
 )
 
 #===============================================================================
@@ -97,7 +98,8 @@ target_link_libraries(${PROJECT_NAME}_node
     yaml-cpp
     ${Eigen_LIBRARIES}
     ${PCL_LIBRARIES})
-add_dependencies(${PROJECT_NAME}_node sonia_msgs_generate_messages_cpp)
+add_dependencies(${PROJECT_NAME}_node sonia_msgs_generate_messages_cpp
+        proc_image_processing_generate_messages_cpp)
 
 #==========================================================================
 # U N I T   T E S T S
