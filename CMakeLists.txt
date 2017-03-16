@@ -12,10 +12,10 @@ cmake_minimum_required(VERSION 2.8.0)
 project(proc_mapping)
 
 if (NOT CMAKE_BUILD_TYPE)
-  set(CMAKE_BUILD_TYPE Debug CACHE STRING
-      "Choose the type of build, options are: None Debug Release
+    set(CMAKE_BUILD_TYPE Debug CACHE STRING
+            "Choose the type of build, options are: None Debug Release
       RelWithDebInfo MinSizeRel."
-      FORCE)
+            FORCE)
 endif (NOT CMAKE_BUILD_TYPE)
 
 set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -std=c++11 -Wall")
@@ -27,21 +27,17 @@ set(proc_mapping_SRC_DIR "src")
 # C A T K I N   C O N F I G U R A T I O N
 
 find_package(
-    catkin REQUIRED COMPONENTS
-    roscpp
-    std_msgs
-    message_generation
-    geometry_msgs
-    sensor_msgs
-    nav_msgs
-    image_transport
-    cv_bridge
-    pcl_ros
-    pcl_conversions
-    lib_atlas
-    sonia_msgs
-    proc_image_processing
-    cmake_modules
+        catkin REQUIRED COMPONENTS
+        roscpp
+        cmake_modules
+        roscpp
+        std_msgs
+        message_runtime
+        image_transport
+        cv_bridge
+        pcl_ros
+        pcl_conversions
+        lib_atlas
 )
 
 find_package(Eigen3 REQUIRED)
@@ -51,41 +47,38 @@ find_package(PCL REQUIRED)
 # G E N E R A T E   M E S S A G E S   &   S E R V I C E S
 
 catkin_package(
-    INCLUDE_DIRS ${proc_mapping_SRC_DIR}
-    LIBRARIES
-    CATKIN_DEPENDS
-    roscpp
-    std_msgs
-    message_runtime
-    geometry_msgs
-    sensor_msgs
-    nav_msgs
-    image_transport
-    cv_bridge
-    pcl_ros
-    pcl_conversions
-    lib_atlas
-    sonia_msgs
-    DEPENDS Eigen3 PCL
+        CATKIN_DEPENDS
+        roscpp
+        std_msgs
+        message_runtime
+        geometry_msgs
+        sensor_msgs
+        nav_msgs
+        image_transport
+        cv_bridge
+        pcl_ros
+        pcl_conversions
+        lib_atlas
+        sonia_msgs
 )
 
 #===============================================================================
 # I N C L U D E   F I L E S
 
 file(GLOB_RECURSE proc_mapping_FILES
-    "${proc_mapping_SRC_DIR}/*.cc"
-    "${proc_mapping_SRC_DIR}/*.h")
+        "${proc_mapping_SRC_DIR}/*.cc"
+        "${proc_mapping_SRC_DIR}/*.h")
 
 list(REMOVE_ITEM proc_mapping_FILES
-    ${CMAKE_CURRENT_SOURCE_DIR}/${proc_mapping_SRC_DIR}/${PROJECT_NAME}/main.cc)
+        ${CMAKE_CURRENT_SOURCE_DIR}/${proc_mapping_SRC_DIR}/${PROJECT_NAME}/main.cc)
 
 include_directories(
-    ${catkin_INCLUDE_DIRS}
-    ${proc_mapping_SRC_DIR}
-    ${lib_atlas_INCLUDE_DIRS}
-    ${Eigen_INCLUDE_DIRS}
-    ${PCL_INCLUDE_DIRS}
-    ${OpenCV_INCLUDE_DIRS}
+        ${catkin_INCLUDE_DIRS}
+        ${proc_mapping_SRC_DIR}
+        ${lib_atlas_INCLUDE_DIRS}
+        ${Eigen_INCLUDE_DIRS}
+        ${PCL_INCLUDE_DIRS}
+        ${OpenCV_INCLUDE_DIRS}
 )
 
 #==========================================================================
@@ -93,17 +86,16 @@ include_directories(
 
 add_executable(${PROJECT_NAME}_node ${proc_mapping_SRC_DIR}/${PROJECT_NAME}/main.cc ${proc_mapping_FILES})
 target_link_libraries(${PROJECT_NAME}_node
-    ${catkin_LIBRARIES}
-    ${lib_atlas_LIBRARIES}
-    yaml-cpp
-    ${Eigen_LIBRARIES}
-    ${PCL_LIBRARIES})
-add_dependencies(${PROJECT_NAME}_node sonia_msgs_generate_messages_cpp
-        proc_image_processing_generate_messages_cpp)
+        ${catkin_LIBRARIES}
+        ${lib_atlas_LIBRARIES}
+        yaml-cpp
+        ${Eigen_LIBRARIES}
+        ${PCL_LIBRARIES})
+add_dependencies(${PROJECT_NAME}_node sonia_msgs_generate_messages_cpp)
 
 #==========================================================================
 # U N I T   T E S T S
 
 if (CATKIN_ENABLE_TESTING)
-  add_subdirectory(test)
+    add_subdirectory(test)
 endif ()

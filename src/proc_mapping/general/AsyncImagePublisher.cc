@@ -1,7 +1,7 @@
 /**
- * \file	data_interpreter.cc
- * \author	Thibaut Mattio <thibaut.mattio@gmail.com>
- * \date	07/02/2016
+ * \file	AsyncImagePublisher.cc
+ * \author	Jérémie St-Jules Prévôt <jeremie.st.jules.prevost@gmail.com>
+ * \date	27/07/2016
  *
  * \copyright Copyright (c) 2016 S.O.N.I.A. All rights reserved.
  *
@@ -23,61 +23,62 @@
  * along with S.O.N.I.A. software. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef PROC_MAPPING_INTERPRETER_DATA_INTERPRETER_H_
-#error This file may only be included data_interpreter.h
-#endif  // PROC_MAPPING_INTERPRETER_DATA_INTERPRETER_H_
-
-#include <yaml-cpp/yaml.h>
-#include <opencv2/opencv.hpp>
-#include "proc_mapping/map/object_registery.h"
-
-namespace proc_mapping {
+#include "AsyncImagePublisher.h"
 
 //==============================================================================
 // C / D T O R S   S E C T I O N
 
 //------------------------------------------------------------------------------
 //
-template <class Tp_>
-inline DataInterpreter<Tp_>::DataInterpreter(
-    const ros::NodeHandlePtr &nh, const ObjectRegistery::Ptr &object_registery)
-    : nh_(nh),
-      object_registery_(object_registery),
-      new_data_ready_(false),
-      last_data_() {}
+AsyncImagePublisher::AsyncImagePublisher(const std::string &topic_name)
+    : topic_name_(topic_name), image_publisher_(topic_name) {
+  image_publisher_.Start();
+  Start();
+}
 
 //------------------------------------------------------------------------------
 //
-template <class Tp_>
-inline DataInterpreter<Tp_>::~DataInterpreter() {}
+AsyncImagePublisher::~AsyncImagePublisher() {
+  Stop();
+  image_publisher_.Stop();
+}
 
 //==============================================================================
 // M E T H O D   S E C T I O N
 
 //------------------------------------------------------------------------------
 //
-template <class Tp_>
-inline Tp_ DataInterpreter<Tp_>::GetLastData() {
-  std::lock_guard<std::mutex> guard(data_mutex_);
-  new_data_ready_ = false;
-  return last_data_;
+void AsyncImagePublisher::Publish(const cv::Mat &image) {
+  image_queue_mutex_.lock();
+  images_to_publish_.push(image);
+  image_queue_mutex_.unlock();
 }
 
 //------------------------------------------------------------------------------
 //
-template <class Tp_>
-inline void DataInterpreter<Tp_>::SetNewData(const Tp_ &data) {
-  std::lock_guard<std::mutex> guard(data_mutex_);
-  last_data_ = data;
-  new_data_ready_ = true;
-}
+void AsyncImagePublisher::Run() {
+  while (!MustStop()) {
+    image_queue_mutex_.lock();
+    size_t size = images_to_publish_.size();
+    image_queue_mutex_.unlock();
+    // No image, wait a bit.
+    if (size == 0) {
+      usleep(1000);
+    } else if (size > 10) {
+      ROS_ERROR("Too much image to publish, clearing the buffer on %s",
+                topic_name_.c_str());
+      image_queue_mutex_.lock();
+      while (!images_to_publish_.empty()) {
+        images_to_publish_.pop();
+      }
+      image_queue_mutex_.unlock();
 
-//------------------------------------------------------------------------------
-//
-template <class Tp_>
-inline bool DataInterpreter<Tp_>::IsNewDataReady() const {
-  std::lock_guard<std::mutex> guard(data_mutex_);
-  return new_data_ready_;
+    } else {
+      image_queue_mutex_.lock();
+      cv::Mat tmp_image(images_to_publish_.front());
+      images_to_publish_.pop();
+      image_queue_mutex_.unlock();
+      image_publisher_.Write(tmp_image);
+    }
+  }
 }
-
-}  // namespace proc_mapping

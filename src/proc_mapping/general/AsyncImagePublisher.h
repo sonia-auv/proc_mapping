@@ -1,7 +1,7 @@
 /**
- * \file	buoy.h
- * \author	Thibaut Mattio <thibaut.mattio@gmail.com>
- * \date	10/06/2016
+ * \file	AsyncImagePublisher.h
+ * \author	Jérémie St-Jules Prévôt <jeremie.st.jules.prevost@gmail.com>
+ * \date	27/07/2016
  *
  * \copyright Copyright (c) 2016 S.O.N.I.A. All rights reserved.
  *
@@ -23,47 +23,52 @@
  * along with S.O.N.I.A. software. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef PROC_MAPPING_MAP_OBJECT_FENCE_H_
-#define PROC_MAPPING_MAP_OBJECT_FENCE_H_
+#ifndef PROC_MAPPING_ASYNC_IMAGE_PUBLISHER_H_
+#define PROC_MAPPING_ASYNC_IMAGE_PUBLISHER_H_
 
-#include <memory>
-#include <string>
-#include <vector>
-#include "proc_mapping/map_objects/map_object.h"
+#include <queue>
 
-namespace proc_mapping {
+#include <lib_atlas/pattern/runnable.h>
+#include <lib_atlas/ros/image_publisher.h>
+#include <ros/ros.h>
+#include <mutex>
+#include <opencv2/opencv.hpp>
 
-class Fence : public MapObject {
+class AsyncImagePublisher : public atlas::Runnable {
  public:
   //==========================================================================
   // T Y P E D E F   A N D   E N U M
 
-  using Ptr = std::shared_ptr<Fence>;
-  using ConstPtr = std::shared_ptr<const Fence>;
-  using PtrList = std::vector<Fence::Ptr>;
-  using ConstPtrList = std::vector<Fence::ConstPtr>;
+  using Ptr = std::shared_ptr<AsyncImagePublisher>;
+  using ConstPtr = std::shared_ptr<const AsyncImagePublisher>;
+  using PtrList = std::vector<AsyncImagePublisher::Ptr>;
+  using ConstPtrList = std::vector<AsyncImagePublisher::ConstPtr>;
 
   //==========================================================================
   // P U B L I C   C / D T O R S
 
-  explicit Fence(const cv::KeyPoint &key_point);
-  virtual ~Fence();
+  explicit AsyncImagePublisher(const std::string &topic_name);
+  ~AsyncImagePublisher();
 
   //==========================================================================
   // P U B L I C   M E T H O D S
 
-  virtual void DrawToMap(cv::Mat) const override;
+  void Publish(const cv::Mat &image);
 
-  virtual visualization_msgs::Marker GenerateVisualizationMarker(
-      int id) const override;
-
- protected:
+ private:
   //==========================================================================
-  // P R O T E C T E D   M E T H O D S
+  // P R I V A T E   M E T H O D S
 
-  virtual uint8_t GetMessageObjectType() const override;
+  void Run() override;
+
+  //==========================================================================
+  // P R I V A T E   M E M B E R S
+
+  std::string topic_name_;
+  atlas::ImagePublisher image_publisher_;
+
+  std::queue<cv::Mat> images_to_publish_;
+  std::mutex image_queue_mutex_;
 };
 
-}  // namespace proc_mapping
-
-#endif  // PROC_MAPPING_MAP_OBJECT_FENCE_H_
+#endif  // PROC_MAPPING_ASYNC_IMAGE_PUBLISHER_H_

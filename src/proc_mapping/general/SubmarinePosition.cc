@@ -1,9 +1,9 @@
 /**
- * \file	vision_interpreter.cc
- * \author	Thibaut Mattio <thibaut.mattio@gmail.com>
- * \date	09/06/2016
+ * \file	SubmarinePosition.cc
+ * \author	Jeremie St-Jules-Prevost <jeremie.st.jules.prevost@gmail.com>
+ * \date	06/02/2016
  *
- * \copyright Copyright (c) 2016 S.O.N.I.A. All rights reserved.
+ * \copyright Copyright (c) 2015 S.O.N.I.A. All rights reserved.
  *
  * \section LICENSE
  *
@@ -23,25 +23,15 @@
  * along with S.O.N.I.A. software. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "wall.h"
+#include "SubmarinePosition.h"
 
 namespace proc_mapping {
 
-//==============================================================================
-// C / D T O R S   S E C T I O N
+SubmarinePosition::SubmarinePosition()
+{
+  auto node_hdl_ = ros::NodeHandle("~");
+  node_hdl_.subscribe("/proc_navigation/odom", 100, &SubmarinePosition::OdometryCallback, this);
+}
 
-//------------------------------------------------------------------------------
-//
-Wall::Wall() : Contour("Wall") {}
 
-//------------------------------------------------------------------------------
-//
-Wall::~Wall() = default;
-
-//==============================================================================
-// M E T H O D   S E C T I O N
-
-//------------------------------------------------------------------------------
-//
-
-}  // namespace proc_mapping
+}// namespace proc_mapping
