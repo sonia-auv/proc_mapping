@@ -41,18 +41,29 @@ namespace proc_mapping {
 class SonarMapper : public BaseObjectMapperInterface
 {
 public:
+
+  const int NB_PIXEL_BY_METER = 10;
+  const int MAP_WIDTH_METER = 60;
+  const int MAP_HEIGTH_METER = 30;
+
   SonarMapper(const SubmarinePosition &submarine_position);
 
   // Override BaseObjectMapperInterface
   void GetMapObject(MapObjectVector &list) override;
   void ResetMapper() override;
 
+  // Sonar input processing
+  void AddScanlineToMap(const sensor_msgs::PointCloud2::ConstPtr &msg);
 private:
+  void ExtractNewPoint(const sensor_msgs::PointCloud2::ConstPtr &msg, int i,
+                       float &intensity, float &x, float &y, float &z) const;
 
 private:
   cv::Mat sonar_map_;
   MapObjectVector object_list_;
   const SubmarinePosition &submarine_position_;
+  int scanline_count_;
+  ros::Subscriber scanline_subscriber_;
 };
 
 inline void SonarMapper::GetMapObject(MapObjectVector &list)
@@ -65,6 +76,16 @@ inline void SonarMapper::ResetMapper()
 {
   sonar_map_.setTo(0);
   object_list_.clear();
+}
+
+inline void
+SonarMapper::ExtractNewPoint(const sensor_msgs::PointCloud2::ConstPtr &msg, int i,
+                             float &intensity, float &x, float &y, float &z) const {
+  int step = i * msg->point_step;
+  memcpy(&x, &msg->data[step + msg->fields[0].offset], sizeof(float));
+  memcpy(&y, &msg->data[step + msg->fields[1].offset], sizeof(float));
+  memcpy(&z, &msg->data[step + msg->fields[2].offset], sizeof(float));
+  memcpy(&intensity, &msg->data[step + msg->fields[3].offset], sizeof(float));
 }
 
 

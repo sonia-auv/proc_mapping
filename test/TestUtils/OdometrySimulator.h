@@ -39,7 +39,7 @@ public:
       yaw_(0.0f), pitch_(0.0f), roll_(0.0f)
   {
     ros::NodeHandle n(node_name);
-    publisher_ = n.advertise<nav_msgs::Odometry>(topic_name, 100);
+    publisher_ = n.subscribe<nav_msgs::Odometry>(topic_name, 100);
     SetPosition(0,0,0,0,0,0);
   }
 

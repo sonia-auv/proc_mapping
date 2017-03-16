@@ -18,7 +18,10 @@ TEST(BasicTransformation, SonarMapper) {
   // The resulting object shoulb be at
   // [20,30] + [10, 10] because of 45 degrees so [30, 40]
   Eigen::Affine3d transform;
-  transform = Eigen::Scaling (10.0,10.0, 10.0) * Eigen::Translation<double, 3>(2,3,0) * sub_orientation ;
+  transform = Eigen::Translation<double, 3>(600/2,300/2,0) *
+      Eigen::Scaling (10.0) *
+      Eigen::Translation<double, 3>(2,3,0) *
+      sub_orientation ;
   Eigen::Vector3d result = transform * object_position;
 
   std::cout << result.x() << " "<<result.y() << " "<<result.z() << std::endl;

@@ -44,8 +44,15 @@ public:
   // Constructor
   SubmarinePosition();
 
-  // Return submarine's orientation in matrix form
+
+  // Return submarine's orientation. Specifying the type,
+  // because of Eigen, since everything can multiply everything...
   Eigen::Matrix3d GetRotationMatrix() const;
+  Eigen::Quaterniond GetQuaternion() const;
+  // ROLL PITCH YAW
+  Eigen::Vector3d GetEuler() const;
+  // XYZ
+  Eigen::Vector3d GetPosition() const;
 
 
 private:
@@ -55,7 +62,7 @@ private:
 
   // ROS
   ros::Subscriber nav_odometry_subscriber_;
-  std::array<double, 3> position_xyz_, orientation_rpy_;
+  Eigen::Vector3d position_xyz_, orientation_rpy_;
   Eigen::Quaterniond orientation_quaternion_;
 };
 
@@ -76,9 +83,25 @@ SubmarinePosition::OdometryCallback(const nav_msgs::Odometry::ConstPtr &odo_in) 
 
 }
 
-inline Eigen::Matrix3d
-SubmarinePosition::GetRotationMatrix() const {
+inline Eigen::Matrix3d SubmarinePosition::GetRotationMatrix() const {
   return atlas::QuatToRot(orientation_quaternion_);
 }
+
+inline Eigen::Quaterniond SubmarinePosition::GetQuaternion() const
+{
+  return orientation_quaternion_;
+}
+
+inline Eigen::Vector3d SubmarinePosition::GetEuler() const
+{
+  return orientation_rpy_;
+}
+
+inline Eigen::Vector3d SubmarinePosition::GetPosition() const
+{
+  return position_xyz_;
+}
+
+
 } // namespace proc_mapping
 #endif //PROC_MAPPING_SUBMARINEPOSITION_H
