@@ -23,7 +23,7 @@
  * along with S.O.N.I.A. software. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <QtCore/QDebug>
+
 #include "proc_mapping/sonar/SonarMapper.h"
 
 namespace proc_mapping {
@@ -32,7 +32,8 @@ SonarMapper::SonarMapper(const SubmarinePosition &submarine_position)
     : sonar_map_(MAP_HEIGTH_METER*NB_PIXEL_BY_METER, MAP_WIDTH_METER*NB_PIXEL_BY_METER, CV_8UC1),
       object_list_(0),
       submarine_position_(submarine_position),
-      scanline_count_(0)
+      scanline_count_(0),
+      image_publisher_("sonar_map")
 {
   std::string topic_name ("/provider_sonar/point_cloud2" );
   auto hdl = ros::NodeHandle("~");
@@ -69,6 +70,12 @@ void SonarMapper::AddScanlineToMap(const sensor_msgs::PointCloud2::ConstPtr &msg
     // Scale the intensity to fit image's normal range.
     // We use 16 bit to prevent overflow if 255+255
     value = (uint8_t)( ( (uint16_t)(intensity * 255.0f) + (uint16_t)value)/2 );
+  }
+
+  if( scanline_count_ > MAX_SCANLINE )
+  {
+    scanline_count_ = 0;
+    image_publisher_.Publish(sonar_map_);
   }
 }
 

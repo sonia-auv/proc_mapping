@@ -24,6 +24,7 @@
  */
 
 #include "AsyncImagePublisher.h"
+#include <cv_bridge/cv_bridge.h>
 
 //==============================================================================
 // C / D T O R S   S E C T I O N
@@ -31,16 +32,25 @@
 //------------------------------------------------------------------------------
 //
 AsyncImagePublisher::AsyncImagePublisher(const std::string &topic_name)
-    : topic_name_(topic_name), image_publisher_(topic_name) {
-  image_publisher_.Start();
-  Start();
+    : topic_name_(topic_name),
+      stop_thread_(false),
+      thread_(),
+      image_publisher_(),
+      it_(ros::NodeHandle("~"))
+{
+  // Create the broadcast topic.
+  image_publisher_ = it_.advertise(topic_name, 100);
+  thread_ = std::thread(std::bind(&AsyncImagePublisher::ThreadFunction, this));
 }
 
 //------------------------------------------------------------------------------
 //
 AsyncImagePublisher::~AsyncImagePublisher() {
-  Stop();
-  image_publisher_.Stop();
+  // Set the flag to stop the thread and wait for it to stop
+  stop_thread_ = true;
+  thread_.join();
+  // Shutdown the topic
+  image_publisher_.shutdown();
 }
 
 //==============================================================================
@@ -56,18 +66,22 @@ void AsyncImagePublisher::Publish(const cv::Mat &image) {
 
 //------------------------------------------------------------------------------
 //
-void AsyncImagePublisher::Run() {
-  while (!MustStop()) {
+void AsyncImagePublisher::ThreadFunction() {
+  cv_bridge::CvImage ros_image;
+  ROS_INFO("Starting ascyn image publisher");
+  while (!stop_thread_) {
     image_queue_mutex_.lock();
     size_t size = images_to_publish_.size();
     image_queue_mutex_.unlock();
     // No image, wait a bit.
     if (size == 0) {
+      // If no image, wait 1 ms
       usleep(1000);
     } else if (size > 10) {
       ROS_ERROR("Too much image to publish, clearing the buffer on %s",
                 topic_name_.c_str());
       image_queue_mutex_.lock();
+      // Clear the queue
       while (!images_to_publish_.empty()) {
         images_to_publish_.pop();
       }
@@ -78,7 +92,10 @@ void AsyncImagePublisher::Run() {
       cv::Mat tmp_image(images_to_publish_.front());
       images_to_publish_.pop();
       image_queue_mutex_.unlock();
-      image_publisher_.Write(tmp_image);
+      ros_image.image = tmp_image;
+      ros_image.encoding = sensor_msgs::image_encodings::MONO8;
+      image_publisher_.publish(ros_image.toImageMsg());
     }
   }
+  ROS_INFO("Closing ascyn image publisher");
 }

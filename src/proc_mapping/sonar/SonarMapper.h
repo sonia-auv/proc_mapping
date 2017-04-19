@@ -31,6 +31,7 @@
 #include <pcl/point_cloud.h>
 #include <pcl/point_types.h>
 #include <pcl_conversions/pcl_conversions.h>
+#include <image_transport/image_transport.h>
 #include <sensor_msgs/PointCloud2.h>
 #include "proc_mapping/general/AsyncImagePublisher.h"
 #include "proc_mapping/general/BaseObjectMapperInterface.h"
@@ -45,6 +46,7 @@ public:
   const int NB_PIXEL_BY_METER = 10;
   const int MAP_WIDTH_METER = 60;
   const int MAP_HEIGTH_METER = 30;
+  const int MAX_SCANLINE = 40;
 
   SonarMapper(const SubmarinePosition &submarine_position);
 
@@ -64,7 +66,11 @@ private:
   const SubmarinePosition &submarine_position_;
   int scanline_count_;
   ros::Subscriber scanline_subscriber_;
+  AsyncImagePublisher image_publisher_;
 };
+
+//=============================================================================
+//      INLINE FUNCTIONS
 
 inline void SonarMapper::GetMapObject(MapObjectVector &list)
 {

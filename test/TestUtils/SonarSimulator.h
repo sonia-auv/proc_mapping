@@ -61,7 +61,7 @@ public:
 
   inline void StartPublishing()
   {
-    stop_publishing_ = true;
+    stop_publishing_ = false;
     publishing_thread_ = std::thread(std::bind(&SonarEmulator::PublishScanlineThreadFunction, this));
   }
   inline void StopPublishing()
@@ -156,7 +156,8 @@ public:
                                  point_cloud_msg.row_step);
     point_cloud_msg.is_bigendian = false;
     point_cloud_msg.is_dense = false;
-    point_cloud_msg.header.frame_id = "SUB";
+    // We remove the normal frame_id "BODY" because we do not want to run a frame transpose with the data
+    point_cloud_msg.header.frame_id = "NED";
   }
 
   inline void SetIntensityBins(std::vector <std::pair<float, uint8_t>> &intensity_bins) const {

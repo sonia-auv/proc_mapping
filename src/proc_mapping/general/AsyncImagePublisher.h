@@ -28,22 +28,15 @@
 
 #include <queue>
 
-#include <lib_atlas/pattern/runnable.h>
-#include <lib_atlas/ros/image_publisher.h>
 #include <ros/ros.h>
 #include <mutex>
+#include <thread>
 #include <opencv2/opencv.hpp>
+#include <image_transport/image_transport.h>
+#include <image_transport/publisher.h>
 
-class AsyncImagePublisher : public atlas::Runnable {
+class AsyncImagePublisher {
  public:
-  //==========================================================================
-  // T Y P E D E F   A N D   E N U M
-
-  using Ptr = std::shared_ptr<AsyncImagePublisher>;
-  using ConstPtr = std::shared_ptr<const AsyncImagePublisher>;
-  using PtrList = std::vector<AsyncImagePublisher::Ptr>;
-  using ConstPtrList = std::vector<AsyncImagePublisher::ConstPtr>;
-
   //==========================================================================
   // P U B L I C   C / D T O R S
 
@@ -59,13 +52,19 @@ class AsyncImagePublisher : public atlas::Runnable {
   //==========================================================================
   // P R I V A T E   M E T H O D S
 
-  void Run() override;
+  void ThreadFunction();
 
   //==========================================================================
   // P R I V A T E   M E M B E R S
 
   std::string topic_name_;
-  atlas::ImagePublisher image_publisher_;
+  // Flag to stop the thread
+  bool stop_thread_;
+  // The thread for broadcasting an image
+  std::thread thread_;
+  // Necessary publisher for the image
+  image_transport::Publisher image_publisher_;
+  image_transport::ImageTransport it_;
 
   std::queue<cv::Mat> images_to_publish_;
   std::mutex image_queue_mutex_;

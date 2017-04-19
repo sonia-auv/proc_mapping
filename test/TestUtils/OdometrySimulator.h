@@ -39,7 +39,7 @@ public:
       yaw_(0.0f), pitch_(0.0f), roll_(0.0f)
   {
     ros::NodeHandle n(node_name);
-    publisher_ = n.subscribe<nav_msgs::Odometry>(topic_name, 100);
+    publisher_ = n.advertise<nav_msgs::Odometry>(topic_name, 100);
     SetPosition(0,0,0,0,0,0);
   }
 
@@ -54,7 +54,7 @@ public:
 
   inline void StartPublishing()
   {
-    stop_publishing_ = true;
+    stop_publishing_ = false;
     publishing_thread_ = std::thread(std::bind(&OdometryEmulator::PublishScanlineThreadFunction, this));
   }
   inline void StopPublishing()
@@ -93,6 +93,8 @@ public:
   }
   inline void PublishScanlineThreadFunction() {
     ros::Rate loop_rate(100);
+
+    // We remove the normal frame_id "NED" because we do not want to run a frame transpose with the data
     msg_.header.frame_id = "NED";
     while (!stop_publishing_) {
       msg_.header.stamp = ros::Time::now();
