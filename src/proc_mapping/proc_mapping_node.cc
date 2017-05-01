@@ -41,7 +41,9 @@ ProcMappingNode::ProcMappingNode(const ros::NodeHandlePtr &nh)
       markers_pub_(),
       reset_map_sub_(),
       submarine_position_(),
-      sonar_mapper_(submarine_position_)
+      sonar_mapper_(submarine_position_),
+      hydro_mapper_(),
+      vision_mapper_()
 {
 //  map_pub_ = nh_->advertise<sonia_msgs::SemanticMap>("/proc_mapping/map", 100);
   markers_pub_ = nh_->advertise<visualization_msgs::MarkerArray>(

@@ -33,6 +33,8 @@
 #include <vector>
 #include "proc_mapping/config.h"
 #include "proc_mapping/sonar/SonarMapper.h"
+#include "proc_mapping/hydrophone/HydrophoneMapper.h"
+#include "proc_mapping/vision/VisionMapper.h"
 
 namespace proc_mapping {
 
@@ -69,6 +71,9 @@ class ProcMappingNode {
   SubmarinePosition submarine_position_;
 
   SonarMapper sonar_mapper_;
+  HydrophoneMapper hydro_mapper_;
+  VisionMapper vision_mapper_;
+
 };
 
 }  // namespace proc_mapping
