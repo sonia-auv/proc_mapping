@@ -29,93 +29,118 @@
 
 namespace proc_mapping {
 
-//==============================================================================
-// C / D T O R S   S E C T I O N
+    //==============================================================================
+    // C / D T O R S   S E C T I O N
 
-//------------------------------------------------------------------------------
-//
-ProcMappingNode::ProcMappingNode(const ros::NodeHandlePtr &nh)
-    : nh_(nh),
-      map_pub_(),
-      markers_pub_(),
-      reset_map_sub_(),
-      submarine_position_()
-{
-//  map_pub_ = nh_->advertise<sonia_msgs::SemanticMap>("/proc_mapping/map", 100);
-  markers_pub_ = nh_->advertise<visualization_msgs::MarkerArray>(
-      "/proc_mapping/markers", 100);
+    //------------------------------------------------------------------------------
+    //
+    ProcMappingNode::ProcMappingNode(const ros::NodeHandlePtr &nh)
+        : nh_(nh),
+          map_pub_(),
+          markers_pub_(),
+          reset_map_sub_(),
+          submarine_position_()
+    {
 
-        visualization_msgs::Marker marker;
 
-        marker.header.frame_id = "NED";
-        marker.header.stamp = ros::Time::now();
+        markers_pub_ = nh_->advertise<visualization_msgs::MarkerArray>("/proc_mapping/markers", 100);
 
-        //marker.ns = "basic_shapes";
+        hydro_sub_ = nh_->subscribe("/provider_hydrophone/markers", 100, &ProcMappingNode::MarkersCallback, this);
+
+        proc_image_sub_ = nh_->subscribe("/proc_image_processing/markers",100, &ProcMappingNode::MarkersCallback, this);
+
+    }
+
+    //------------------------------------------------------------------------------
+    //
+    ProcMappingNode::~ProcMappingNode() {}
+
+    //==============================================================================
+    // M E T H O D   S E C T I O N
+
+    //------------------------------------------------------------------------------
+    //
+    //void ProcMappingNode::ResetMapCallback(
+    //    const sonia_msgs::ResetMap::ConstPtr &msg) {
+    //  ROS_INFO("Resetting the mappers object.");
+    //  sonar_mapper_.ResetMapper();
+    //}
+
+    //------------------------------------------------------------------------------
+    //
+    void ProcMappingNode::Spin() {
+      ros::Rate r(15);  // 15 hz
+            //int id=0;
+
+
+
+      while (ros::ok()) {
+        ros::spinOnce();
+
+          markers_pub_.publish(markers);
+
+        r.sleep();
+      }
+    }
+
+
+    void ProcMappingNode::MarkersCallback(const visualization_msgs::MarkerArray::ConstPtr &markers) {
+
+        //visualization_msgs::Marker marker;
+
+        //marker.header.frame_id = "NED";
+        //marker.header.stamp = ros::Time::now();
+        //marker.type = visualization_msgs::Marker::SPHERE;
+
         //marker.id = 0;
+        //marker.action = visualization_msgs::Marker::ADD;
 
-        marker.type = visualization_msgs::Marker::SPHERE;
+        //marker.pose.position.x=0;
+        //marker.pose.position.y=0;
+        //marker.pose.position.z=0;
 
-        marker.id = 0;
-        marker.action = visualization_msgs::Marker::ADD;
+
+        //marker.pose.orientation.x = 0.0;
+        //marker.pose.orientation.y = 0.0;
+        //marker.pose.orientation.z = 0.0;
+        //marker.pose.orientation.w = 1.0;
+
+        //marker.scale.x = 1.0;
+        //marker.scale.y = 1.0;
+        //marker.scale.z = 1.0;
 
 
-        marker.pose.position.x=0;
-        marker.pose.position.y=0;
-        marker.pose.position.z=0;
+        //marker.color.r = 1.0f;
+        //marker.color.g = 1.0f;
+        //marker.color.b = 0.0f;
+        //marker.color.a = 1.0;
 
-        marker.pose.orientation.x = 0.0;
-        marker.pose.orientation.y = 0.0;
-        marker.pose.orientation.z = 0.0;
-        marker.pose.orientation.w = 1.0;
+        //marker.lifetime = ros::Duration();
 
-        marker.scale.x = 1.0;
-        marker.scale.y = 1.0;
-        marker.scale.z = 1.0;
+        for (unsigned int i = 0; i < markers->markers.size(); ++i) {
 
-        marker.color.r = 1.0f;
-        marker.color.g = 1.0f;
-        marker.color.b = 0.0f;
-        marker.color.a = 1.0;
+            auto marker = markers->markers[i];
 
-        marker.lifetime = ros::Duration();
+            marker.header.frame_id = "NED";
+            marker.header.stamp = ros::Time::now();
 
-        markers.markers.push_back(marker);
+            marker.ns = std::to_string(marker.id);
 
-//  reset_map_sub_ = nh_->subscribe("reset_map", 100,
-//                                  &ProcMappingNode::ResetMapCallback, this);
+            marker.id = 0;
+            marker.action = visualization_msgs::Marker::ADD;
 
-}
+            marker.scale.x = 1.0;
+            marker.scale.y = 1.0;
+            marker.scale.z = 1.0;
 
-//------------------------------------------------------------------------------
-//
-ProcMappingNode::~ProcMappingNode() {}
+            marker.lifetime = ros::Duration();
 
-//==============================================================================
-// M E T H O D   S E C T I O N
+            this->markers.markers.push_back(marker);
 
-//------------------------------------------------------------------------------
-//
-//void ProcMappingNode::ResetMapCallback(
-//    const sonia_msgs::ResetMap::ConstPtr &msg) {
-//  ROS_INFO("Resetting the mappers object.");
-//  sonar_mapper_.ResetMapper();
-//}
-
-//------------------------------------------------------------------------------
-//
-void ProcMappingNode::Spin() {
-  ros::Rate r(15);  // 15 hz
-        int id=0;
+        }
 
 
 
-  while (ros::ok()) {
-    ros::spinOnce();
-
-      markers_pub_.publish(markers);
-
-    r.sleep();
-  }
-}
+    }
 
 }  // namespace proc_mapping

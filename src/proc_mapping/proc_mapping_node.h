@@ -53,8 +53,7 @@ class ProcMappingNode {
   /// Each iteration of the loop, this will take the objects in the object
   /// registery, empty it and publish the objects.
   void Spin();
-
-//  void ResetMapCallback(const sonia_msgs::ResetMap::ConstPtr &msg);
+  //  void ResetMapCallback(const sonia_msgs::ResetMap::ConstPtr &msg);
 
 
 
@@ -62,14 +61,20 @@ class ProcMappingNode {
   //==========================================================================
   // P R I V A T E   M E M B E R S
 
-  ros::NodeHandlePtr nh_;
-  ros::Publisher map_pub_;
-  ros::Publisher markers_pub_;
-  ros::Subscriber reset_map_sub_;
+    ros::NodeHandlePtr nh_;
+    ros::Publisher map_pub_;
+    ros::Publisher markers_pub_;
+    ros::Subscriber reset_map_sub_;
+
+    ros::Subscriber hydro_sub_;
+    ros::Subscriber proc_image_sub_;
+
 
   SubmarinePosition submarine_position_;
 
   visualization_msgs::MarkerArray markers;
+
+  void MarkersCallback(const visualization_msgs::MarkerArray::ConstPtr &markers);
 
 };
 
