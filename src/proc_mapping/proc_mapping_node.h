@@ -33,6 +33,7 @@
 #include <vector>
 #include "proc_mapping/config.h"
 #include "proc_mapping/general/SubmarinePosition.h"
+#include <visualization_msgs/MarkerArray.h>
 
 namespace proc_mapping {
 
@@ -68,6 +69,7 @@ class ProcMappingNode {
 
   SubmarinePosition submarine_position_;
 
+  visualization_msgs::MarkerArray markers;
 
 };
 
