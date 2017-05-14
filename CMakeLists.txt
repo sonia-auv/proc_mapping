@@ -33,15 +33,15 @@ find_package(
         roscpp
         std_msgs
         message_runtime
-        image_transport
-        cv_bridge
-        pcl_ros
-        pcl_conversions
+#        image_transport
+#        cv_bridge
+#        pcl_ros
+#        pcl_conversions
         lib_atlas
 )
 
-find_package(Eigen3 REQUIRED)
-find_package(PCL REQUIRED)
+#find_package(Eigen3 REQUIRED)
+#find_package(PCL REQUIRED)
 
 #===============================================================================
 # G E N E R A T E   M E S S A G E S   &   S E R V I C E S
@@ -54,11 +54,11 @@ catkin_package(
         geometry_msgs
         sensor_msgs
         nav_msgs
-        image_transport
-        cv_bridge
-        pcl_ros
-        pcl_conversions
-        lib_atlas
+#        image_transport
+#        cv_bridge
+#        pcl_ros
+#        pcl_conversions
+#        lib_atlas
         sonia_msgs
 )
 
@@ -76,9 +76,9 @@ include_directories(
         ${catkin_INCLUDE_DIRS}
         ${proc_mapping_SRC_DIR}
         ${lib_atlas_INCLUDE_DIRS}
-        ${Eigen_INCLUDE_DIRS}
-        ${PCL_INCLUDE_DIRS}
-        ${OpenCV_INCLUDE_DIRS}
+#        ${Eigen_INCLUDE_DIRS}
+#        ${PCL_INCLUDE_DIRS}
+#        ${OpenCV_INCLUDE_DIRS}
 )
 
 #==========================================================================
@@ -89,8 +89,9 @@ target_link_libraries(${PROJECT_NAME}_node
         ${catkin_LIBRARIES}
         ${lib_atlas_LIBRARIES}
         yaml-cpp
-        ${Eigen_LIBRARIES}
-        ${PCL_LIBRARIES})
+#        ${Eigen_LIBRARIES}
+#        ${PCL_LIBRARIES}
+        )
 add_dependencies(${PROJECT_NAME}_node sonia_msgs_generate_messages_cpp)
 
 #==========================================================================
