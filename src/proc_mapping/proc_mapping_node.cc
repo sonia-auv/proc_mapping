@@ -39,7 +39,8 @@ namespace proc_mapping {
           map_pub_(),
           markers_pub_(),
           reset_map_sub_(),
-          submarine_position_()
+          submarine_position_(),
+          buoys_(3)
     {
 
 
@@ -118,6 +119,8 @@ namespace proc_mapping {
         //marker.lifetime = ros::Duration();
 
         for (unsigned int i = 0; i < markers->markers.size(); ++i) {
+
+            // TODO Check marker type (buoy, fens, ...) then add it to the objective
 
             auto marker = markers->markers[i];
 

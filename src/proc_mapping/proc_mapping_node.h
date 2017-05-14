@@ -35,6 +35,8 @@
 #include "proc_mapping/general/SubmarinePosition.h"
 #include <visualization_msgs/MarkerArray.h>
 
+#include "proc_mapping/objectives/Objective.h"
+
 namespace proc_mapping {
 
 class ProcMappingNode {
@@ -73,6 +75,8 @@ class ProcMappingNode {
   SubmarinePosition submarine_position_;
 
   visualization_msgs::MarkerArray markers;
+
+    Objective buoys_;
 
   void MarkersCallback(const visualization_msgs::MarkerArray::ConstPtr &markers);
 
