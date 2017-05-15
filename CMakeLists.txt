@@ -39,6 +39,15 @@ find_library(MLPACK_LIBRARY
         NAMES mlpack
         PATHS /usr/lib/x86_64-linux-gnu /usr/local/lib/x86_64-linux-gnu /usr/lib64/ /usr/lib/ /usr/local/lib64/ /usr/local/)
 
+find_library(ARMADILLO_LIBRARY
+        NAMES armadillo
+        PATHS /usr/lib/x86_64-linux-gnu /usr/local/lib/x86_64-linux-gnu /usr/lib64/ /usr/lib/ /usr/local/lib64/ /usr/local/
+        )
+find_path(ARMADILLO_INCLUDE_DIR
+        NAMES armadillo
+        PATHS /usr/include
+        )
+
 
 find_package(
         catkin REQUIRED COMPONENTS
@@ -48,6 +57,7 @@ find_package(
         std_msgs
         message_runtime
         lib_atlas
+
 )
 
 #find_package(Eigen3 REQUIRED)
@@ -82,6 +92,7 @@ include_directories(
         ${proc_mapping_SRC_DIR}
         ${lib_atlas_INCLUDE_DIRS}
         ${MLPACK_INCLUDE_DIR}
+        ${ARMADILLO_INCLUDE_DIR}
 )
 
 #==========================================================================
@@ -92,6 +103,7 @@ target_link_libraries(${PROJECT_NAME}_node
         ${catkin_LIBRARIES}
         ${lib_atlas_LIBRARIES}
         ${MLPACK_LIBRARY}
+        ${ARMADILLO_LIBRARY}
         yaml-cpp
         )
 add_dependencies(${PROJECT_NAME}_node sonia_msgs_generate_messages_cpp)
