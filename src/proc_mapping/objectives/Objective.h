@@ -6,6 +6,8 @@
 #define PROC_MAPPING_OBJECTIVE_H
 
 #include "visualization_msgs/Marker.h"
+#include "mlpack/methods/kmeans/kmeans.hpp"
+#include "armadillo"
 
 namespace proc_mapping
 {
@@ -26,6 +28,9 @@ namespace proc_mapping
 
         std::vector<visualization_msgs::Marker> markers;
         uint8_t nbObjects;
+
+        mlpack::kmeans::KMeans<> kmeans;
+
 
     };
 }

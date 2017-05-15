@@ -11,6 +11,19 @@ namespace proc_mapping
         : nbObjects(nbObjects)
     {
 
+        //arma::mat data;
+
+        arma::mat data;
+// The number of clusters we are getting.
+        size_t clusters;
+// The assignments will be stored in this vector.
+        arma::Row<size_t> assignments;
+// The centroids will be stored in this matrix.
+        arma::mat centroids;
+
+
+        // TODO Décommenter la ligne suivante amène l'erreur
+        //kmeans.Cluster(data, clusters, assignments, centroids);
 
     }
 

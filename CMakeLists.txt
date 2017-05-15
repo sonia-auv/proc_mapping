@@ -25,6 +25,20 @@ set(proc_mapping_SRC_DIR "src")
 
 #===============================================================================
 # C A T K I N   C O N F I G U R A T I O N
+# Store the mlpack include directory in MLPACK_INCLUDE_DIR.
+# The PATHS variable may be specified to give hints for where to find core.hpp.
+find_path(MLPACK_INCLUDE_DIR
+        NAMES core.hpp prereqs.hpp
+        PATHS /usr/include/mlpack
+        )
+
+# Find libmlpack.so (or equivalent) and store it in MLPACK_LIBRARY.
+# If this example script were smarter, it would also find other dependencies of mlpack and store them in
+# an MLPACK_LIBRARIES variable instead.
+find_library(MLPACK_LIBRARY
+        NAMES mlpack
+        PATHS /usr/lib/x86_64-linux-gnu /usr/local/lib/x86_64-linux-gnu /usr/lib64/ /usr/lib/ /usr/local/lib64/ /usr/local/)
+
 
 find_package(
         catkin REQUIRED COMPONENTS
@@ -33,10 +47,6 @@ find_package(
         roscpp
         std_msgs
         message_runtime
-#        image_transport
-#        cv_bridge
-#        pcl_ros
-#        pcl_conversions
         lib_atlas
 )
 
@@ -54,11 +64,6 @@ catkin_package(
         geometry_msgs
         sensor_msgs
         nav_msgs
-#        image_transport
-#        cv_bridge
-#        pcl_ros
-#        pcl_conversions
-#        lib_atlas
         sonia_msgs
 )
 
@@ -76,9 +81,7 @@ include_directories(
         ${catkin_INCLUDE_DIRS}
         ${proc_mapping_SRC_DIR}
         ${lib_atlas_INCLUDE_DIRS}
-#        ${Eigen_INCLUDE_DIRS}
-#        ${PCL_INCLUDE_DIRS}
-#        ${OpenCV_INCLUDE_DIRS}
+        ${MLPACK_INCLUDE_DIR}
 )
 
 #==========================================================================
@@ -88,9 +91,8 @@ add_executable(${PROJECT_NAME}_node ${proc_mapping_SRC_DIR}/${PROJECT_NAME}/main
 target_link_libraries(${PROJECT_NAME}_node
         ${catkin_LIBRARIES}
         ${lib_atlas_LIBRARIES}
+        ${MLPACK_LIBRARY}
         yaml-cpp
-#        ${Eigen_LIBRARIES}
-#        ${PCL_LIBRARIES}
         )
 add_dependencies(${PROJECT_NAME}_node sonia_msgs_generate_messages_cpp)
 
