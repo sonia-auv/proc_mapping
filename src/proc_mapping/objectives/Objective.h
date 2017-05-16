@@ -9,6 +9,8 @@
 #include "mlpack/methods/kmeans/kmeans.hpp"
 #include "armadillo"
 
+#include <ros/ros.h>
+
 namespace proc_mapping
 {
     class Objective {
@@ -29,8 +31,12 @@ namespace proc_mapping
         std::vector<visualization_msgs::Marker> markers;
         uint8_t nbObjects;
 
-        mlpack::kmeans::KMeans<> kmeans;
+        arma::mat kmean_mat;
 
+        // The centroids will be stored in this matrix.
+        arma::mat centroids;
+
+        int const NB_ROW = 3;
 
     };
 }

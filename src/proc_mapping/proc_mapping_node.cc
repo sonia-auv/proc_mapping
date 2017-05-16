@@ -118,9 +118,13 @@ namespace proc_mapping {
 
         //marker.lifetime = ros::Duration();
 
-        for (unsigned int i = 0; i < markers->markers.size(); ++i) {
+        std::vector<visualization_msgs::Marker> markersObjectives;
+
+        for (unsigned int i = 0; i < markers->markers.size(); i++) {
 
             // TODO Check marker type (buoy, fens, ...) then add it to the objective
+
+
 
             auto marker = markers->markers[i];
 
@@ -140,8 +144,11 @@ namespace proc_mapping {
 
             this->markers.markers.push_back(marker);
 
+            markersObjectives.push_back(marker);
+
         }
 
+        buoys_.addMarkers(markersObjectives);
 
 
     }
