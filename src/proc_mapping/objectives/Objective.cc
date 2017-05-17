@@ -14,7 +14,7 @@ namespace proc_mapping
     {
 
         // TODO Temporaire
-        this->nbObjects = 1;
+        //this->nbObjects = 1;
         centroids = arma::mat(NB_ROW, this->nbObjects);
 
         // TODO Décommenter la ligne suivante amène l'erreur
@@ -70,18 +70,29 @@ namespace proc_mapping
 
         kmean_mat.print("Final matrix");
 
-        std::cout << "Begin Clustering" << std::endl;
 
-        mlpack::kmeans::KMeans<> kmeans;
+        centroids.print("Centroids before treatment");
 
-        // true => initial guess for centroids
-        kmeans.Cluster(kmean_mat, nbObjects, centroids, true);
+        // TODO Check for better
+        if (kmean_mat.n_cols >= nbObjects)
+        {
+            std::cout << "Begin Clustering" << std::endl;
 
-        std::cout << "End Clustering" << std::endl;
+            mlpack::kmeans::KMeans<> kmeans;
 
-        kmean_mat.print("Matrix after clusters");
+            // true => initial guess for centroids
+            kmeans.Cluster(kmean_mat, nbObjects, centroids, true);
 
-        centroids.print("Centroids after clusters");
+            std::cout << "End Clustering" << std::endl;
+
+            kmean_mat.print("Matrix after clusters");
+
+            centroids.print("Centroids after clusters");
+        }
+        else
+        {
+            std::cout << "Not enough object to run algorithm" << std::endl;
+        }
 
     }
 
