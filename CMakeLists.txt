@@ -55,16 +55,23 @@ find_package(
         cmake_modules
         roscpp
         std_msgs
+        visualization_msgs
+        message_generation
         message_runtime
         lib_atlas
 
 )
 
-#find_package(Eigen3 REQUIRED)
-#find_package(PCL REQUIRED)
-
 #===============================================================================
 # G E N E R A T E   M E S S A G E S   &   S E R V I C E S
+
+add_message_files(DIRECTORY msg
+        FILES
+        MappingRequest.msg
+        MappingResponse.msg
+        ProviderActivationRequest.msg)
+
+generate_messages(DEPENDENCIES visualization_msgs)
 
 catkin_package(
         CATKIN_DEPENDS
@@ -75,7 +82,10 @@ catkin_package(
         sensor_msgs
         nav_msgs
         sonia_msgs
+        visualization_msgs
 )
+
+
 
 #===============================================================================
 # I N C L U D E   F I L E S
