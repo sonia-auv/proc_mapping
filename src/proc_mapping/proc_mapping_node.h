@@ -36,6 +36,8 @@
 #include <visualization_msgs/MarkerArray.h>
 
 #include "proc_mapping/objectives/Objective.h"
+#include "proc_mapping/MappingRequest.h"
+#include "proc_mapping/MappingResponse.h"
 
 namespace proc_mapping {
 
@@ -66,11 +68,14 @@ class ProcMappingNode {
     ros::NodeHandlePtr nh_;
     ros::Publisher map_pub_;
     ros::Publisher markers_pub_;
+    ros::Publisher mapping_response_pub_;
+
+
     ros::Subscriber reset_map_sub_;
 
     ros::Subscriber hydro_sub_;
     ros::Subscriber proc_image_sub_;
-
+    ros::Subscriber mapping_request_sub_;
 
   SubmarinePosition submarine_position_;
 
@@ -78,7 +83,8 @@ class ProcMappingNode {
 
     Objective buoys_;
 
-  void MarkersCallback(const visualization_msgs::MarkerArray::ConstPtr &markers);
+    void MarkersCallback(const visualization_msgs::MarkerArray::ConstPtr &markers);
+    void MappingRequestCallback(const proc_mapping::MappingRequest::ConstPtr &request);
 
 };
 

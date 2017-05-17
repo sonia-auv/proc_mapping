@@ -43,12 +43,17 @@ namespace proc_mapping {
           buoys_(3)
     {
 
+        // TODO Use attributes initialisation
 
         markers_pub_ = nh_->advertise<visualization_msgs::MarkerArray>("/proc_mapping/markers", 100);
+
 
         hydro_sub_ = nh_->subscribe("/provider_hydrophone/markers", 100, &ProcMappingNode::MarkersCallback, this);
 
         proc_image_sub_ = nh_->subscribe("/proc_image_processing/markers",100, &ProcMappingNode::MarkersCallback, this);
+
+        mapping_request_sub_ = nh_->subscribe("/proc_mapping/mapping_request", 100, &ProcMappingNode::MappingRequestCallback, this);
+        mapping_response_pub_ = nh_->advertise<proc_mapping::MappingResponse>("/proc_mapping/mapping_response", 100);
 
     }
 
@@ -87,37 +92,6 @@ namespace proc_mapping {
 
     void ProcMappingNode::MarkersCallback(const visualization_msgs::MarkerArray::ConstPtr &markers) {
 
-        //visualization_msgs::Marker marker;
-
-        //marker.header.frame_id = "NED";
-        //marker.header.stamp = ros::Time::now();
-        //marker.type = visualization_msgs::Marker::SPHERE;
-
-        //marker.id = 0;
-        //marker.action = visualization_msgs::Marker::ADD;
-
-        //marker.pose.position.x=0;
-        //marker.pose.position.y=0;
-        //marker.pose.position.z=0;
-
-
-        //marker.pose.orientation.x = 0.0;
-        //marker.pose.orientation.y = 0.0;
-        //marker.pose.orientation.z = 0.0;
-        //marker.pose.orientation.w = 1.0;
-
-        //marker.scale.x = 1.0;
-        //marker.scale.y = 1.0;
-        //marker.scale.z = 1.0;
-
-
-        //marker.color.r = 1.0f;
-        //marker.color.g = 1.0f;
-        //marker.color.b = 0.0f;
-        //marker.color.a = 1.0;
-
-        //marker.lifetime = ros::Duration();
-
         std::vector<visualization_msgs::Marker> markersObjectives;
 
         for (unsigned int i = 0; i < markers->markers.size(); i++) {
@@ -151,6 +125,33 @@ namespace proc_mapping {
         buoys_.addMarkers(markersObjectives);
 
 
+    }
+
+    void ProcMappingNode::MappingRequestCallback(const proc_mapping::MappingRequest::ConstPtr &request)
+    {
+
+        proc_mapping::MappingResponse response;
+
+        response.mapping_request = *request;
+
+        // TODO Collect information from objectives
+
+        switch (request->object_type)
+        {
+            case MappingRequest::BUOY:
+
+                break;
+
+            case MappingRequest::FENS:
+
+                break;
+
+            case MappingRequest::PINGER:
+
+                break;
+        }
+
+        mapping_response_pub_.publish(response);
     }
 
 }  // namespace proc_mapping
