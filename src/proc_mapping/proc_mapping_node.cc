@@ -141,7 +141,7 @@ namespace proc_mapping {
 
                 break;
 
-            case MappingRequest::FENS:
+            case MappingRequest::FENCE:
 
                 break;
 
