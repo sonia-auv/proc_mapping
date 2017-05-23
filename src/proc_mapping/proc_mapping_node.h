@@ -26,13 +26,9 @@
 #ifndef PROC_MAPPING_PROC_MAPPING_NODE_H_
 #define PROC_MAPPING_PROC_MAPPING_NODE_H_
 
-#include <lib_atlas/macros.h>
 #include <ros/node_handle.h>
-//#include <sonia_msgs/ResetMap.h>
 #include <memory>
 #include <vector>
-#include "proc_mapping/config.h"
-#include "proc_mapping/general/SubmarinePosition.h"
 #include <visualization_msgs/MarkerArray.h>
 
 #include "proc_mapping/objectives/Objective.h"
@@ -80,9 +76,7 @@ class ProcMappingNode {
     ros::Subscriber proc_image_sub_;
     ros::Subscriber mapping_request_sub_;
 
-  SubmarinePosition submarine_position_;
-
-  visualization_msgs::MarkerArray markers;
+    visualization_msgs::MarkerArray markers;
 
     Objective buoys_;
 

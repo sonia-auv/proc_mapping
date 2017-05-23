@@ -36,7 +36,7 @@ namespace proc_mapping
         // The centroids will be stored in this matrix.
         arma::mat centroids;
 
-        int const NB_ROW = 3;
+        static const arma::uword NB_ROWS = 3;
 
     };
 }

@@ -42,6 +42,7 @@ class MockBuoy:
 
     def getMarker1(self):
 
+        #TODO Sphere = buoy
         marker = Marker()
 
         marker.pose.position.x = uniform(-5,5)
@@ -51,6 +52,8 @@ class MockBuoy:
         return marker
 
     def getMarker2(self):
+
+        #TODO Sphere = buoy
         marker = Marker()
 
         marker.pose.position.x = uniform(0,10)
@@ -60,6 +63,8 @@ class MockBuoy:
         return marker
 
     def getMarker3(self):
+
+        #TODO Sphere = buoy
         marker = Marker()
 
         marker.pose.position.x = uniform(5,25)

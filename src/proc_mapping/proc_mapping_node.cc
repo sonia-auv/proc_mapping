@@ -24,8 +24,6 @@
  */
 
 #include "proc_mapping/proc_mapping_node.h"
-#include <functional>
-#include "proc_mapping/config.h"
 
 namespace proc_mapping {
 
@@ -39,7 +37,6 @@ namespace proc_mapping {
           map_pub_(),
           markers_pub_(),
           reset_map_sub_(),
-          submarine_position_(),
           buoys_(3)
     {
 

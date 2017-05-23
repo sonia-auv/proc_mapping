@@ -58,7 +58,6 @@ find_package(
         visualization_msgs
         message_generation
         message_runtime
-        lib_atlas
 
 )
 
@@ -81,7 +80,6 @@ catkin_package(
         geometry_msgs
         sensor_msgs
         nav_msgs
-        sonia_msgs
         visualization_msgs
 )
 
@@ -100,7 +98,6 @@ list(REMOVE_ITEM proc_mapping_FILES
 include_directories(
         ${catkin_INCLUDE_DIRS}
         ${proc_mapping_SRC_DIR}
-        ${lib_atlas_INCLUDE_DIRS}
         ${MLPACK_INCLUDE_DIR}
         ${ARMADILLO_INCLUDE_DIR}
 )
@@ -111,7 +108,6 @@ include_directories(
 add_executable(${PROJECT_NAME}_node ${proc_mapping_SRC_DIR}/${PROJECT_NAME}/main.cc ${proc_mapping_FILES})
 target_link_libraries(${PROJECT_NAME}_node
         ${catkin_LIBRARIES}
-        ${lib_atlas_LIBRARIES}
         ${MLPACK_LIBRARY}
         ${ARMADILLO_LIBRARY}
         yaml-cpp

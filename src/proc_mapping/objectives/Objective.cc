@@ -10,21 +10,11 @@ namespace proc_mapping
     Objective::Objective(uint8_t nbObjects)
         : nbObjects(nbObjects),
           kmean_mat(),
-          centroids(NB_ROW, nbObjects, arma::fill::zeros)
+          centroids(NB_ROWS, nbObjects, arma::fill::zeros)
     {
-
-        // TODO Temporaire
-        //this->nbObjects = 1;
-        centroids = arma::mat(NB_ROW, this->nbObjects);
-
-        // TODO Décommenter la ligne suivante amène l'erreur
-        //kmeans.Cluster(kmean_mat, this->nbObjects, assignments, centroids);
-
     }
 
-    Objective::~Objective() {
-
-    }
+    Objective::~Objective() {}
 
     void Objective::addMarkers(std::vector<visualization_msgs::Marker> markers) {
 
@@ -41,11 +31,11 @@ namespace proc_mapping
 
         std::cout << "Initial nbCol : " << nbCol << std::endl;
 
-        std::cout << "NB_ROW : " << NB_ROW << std::endl;
+        std::cout << "NB_ROWS : " << NB_ROWS << std::endl;
 
         kmean_mat.print("Initial Matrix");
 
-        kmean_mat.resize(NB_ROW, nbCol + markers.size());
+        kmean_mat.resize(NB_ROWS, nbCol + markers.size());
 
         kmean_mat.print("Reshaped Matrix");
 
