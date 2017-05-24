@@ -42,34 +42,43 @@ class MockBuoy:
 
     def getMarker1(self):
 
-        #TODO Sphere = buoy
-        marker = Marker()
+        marker = self.getDefaultMarker()
 
         marker.pose.position.x = uniform(-5,5)
         marker.pose.position.y = uniform(-5,5)
         marker.pose.position.z = uniform(-5,5)
 
+        marker.type = Marker.SPHERE
+
         return marker
 
     def getMarker2(self):
 
-        #TODO Sphere = buoy
-        marker = Marker()
+        marker = self.getDefaultMarker()
 
         marker.pose.position.x = uniform(0,10)
         marker.pose.position.y = uniform(0,10)
         marker.pose.position.z = uniform(0,10)
 
+        marker.type = Marker.SPHERE
+
         return marker
 
     def getMarker3(self):
 
-        #TODO Sphere = buoy
-        marker = Marker()
+        marker = self.getDefaultMarker()
 
         marker.pose.position.x = uniform(5,25)
         marker.pose.position.y = uniform(5,25)
         marker.pose.position.z = uniform(5,25)
+
+        return marker
+
+    def getDefaultMarker(self):
+
+        marker = Marker()
+
+        marker.type = Marker.SPHERE
 
         return marker
 
