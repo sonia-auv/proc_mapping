@@ -60,8 +60,6 @@ namespace proc_mapping
 
             ROS_INFO("Beginning of centroids");
 
-            centroids.print();
-
             for (int j = 0; j < this->nbObjects; ++j) {
 
                 ROS_INFO("Centroid #%d, { x = %f, y = %f, z = %f}", j, centroids(0,j), centroids(1,j), centroids(2,j));

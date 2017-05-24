@@ -79,6 +79,8 @@ class ProcMappingNode {
     visualization_msgs::MarkerArray markers;
 
     Objective buoys_;
+    Objective fence_;
+    Objective pinger_;
 
     void MarkersCallback(const visualization_msgs::MarkerArray::ConstPtr &markers);
     void MappingRequestCallback(const proc_mapping::MappingRequest::ConstPtr &request);

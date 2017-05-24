@@ -37,7 +37,9 @@ namespace proc_mapping {
           map_pub_(),
           markers_pub_(),
           reset_map_sub_(),
-          buoys_(3)
+          buoys_(3),
+          fence_(1),
+          pinger_(1)
     {
 
         // TODO Use attributes initialisation
@@ -91,15 +93,30 @@ namespace proc_mapping {
 
     void ProcMappingNode::MarkersCallback(const visualization_msgs::MarkerArray::ConstPtr &markers) {
 
-        std::vector<visualization_msgs::Marker> markersObjectives;
+        std::vector<visualization_msgs::Marker> buoysMarkers;
+        std::vector<visualization_msgs::Marker> fenceMarkers;
+        std::vector<visualization_msgs::Marker> pingerMarkers;
 
         for (unsigned int i = 0; i < markers->markers.size(); i++) {
 
-            // TODO Check marker type (buoy, fens, ...) then add it to the objective
-
-
-
             auto marker = markers->markers[i];
+
+            switch (marker.type)
+            {
+                case visualization_msgs::Marker::SPHERE:
+                    buoysMarkers.push_back(visualization_msgs::Marker(marker));
+                    break;
+                case visualization_msgs::Marker::CUBE:
+                    fenceMarkers.push_back(visualization_msgs::Marker(marker));
+                    break;
+                case visualization_msgs::Marker::CYLINDER:
+                    pingerMarkers.push_back(visualization_msgs::Marker(marker));
+
+                    break;
+                default:
+                    ROS_ERROR("Type of marker not supported");
+                    break;
+            }
 
             marker.header.frame_id = "NED";
             marker.header.stamp = ros::Time::now();
@@ -117,13 +134,14 @@ namespace proc_mapping {
 
             this->markers.markers.push_back(marker);
 
-            markersObjectives.push_back(marker);
-
         }
 
-        buoys_.addMarkers(markersObjectives);
-
-
+        if (!buoysMarkers.empty())
+            buoys_.addMarkers(buoysMarkers);
+        if (!fenceMarkers.empty())
+            fence_.addMarkers(fenceMarkers);
+        if (!pingerMarkers.empty())
+            pinger_.addMarkers(pingerMarkers);
     }
 
     void ProcMappingNode::MappingRequestCallback(const proc_mapping::MappingRequest::ConstPtr &request)
