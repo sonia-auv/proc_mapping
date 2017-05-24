@@ -18,26 +18,16 @@ namespace proc_mapping
 
     void Objective::addMarkers(std::vector<visualization_msgs::Marker> markers) {
 
-        // TODO Remove std:cout
-        // TODO If total makers < nbObjects, then resize
 
-        std::cout << "Markers size : " << markers.size() << std::endl;
-
-        centroids.print("Centroids");
+        ROS_INFO("Markers received size : %lu", markers.size());
 
         if(markers.empty()) return;
 
-        long long int nbCol = kmean_mat.n_cols;
+        arma::uword nbCol = kmean_mat.n_cols;
 
-        std::cout << "Initial nbCol : " << nbCol << std::endl;
-
-        std::cout << "NB_ROWS : " << NB_ROWS << std::endl;
-
-        kmean_mat.print("Initial Matrix");
+        ROS_DEBUG("Initial nbCol : %lld", nbCol);
 
         kmean_mat.resize(NB_ROWS, nbCol + markers.size());
-
-        kmean_mat.print("Reshaped Matrix");
 
         int i = 0;
 
@@ -45,43 +35,45 @@ namespace proc_mapping
         {
             this->markers.push_back(marker);
 
-            long long int noCol = nbCol + i;
-
+            arma::uword noCol = nbCol + i;
 
             kmean_mat(0,noCol) = marker.pose.position.x;
             kmean_mat(1,noCol) = marker.pose.position.y;
             kmean_mat(2,noCol) = marker.pose.position.z;
 
-            kmean_mat.print("After set column");
-
             i++;
 
         }
 
-        kmean_mat.print("Final matrix");
-
-
-        centroids.print("Centroids before treatment");
-
-        // TODO Check for better
         if (kmean_mat.n_cols >= nbObjects)
         {
-            std::cout << "Begin Clustering" << std::endl;
+
+            ROS_DEBUG("Begin clustering");
+
 
             mlpack::kmeans::KMeans<> kmeans;
 
             // true => initial guess for centroids
             kmeans.Cluster(kmean_mat, nbObjects, centroids, true);
 
-            std::cout << "End Clustering" << std::endl;
+            ROS_DEBUG("End Clustering");
 
-            kmean_mat.print("Matrix after clusters");
+            ROS_INFO("Beginning of centroids");
 
-            centroids.print("Centroids after clusters");
+            centroids.print();
+
+            for (int j = 0; j < this->nbObjects; ++j) {
+
+                ROS_INFO("Centroid #%d, { x = %f, y = %f, z = %f}", j, centroids(0,j), centroids(1,j), centroids(2,j));
+
+            }
+
+            ROS_INFO("End of centroids");
+
         }
         else
         {
-            std::cout << "Not enough object to run algorithm" << std::endl;
+            ROS_INFO("Not enough object to run algorithm");
         }
 
     }
