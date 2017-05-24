@@ -7,10 +7,12 @@
 namespace proc_mapping
 {
 
-    Objective::Objective(uint8_t nbObjects)
-        : nbObjects(nbObjects),
+    Objective::Objective(std::string id, uint8_t nbObjects)
+        : id(id),
+          nbObjects(nbObjects),
           kmean_mat(),
           centroids(NB_ROWS, nbObjects, arma::fill::zeros)
+
     {
     }
 
@@ -19,9 +21,16 @@ namespace proc_mapping
     void Objective::addMarkers(std::vector<visualization_msgs::Marker> markers) {
 
 
-        ROS_INFO("Markers received size : %lu", markers.size());
 
-        if(markers.empty()) return;
+        if(markers.empty())
+        {
+            ROS_INFO("No markers received in %s objective", id.data());
+            return;
+        }
+
+        ROS_INFO("Start adding markers for %s", id.data());
+
+        ROS_INFO("Markers received size : %lu", markers.size());
 
         arma::uword nbCol = kmean_mat.n_cols;
 
@@ -73,6 +82,8 @@ namespace proc_mapping
         {
             ROS_INFO("Not enough object to run algorithm");
         }
+
+        ROS_INFO("End adding markers for %s", id.data());
 
     }
 

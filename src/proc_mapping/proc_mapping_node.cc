@@ -37,9 +37,9 @@ namespace proc_mapping {
           map_pub_(),
           markers_pub_(),
           reset_map_sub_(),
-          buoys_(3),
-          fence_(1),
-          pinger_(1)
+          buoys_("buoys", 3),
+          fence_("fence", 1),
+          pinger_("pinger", 1)
     {
 
         // TODO Use attributes initialisation

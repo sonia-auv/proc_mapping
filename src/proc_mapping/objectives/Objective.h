@@ -16,7 +16,7 @@ namespace proc_mapping
     class Objective {
     public:
 
-        Objective(uint8_t nbObjects);
+        Objective(std::string id, uint8_t nbObjects);
         ~Objective();
 
 
@@ -29,6 +29,8 @@ namespace proc_mapping
     private:
 
         std::vector<visualization_msgs::Marker> markers;
+
+        const std::string id;
         uint8_t nbObjects;
 
         arma::mat kmean_mat;
