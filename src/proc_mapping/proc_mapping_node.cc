@@ -137,11 +137,21 @@ namespace proc_mapping {
         }
 
         if (!buoysMarkers.empty())
+        {
             buoys_.addMarkers(buoysMarkers);
+            buoys_.getObjectives();
+        }
         if (!fenceMarkers.empty())
+        {
             fence_.addMarkers(fenceMarkers);
+            fence_.getObjectives();
+        }
         if (!pingerMarkers.empty())
+        {
             pinger_.addMarkers(pingerMarkers);
+            pinger_.getObjectives();
+        }
+
     }
 
     void ProcMappingNode::MappingRequestCallback(const proc_mapping::MappingRequest::ConstPtr &request)

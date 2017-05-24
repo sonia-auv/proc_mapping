@@ -23,22 +23,51 @@ namespace proc_mapping
         // Add markers to the list of markers
         void addMarkers(std::vector<visualization_msgs::Marker> markers);
 
+        std::vector<visualization_msgs::Marker> getObjectives();
+
         void setNbObjects(uint8_t nbObjects);
         uint8_t getNbObjects();
 
+        std::string getId();
+
     private:
 
-        std::vector<visualization_msgs::Marker> markers;
+        // x, y and z
+        static const arma::uword NB_ROWS = 3;
 
+        // Id of the objective (its name)
         const std::string id;
+
+        // Nb of clusters (objective item)
         uint8_t nbObjects;
 
+        // All markers
+        std::vector<visualization_msgs::Marker> markers;
+
+        // Markers that have to be added to kmean_mat
+        std::vector<visualization_msgs::Marker> untreatedMarkers;
+
+        // KMean algorithm matrix
         arma::mat kmean_mat;
 
-        // The centroids will be stored in this matrix.
+        // The centroids matrix
         arma::mat centroids;
 
-        static const arma::uword NB_ROWS = 3;
+        // The centroids list
+        std::vector<visualization_msgs::Marker> centroidsList;
+
+        // Resize the kmean matrix with new markers
+        void resizeKmeanMatrix();
+
+        // Add marker at the end of the matrix
+        void addUntreadedMarkersToMatrix();
+
+        // Run KMean algorithm
+        bool runAlgorithm();
+
+        void fillCentroidsList();
+
+        void printCentroids();
 
     };
 }
