@@ -7,15 +7,11 @@
 namespace proc_mapping
 {
     Position::Position(const ros::NodeHandlePtr &nh) :
-        nh_(nh)
+        nh_(nh),
+        save_position_sub_(nh_->subscribe("/proc_mapping/SavePose", 100, &Position::SavePositionCallback, this)),
+        saved_position_request_sub_(nh_->subscribe("/proc_mapping/GetSavedPoseRequest", 100, &Position::GetSavedPoseRequestCallback, this)),
+        saved_position_response_pub_(nh_->advertise<KeyValueIdPose>("/proc_mapping/GetSavedPoseResponse", 100))
     {
-        // TODO Check to use initialization
-        this->save_position_sub_ = nh_->subscribe("/proc_mapping/SavePose", 100, &Position::SavePositionCallback, this);
-
-        this->saved_position_request_sub_ = nh_->subscribe("/proc_mapping/GetSavedPoseRequest", 100, &Position::GetSavedPoseRequestCallback, this);
-
-        this->saved_position_response_pub_ = nh_->advertise<KeyValueIdPose>("/proc_mapping/GetSavedPoseResponse", 100);
-
     }
 
     void Position::SavePositionCallback(const proc_mapping::KeyValueIdPose::ConstPtr &request)
@@ -28,11 +24,12 @@ namespace proc_mapping
             ROS_INFO("Position id doesn't exist yet");
         } else
         {
+            geometry_msgs::Pose position = positions_map[request->id];
 
             ROS_INFO("Position id already exist. Saved position : {id = %d, p.x = %f, p.y = %f, p.z = %f, o.x = %f, o.y = %f, o.z = %f,o.w = %f}",
-                     request->id, positions_map[request->id].position.x, positions_map[request->id].position.y, positions_map[request->id].position.z,
-                     positions_map[request->id].orientation.x, positions_map[request->id].orientation.y, positions_map[request->id].orientation.z,
-                     positions_map[request->id].orientation.w);
+                     request->id, position.position.x, position.position.y, position.position.z,
+                     position.orientation.x, position.orientation.y, position.orientation.z,
+                     position.orientation.w);
 
 
         }
