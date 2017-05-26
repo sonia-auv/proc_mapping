@@ -36,6 +36,7 @@
 #include "proc_mapping/MappingResponse.h"
 #include "proc_mapping/ProviderActivationRequest.h"
 #include "proc_mapping/position.h"
+#include "proc_mapping/debug.h"
 
 namespace proc_mapping {
 
@@ -88,6 +89,8 @@ class ProcMappingNode {
     void MarkersCallback(const visualization_msgs::MarkerArray::ConstPtr &markers);
     void MappingRequestCallback(const proc_mapping::MappingRequest::ConstPtr &request);
     void ProviderActivationRequestCallback(const proc_mapping::ProviderActivationRequest::ConstPtr &request);
+
+    Debug * debug = 0;
 
 };
 

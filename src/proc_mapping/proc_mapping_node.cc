@@ -58,11 +58,24 @@ namespace proc_mapping {
         mapping_request_sub_ = nh_->subscribe("/proc_mapping/mapping_request", 100, &ProcMappingNode::MappingRequestCallback, this);
         mapping_response_pub_ = nh_->advertise<proc_mapping::MappingResponse>("/proc_mapping/mapping_response", 100);
 
+        // TODO Param
+        if (true)
+        {
+            debug = new Debug(nh_);
+        }
+
     }
 
     //------------------------------------------------------------------------------
     //
-    ProcMappingNode::~ProcMappingNode() {}
+    ProcMappingNode::~ProcMappingNode() {
+
+        if (debug)
+        {
+            delete debug;
+        }
+
+    }
 
     //==============================================================================
     // M E T H O D   S E C T I O N
@@ -87,6 +100,11 @@ namespace proc_mapping {
         ros::spinOnce();
 
           markers_pub_.publish(markers);
+
+        if (debug)
+        {
+            debug->sendDebugData();
+        }
 
         r.sleep();
       }
@@ -128,6 +146,10 @@ namespace proc_mapping {
             marker.id = 0;
             marker.action = visualization_msgs::Marker::ADD;
 
+            marker.color.a = 1;
+
+            marker.color.b = 1;
+
             marker.scale.x = 1.0;
             marker.scale.y = 1.0;
             marker.scale.z = 1.0;
@@ -141,17 +163,17 @@ namespace proc_mapping {
         if (!buoysMarkers.empty())
         {
             buoys_.addMarkers(buoysMarkers);
-            buoys_.getObjectives();
+            //buoys_.getObjectives();
         }
         if (!fenceMarkers.empty())
         {
             fence_.addMarkers(fenceMarkers);
-            fence_.getObjectives();
+            //fence_.getObjectives();
         }
         if (!pingerMarkers.empty())
         {
             pinger_.addMarkers(pingerMarkers);
-            pinger_.getObjectives();
+            //pinger_.getObjectives();
         }
 
     }
@@ -163,21 +185,26 @@ namespace proc_mapping {
 
         response.mapping_request = *request;
 
-        // TODO Collect information from objectives
+        std::vector<visualization_msgs::Marker> objectives;
 
         switch (request->object_type)
         {
             case MappingRequest::BUOY:
-
+                objectives = buoys_.getObjectives();
                 break;
 
             case MappingRequest::FENCE:
-
+                objectives = fence_.getObjectives();
                 break;
 
             case MappingRequest::PINGER:
-
+                objectives = pinger_.getObjectives();
                 break;
+        }
+
+        for (visualization_msgs::Marker marker : objectives)
+        {
+            response.data.markers.push_back(marker);
         }
 
         mapping_response_pub_.publish(response);

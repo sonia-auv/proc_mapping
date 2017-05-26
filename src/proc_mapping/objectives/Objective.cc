@@ -40,35 +40,6 @@ namespace proc_mapping
 
         ROS_INFO("Markers added to list. Markers are ready to be treated");
 
-//        // TODO Start Temp (for resize method)
-//        arma::uword nbCol = kmean_mat.n_cols;
-//        untreatedMarkers = markers;
-//
-//        resizeKmeanMatrix();
-//
-//        // TODO END
-
-//        int i = 0;
-//
-//        for(auto marker : markers)
-//        {
-//            this->markers.push_back(marker);
-//
-//            arma::uword noCol = nbCol + i;
-//
-//            kmean_mat(0,noCol) = marker.pose.position.x;
-//            kmean_mat(1,noCol) = marker.pose.position.y;
-//            kmean_mat(2,noCol) = marker.pose.position.z;
-//
-//            i++;
-//
-//        }
-
-//        if (runAlgorithm())
-//        {
-//            printCentroids();
-//        }
-
         ROS_INFO("End adding markers for %s", id.data());
 
     }
