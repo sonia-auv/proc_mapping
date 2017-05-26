@@ -82,7 +82,7 @@ class ProcMappingNode {
 
     const Position position_;
 
-    Objective buoys_;
+    Objective::Ptr buoys_;
     Objective fence_;
     Objective pinger_;
 

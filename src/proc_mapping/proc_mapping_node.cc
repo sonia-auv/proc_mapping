@@ -38,7 +38,7 @@ namespace proc_mapping {
           markers_pub_(),
           reset_map_sub_(),
           position_(nh),
-          buoys_("buoys", 3),
+          buoys_(new Objective("buoys", 3)),
           fence_("fence", 1),
           pinger_("pinger", 1)
 
@@ -61,7 +61,7 @@ namespace proc_mapping {
         // TODO Param
         if (true)
         {
-            debug = new Debug(nh_);
+            debug = new Debug(nh_, buoys_, fence_, pinger_);
         }
 
     }
@@ -121,16 +121,18 @@ namespace proc_mapping {
 
             auto marker = markers->markers[i];
 
+            marker.ns = std::to_string(marker.id);
+
             switch (marker.type)
             {
                 case visualization_msgs::Marker::SPHERE:
-                    buoysMarkers.push_back(visualization_msgs::Marker(marker));
+                    buoysMarkers.push_back(marker);
                     break;
                 case visualization_msgs::Marker::CUBE:
-                    fenceMarkers.push_back(visualization_msgs::Marker(marker));
+                    fenceMarkers.push_back(marker);
                     break;
                 case visualization_msgs::Marker::CYLINDER:
-                    pingerMarkers.push_back(visualization_msgs::Marker(marker));
+                    pingerMarkers.push_back(marker);
 
                     break;
                 default:
@@ -162,7 +164,7 @@ namespace proc_mapping {
 
         if (!buoysMarkers.empty())
         {
-            buoys_.addMarkers(buoysMarkers);
+            buoys_->addMarkers(buoysMarkers);
             //buoys_.getObjectives();
         }
         if (!fenceMarkers.empty())
@@ -190,7 +192,7 @@ namespace proc_mapping {
         switch (request->object_type)
         {
             case MappingRequest::BUOY:
-                objectives = buoys_.getObjectives();
+                objectives = buoys_->getObjectives();
                 break;
 
             case MappingRequest::FENCE:

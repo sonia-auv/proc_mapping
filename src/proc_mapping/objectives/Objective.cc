@@ -19,10 +19,14 @@ namespace proc_mapping
         // TODO Log using ROS_LOG_STREAM for matrix
     }
 
+    Objective::Objective(const Objective &objective){
+
+    }
+
     Objective::~Objective() {}
 
     void Objective::addMarkers(std::vector<visualization_msgs::Marker> markers) {
-
+idTest++;
         if(markers.empty())
         {
             ROS_INFO("No markers received in %s objective", id.data());
@@ -36,6 +40,7 @@ namespace proc_mapping
         for (auto marker : markers)
         {
             untreatedMarkers.push_back(marker);
+            this->markers.push_back(marker);
         }
 
         ROS_INFO("Markers added to list. Markers are ready to be treated");
@@ -66,6 +71,11 @@ namespace proc_mapping
 
     }
 
+    std::vector<visualization_msgs::Marker> Objective::getAllMarkers()
+    {
+        return this->markers;
+    }
+
     void Objective::fillCentroidsList()
     {
         centroidsList.clear();
@@ -77,6 +87,8 @@ namespace proc_mapping
             marker.pose.position.x  = centroids(0,i);
             marker.pose.position.y  = centroids(1,i);
             marker.pose.position.z  = centroids(2,i);
+
+            marker.id = i;
 
             centroidsList.push_back(marker);
 

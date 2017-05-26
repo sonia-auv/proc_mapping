@@ -8,11 +8,13 @@
 #include <ros/node_handle.h>
 #include "visualization_msgs/MarkerArray.h"
 
+#include "proc_mapping/objectives/Objective.h"
+
 namespace proc_mapping
 {
     class Debug {
     public:
-        Debug(const ros::NodeHandlePtr &nh);
+        Debug(const ros::NodeHandlePtr &nh, Objective::Ptr &buoys, Objective &fence, Objective &pinger);
 
         void sendDebugData();
 
@@ -24,6 +26,14 @@ namespace proc_mapping
         const ros::Publisher buoys_pub_;
         const ros::Publisher fence_pub_;
         const ros::Publisher pinger_pub_;
+
+        Objective::Ptr buoys_;
+        Objective fence_;
+        Objective pinger_;
+
+        //void static sendDebugMarkers(Objective objective, ros::Publisher all_publisher, ros::Publisher publisher);
+
+        void sendBuoysMarkers();
 
     };
 }

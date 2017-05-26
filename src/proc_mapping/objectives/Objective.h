@@ -16,7 +16,10 @@ namespace proc_mapping
     class Objective {
     public:
 
+        using Ptr = std::shared_ptr<Objective>;
+
         Objective(std::string id, uint8_t nbObjects);
+        Objective(const Objective &objective);
         ~Objective();
 
 
@@ -24,6 +27,8 @@ namespace proc_mapping
         void addMarkers(std::vector<visualization_msgs::Marker> markers);
 
         std::vector<visualization_msgs::Marker> getObjectives();
+        std::vector<visualization_msgs::Marker> getAllMarkers();
+
 
         void setNbObjects(uint8_t nbObjects);
         uint8_t getNbObjects();
@@ -31,6 +36,8 @@ namespace proc_mapping
         std::string getId();
 
     private:
+
+        int idTest=0;
 
         // x, y and z
         static const arma::uword NB_ROWS = 3;
