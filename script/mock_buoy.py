@@ -16,6 +16,8 @@ class MockBuoy:
 
         self.publisher = rospy.Publisher("/proc_image_processing/markers", MarkerArray, queue_size=100)
 
+        self.id = 1
+
         seed()
 
         self.mock()
@@ -78,7 +80,10 @@ class MockBuoy:
 
         marker = Marker()
 
+        marker.id = self.id = self.id + 1
         marker.type = Marker.SPHERE
+
+
 
         return marker
 
