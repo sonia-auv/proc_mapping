@@ -26,15 +26,17 @@ namespace proc_mapping
 
         // Subscribers
         ros::Subscriber save_position_sub_;
-        const ros::Subscriber saved_position_request_sub_;
+        ros::Subscriber saved_position_request_sub_;
 
 
         // Publishers
-        const ros::Publisher saved_position_response_pub_;
+        ros::Publisher saved_position_response_pub_;
 
 
         // Callbacks
         void SavePositionCallback(const proc_mapping::KeyValueIdPose::ConstPtr &request);
+        void GetSavedPoseRequestCallback(const proc_mapping::PoseSavedRequest::ConstPtr &request);
+
 
         std::map<uint8_t , geometry_msgs::Pose> positions_map;
 
