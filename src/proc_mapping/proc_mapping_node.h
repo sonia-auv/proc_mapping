@@ -35,6 +35,7 @@
 #include "proc_mapping/MappingRequest.h"
 #include "proc_mapping/MappingResponse.h"
 #include "proc_mapping/ProviderActivationRequest.h"
+#include "proc_mapping/position.h"
 
 namespace proc_mapping {
 
@@ -77,6 +78,8 @@ class ProcMappingNode {
     ros::Subscriber mapping_request_sub_;
 
     visualization_msgs::MarkerArray markers;
+
+    const Position position_;
 
     Objective buoys_;
     Objective fence_;
