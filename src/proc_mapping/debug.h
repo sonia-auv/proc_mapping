@@ -34,7 +34,8 @@ namespace proc_mapping
         //void static sendDebugMarkers(Objective objective, ros::Publisher all_publisher, ros::Publisher publisher);
 
         void sendBuoysMarkers();
-
+        void sendFenceMarkers();
+        void sendPingerMarkers();
 
         void setupMarker(visualization_msgs::Marker &marker);
 

@@ -23,6 +23,8 @@ namespace proc_mapping
     void Debug::sendDebugData()
     {
         sendBuoysMarkers();
+        sendFenceMarkers();
+        sendPingerMarkers();
     }
 
     void Debug::sendBuoysMarkers()
@@ -64,6 +66,93 @@ namespace proc_mapping
         }
 
         all_buoys_pub_.publish(allMarkers);
+    }
+
+    void Debug::sendFenceMarkers()
+    {
+        visualization_msgs::MarkerArray markers;
+
+        for (visualization_msgs::Marker marker : fence_->getObjectives())
+        {
+            setupMarker(marker);
+
+            marker.scale.x = 1.0;
+            marker.scale.y = 1.0;
+            marker.scale.z = 1.0;
+
+            marker.color.b = 0.5;
+            marker.color.g = 0.5;
+
+            marker.type = visualization_msgs::Marker::CUBE;
+
+            markers.markers.push_back(marker);
+        }
+
+        fence_pub_.publish(markers);
+
+        visualization_msgs::MarkerArray allMarkers;
+
+        for (visualization_msgs::Marker marker : fence_->getAllMarkers())
+        {
+            setupMarker(marker);
+
+            marker.scale.x = 1.0;
+            marker.scale.y = 1.0;
+            marker.scale.z = 1.0;
+
+            marker.color.b = 0.5;
+            marker.color.r = 0.5;
+
+            marker.type = visualization_msgs::Marker::CUBE;
+
+            allMarkers.markers.push_back(marker);
+        }
+
+        all_fences_pub_.publish(allMarkers);
+    }
+
+    void Debug::sendPingerMarkers()
+    {
+        visualization_msgs::MarkerArray markers;
+
+        for (visualization_msgs::Marker marker : pinger_->getObjectives())
+        {
+            setupMarker(marker);
+
+            marker.scale.x = 1.0;
+            marker.scale.y = 1.0;
+            marker.scale.z = 1.0;
+
+            marker.color.r = 0.5;
+            marker.color.g = 0.5;
+
+            marker.type = visualization_msgs::Marker::CYLINDER;
+
+            markers.markers.push_back(marker);
+        }
+
+        pinger_pub_.publish(markers);
+
+        visualization_msgs::MarkerArray allMarkers;
+
+        for (visualization_msgs::Marker marker : pinger_->getAllMarkers())
+        {
+            setupMarker(marker);
+
+            marker.scale.x = 1.0;
+            marker.scale.y = 1.0;
+            marker.scale.z = 1.0;
+
+            marker.color.b = 1;
+            marker.color.r = 1;
+            marker.color.g = 1;
+
+            marker.type = visualization_msgs::Marker::CYLINDER;
+
+            allMarkers.markers.push_back(marker);
+        }
+
+        all_pingers_pub_.publish(allMarkers);
     }
 
     void Debug::setupMarker(visualization_msgs::Marker &marker) {
