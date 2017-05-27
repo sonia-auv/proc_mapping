@@ -14,7 +14,7 @@ namespace proc_mapping
 {
     class Debug {
     public:
-        Debug(const ros::NodeHandlePtr &nh, Objective::Ptr &buoys, Objective &fence, Objective &pinger);
+        Debug(const ros::NodeHandlePtr &nh, Objective::Ptr &buoys, Objective::Ptr &fence, Objective::Ptr &pinger);
 
         void sendDebugData();
 
@@ -28,8 +28,8 @@ namespace proc_mapping
         const ros::Publisher pinger_pub_;
 
         Objective::Ptr buoys_;
-        Objective fence_;
-        Objective pinger_;
+        Objective::Ptr fence_;
+        Objective::Ptr pinger_;
 
         //void static sendDebugMarkers(Objective objective, ros::Publisher all_publisher, ros::Publisher publisher);
 

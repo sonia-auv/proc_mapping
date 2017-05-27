@@ -6,7 +6,7 @@
 
 namespace proc_mapping
 {
-    Debug::Debug(const ros::NodeHandlePtr &nh, Objective::Ptr &buoys, Objective &fence, Objective &pinger) :
+    Debug::Debug(const ros::NodeHandlePtr &nh, Objective::Ptr &buoys, Objective::Ptr &fence, Objective::Ptr &pinger) :
         nh_(nh),
         all_buoys_pub_(nh_->advertise<visualization_msgs::MarkerArray>("/proc_mapping/debug/all_buoys", 100)),
         all_fences_pub_(nh_->advertise<visualization_msgs::MarkerArray>("/proc_mapping/debug/all_fences", 100)),

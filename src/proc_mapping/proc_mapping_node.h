@@ -83,8 +83,8 @@ class ProcMappingNode {
     const Position position_;
 
     Objective::Ptr buoys_;
-    Objective fence_;
-    Objective pinger_;
+    Objective::Ptr fence_;
+    Objective::Ptr pinger_;
 
     void MarkersCallback(const visualization_msgs::MarkerArray::ConstPtr &markers);
     void MappingRequestCallback(const proc_mapping::MappingRequest::ConstPtr &request);

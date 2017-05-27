@@ -39,8 +39,8 @@ namespace proc_mapping {
           reset_map_sub_(),
           position_(nh),
           buoys_(new Objective("buoys", 3)),
-          fence_("fence", 1),
-          pinger_("pinger", 1)
+          fence_(new Objective("fence", 1)),
+          pinger_(new Objective("pinger", 1))
 
     {
 
@@ -169,12 +169,12 @@ namespace proc_mapping {
         }
         if (!fenceMarkers.empty())
         {
-            fence_.addMarkers(fenceMarkers);
+            fence_->addMarkers(fenceMarkers);
             //fence_.getObjectives();
         }
         if (!pingerMarkers.empty())
         {
-            pinger_.addMarkers(pingerMarkers);
+            pinger_->addMarkers(pingerMarkers);
             //pinger_.getObjectives();
         }
 
@@ -196,11 +196,11 @@ namespace proc_mapping {
                 break;
 
             case MappingRequest::FENCE:
-                objectives = fence_.getObjectives();
+                objectives = fence_->getObjectives();
                 break;
 
             case MappingRequest::PINGER:
-                objectives = pinger_.getObjectives();
+                objectives = pinger_->getObjectives();
                 break;
         }
 
