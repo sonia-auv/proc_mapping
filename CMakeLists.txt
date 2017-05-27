@@ -68,9 +68,10 @@ add_message_files(DIRECTORY msg
         FILES
         MappingRequest.msg
         MappingResponse.msg
-        ProviderActivationRequest.msg
         KeyValueIdPose.msg
         PoseSavedRequest.msg)
+
+add_service_files(DIRECTORY srv FILES ProviderActivation.srv)
 
 generate_messages(DEPENDENCIES visualization_msgs)
 

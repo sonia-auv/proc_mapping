@@ -53,7 +53,7 @@ namespace proc_mapping {
 
         proc_image_sub_ = nh_->subscribe("/proc_image_processing/markers",100, &ProcMappingNode::MarkersCallback, this);
 
-        provider_activation_request_sub_ = nh_->subscribe("/proc_mapping/provider_activation_request/", 100, &ProcMappingNode::ProviderActivationRequestCallback, this);
+        provider_activation_srv_ = nh_->advertiseService("/proc_mapping/provider_activation_request/", &ProcMappingNode::ProviderActivationCallback, this);
 
         mapping_request_sub_ = nh_->subscribe("/proc_mapping/mapping_request", 100, &ProcMappingNode::MappingRequestCallback, this);
         mapping_response_pub_ = nh_->advertise<proc_mapping::MappingResponse>("/proc_mapping/mapping_response", 100);
@@ -213,12 +213,14 @@ namespace proc_mapping {
         mapping_response_pub_.publish(response);
     }
 
-    void ProcMappingNode::ProviderActivationRequestCallback(const proc_mapping::ProviderActivationRequest::ConstPtr &request) {
+    bool ProcMappingNode::ProviderActivationCallback(proc_mapping::ProviderActivation::Request &request,
+                                                     proc_mapping::ProviderActivation::Response &response) {
 
         // TODO Handle callback
 
-        ROS_INFO("Callback received on '/proc_mapping/provider_activation_request'");
+        //ROS_INFO("Callback received on '/proc_mapping/provider_activation_request'");
 
+        return true;
 
     }
 
