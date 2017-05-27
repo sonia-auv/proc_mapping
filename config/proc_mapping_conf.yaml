@@ -12,3 +12,5 @@
 /proc_mapping/map/pixel_to_m: 0.025
 # Distance in meters of data to eliminate (turbulence in front must be rejected from the dataset)
 /proc_mapping/map/sonar_threshold: 3.0
+
+/proc_mapping/debug: true

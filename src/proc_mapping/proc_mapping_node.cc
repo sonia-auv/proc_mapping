@@ -58,10 +58,11 @@ namespace proc_mapping {
         mapping_request_sub_ = nh_->subscribe("/proc_mapping/mapping_request", 100, &ProcMappingNode::MappingRequestCallback, this);
         mapping_response_pub_ = nh_->advertise<proc_mapping::MappingResponse>("/proc_mapping/mapping_response", 100);
 
-        // TODO Param
-        if (true)
+        bool debug;
+
+        if (nh_->getParam("/proc_mapping/debug", debug) && debug)
         {
-            debug = new Debug(nh_, buoys_, fence_, pinger_);
+            this->debug = new Debug(nh_, buoys_, fence_, pinger_);
         }
 
     }
