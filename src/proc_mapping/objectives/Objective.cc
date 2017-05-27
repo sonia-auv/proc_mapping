@@ -19,10 +19,6 @@ namespace proc_mapping
         // TODO Log using ROS_LOG_STREAM for matrix
     }
 
-    Objective::Objective(const Objective &objective){
-
-    }
-
     Objective::~Objective() {}
 
     void Objective::addMarkers(std::vector<visualization_msgs::Marker> markers) {

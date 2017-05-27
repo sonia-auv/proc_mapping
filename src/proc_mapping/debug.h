@@ -35,6 +35,9 @@ namespace proc_mapping
 
         void sendBuoysMarkers();
 
+
+        void setupMarker(visualization_msgs::Marker &marker);
+
     };
 }
 

@@ -19,7 +19,6 @@ namespace proc_mapping
         using Ptr = std::shared_ptr<Objective>;
 
         Objective(std::string id, uint8_t nbObjects);
-        Objective(const Objective &objective);
         ~Objective();
 
 
