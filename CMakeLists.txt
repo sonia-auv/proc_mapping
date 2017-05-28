@@ -68,6 +68,10 @@ add_message_files(DIRECTORY msg
         FILES
         MappingRequest.msg
         MappingResponse.msg
+        GlobalMappingRequest.msg
+        GlobalMappingResponse.msg
+        LocalMappingRequest.msg
+        LocalMappingResponse.msg
         KeyValueIdPose.msg
         PoseSavedRequest.msg)
 

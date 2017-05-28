@@ -1,0 +1,2 @@
+proc_mapping/LocalMappingRequest request
+geometry_msgs/Point point
