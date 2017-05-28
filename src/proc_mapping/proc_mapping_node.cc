@@ -53,7 +53,7 @@ namespace proc_mapping {
 
         proc_image_sub_ = nh_->subscribe("/proc_image_processing/markers",100, &ProcMappingNode::MarkersCallback, this);
 
-        provider_activation_srv_ = nh_->advertiseService("/proc_mapping/provider_activation_request/", &ProcMappingNode::ProviderActivationCallback, this);
+        objective_reset_srv_ = nh_->advertiseService("/proc_mapping/objective_reset/", &ProcMappingNode::ObjectiveResetCallback, this);
 
         mapping_request_sub_ = nh_->subscribe("/proc_mapping/mapping_request", 100, &ProcMappingNode::MappingRequestCallback, this);
         mapping_response_pub_ = nh_->advertise<proc_mapping::MappingResponse>("/proc_mapping/mapping_response", 100);
@@ -213,8 +213,8 @@ namespace proc_mapping {
         mapping_response_pub_.publish(response);
     }
 
-    bool ProcMappingNode::ProviderActivationCallback(proc_mapping::ProviderActivation::Request &request,
-                                                     proc_mapping::ProviderActivation::Response &response) {
+    bool ProcMappingNode::ObjectiveResetCallback(proc_mapping::ObjectiveReset::Request &request,
+                                                     proc_mapping::ObjectiveReset::Response &response) {
 
         // TODO Handle callback
 

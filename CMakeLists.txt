@@ -75,7 +75,7 @@ add_message_files(DIRECTORY msg
         KeyValueIdPose.msg
         PoseSavedRequest.msg)
 
-add_service_files(DIRECTORY srv FILES ProviderActivation.srv)
+add_service_files(DIRECTORY srv FILES ObjectiveReset.srv)
 
 generate_messages(DEPENDENCIES visualization_msgs)
 

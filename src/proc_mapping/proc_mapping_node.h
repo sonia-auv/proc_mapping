@@ -34,7 +34,7 @@
 #include "proc_mapping/objectives/Objective.h"
 #include "proc_mapping/MappingRequest.h"
 #include "proc_mapping/MappingResponse.h"
-#include "proc_mapping/ProviderActivation.h"
+#include "proc_mapping/ObjectiveReset.h"
 #include "proc_mapping/position.h"
 #include "proc_mapping/debug.h"
 
@@ -72,7 +72,7 @@ class ProcMappingNode {
 
     ros::Subscriber reset_map_sub_;
 
-    ros::ServiceServer provider_activation_srv_;
+    ros::ServiceServer objective_reset_srv_;
 
     ros::Subscriber hydro_sub_;
     ros::Subscriber proc_image_sub_;
@@ -88,8 +88,8 @@ class ProcMappingNode {
 
     void MarkersCallback(const visualization_msgs::MarkerArray::ConstPtr &markers);
     void MappingRequestCallback(const proc_mapping::MappingRequest::ConstPtr &request);
-    bool ProviderActivationCallback(proc_mapping::ProviderActivation::Request &request,
-                                    proc_mapping::ProviderActivation::Response &response);
+    bool ObjectiveResetCallback(proc_mapping::ObjectiveReset::Request &request,
+                                    proc_mapping::ObjectiveReset::Response &response);
 
     Debug * debug = 0;
 
