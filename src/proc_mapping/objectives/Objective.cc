@@ -19,10 +19,13 @@ namespace proc_mapping
         // TODO Log using ROS_LOG_STREAM for matrix
     }
 
-    Objective::~Objective() {}
+    Objective::~Objective() {
+
+    }
 
     void Objective::addMarkers(std::vector<visualization_msgs::Marker> markers) {
-idTest++;
+
+        //idTest++;
         if(markers.empty())
         {
             ROS_INFO("No markers received in %s objective", id.data());
@@ -70,6 +73,14 @@ idTest++;
     std::vector<visualization_msgs::Marker> Objective::getAllMarkers()
     {
         return this->markers;
+    }
+
+    void Objective::reset() {
+        markers.clear();
+        untreatedMarkers.clear();
+
+        kmean_mat.resize(0,0);
+
     }
 
     void Objective::fillCentroidsList()

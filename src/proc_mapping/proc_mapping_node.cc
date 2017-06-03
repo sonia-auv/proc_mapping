@@ -216,9 +216,32 @@ namespace proc_mapping {
     bool ProcMappingNode::ObjectiveResetCallback(proc_mapping::ObjectiveReset::Request &request,
                                                      proc_mapping::ObjectiveReset::Response &response) {
 
-        // TODO Handle callback
 
-        //ROS_INFO("Callback received on '/proc_mapping/provider_activation_request'");
+        switch (request.objectiveType)
+        {
+            case proc_mapping::ObjectiveReset::Request::ALL:
+                buoys_->reset();
+                fence_->reset();
+                pinger_->reset();
+                break;
+
+            case proc_mapping::ObjectiveReset::Request::BUOY:
+                buoys_->reset();
+                break;
+
+            case proc_mapping::ObjectiveReset::Request::FENCE:
+                fence_->reset();
+                break;
+
+            case proc_mapping::ObjectiveReset::Request::PINGER:
+                pinger_->reset();
+                break;
+
+            default:
+                ROS_WARN("Invalid value for ObjectiveReset::Request::objectiveType");
+                break;
+
+        }
 
         return true;
 

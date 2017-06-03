@@ -34,9 +34,11 @@ namespace proc_mapping
 
         std::string getId();
 
+        void reset();
+
     private:
 
-        int idTest=0;
+        //int idTest=0;
 
         // x, y and z
         static const arma::uword NB_ROWS = 3;
