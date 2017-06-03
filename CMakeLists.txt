@@ -66,8 +66,6 @@ find_package(
 
 add_message_files(DIRECTORY msg
         FILES
-        MappingRequest.msg
-        MappingResponse.msg
         GlobalMappingRequest.msg
         GlobalMappingResponse.msg
         LocalMappingRequest.msg

@@ -32,8 +32,7 @@
 #include <visualization_msgs/MarkerArray.h>
 
 #include "proc_mapping/objectives/Objective.h"
-#include "proc_mapping/MappingRequest.h"
-#include "proc_mapping/MappingResponse.h"
+#include "proc_mapping/GlobalMappingRequest.h"
 #include "proc_mapping/ObjectiveReset.h"
 #include "proc_mapping/position.h"
 #include "proc_mapping/debug.h"
@@ -87,7 +86,7 @@ class ProcMappingNode {
     Objective::Ptr pinger_;
 
     void MarkersCallback(const visualization_msgs::MarkerArray::ConstPtr &markers);
-    void MappingRequestCallback(const proc_mapping::MappingRequest::ConstPtr &request);
+    //void MappingRequestCallback(const proc_mapping::MappingRequest::ConstPtr &request);
     bool ObjectiveResetCallback(proc_mapping::ObjectiveReset::Request &request,
                                     proc_mapping::ObjectiveReset::Response &response);
 

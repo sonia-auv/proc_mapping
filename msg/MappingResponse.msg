@@ -1,2 +1,0 @@
-proc_mapping/MappingRequest mapping_request
-visualization_msgs/MarkerArray data

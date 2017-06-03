@@ -55,9 +55,6 @@ namespace proc_mapping {
 
         objective_reset_srv_ = nh_->advertiseService("/proc_mapping/objective_reset/", &ProcMappingNode::ObjectiveResetCallback, this);
 
-        mapping_request_sub_ = nh_->subscribe("/proc_mapping/mapping_request", 100, &ProcMappingNode::MappingRequestCallback, this);
-        mapping_response_pub_ = nh_->advertise<proc_mapping::MappingResponse>("/proc_mapping/mapping_response", 100);
-
         bool debug;
 
         if (nh_->getParam("/proc_mapping/debug", debug) && debug)
@@ -181,37 +178,37 @@ namespace proc_mapping {
 
     }
 
-    void ProcMappingNode::MappingRequestCallback(const proc_mapping::MappingRequest::ConstPtr &request)
-    {
-
-        proc_mapping::MappingResponse response;
-
-        response.mapping_request = *request;
-
-        std::vector<visualization_msgs::Marker> objectives;
-
-        switch (request->object_type)
-        {
-            case MappingRequest::BUOY:
-                objectives = buoys_->getObjectives();
-                break;
-
-            case MappingRequest::FENCE:
-                objectives = fence_->getObjectives();
-                break;
-
-            case MappingRequest::PINGER:
-                objectives = pinger_->getObjectives();
-                break;
-        }
-
-        for (visualization_msgs::Marker marker : objectives)
-        {
-            response.data.markers.push_back(marker);
-        }
-
-        mapping_response_pub_.publish(response);
-    }
+//    void ProcMappingNode::MappingRequestCallback(const proc_mapping::MappingRequest::ConstPtr &request)
+//    {
+//
+//        proc_mapping::MappingResponse response;
+//
+//        response.mapping_request = *request;
+//
+//        std::vector<visualization_msgs::Marker> objectives;
+//
+//        switch (request->object_type)
+//        {
+//            case MappingRequest::BUOY:
+//                objectives = buoys_->getObjectives();
+//                break;
+//
+//            case MappingRequest::FENCE:
+//                objectives = fence_->getObjectives();
+//                break;
+//
+//            case MappingRequest::PINGER:
+//                objectives = pinger_->getObjectives();
+//                break;
+//        }
+//
+//        for (visualization_msgs::Marker marker : objectives)
+//        {
+//            response.data.markers.push_back(marker);
+//        }
+//
+//        mapping_response_pub_.publish(response);
+//    }
 
     bool ProcMappingNode::ObjectiveResetCallback(proc_mapping::ObjectiveReset::Request &request,
                                                      proc_mapping::ObjectiveReset::Response &response) {
