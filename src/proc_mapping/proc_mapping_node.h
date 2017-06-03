@@ -33,6 +33,10 @@
 
 #include "proc_mapping/objectives/Objective.h"
 #include "proc_mapping/GlobalMappingRequest.h"
+#include "proc_mapping/GlobalMappingResponse.h"
+#include "proc_mapping/LocalMappingRequest.h"
+#include "proc_mapping/LocalMappingResponse.h"
+
 #include "proc_mapping/ObjectiveReset.h"
 #include "proc_mapping/position.h"
 #include "proc_mapping/debug.h"
@@ -64,10 +68,14 @@ class ProcMappingNode {
   // P R I V A T E   M E M B E R S
 
     ros::NodeHandlePtr nh_;
+
     ros::Publisher map_pub_;
     ros::Publisher markers_pub_;
-    ros::Publisher mapping_response_pub_;
 
+    ros::Subscriber global_mapping_request_sub_;
+    ros::Subscriber local_mapping_request_sub_;
+    ros::Publisher global_mapping_response_pub_;
+    ros::Publisher local_mapping_response_pub_;
 
     ros::Subscriber reset_map_sub_;
 
@@ -75,7 +83,6 @@ class ProcMappingNode {
 
     ros::Subscriber hydro_sub_;
     ros::Subscriber proc_image_sub_;
-    ros::Subscriber mapping_request_sub_;
 
     visualization_msgs::MarkerArray markers;
 
@@ -86,6 +93,8 @@ class ProcMappingNode {
     Objective::Ptr pinger_;
 
     void MarkersCallback(const visualization_msgs::MarkerArray::ConstPtr &markers);
+    void GlobalMappingRequestCallback(const proc_mapping::GlobalMappingRequest::ConstPtr &request);
+    void LocalMappingRequestCallback(const proc_mapping::LocalMappingRequest::ConstPtr &request);
     //void MappingRequestCallback(const proc_mapping::MappingRequest::ConstPtr &request);
     bool ObjectiveResetCallback(proc_mapping::ObjectiveReset::Request &request,
                                     proc_mapping::ObjectiveReset::Response &response);
