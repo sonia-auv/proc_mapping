@@ -203,21 +203,21 @@ namespace proc_mapping {
 
     void ProcMappingNode::LocalMappingRequestCallback(const proc_mapping::LocalMappingRequest::ConstPtr &request)
     {
-        proc_mapping::LocalMappingResponse response;
+        proc_mapping::LocalMappingResponsePtr response(new proc_mapping::LocalMappingResponse());
 
-        response.request = *request;
+        response->request = *request;
 
         switch (request->object_type) {
             case proc_mapping::LocalMappingRequest::BUOY:
-                response.point = *buoys_->getLocalMapping(request->color);
+                response->point = *buoys_->getLocalMapping(request->color);
                 break;
 
             case proc_mapping::LocalMappingRequest::PINGER:
-                response.point = *pinger_->getLocalMapping(request->color);
+                response->point = *pinger_->getLocalMapping(request->color);
                 break;
 
             case proc_mapping::LocalMappingRequest::FENCE:
-                response.point = *fence_->getLocalMapping(request->color);
+                response->point = *fence_->getLocalMapping(request->color);
                 break;
 
             default:
@@ -225,7 +225,7 @@ namespace proc_mapping {
                 break;
         }
 
-        global_mapping_response_pub_.publish(response);
+        local_mapping_response_pub_.publish(response);
     }
 
     bool ProcMappingNode::ObjectiveResetCallback(proc_mapping::ObjectiveReset::Request &request,

@@ -57,7 +57,6 @@ namespace proc_mapping
         mlpack::kmeans::KMeans<> kmeans;
 
         try {
-
             kmeans.Cluster(this->centroids, 1, centroids);
 
             geometry_msgs::PointPtr point(new geometry_msgs::Point);
@@ -69,16 +68,25 @@ namespace proc_mapping
             return point;
 
         } catch (...) {
-            ROS_ERROR("An error occured when trying to run kmean algorithm");
-            ROS_DEBUG("End Clustering");
+
         }
+
 
         return geometry_msgs::PointConstPtr();
     }
 
     geometry_msgs::PointConstPtr Objective::getLocalMapping(std_msgs::ColorRGBA color)
     {
-        return geometry_msgs::PointConstPtr();
+
+        // TODO Change point to return the great one
+
+        geometry_msgs::PointPtr point(new geometry_msgs::Point);
+
+        point->x = centroids(0,0);
+        point->y = centroids(1,0);
+        point->z = centroids(2,0);
+
+        return point;
     }
 
     std::vector<visualization_msgs::Marker> Objective::getObjectives()
