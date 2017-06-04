@@ -16,7 +16,6 @@ namespace proc_mapping
           centroidsList()
 
     {
-        // TODO Log using ROS_LOG_STREAM for matrix
     }
 
     Objective::~Objective() {
@@ -25,7 +24,6 @@ namespace proc_mapping
 
     void Objective::addMarkers(std::vector<visualization_msgs::Marker> markers) {
 
-        //idTest++;
         if(markers.empty())
         {
             ROS_INFO("No markers received in %s objective", id.data());
@@ -51,6 +49,8 @@ namespace proc_mapping
     geometry_msgs::PointConstPtr Objective::getGlobalMapping()
     {
 
+        ROS_INFO("Creating GlobalMapping for %s", id.data());
+
         // The centroids matrix
         arma::mat centroids(NB_ROWS, 1, arma::fill::zeros);
 
@@ -65,13 +65,15 @@ namespace proc_mapping
             point->y = centroids(1,0);
             point->z = centroids(2,0);
 
+            ROS_DEBUG("Returning GlobalMapping point { x = %f, y = %f, z = %f", point->x, point->y, point->z);
+
             return point;
 
         } catch (...) {
-
+            ROS_ERROR("An error occur while trying to generate GlobalMapping for %s", id.data());
         }
 
-
+        ROS_INFO("Returning default value for Point");
         return geometry_msgs::PointConstPtr();
     }
 
@@ -85,6 +87,8 @@ namespace proc_mapping
         point->x = centroids(0,0);
         point->y = centroids(1,0);
         point->z = centroids(2,0);
+
+        ROS_DEBUG("Returning LocalMapping point { x = %f, y = %f, z = %f", point->x, point->y, point->z);
 
         return point;
     }
@@ -117,6 +121,9 @@ namespace proc_mapping
     }
 
     void Objective::reset() {
+
+        ROS_DEBUG("Reset markers in objective %s", id.data());
+
         markers.clear();
         untreatedMarkers.clear();
 
