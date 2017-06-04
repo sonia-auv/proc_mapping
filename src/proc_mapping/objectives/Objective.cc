@@ -48,6 +48,16 @@ namespace proc_mapping
 
     }
 
+    geometry_msgs::PointConstPtr Objective::getGlobalMapping()
+    {
+        return geometry_msgs::PointConstPtr();
+    }
+
+    geometry_msgs::PointConstPtr Objective::getLocalMapping(std_msgs::ColorRGBA color)
+    {
+        return geometry_msgs::PointConstPtr();
+    }
+
     std::vector<visualization_msgs::Marker> Objective::getObjectives()
     {
         if (untreatedMarkers.empty())

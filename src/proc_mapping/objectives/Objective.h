@@ -9,6 +9,9 @@
 #include "mlpack/methods/kmeans/kmeans.hpp"
 #include "armadillo"
 
+#include "geometry_msgs/Point.h"
+#include "std_msgs/ColorRGBA.h"
+
 #include <ros/ros.h>
 
 namespace proc_mapping
@@ -28,6 +31,8 @@ namespace proc_mapping
         std::vector<visualization_msgs::Marker> getObjectives();
         std::vector<visualization_msgs::Marker> getAllMarkers();
 
+        geometry_msgs::PointConstPtr getGlobalMapping();
+        geometry_msgs::PointConstPtr getLocalMapping(std_msgs::ColorRGBA color);
 
         void setNbObjects(uint8_t nbObjects);
         uint8_t getNbObjects();
