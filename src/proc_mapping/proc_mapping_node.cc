@@ -174,12 +174,58 @@ namespace proc_mapping {
 
     void ProcMappingNode::GlobalMappingRequestCallback(const proc_mapping::GlobalMappingRequest::ConstPtr &request)
     {
-        // TODO Implements
+
+        proc_mapping::GlobalMappingResponse response;
+
+        response.request = *request;
+
+        switch (request->object_type) {
+            case proc_mapping::GlobalMappingRequest::BUOY:
+                response.point = *buoys_->getGlobalMapping();
+                break;
+
+            case proc_mapping::GlobalMappingRequest::PINGER:
+                response.point = *pinger_->getGlobalMapping();
+                break;
+
+            case proc_mapping::GlobalMappingRequest::FENCE:
+                response.point = *fence_->getGlobalMapping();
+                break;
+
+            default:
+                // TODO Handle with logs
+                break;
+        }
+
+        global_mapping_response_pub_.publish(response);
+
     }
 
     void ProcMappingNode::LocalMappingRequestCallback(const proc_mapping::LocalMappingRequest::ConstPtr &request)
     {
-        // TODO Implements
+        proc_mapping::LocalMappingResponse response;
+
+        response.request = *request;
+
+        switch (request->object_type) {
+            case proc_mapping::LocalMappingRequest::BUOY:
+                response.point = *buoys_->getLocalMapping(request->color);
+                break;
+
+            case proc_mapping::LocalMappingRequest::PINGER:
+                response.point = *pinger_->getLocalMapping(request->color);
+                break;
+
+            case proc_mapping::LocalMappingRequest::FENCE:
+                response.point = *fence_->getLocalMapping(request->color);
+                break;
+
+            default:
+                // TODO Handle with logs
+                break;
+        }
+
+        global_mapping_response_pub_.publish(response);
     }
 
     bool ProcMappingNode::ObjectiveResetCallback(proc_mapping::ObjectiveReset::Request &request,
