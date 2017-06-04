@@ -51,8 +51,8 @@ namespace proc_mapping {
         global_mapping_request_sub_ = nh_->subscribe("/proc_mapping/global_mapping_request", 100, &ProcMappingNode::GlobalMappingRequestCallback, this);
         local_mapping_request_sub_ = nh_->subscribe("/proc_mapping/local_mapping_request", 100, &ProcMappingNode::LocalMappingRequestCallback, this);
 
-        global_mapping_response_pub_ = nh_->advertise<proc_mapping::GlobalMappingResponse>("/proc_mapping/global_mapping_reponse", 100);
-        local_mapping_response_pub_ = nh_->advertise<proc_mapping::LocalMappingResponse>("/proc_mapping/local_mapping_reponse", 100);
+        global_mapping_response_pub_ = nh_->advertise<proc_mapping::GlobalMappingResponse>("/proc_mapping/global_mapping_response", 100);
+        local_mapping_response_pub_ = nh_->advertise<proc_mapping::LocalMappingResponse>("/proc_mapping/local_mapping_response", 100);
 
         hydro_sub_ = nh_->subscribe("/provider_hydrophone/markers", 100, &ProcMappingNode::MarkersCallback, this);
         proc_image_sub_ = nh_->subscribe("/proc_image_processing/markers",100, &ProcMappingNode::MarkersCallback, this);
@@ -175,21 +175,21 @@ namespace proc_mapping {
     void ProcMappingNode::GlobalMappingRequestCallback(const proc_mapping::GlobalMappingRequest::ConstPtr &request)
     {
 
-        proc_mapping::GlobalMappingResponse response;
+        proc_mapping::GlobalMappingResponsePtr response(new proc_mapping::GlobalMappingResponse());
 
-        response.request = *request;
+        response->request = *request;
 
         switch (request->object_type) {
             case proc_mapping::GlobalMappingRequest::BUOY:
-                response.point = *buoys_->getGlobalMapping();
+                response->point = *buoys_->getGlobalMapping();
                 break;
 
             case proc_mapping::GlobalMappingRequest::PINGER:
-                response.point = *pinger_->getGlobalMapping();
+                response->point = *pinger_->getGlobalMapping();
                 break;
 
             case proc_mapping::GlobalMappingRequest::FENCE:
-                response.point = *fence_->getGlobalMapping();
+                response->point = *fence_->getGlobalMapping();
                 break;
 
             default:

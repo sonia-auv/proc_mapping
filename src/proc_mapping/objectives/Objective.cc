@@ -50,6 +50,29 @@ namespace proc_mapping
 
     geometry_msgs::PointConstPtr Objective::getGlobalMapping()
     {
+
+        // The centroids matrix
+        arma::mat centroids(NB_ROWS, 1, arma::fill::zeros);
+
+        mlpack::kmeans::KMeans<> kmeans;
+
+        try {
+
+            kmeans.Cluster(this->centroids, 1, centroids);
+
+            geometry_msgs::PointPtr point(new geometry_msgs::Point);
+
+            point->x = centroids(0,0);
+            point->y = centroids(1,0);
+            point->z = centroids(2,0);
+
+            return point;
+
+        } catch (...) {
+            ROS_ERROR("An error occured when trying to run kmean algorithm");
+            ROS_DEBUG("End Clustering");
+        }
+
         return geometry_msgs::PointConstPtr();
     }
 
