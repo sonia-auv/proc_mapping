@@ -85,6 +85,8 @@ namespace proc_mapping
 
         void printCentroids();
 
+        geometry_msgs::PointConstPtr getPoint(double x, double y, double z);
+
         /////////////////////////
         //// COLOR TOLERANCE ////
         /////////////////////////

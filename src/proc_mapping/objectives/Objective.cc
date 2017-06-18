@@ -90,12 +90,10 @@ namespace proc_mapping
 
             if (nearBlue && nearRed && nearGreen)
             {
-                ROS_DEBUG("Returning LocalMapping point { x = %f, y = %f, z = %f", marker.pose.position.x, marker.pose.position.y, marker.pose.position.z);
-                geometry_msgs::PointPtr point(new geometry_msgs::Point);
 
-                point->x = marker.pose.position.x;
-                point->y = marker.pose.position.y;
-                point->z = marker.pose.position.z;
+                auto point = getPoint(marker.pose.position.x, marker.pose.position.y, marker.pose.position.z);
+
+                ROS_DEBUG("Returning LocalMapping point { x = %f, y = %f, z = %f", marker.pose.position.x, marker.pose.position.y, marker.pose.position.z);
 
                 return point;
 
@@ -103,12 +101,7 @@ namespace proc_mapping
 
         }
 
-        // Sending first centroid (didnt find the right color)
-        geometry_msgs::PointPtr point(new geometry_msgs::Point);
-
-        point->x = centroids(0,0);
-        point->y = centroids(1,0);
-        point->z = centroids(2,0);
+        auto point = getPoint(centroids(0,0), centroids(1,0), centroids(2,0));
 
         ROS_DEBUG("Returning first centroids point");
         ROS_DEBUG("Returning LocalMapping point { x = %f, y = %f, z = %f", point->x, point->y, point->z);
@@ -136,6 +129,17 @@ namespace proc_mapping
 
         return centroidsList;
 
+    }
+
+    geometry_msgs::PointConstPtr Objective::getPoint(double x, double y, double z)
+    {
+        geometry_msgs::PointPtr point(new geometry_msgs::Point);
+
+        point->x = x;
+        point->y = y;
+        point->z = z;
+
+        return point;
     }
 
     std::vector<visualization_msgs::Marker> Objective::getAllMarkers()
