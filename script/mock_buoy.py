@@ -50,6 +50,13 @@ class MockBuoy:
         marker.pose.position.y = uniform(-5,5)
         marker.pose.position.z = uniform(-5,5)
 
+        marker.color.a = 1
+        marker.color.b = 1
+        marker.color.g = 1
+        marker.color.r = 1
+
+
+
         marker.type = Marker.SPHERE
 
         return marker

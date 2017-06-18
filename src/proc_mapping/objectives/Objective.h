@@ -66,6 +66,9 @@ namespace proc_mapping
         // The centroids matrix
         arma::mat centroids;
 
+        // The assignments will be stored in this vector.
+        arma::Row<size_t> assignments;
+
         // The centroids list
         std::vector<visualization_msgs::Marker> centroidsList;
 
@@ -81,6 +84,19 @@ namespace proc_mapping
         void fillCentroidsList();
 
         void printCentroids();
+
+        /////////////////////////
+        //// COLOR TOLERANCE ////
+        /////////////////////////
+        // TODO Put tolerances in params
+        float redLowerTolerance = 0.25;
+        float redUpperTolerance = 0.25;
+
+        float blueLowerTolerance = 0.25;
+        float blueUpperTolerance = 0.25;
+
+        float greenLowerTolerance = 0.25;
+        float greenUpperTolerance = 0.25;
 
     };
 }

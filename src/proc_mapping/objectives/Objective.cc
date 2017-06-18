@@ -82,12 +82,35 @@ namespace proc_mapping
 
         // TODO Change point to return the great one
 
+        for (auto marker : centroidsList)
+        {
+            bool nearBlue = marker.color.b < color.b + blueUpperTolerance && marker.color.b > color.b - blueLowerTolerance;
+            bool nearRed = marker.color.r < color.r + redUpperTolerance && marker.color.r > color.r - redLowerTolerance;
+            bool nearGreen = marker.color.g < color.g + greenUpperTolerance && marker.color.g > color.g - greenLowerTolerance;
+
+            if (nearBlue && nearRed && nearGreen)
+            {
+                ROS_DEBUG("Returning LocalMapping point { x = %f, y = %f, z = %f", marker.pose.position.x, marker.pose.position.y, marker.pose.position.z);
+                geometry_msgs::PointPtr point(new geometry_msgs::Point);
+
+                point->x = marker.pose.position.x;
+                point->y = marker.pose.position.y;
+                point->z = marker.pose.position.z;
+
+                return point;
+
+            }
+
+        }
+
+        // Sending first centroid (didnt find the right color)
         geometry_msgs::PointPtr point(new geometry_msgs::Point);
 
         point->x = centroids(0,0);
         point->y = centroids(1,0);
         point->z = centroids(2,0);
 
+        ROS_DEBUG("Returning first centroids point");
         ROS_DEBUG("Returning LocalMapping point { x = %f, y = %f, z = %f", point->x, point->y, point->z);
 
         return point;
@@ -144,6 +167,42 @@ namespace proc_mapping
             marker.pose.position.z  = centroids(2,i);
 
             marker.id = i;
+
+            std_msgs::ColorRGBA color;
+
+            unsigned int coloredMarker = 0;
+
+            for (auto j = 0; j < assignments.size() ; j++)
+            {
+
+                auto assignment = assignments[j];
+
+                if (assignment != i)
+                    continue;
+
+                auto associatedMaker = markers.at(j);
+
+                if (associatedMaker.color.b != 0 || associatedMaker.color.g != 0 || associatedMaker.color.r != 0)
+                {
+                    color.g += associatedMaker.color.b;
+                    color.b += associatedMaker.color.b;
+                    color.r += associatedMaker.color.r;
+                    coloredMarker++;
+                }
+
+            }
+
+            if (coloredMarker != 0)
+            {
+                color.b /= coloredMarker;
+                color.g /= coloredMarker;
+                color.r /= coloredMarker;
+            }
+
+
+            color.a = 1;
+
+            marker.color = color;
 
             centroidsList.push_back(marker);
 
@@ -214,7 +273,8 @@ namespace proc_mapping
             ROS_DEBUG("Begin clustering");
 
             // true => initial guess for centroids
-            kmeans.Cluster(kmean_mat, nbObjects, centroids, true);
+            kmeans.Cluster(kmean_mat, nbObjects, assignments, centroids, false, true);
+
         } catch (...) {
             ROS_ERROR("An error occured when trying to run kmean algorithm");
             ROS_DEBUG("End Clustering");
