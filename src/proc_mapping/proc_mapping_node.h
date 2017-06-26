@@ -26,21 +26,20 @@
 #ifndef PROC_MAPPING_PROC_MAPPING_NODE_H_
 #define PROC_MAPPING_PROC_MAPPING_NODE_H_
 
-#include <lib_atlas/macros.h>
 #include <ros/node_handle.h>
-#include <sonia_msgs/ChangeParameter.h>
-#include <sonia_msgs/ChangeProcTree.h>
-#include <sonia_msgs/GetCurrentProcTree.h>
-#include <sonia_msgs/InsertCircleROI.h>
-#include <sonia_msgs/InsertRectROI.h>
-#include <sonia_msgs/ResetMap.h>
-#include <sonia_msgs/SendSemanticMap.h>
 #include <memory>
 #include <vector>
-#include "proc_mapping/config.h"
-#include "proc_mapping/interpreter/map_interpreter.h"
-#include "proc_mapping/map/raw_map.h"
-#include "proc_mapping/map/semantic_map.h"
+#include <visualization_msgs/MarkerArray.h>
+
+#include "proc_mapping/objectives/Objective.h"
+#include "proc_mapping/GlobalMappingRequest.h"
+#include "proc_mapping/GlobalMappingResponse.h"
+#include "proc_mapping/LocalMappingRequest.h"
+#include "proc_mapping/LocalMappingResponse.h"
+
+#include "proc_mapping/ObjectiveReset.h"
+#include "proc_mapping/position.h"
+#include "proc_mapping/debug.h"
 
 namespace proc_mapping {
 
@@ -48,11 +47,6 @@ class ProcMappingNode {
  public:
   //==========================================================================
   // T Y P E D E F   A N D   E N U M
-
-  using Ptr = std::shared_ptr<ProcMappingNode>;
-  using ConstPtr = std::shared_ptr<const ProcMappingNode>;
-  using PtrList = std::vector<ProcMappingNode::Ptr>;
-  using ConstPtrList = std::vector<ProcMappingNode::ConstPtr>;
 
   //==========================================================================
   // P U B L I C   C / D T O R S
@@ -65,52 +59,48 @@ class ProcMappingNode {
   /// Each iteration of the loop, this will take the objects in the object
   /// registery, empty it and publish the objects.
   void Spin();
+  //  void ResetMapCallback(const sonia_msgs::ResetMap::ConstPtr &msg);
 
-  void ResetMapCallback(const sonia_msgs::ResetMap::ConstPtr &msg);
 
-  bool GetCurrentProcTreeCallback(
-      sonia_msgs::GetCurrentProcTree::Request &req,
-      sonia_msgs::GetCurrentProcTree::Response &res);
-
-  bool GetProcTreeListCallback(sonia_msgs::GetProcTreeList::Request &req,
-                               sonia_msgs::GetProcTreeList::Response &res);
-
-  bool ChangeParameterCallback(sonia_msgs::ChangeParameter::Request &req,
-                               sonia_msgs::ChangeParameter::Response &resp);
-
-  bool SendMapCallback(sonia_msgs::SendSemanticMap::Request &req,
-                       sonia_msgs::SendSemanticMap::Response &res);
-
-  bool ChangeProcTreeCallback(sonia_msgs::ChangeProcTree::Request &req,
-                              sonia_msgs::ChangeProcTree::Response &res);
-
-  bool InsertRectROICallback(sonia_msgs::InsertRectROI::Request &req,
-                             sonia_msgs::InsertRectROI::Response &res);
-
-  bool InsertCircleROICallback(sonia_msgs::InsertCircleROI::Request &req,
-                               sonia_msgs::InsertCircleROI::Response &res);
 
  private:
   //==========================================================================
   // P R I V A T E   M E M B E R S
 
-  ros::NodeHandlePtr nh_;
-  ros::Publisher map_pub_;
-  ros::Publisher markers_pub_;
-  ros::Subscriber reset_map_sub_;
-  ros::ServiceServer get_current_proc_tree_srv_;
-  ros::ServiceServer get_proc_tree_list_srv_;
-  ros::ServiceServer change_parameter_srv_;
-  ros::ServiceServer send_map_srv_;
-  ros::ServiceServer change_pt_srv_;
-  ros::ServiceServer insert_rect_ROI_srv_;
-  ros::ServiceServer insert_circle_ROI_srv_;
+    ros::NodeHandlePtr nh_;
 
-  CoordinateSystems::Ptr cs_;
+    ros::Publisher map_pub_;
+    ros::Publisher markers_pub_;
 
-  RawMap raw_map_;
-  SemanticMap semantic_map_;
-  MapInterpreter map_interpreter_;
+    ros::Subscriber global_mapping_request_sub_;
+    ros::Subscriber local_mapping_request_sub_;
+    ros::Publisher global_mapping_response_pub_;
+    ros::Publisher local_mapping_response_pub_;
+
+    ros::Subscriber reset_map_sub_;
+
+    ros::ServiceServer objective_reset_srv_;
+
+    ros::Subscriber hydro_sub_;
+    ros::Subscriber proc_image_sub_;
+
+    visualization_msgs::MarkerArray markers;
+
+    const Position position_;
+
+    Objective::Ptr buoys_;
+    Objective::Ptr fence_;
+    Objective::Ptr pinger_;
+
+    void MarkersCallback(const visualization_msgs::MarkerArray::ConstPtr &markers);
+    void GlobalMappingRequestCallback(const proc_mapping::GlobalMappingRequest::ConstPtr &request);
+    void LocalMappingRequestCallback(const proc_mapping::LocalMappingRequest::ConstPtr &request);
+    //void MappingRequestCallback(const proc_mapping::MappingRequest::ConstPtr &request);
+    bool ObjectiveResetCallback(proc_mapping::ObjectiveReset::Request &request,
+                                    proc_mapping::ObjectiveReset::Response &response);
+
+    Debug * debug = 0;
+
 };
 
 }  // namespace proc_mapping

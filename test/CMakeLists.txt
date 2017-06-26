@@ -1,3 +1,37 @@
-catkin_add_gtest(raw_map_test raw_map_test.cc  ${proc_mapping_FILES})
-target_link_libraries(raw_map_test ${catkin_LIBRARIES} ${lib_atlas_LIBRARIES}
-    yaml-cpp ${Eigen_LIBRARIES} ${PCL_LIBRARIES})
+include_directories(
+        ${catkin_INCLUDE_DIRS}
+        ${proc_mapping_SRC_DIR}
+        ${lib_atlas_INCLUDE_DIRS}
+        ${Eigen_INCLUDE_DIRS}
+        ${PCL_INCLUDE_DIRS}
+        ${OpenCV_INCLUDE_DIRS}
+)
+
+find_package(
+        catkin REQUIRED COMPONENTS
+        roscpp
+        cmake_modules
+        roscpp
+        std_msgs
+        message_runtime
+        geometry_msgs
+        sensor_msgs
+        nav_msgs
+        image_transport
+        cv_bridge
+        pcl_ros
+        pcl_conversions
+        lib_atlas
+        sonia_msgs
+)
+
+find_package(Eigen3 REQUIRED)
+find_package(PCL REQUIRED)
+
+
+catkin_add_gtest(SonarMapperTest SonarMapperTest.cc  ${proc_mapping_FILES} TestUtils/OdometrySimulator.h TestUtils/SonarSimulator.h)
+target_link_libraries(SonarMapperTest
+        ${catkin_LIBRARIES}
+        ${lib_atlas_LIBRARIES}
+        ${Eigen_LIBRARIES}
+        ${PCL_LIBRARIES})

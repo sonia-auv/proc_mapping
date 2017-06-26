@@ -24,255 +24,242 @@
  */
 
 #include "proc_mapping/proc_mapping_node.h"
-#include <sonia_msgs/SemanticMap.h>
-#include <visualization_msgs/MarkerArray.h>
-#include <functional>
-#include "proc_mapping/config.h"
-#include "proc_mapping/region_of_interest/rotated_rectangle.h"
 
 namespace proc_mapping {
 
-//==============================================================================
-// C / D T O R S   S E C T I O N
+    //==============================================================================
+    // C / D T O R S   S E C T I O N
 
-//------------------------------------------------------------------------------
-//
-ProcMappingNode::ProcMappingNode(const ros::NodeHandlePtr &nh)
-    : nh_(nh),
-      map_pub_(),
-      markers_pub_(),
-      reset_map_sub_(),
-      get_current_proc_tree_srv_(),
-      get_proc_tree_list_srv_(),
-      change_parameter_srv_(),
-      send_map_srv_(),
-      cs_(std::make_shared<CoordinateSystems>(nh_)),
-      raw_map_(nh_, cs_),
-      semantic_map_(cs_),
-      map_interpreter_(nh_, "proc_trees", semantic_map_.GetObjectRegistery()) {
-  map_pub_ = nh_->advertise<sonia_msgs::SemanticMap>("/proc_mapping/map", 100);
-  markers_pub_ = nh_->advertise<visualization_msgs::MarkerArray>(
-      "/proc_mapping/markers", 100);
+    //------------------------------------------------------------------------------
+    //
+    ProcMappingNode::ProcMappingNode(const ros::NodeHandlePtr &nh)
+        : nh_(nh),
+          map_pub_(),
+          markers_pub_(),
+          reset_map_sub_(),
+          position_(nh),
+          buoys_(new Objective("buoys", 3)),
+          fence_(new Objective("fence", 1)),
+          pinger_(new Objective("pinger", 1))
 
-  reset_map_sub_ = nh_->subscribe("reset_map", 100,
-                                  &ProcMappingNode::ResetMapCallback, this);
+    {
 
-  get_current_proc_tree_srv_ =
-      nh_->advertiseService("get_current_proc_tree",
-                            &ProcMappingNode::GetCurrentProcTreeCallback, this);
+        // TODO Use attributes initialisation
 
-  get_proc_tree_list_srv_ = nh_->advertiseService(
-      "get_proc_tree_list", &ProcMappingNode::GetProcTreeListCallback, this);
+        markers_pub_ = nh_->advertise<visualization_msgs::MarkerArray>("/proc_mapping/markers", 100);
 
-  change_parameter_srv_ = nh_->advertiseService(
-      "change_parameter", &ProcMappingNode::ChangeParameterCallback, this);
+        global_mapping_request_sub_ = nh_->subscribe("/proc_mapping/global_mapping_request", 100, &ProcMappingNode::GlobalMappingRequestCallback, this);
+        local_mapping_request_sub_ = nh_->subscribe("/proc_mapping/local_mapping_request", 100, &ProcMappingNode::LocalMappingRequestCallback, this);
 
-  send_map_srv_ = nh_->advertiseService(
-      "send_map", &ProcMappingNode::SendMapCallback, this);
+        global_mapping_response_pub_ = nh_->advertise<proc_mapping::GlobalMappingResponse>("/proc_mapping/global_mapping_response", 100);
+        local_mapping_response_pub_ = nh_->advertise<proc_mapping::LocalMappingResponse>("/proc_mapping/local_mapping_response", 100);
 
-  change_pt_srv_ = nh_->advertiseService(
-      "change_proc_tree", &ProcMappingNode::ChangeProcTreeCallback, this);
+        hydro_sub_ = nh_->subscribe("/provider_hydrophone/markers", 100, &ProcMappingNode::MarkersCallback, this);
+        proc_image_sub_ = nh_->subscribe("/proc_image_processing/markers",100, &ProcMappingNode::MarkersCallback, this);
+        objective_reset_srv_ = nh_->advertiseService("/proc_mapping/objective_reset/", &ProcMappingNode::ObjectiveResetCallback, this);
 
-  insert_rect_ROI_srv_ = nh_->advertiseService(
-      "insert_rect_roi", &ProcMappingNode::InsertRectROICallback, this);
+        bool debug;
 
-  insert_circle_ROI_srv_ = nh_->advertiseService(
-      "insert_circle_roi", &ProcMappingNode::InsertCircleROICallback, this);
+        if (nh_->getParam("/proc_mapping/debug", debug) && debug)
+        {
+            this->debug = new Debug(nh_, buoys_, fence_, pinger_);
+        }
 
-  raw_map_.Attach(map_interpreter_);
-  map_interpreter_.Attach(semantic_map_);
-}
-
-//------------------------------------------------------------------------------
-//
-ProcMappingNode::~ProcMappingNode() {}
-
-//==============================================================================
-// M E T H O D   S E C T I O N
-
-//------------------------------------------------------------------------------
-//
-void ProcMappingNode::ResetMapCallback(
-    const sonia_msgs::ResetMap::ConstPtr &msg) {
-  ROS_INFO("Resetting the semantic map object.");
-  semantic_map_.ClearSemanticMap();
-  raw_map_.ResetRawMap();
-  semantic_map_.ResetSemanticMap();
-  cs_->ResetPosition();
-}
-
-//------------------------------------------------------------------------------
-//
-bool ProcMappingNode::SendMapCallback(
-    sonia_msgs::SendSemanticMap::Request &req,
-    sonia_msgs::SendSemanticMap::Response &res) {
-  ROS_INFO_STREAM(
-      "Sending the semantic map objects to as ROS messages on "
-      "topic "
-      << map_pub_.getTopic());
-  auto map_msg = semantic_map_.GenerateSemanticMapMessage();
-  map_pub_.publish(map_msg);
-  return true;
-}
-
-//------------------------------------------------------------------------------
-//
-bool ProcMappingNode::GetCurrentProcTreeCallback(
-    sonia_msgs::GetCurrentProcTree::Request &req,
-    sonia_msgs::GetCurrentProcTree::Response &res) {
-  ProcTree::Ptr current_proc_tree;
-  current_proc_tree = map_interpreter_.GetCurrentProcTree();
-  if (current_proc_tree) {
-    ROS_INFO("Sending the current proc tree to the service client.");
-    res.current_proc_tree = current_proc_tree->BuildRosMessage();
-  } else {
-    ROS_ERROR("Trying ty access the current proc tree, but there is none.");
-  }
-
-  return true;
-}
-
-//------------------------------------------------------------------------------
-//
-bool ProcMappingNode::GetProcTreeListCallback(
-    sonia_msgs::GetProcTreeList::Request &req,
-    sonia_msgs::GetProcTreeList::Response &res) {
-  std::vector<ProcTree::Ptr> proc_tree_list =
-      map_interpreter_.GetProcTreeList();
-
-  for (const auto pt : proc_tree_list) {
-    res.proc_tree_list.push_back(pt->BuildRosMessage());
-  }
-
-  if (!res.proc_tree_list.size()) {
-    ROS_ERROR(
-        "Enable to get the list of the proc tree, sending an empty "
-        "message");
-    return false;
-  } else {
-    ROS_INFO("Sending the list of all the proc tree");
-  }
-
-  return true;
-}
-
-//------------------------------------------------------------------------------
-//
-bool ProcMappingNode::ChangeParameterCallback(
-    sonia_msgs::ChangeParameter::Request &req,
-    sonia_msgs::ChangeParameter::Response &resp) {
-  ProcTree::Ptr pt = map_interpreter_.GetProcTree(req.proc_tree_name);
-  ProcUnit::Ptr pu = pt->GetProcUnit(req.proc_unit_name);
-
-  for (auto pup : pu->GetParameters()) {
-    if (pup->GetName() == req.proc_unit_parameter.name) {
-      ROS_INFO_STREAM("Setting the parameter of the pu "
-                      << req.proc_unit_name << " with the name "
-                      << req.proc_unit_parameter.name << " in the proc tree "
-                      << req.proc_tree_name << " to the value "
-                      << req.proc_unit_parameter.value);
-      pup->SetFromRosMessage(req.proc_unit_parameter);
-      return true;
-    }
-  }
-  ROS_ERROR_STREAM("Enable to find a parameter with the pu "
-                   << req.proc_unit_name << " with the name "
-                   << req.proc_unit_parameter.name << " in the proc tree "
-                   << req.proc_tree_name);
-  return true;
-}
-
-//------------------------------------------------------------------------------
-//
-bool ProcMappingNode::ChangeProcTreeCallback(
-    sonia_msgs::ChangeProcTree::Request &req,
-    sonia_msgs::ChangeProcTree::Response &res) {
-  if (req.target == req.FAR_BUOYS) {
-    map_interpreter_.SetDetectionMode(DetectionMode::FAR_BUOYS);
-    ROS_INFO("Changing the proc tree to far_buoys");
-    return true;
-  } else if (req.target == req.BUOYS) {
-    map_interpreter_.SetDetectionMode(DetectionMode::BUOYS);
-    ROS_INFO("Changing the proc tree to buoys");
-    return true;
-  } else if (req.target == req.FENCE) {
-    map_interpreter_.SetDetectionMode(DetectionMode::FENCE);
-    ROS_INFO("Changing the proc tree to fence");
-    return true;
-  } else if (req.target == req.WALL) {
-    map_interpreter_.SetDetectionMode(DetectionMode::WALL);
-    ROS_INFO("Changing the proc tree to wall");
-    return true;
-  } else {
-    map_interpreter_.SetDetectionMode(DetectionMode::NONE);
-  }
-  ROS_ERROR(
-      "Could no find a proc tree corresponding to the message, setting "
-      "to no proc tree");
-  return false;
-}
-
-//------------------------------------------------------------------------------
-//
-bool ProcMappingNode::InsertRectROICallback(
-    sonia_msgs::InsertRectROI::Request &req,
-    sonia_msgs::InsertRectROI::Response &res) {
-  cv::Point2d center;
-  cv::Point2f size;
-  center.x = 10;
-  center.y = 10;
-  size.x = req.size.x;
-  size.y = req.size.y;
-
-  DetectionMode type;
-
-  if (req.type == req.BUOYS) {
-    type = DetectionMode::BUOYS;
-    ROS_INFO("Adding Rectangle ROI : BUOY");
-  } else if (req.type == req.FENCE) {
-    type = DetectionMode::FENCE;
-    ROS_INFO("Adding Rectangle ROI : FENCE");
-  } else {
-    ROS_INFO_STREAM("Wrong ROI type");
-  }
-
-  RegionOfInterest *r = nullptr;
-  r = new RotatedRectangle(req.name, center, size, req.angle, type);
-  if (r) {
-    semantic_map_.InsertRegionOfInterest(std::move(RegionOfInterest::Ptr{r}));
-    ROS_INFO("Adding Rectangle ROI");
-  }
-  return true;
-}
-
-//------------------------------------------------------------------------------
-//
-bool ProcMappingNode::InsertCircleROICallback(
-    sonia_msgs::InsertCircleROI::Request &req,
-    sonia_msgs::InsertCircleROI::Response &res) {
-  // Todo Implement the Circle ROI logic
-  return true;
-}
-
-//------------------------------------------------------------------------------
-//
-void ProcMappingNode::Spin() {
-  ros::Rate r(15);  // 15 hz
-  while (ros::ok()) {
-    if (semantic_map_.IsNewDataAvailable()) {
-      auto map_msg = semantic_map_.GenerateSemanticMapMessage();
-      map_pub_.publish(map_msg);
-      auto markers = semantic_map_.GenerateVisualizationMessage();
-      markers_pub_.publish(markers);
     }
 
-#ifdef DEBUG
-    semantic_map_.PrintMap();
-#endif
+    //------------------------------------------------------------------------------
+    //
+    ProcMappingNode::~ProcMappingNode() {
 
-    ros::spinOnce();
-    r.sleep();
-  }
-}
+        if (debug)
+        {
+            delete debug;
+        }
+
+    }
+
+    //==============================================================================
+    // M E T H O D   S E C T I O N
+    //------------------------------------------------------------------------------
+    //
+    void ProcMappingNode::Spin() {
+      ros::Rate r(15);  // 15 hz
+            //int id=0;
+
+
+
+      while (ros::ok()) {
+        ros::spinOnce();
+
+          markers_pub_.publish(markers);
+
+        if (debug)
+        {
+            debug->sendDebugData();
+        }
+
+        r.sleep();
+      }
+    }
+
+
+    void ProcMappingNode::MarkersCallback(const visualization_msgs::MarkerArray::ConstPtr &markers) {
+
+        std::vector<visualization_msgs::Marker> buoysMarkers;
+        std::vector<visualization_msgs::Marker> fenceMarkers;
+        std::vector<visualization_msgs::Marker> pingerMarkers;
+
+        for (unsigned int i = 0; i < markers->markers.size(); i++) {
+
+            auto marker = markers->markers[i];
+
+            marker.ns = std::to_string(marker.id);
+
+            switch (marker.type)
+            {
+                case visualization_msgs::Marker::SPHERE:
+                    buoysMarkers.push_back(marker);
+                    break;
+                case visualization_msgs::Marker::CUBE:
+                    fenceMarkers.push_back(marker);
+                    break;
+                case visualization_msgs::Marker::CYLINDER:
+                    pingerMarkers.push_back(marker);
+
+                    break;
+                default:
+                    ROS_ERROR("Type of marker not supported");
+                    break;
+            }
+
+            marker.header.frame_id = "NED";
+            marker.header.stamp = ros::Time::now();
+
+            marker.ns = std::to_string(marker.id);
+
+            marker.id = 0;
+            marker.action = visualization_msgs::Marker::ADD;
+
+            marker.color.a = 1;
+
+            marker.color.b = 1;
+
+            marker.scale.x = 1.0;
+            marker.scale.y = 1.0;
+            marker.scale.z = 1.0;
+
+            marker.lifetime = ros::Duration();
+
+            this->markers.markers.push_back(marker);
+
+        }
+
+        if (!buoysMarkers.empty())
+        {
+            buoys_->addMarkers(buoysMarkers);
+            //buoys_.getObjectives();
+        }
+        if (!fenceMarkers.empty())
+        {
+            fence_->addMarkers(fenceMarkers);
+            //fence_.getObjectives();
+        }
+        if (!pingerMarkers.empty())
+        {
+            pinger_->addMarkers(pingerMarkers);
+            //pinger_.getObjectives();
+        }
+
+    }
+
+    void ProcMappingNode::GlobalMappingRequestCallback(const proc_mapping::GlobalMappingRequest::ConstPtr &request)
+    {
+
+        proc_mapping::GlobalMappingResponsePtr response(new proc_mapping::GlobalMappingResponse());
+
+        response->request = *request;
+
+        switch (request->object_type) {
+            case proc_mapping::GlobalMappingRequest::BUOY:
+                response->point = *buoys_->getGlobalMapping();
+                break;
+
+            case proc_mapping::GlobalMappingRequest::PINGER:
+                response->point = *pinger_->getGlobalMapping();
+                break;
+
+            case proc_mapping::GlobalMappingRequest::FENCE:
+                response->point = *fence_->getGlobalMapping();
+                break;
+
+            default:
+                // TODO Handle with logs
+                break;
+        }
+
+        global_mapping_response_pub_.publish(response);
+
+    }
+
+    void ProcMappingNode::LocalMappingRequestCallback(const proc_mapping::LocalMappingRequest::ConstPtr &request)
+    {
+        proc_mapping::LocalMappingResponsePtr response(new proc_mapping::LocalMappingResponse());
+
+        response->request = *request;
+
+        switch (request->object_type) {
+            case proc_mapping::LocalMappingRequest::BUOY:
+                response->point = *buoys_->getLocalMapping(request->color);
+                break;
+
+            case proc_mapping::LocalMappingRequest::PINGER:
+                response->point = *pinger_->getLocalMapping(request->color);
+                break;
+
+            case proc_mapping::LocalMappingRequest::FENCE:
+                response->point = *fence_->getLocalMapping(request->color);
+                break;
+
+            default:
+                // TODO Handle with logs
+                break;
+        }
+
+        local_mapping_response_pub_.publish(response);
+    }
+
+    bool ProcMappingNode::ObjectiveResetCallback(proc_mapping::ObjectiveReset::Request &request,
+                                                     proc_mapping::ObjectiveReset::Response &response) {
+
+
+        switch (request.objectiveType)
+        {
+            case proc_mapping::ObjectiveReset::Request::ALL:
+                buoys_->reset();
+                fence_->reset();
+                pinger_->reset();
+                break;
+
+            case proc_mapping::ObjectiveReset::Request::BUOY:
+                buoys_->reset();
+                break;
+
+            case proc_mapping::ObjectiveReset::Request::FENCE:
+                fence_->reset();
+                break;
+
+            case proc_mapping::ObjectiveReset::Request::PINGER:
+                pinger_->reset();
+                break;
+
+            default:
+                ROS_WARN("Invalid value for ObjectiveReset::Request::objectiveType");
+                break;
+
+        }
+
+        return true;
+
+    }
 
 }  // namespace proc_mapping
