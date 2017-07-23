@@ -17,7 +17,7 @@ namespace proc_mapping{
 
     private:
 
-
+        std::vector<proc_hydrophone::PingPoseConstPtr> pings;
 
     };
 }

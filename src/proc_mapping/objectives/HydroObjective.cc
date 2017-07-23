@@ -15,6 +15,14 @@ namespace proc_mapping
     HydroObjective::~HydroObjective() {
 
     }
+
+    void HydroObjective::addPing(proc_hydrophone::PingPoseConstPtr &ping) {
+
+        pings.push_back(ping);
+
+        // TODO Handle matrix
+
+    }
 }
 
 

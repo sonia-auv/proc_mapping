@@ -58,7 +58,7 @@ find_package(
         visualization_msgs
         message_generation
         message_runtime
-
+        proc_hydrophone
 )
 
 #===============================================================================
@@ -86,6 +86,7 @@ catkin_package(
         sensor_msgs
         nav_msgs
         visualization_msgs
+
 )
 
 
