@@ -86,7 +86,7 @@ catkin_package(
         sensor_msgs
         nav_msgs
         visualization_msgs
-
+        proc_hydrophone
 )
 
 
