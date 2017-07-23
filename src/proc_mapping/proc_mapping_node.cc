@@ -54,7 +54,7 @@ namespace proc_mapping {
         global_mapping_response_pub_ = nh_->advertise<proc_mapping::GlobalMappingResponse>("/proc_mapping/global_mapping_response", 100);
         local_mapping_response_pub_ = nh_->advertise<proc_mapping::LocalMappingResponse>("/proc_mapping/local_mapping_response", 100);
 
-        hydro_sub_ = nh_->subscribe("/provider_hydrophone/markers", 100, &ProcMappingNode::MarkersCallback, this);
+        hydro_sub_ = nh_->subscribe("/proc_hydrophone/ping", 100, &ProcMappingNode::PingsCallback, this);
         proc_image_sub_ = nh_->subscribe("/proc_image_processing/markers",100, &ProcMappingNode::MarkersCallback, this);
         objective_reset_srv_ = nh_->advertiseService("/proc_mapping/objective_reset/", &ProcMappingNode::ObjectiveResetCallback, this);
 
@@ -259,6 +259,12 @@ namespace proc_mapping {
         }
 
         return true;
+
+    }
+
+    void ProcMappingNode::PingsCallback(const proc_hydrophone::PingPoseConstPtr &ping) {
+
+        std::cout << "Ping callback" << std::endl;
 
     }
 
