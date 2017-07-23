@@ -6,6 +6,7 @@
 #define PROC_MAPPING_HYDROOBJECTIVE_H
 
 #include <proc_hydrophone/PingPose.h>
+#include <armadillo>
 
 namespace proc_mapping{
     class HydroObjective {
@@ -18,6 +19,9 @@ namespace proc_mapping{
     private:
 
         std::vector<proc_hydrophone::PingPoseConstPtr> pings;
+        arma::mat functions;// Matrix with m and b of y = mx+b linear function
+
+        arma::mat GetFunction(const proc_hydrophone::PingPoseConstPtr &ping);
 
     };
 }

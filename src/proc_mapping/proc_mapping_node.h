@@ -31,9 +31,11 @@
 #include <vector>
 #include <visualization_msgs/MarkerArray.h>
 #include <proc_hydrophone/PingPose.h>
-#include <proc_mapping/objectives/HydroObjective.h>
+
 
 #include "proc_mapping/objectives/Objective.h"
+#include <proc_mapping/objectives/HydroObjective.h>
+
 #include "proc_mapping/GlobalMappingRequest.h"
 #include "proc_mapping/GlobalMappingResponse.h"
 #include "proc_mapping/LocalMappingRequest.h"
