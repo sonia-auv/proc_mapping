@@ -31,6 +31,7 @@
 #include <vector>
 #include <visualization_msgs/MarkerArray.h>
 #include <proc_hydrophone/PingPose.h>
+#include <proc_mapping/objectives/HydroObjective.h>
 
 #include "proc_mapping/objectives/Objective.h"
 #include "proc_mapping/GlobalMappingRequest.h"
@@ -92,6 +93,8 @@ class ProcMappingNode {
     Objective::Ptr buoys_;
     Objective::Ptr fence_;
     Objective::Ptr pinger_;
+
+    HydroObjective pingObjective;
 
     void PingsCallback(const proc_hydrophone::PingPoseConstPtr &ping);
 

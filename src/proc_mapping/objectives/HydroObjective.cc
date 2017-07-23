@@ -16,7 +16,7 @@ namespace proc_mapping
 
     }
 
-    void HydroObjective::addPing(proc_hydrophone::PingPoseConstPtr &ping) {
+    void HydroObjective::addPing(const proc_hydrophone::PingPoseConstPtr &ping) {
 
         pings.push_back(ping);
 

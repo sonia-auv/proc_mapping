@@ -13,7 +13,7 @@ namespace proc_mapping{
         HydroObjective();
         ~HydroObjective();
 
-        void addPing(proc_hydrophone::PingPoseConstPtr &ping);
+        void addPing(const proc_hydrophone::PingPoseConstPtr &ping);
 
     private:
 

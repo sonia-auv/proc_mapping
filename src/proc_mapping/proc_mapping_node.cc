@@ -266,6 +266,8 @@ namespace proc_mapping {
 
         std::cout << "Ping callback" << std::endl;
 
+        pingObjective.addPing(ping);
+
     }
 
 }  // namespace proc_mapping
