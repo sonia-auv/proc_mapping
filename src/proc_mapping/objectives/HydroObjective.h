@@ -15,6 +15,7 @@ namespace proc_mapping{
         ~HydroObjective();
 
         void addPing(const proc_hydrophone::PingPoseConstPtr &ping);
+        geometry_msgs::PointConstPtr getPoint();
 
     private:
 
