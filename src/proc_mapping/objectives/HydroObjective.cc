@@ -27,8 +27,6 @@ namespace proc_mapping
         // TODO Delete
         functions.print();
 
-        getPoint();
-
     }
 
     arma::mat HydroObjective::GetFunction(const proc_hydrophone::PingPoseConstPtr &ping) {

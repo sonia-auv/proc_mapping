@@ -71,7 +71,8 @@ add_message_files(DIRECTORY msg
         LocalMappingRequest.msg
         LocalMappingResponse.msg
         KeyValueIdPose.msg
-        PoseSavedRequest.msg)
+        PoseSavedRequest.msg
+        PingerLocation.msg)
 
 add_service_files(DIRECTORY srv FILES ObjectiveReset.srv)
 

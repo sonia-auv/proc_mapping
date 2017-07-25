@@ -86,7 +86,7 @@ namespace proc_mapping {
       ros::Rate r(15);  // 15 hz
             //int id=0;
 
-
+        auto previousStamp = ros::Time();
 
       while (ros::ok()) {
         ros::spinOnce();
@@ -97,6 +97,18 @@ namespace proc_mapping {
         {
             debug->sendDebugData();
         }
+
+          if ((ros::Time() - previousStamp).sec >= 10)
+          {
+
+              auto point = pingObjective.getPoint();
+
+
+
+              //PingPose pingPose;
+
+            previousStamp = ros::Time();
+          }
 
         r.sleep();
       }
@@ -264,7 +276,7 @@ namespace proc_mapping {
 
     void ProcMappingNode::PingsCallback(const proc_hydrophone::PingPoseConstPtr &ping) {
 
-        std::cout << "Ping callback" << std::endl;
+        //std::cout << "Ping callback" << std::endl;
 
         pingObjective.addPing(ping);
 
