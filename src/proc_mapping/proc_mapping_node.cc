@@ -58,6 +58,8 @@ namespace proc_mapping {
         proc_image_sub_ = nh_->subscribe("/proc_image_processing/markers",100, &ProcMappingNode::MarkersCallback, this);
         objective_reset_srv_ = nh_->advertiseService("/proc_mapping/objective_reset/", &ProcMappingNode::ObjectiveResetCallback, this);
 
+        pingerLocationPublisher = nh_->advertise<PingerLocation>("/proc_mapping/pinger_location", 100);
+
         bool debug;
 
         if (nh_->getParam("/proc_mapping/debug", debug) && debug)
@@ -103,9 +105,14 @@ namespace proc_mapping {
 
               auto point = pingObjective.getPoint();
 
+                PingerLocationPtr pingerLocation(new PingerLocation());
 
 
+              pingerLocation->point = *point;
+                pingerLocation->frequency = 40;
               //PingPose pingPose;
+
+              pingerLocationPublisher.publish(pingerLocation);
 
             previousStamp = ros::Time();
           }

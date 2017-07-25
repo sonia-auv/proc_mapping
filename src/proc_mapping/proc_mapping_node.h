@@ -40,6 +40,7 @@
 #include "proc_mapping/GlobalMappingResponse.h"
 #include "proc_mapping/LocalMappingRequest.h"
 #include "proc_mapping/LocalMappingResponse.h"
+#include "proc_mapping/PingerLocation.h"
 
 #include "proc_mapping/ObjectiveReset.h"
 #include "proc_mapping/position.h"
@@ -80,6 +81,8 @@ class ProcMappingNode {
     ros::Subscriber local_mapping_request_sub_;
     ros::Publisher global_mapping_response_pub_;
     ros::Publisher local_mapping_response_pub_;
+
+    ros::Publisher pingerLocationPublisher;
 
     ros::Subscriber reset_map_sub_;
 
