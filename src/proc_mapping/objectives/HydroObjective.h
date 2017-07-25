@@ -6,6 +6,7 @@
 #define PROC_MAPPING_HYDROOBJECTIVE_H
 
 #include <proc_hydrophone/PingPose.h>
+#define ARMA_DONT_PRINT_ERRORS
 #include <armadillo>
 
 namespace proc_mapping{

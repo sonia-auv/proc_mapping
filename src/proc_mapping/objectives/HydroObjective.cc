@@ -27,6 +27,8 @@ namespace proc_mapping
         // TODO Delete
         functions.print();
 
+        getPoint();
+
     }
 
     arma::mat HydroObjective::GetFunction(const proc_hydrophone::PingPoseConstPtr &ping) {
@@ -98,15 +100,38 @@ namespace proc_mapping
 
 
             auto size = points.size();
-            arma::mat pointsMatrix(size,2);
+            arma::mat pointsMatrix(2, size);
 
             for (uint16_t i = 0; i < size; ++i) {
-                pointsMatrix(i, 0) = points[i].x;
-                pointsMatrix(i, 1) = points[i].y;
+                pointsMatrix(0, i) = points[i].x;
+                pointsMatrix(1, i) = points[i].y;
             }
 
+            // TODO Debug : DELETE
+            pointsMatrix.print();
 
+            arma::mat xMatrix = sort(pointsMatrix.row(0));
+            arma::mat yMatrix = sort(pointsMatrix.row(1));
 
+            // TODO Debug : DELETE
+            xMatrix.print();
+            yMatrix.print();
+
+            geometry_msgs::PointPtr point(new geometry_msgs::Point());
+
+            auto index = size / 2;
+
+            if (size % 2) // 1
+            {
+                point->x = xMatrix(0,index);
+                point->y = yMatrix(0,index);
+            }
+            else {
+                point->x = xMatrix(0, index - 1) + xMatrix(0, index);
+                point->y = yMatrix(0, index - 1) + yMatrix(0, index);
+            }
+
+            return point;
 
         }
 
