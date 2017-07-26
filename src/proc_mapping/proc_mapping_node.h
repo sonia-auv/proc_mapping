@@ -43,6 +43,8 @@
 #include "proc_mapping/PingerLocation.h"
 
 #include "proc_mapping/ObjectiveReset.h"
+#include <proc_mapping/PingerLocationService.h>
+
 #include "proc_mapping/position.h"
 #include "proc_mapping/debug.h"
 
@@ -87,6 +89,7 @@ class ProcMappingNode {
     ros::Subscriber reset_map_sub_;
 
     ros::ServiceServer objective_reset_srv_;
+    ros::ServiceServer pingerLocationService;
 
     ros::Subscriber hydro_sub_;
     ros::Subscriber proc_image_sub_;
@@ -109,6 +112,8 @@ class ProcMappingNode {
     //void MappingRequestCallback(const proc_mapping::MappingRequest::ConstPtr &request);
     bool ObjectiveResetCallback(proc_mapping::ObjectiveReset::Request &request,
                                     proc_mapping::ObjectiveReset::Response &response);
+    bool PingerLocationServiceCallback(proc_mapping::PingerLocationService::Request &request,
+                                proc_mapping::PingerLocationService::Response &response);
 
     Debug * debug = 0;
 

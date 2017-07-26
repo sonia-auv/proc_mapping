@@ -56,7 +56,9 @@ namespace proc_mapping {
 
         hydro_sub_ = nh_->subscribe("/proc_hydrophone/ping", 100, &ProcMappingNode::PingsCallback, this);
         proc_image_sub_ = nh_->subscribe("/proc_image_processing/markers",100, &ProcMappingNode::MarkersCallback, this);
+
         objective_reset_srv_ = nh_->advertiseService("/proc_mapping/objective_reset/", &ProcMappingNode::ObjectiveResetCallback, this);
+        pingerLocationService = nh_->advertiseService("/proc_mapping/pinger_location_service", &ProcMappingNode::PingerLocationServiceCallback, this);
 
         pingerLocationPublisher = nh_->advertise<PingerLocation>("/proc_mapping/pinger_location", 100);
 
@@ -279,6 +281,17 @@ namespace proc_mapping {
 
         return true;
 
+    }
+
+    bool ProcMappingNode::PingerLocationServiceCallback(proc_mapping::PingerLocationService::Request &request,
+                                       proc_mapping::PingerLocationService::Response &response)
+    {
+        // TODO Manage frequency. To test
+
+        response.pingerLocation.point = *(pingObjective.getPoint());
+        response.pingerLocation.frequency = request.frequency;
+
+        return true;
     }
 
     void ProcMappingNode::PingsCallback(const proc_hydrophone::PingPoseConstPtr &ping) {
