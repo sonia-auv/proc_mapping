@@ -85,6 +85,7 @@ class ProcMappingNode {
     ros::Publisher local_mapping_response_pub_;
 
     ros::Publisher pingerLocationPublisher;
+    ros::Publisher pingerLocationDebugPublisher;
 
     ros::Subscriber reset_map_sub_;
 
