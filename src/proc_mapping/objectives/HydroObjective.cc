@@ -8,8 +8,6 @@ namespace proc_mapping
 {
     HydroObjective::HydroObjective() {
 
-
-
     }
 
     HydroObjective::~HydroObjective() {
@@ -134,6 +132,13 @@ namespace proc_mapping
         }
 
         return geometry_msgs::PointConstPtr();
+    }
+
+    void HydroObjective::setOdom(const nav_msgs::OdometryConstPtr &odom) {
+
+        // Todo Logic
+        this->odom = odom;
+
     }
 }
 
