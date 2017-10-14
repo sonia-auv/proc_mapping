@@ -30,6 +30,8 @@ namespace proc_mapping{
 
         nav_msgs::OdometryConstPtr odom;
 
+        bool needProcess(const proc_hydrophone::PingPoseConstPtr &ping);
+
     };
 }
 

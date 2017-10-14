@@ -18,6 +18,14 @@ namespace proc_mapping
 
         pings.push_back(ping);
 
+        // If we should process (for now, 1m from start ping)
+        if (needProcess(ping))
+        {
+
+
+
+        }
+
         auto newFunction = GetFunction(ping);
 
         functions = join_rows(functions, newFunction);
@@ -25,6 +33,33 @@ namespace proc_mapping
         // TODO Delete
         functions.print();
 
+    }
+
+    bool HydroObjective::needProcess(const proc_hydrophone::PingPoseConstPtr &ping) {
+
+        if (pings.size() <= 1)
+            return false;
+
+        auto firstPing = pings.front();
+
+        auto firstPosition = firstPing->pose.position;
+        auto lastPosition = ping->pose.position;
+
+        auto firstPositionMatrix = arma::mat(2,1);
+        firstPositionMatrix(0,0) = firstPosition.x;
+        firstPositionMatrix(1,0) = firstPosition.y;
+
+        auto lastPositionMatrix = arma::mat(2,1);
+        lastPositionMatrix(0,0) = lastPosition.x;
+        lastPositionMatrix(1,0) = lastPosition.y;
+
+        double distance = norm(lastPositionMatrix - firstPositionMatrix);
+
+
+        if (distance >= 1d)
+            return true;
+
+        return false;
     }
 
     arma::mat HydroObjective::GetFunction(const proc_hydrophone::PingPoseConstPtr &ping) {
@@ -140,6 +175,8 @@ namespace proc_mapping
         this->odom = odom;
 
     }
+
+
 }
 
 

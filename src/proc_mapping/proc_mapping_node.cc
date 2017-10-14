@@ -60,25 +60,25 @@ namespace proc_mapping {
 
             ros::spinOnce();
 
-            if ((ros::Time::now() - previousStamp).sec >= 10)
-            {
-
-                auto point = pingObjective.getPoint();
-
-                if (point)
-                {
-                    PingerLocationPtr pingerLocation(new PingerLocation());
-
-                    pingerLocation->point = *point;
-                    pingerLocation->frequency = 40;
-
-                    pingerLocationPublisher.publish(pingerLocation);
-
-                    pingerLocationDebugPublisher.publish(point);
-                }
-
-                previousStamp = ros::Time::now();
-            }
+//            if ((ros::Time::now() - previousStamp).sec >= 10)
+//            {
+//
+//                auto point = pingObjective.getPoint();
+//
+//                if (point)
+//                {
+//                    PingerLocationPtr pingerLocation(new PingerLocation());
+//
+//                    pingerLocation->point = *point;
+//                    pingerLocation->frequency = 40;
+//
+//                    pingerLocationPublisher.publish(pingerLocation);
+//
+//                    pingerLocationDebugPublisher.publish(point);
+//                }
+//
+//                previousStamp = ros::Time::now();
+//            }
 
             r.sleep();
         }
@@ -130,7 +130,7 @@ namespace proc_mapping {
 
     void ProcMappingNode::PingsCallback(const proc_hydrophone::PingPoseConstPtr &ping) {
 
-        //std::cout << "Ping callback" << std::endl;
+        std::cout << "Ping callback" << std::endl;
 
         pingObjective.addPing(ping);
 
