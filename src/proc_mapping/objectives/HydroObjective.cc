@@ -22,16 +22,50 @@ namespace proc_mapping
         if (needProcess(ping))
         {
 
+            // Get the position matrix
+            auto positions = GetPositions();
+
+            // Get the headings list
+            auto headings = GetHeadings();
+
+            // Get the centroid
+            auto centroid = GetCentroids(positions, 1);
+
+            // Get que right heading
+            auto heading = GetHeading(headings);
+
+            // PROCESSS, SOLVE
+            auto newFunction = GetFunction(centroid, heading);
+
+            std::cout << "Before" << std::endl;
+
+            // TODO Delete
+            functions.print();
+
+            functions = join_rows(functions, newFunction);
+
+            std::cout << "After" << std::endl;
+
+            // TODO Delete
+            functions.print();
+
+            auto point = getPoint();
+
+            // Clear pings vector
+            pings.clear();
+
+            // Add last received ping
+            pings.push_back(ping);
 
 
         }
 
-        auto newFunction = GetFunction(ping);
+        //auto newFunction = GetFunction(ping);
 
-        functions = join_rows(functions, newFunction);
+        //functions = join_rows(functions, newFunction);
 
         // TODO Delete
-        functions.print();
+        //functions.print();
 
     }
 
@@ -56,10 +90,97 @@ namespace proc_mapping
         double distance = norm(lastPositionMatrix - firstPositionMatrix);
 
 
-        if (distance >= 1d)
+        if (distance >= 1)
             return true;
 
         return false;
+    }
+
+    arma::mat HydroObjective::GetPositions() {
+
+        if (pings.empty())
+            return arma::mat();
+
+        arma::mat positions(2,pings.size());
+
+        for (unsigned int i = 0; i < pings.size(); ++i) {
+
+            auto ping = pings[i]->pose.position;
+
+            positions(0, i) = ping.x;
+            positions(1, i) = ping.y;
+
+        }
+
+        return positions;
+
+    }
+
+    std::vector<double> HydroObjective::GetHeadings() {
+        std::vector<double> headings;
+
+        for (unsigned int i = 0; i < pings.size(); ++i) {
+
+            headings.push_back(pings[i]->pose.orientation.z);
+
+        }
+
+        return headings;
+    }
+
+    arma::mat HydroObjective::GetCentroids(arma::mat matrix, unsigned int nb) {
+
+
+        mlpack::kmeans::KMeans<> k;
+
+        arma::mat result;
+
+        k.Cluster(matrix, nb, result);
+
+        result.print();
+
+        return result;
+
+    }
+
+    double HydroObjective::GetHeading(std::vector<double> headings) {
+
+        if (headings.empty())
+            return 0;
+
+
+        double sumX = 0;
+        double sumY = 0;
+
+        for (auto heading : headings) {
+
+            sumX += cos(heading);
+            sumY += sin(heading);
+
+        }
+
+        auto count = headings.size();
+
+        return atan2(sumY / count, sumX / count);
+
+    }
+
+    arma::mat HydroObjective::GetFunction(arma::mat position, double heading) {
+
+        double x = position(0,0);
+        double y = position(1,0);
+
+        double m = sin(heading) / cos(heading);
+
+        double b = y - m * x;
+
+        arma::mat matrix(2,1);
+
+        matrix(0,0) = m;
+        matrix(1,0) = b;
+
+        return matrix;
+
     }
 
     arma::mat HydroObjective::GetFunction(const proc_hydrophone::PingPoseConstPtr &ping) {
@@ -79,6 +200,10 @@ namespace proc_mapping
 
         return matrix;
     }
+
+
+
+
 
     geometry_msgs::PointConstPtr HydroObjective::getPoint() {
 
@@ -175,6 +300,8 @@ namespace proc_mapping
         this->odom = odom;
 
     }
+
+
 
 
 }

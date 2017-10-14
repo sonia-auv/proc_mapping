@@ -8,7 +8,8 @@
 #include <proc_hydrophone/PingPose.h>
 #include <nav_msgs/Odometry.h>
 #define ARMA_DONT_PRINT_ERRORS
-#include <armadillo>
+//#include <armadillo>
+#include <mlpack/methods/kmeans/kmeans.hpp>
 
 namespace proc_mapping{
     class HydroObjective {
@@ -28,9 +29,19 @@ namespace proc_mapping{
 
         arma::mat GetFunction(const proc_hydrophone::PingPoseConstPtr &ping);
 
+        /// TODO delete
         nav_msgs::OdometryConstPtr odom;
 
         bool needProcess(const proc_hydrophone::PingPoseConstPtr &ping);
+
+        arma::mat GetPositions();
+        std::vector<double> GetHeadings();
+
+        arma::mat GetCentroids(arma::mat matrix, unsigned int nb);
+        double GetHeading(std::vector<double> headings);
+
+
+        arma::mat GetFunction(arma::mat position, double heading);
 
     };
 }
