@@ -16,7 +16,7 @@ namespace proc_mapping
 
     void HydroObjective::addPing(const proc_hydrophone::PingPoseConstPtr &ping) {
 
-        pings.push_back(ping);
+        //pings.push_back(ping);
 
         // If we should process (for now, 1m from start ping)
         if (needProcess(ping))
@@ -55,11 +55,13 @@ namespace proc_mapping
             pings.clear();
 
             // Add last received ping
-            pings.push_back(ping);
+            //pings.push_back(ping);
 
 
         }
 
+
+        pings.push_back(ping);
         //auto newFunction = GetFunction(ping);
 
         //functions = join_rows(functions, newFunction);
@@ -71,7 +73,7 @@ namespace proc_mapping
 
     bool HydroObjective::needProcess(const proc_hydrophone::PingPoseConstPtr &ping) {
 
-        if (pings.size() <= 1)
+        if (pings.size() < 1)
             return false;
 
         auto firstPing = pings.front();
@@ -235,7 +237,7 @@ namespace proc_mapping
 
                     arma::mat mMatrix(2,2);
                     mMatrix(0,0) = matI(0,0);
-                    mMatrix(1,0) = matI(0,0);
+                    mMatrix(1,0) = matJ(0,0);
                     mMatrix(0,1) = -1;
                     mMatrix(1,1) = -1;
 
@@ -244,6 +246,14 @@ namespace proc_mapping
                     bMatrix(1,0) = -matJ(1,0);
 
                     arma::mat solution = solve(mMatrix, bMatrix);
+
+                    std::cout << "M matrix" << std::endl;
+                    mMatrix.print();
+
+                    std::cout << "B matrix" << std::endl;
+                    bMatrix.print();
+
+                    std::cout << "END matrix" << std::endl;
 
                     Point point;
                     point.x = solution(0,0);
@@ -254,6 +264,7 @@ namespace proc_mapping
                 }
             }
 
+            // CODE WORKS UNTIL HERE
 
             auto size = points.size();
             arma::mat pointsMatrix(2, size);
