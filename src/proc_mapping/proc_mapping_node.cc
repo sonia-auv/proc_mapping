@@ -130,7 +130,7 @@ namespace proc_mapping {
 
     void ProcMappingNode::PingsCallback(const proc_hydrophone::PingPoseConstPtr &ping) {
 
-        std::cout << "Ping callback" << std::endl;
+        //std::cout << "Ping callback" << std::endl;
 
         pingObjective.addPing(ping);
 

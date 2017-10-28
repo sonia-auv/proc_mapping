@@ -37,17 +37,17 @@ namespace proc_mapping
             // PROCESSS, SOLVE
             auto newFunction = GetFunction(centroid, heading);
 
-            std::cout << "Before" << std::endl;
+            //std::cout << "Before" << std::endl;
 
             // TODO Delete
-            functions.print();
+            //functions.print();
 
             functions = join_rows(functions, newFunction);
 
-            std::cout << "After" << std::endl;
+            //std::cout << "After" << std::endl;
 
             // TODO Delete
-            functions.print();
+            //functions.print();
 
             auto point = getPoint();
 
@@ -139,7 +139,7 @@ namespace proc_mapping
 
         k.Cluster(matrix, nb, result);
 
-        result.print();
+        //result.print();
 
         return result;
 
@@ -247,13 +247,13 @@ namespace proc_mapping
 
                     arma::mat solution = solve(mMatrix, bMatrix);
 
-                    std::cout << "M matrix" << std::endl;
-                    mMatrix.print();
+                    //std::cout << "M matrix" << std::endl;
+                    //mMatrix.print();
 
-                    std::cout << "B matrix" << std::endl;
-                    bMatrix.print();
+                    //std::cout << "B matrix" << std::endl;
+                    //bMatrix.print();
 
-                    std::cout << "END matrix" << std::endl;
+                    //std::cout << "END matrix" << std::endl;
 
                     Point point;
                     point.x = solution(0, 0);
@@ -274,7 +274,7 @@ namespace proc_mapping
 
             auto centroid = GetCentroids(pointsMatrix, 1);
 
-            centroid.print();
+            //centroid.print();
 
             geometry_msgs::PointPtr point(new geometry_msgs::Point());
 
