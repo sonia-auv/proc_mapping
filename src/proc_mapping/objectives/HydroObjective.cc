@@ -235,15 +235,15 @@ namespace proc_mapping
                     arma::mat matI = lastFunctions.col(i);
                     arma::mat matJ = lastFunctions.col(j);
 
-                    arma::mat mMatrix(2,2);
-                    mMatrix(0,0) = matI(0,0);
-                    mMatrix(1,0) = matJ(0,0);
-                    mMatrix(0,1) = -1;
-                    mMatrix(1,1) = -1;
+                    arma::mat mMatrix(2, 2);
+                    mMatrix(0, 0) = matI(0, 0);
+                    mMatrix(1, 0) = matJ(0, 0);
+                    mMatrix(0, 1) = -1;
+                    mMatrix(1, 1) = -1;
 
-                    arma::mat bMatrix(2,1);
-                    bMatrix(0,0) = -matI(1,0);
-                    bMatrix(1,0) = -matJ(1,0);
+                    arma::mat bMatrix(2, 1);
+                    bMatrix(0, 0) = -matI(1, 0);
+                    bMatrix(1, 0) = -matJ(1, 0);
 
                     arma::mat solution = solve(mMatrix, bMatrix);
 
@@ -256,15 +256,13 @@ namespace proc_mapping
                     std::cout << "END matrix" << std::endl;
 
                     Point point;
-                    point.x = solution(0,0);
-                    point.y = solution(1,0);
+                    point.x = solution(0, 0);
+                    point.y = solution(1, 0);
 
                     points.push_back(point);
 
                 }
             }
-
-            // CODE WORKS UNTIL HERE
 
             auto size = points.size();
             arma::mat pointsMatrix(2, size);
@@ -274,29 +272,14 @@ namespace proc_mapping
                 pointsMatrix(1, i) = points[i].y;
             }
 
-            // TODO Debug : DELETE
-            pointsMatrix.print();
+            auto centroid = GetCentroids(pointsMatrix, 1);
 
-            arma::mat xMatrix = sort(pointsMatrix.row(0));
-            arma::mat yMatrix = sort(pointsMatrix.row(1));
-
-            // TODO Debug : DELETE
-            xMatrix.print();
-            yMatrix.print();
+            centroid.print();
 
             geometry_msgs::PointPtr point(new geometry_msgs::Point());
 
-            auto index = size / 2;
-
-            if (size % 2) // 1
-            {
-                point->x = xMatrix(0,index);
-                point->y = yMatrix(0,index);
-            }
-            else {
-                point->x = xMatrix(0, index - 1) + xMatrix(0, index);
-                point->y = yMatrix(0, index - 1) + yMatrix(0, index);
-            }
+            point->x = centroid(0,0);
+            point->y = centroid(1,0);
 
             return point;
 
