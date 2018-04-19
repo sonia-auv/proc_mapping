@@ -154,10 +154,11 @@ namespace proc_mapping
         double sumX = 0;
         double sumY = 0;
 
+        // TODO Review this, not sure this is good
         for (auto heading : headings) {
 
-            sumX += cos(heading);
-            sumY += sin(heading);
+            sumX += sin(heading);
+            sumY += cos(heading);
 
         }
 
@@ -191,7 +192,7 @@ namespace proc_mapping
         double x = ping->pose.position.x;
         double y = ping->pose.position.y;
 
-        double m = sin(heading) / cos(heading);
+        double m = cos(heading) / sin(heading);
 
         double b = y - m * x;
 
