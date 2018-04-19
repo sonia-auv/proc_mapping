@@ -172,7 +172,7 @@ namespace proc_mapping
         double x = position(0,0);
         double y = position(1,0);
 
-        double m = sin(heading) / cos(heading);
+        double m = cos(heading) / sin(heading);
 
         double b = y - m * x;
 
