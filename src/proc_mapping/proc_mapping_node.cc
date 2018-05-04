@@ -56,9 +56,12 @@ namespace proc_mapping {
 
         hydro_sub_ = nh_->subscribe("/proc_hydrophone/ping", 100, &ProcMappingNode::PingsCallback, this);
         proc_image_sub_ = nh_->subscribe("/proc_image_processing/markers",100, &ProcMappingNode::MarkersCallback, this);
+
         objective_reset_srv_ = nh_->advertiseService("/proc_mapping/objective_reset/", &ProcMappingNode::ObjectiveResetCallback, this);
+        pingerLocationService = nh_->advertiseService("/proc_mapping/pinger_location_service", &ProcMappingNode::PingerLocationServiceCallback, this);
 
         pingerLocationPublisher = nh_->advertise<PingerLocation>("/proc_mapping/pinger_location", 100);
+        pingerLocationDebugPublisher = nh_->advertise<geometry_msgs::Point>("/proc_mapping/debug/pinger_location", 100);
 
         bool debug;
 
@@ -88,7 +91,7 @@ namespace proc_mapping {
       ros::Rate r(15);  // 15 hz
             //int id=0;
 
-        auto previousStamp = ros::Time();
+        auto previousStamp = ros::Time::now();
 
       while (ros::ok()) {
         ros::spinOnce();
@@ -100,21 +103,28 @@ namespace proc_mapping {
             debug->sendDebugData();
         }
 
-          if ((ros::Time() - previousStamp).sec >= 10)
+          if ((ros::Time::now() - previousStamp).sec >= 10)
           {
 
               auto point = pingObjective.getPoint();
 
-                PingerLocationPtr pingerLocation(new PingerLocation());
+              if (point)
+              {
+                  PingerLocationPtr pingerLocation(new PingerLocation());
 
 
-              pingerLocation->point = *point;
-                pingerLocation->frequency = 40;
-              //PingPose pingPose;
+                  pingerLocation->point = *point;
+                  pingerLocation->frequency = 40;
+                  //PingPose pingPose;
 
-              pingerLocationPublisher.publish(pingerLocation);
+                  pingerLocationPublisher.publish(pingerLocation);
 
-            previousStamp = ros::Time();
+                  pingerLocationDebugPublisher.publish(point);
+              }
+
+
+
+            previousStamp = ros::Time::now();
           }
 
         r.sleep();
@@ -279,6 +289,17 @@ namespace proc_mapping {
 
         return true;
 
+    }
+
+    bool ProcMappingNode::PingerLocationServiceCallback(proc_mapping::PingerLocationService::Request &request,
+                                       proc_mapping::PingerLocationService::Response &response)
+    {
+        // TODO Manage frequency. To test
+
+        response.pingerLocation.point = *(pingObjective.getPoint());
+        response.pingerLocation.frequency = request.frequency;
+
+        return true;
     }
 
     void ProcMappingNode::PingsCallback(const proc_hydrophone::PingPoseConstPtr &ping) {

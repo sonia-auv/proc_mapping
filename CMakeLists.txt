@@ -74,7 +74,10 @@ add_message_files(DIRECTORY msg
         PoseSavedRequest.msg
         PingerLocation.msg)
 
-add_service_files(DIRECTORY srv FILES ObjectiveReset.srv)
+add_service_files(DIRECTORY srv
+        FILES
+        ObjectiveReset.srv
+        PingerLocationService.srv)
 
 generate_messages(DEPENDENCIES visualization_msgs)
 
