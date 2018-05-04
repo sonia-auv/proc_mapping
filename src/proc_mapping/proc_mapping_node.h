@@ -30,23 +30,15 @@
 #include <memory>
 #include <vector>
 #include <visualization_msgs/MarkerArray.h>
+#include <nav_msgs/Odometry.h>
 #include <proc_hydrophone/PingPose.h>
 
-
-#include "proc_mapping/objectives/Objective.h"
 #include <proc_mapping/objectives/HydroObjective.h>
 
-#include "proc_mapping/GlobalMappingRequest.h"
-#include "proc_mapping/GlobalMappingResponse.h"
-#include "proc_mapping/LocalMappingRequest.h"
-#include "proc_mapping/LocalMappingResponse.h"
 #include "proc_mapping/PingerLocation.h"
 
 #include "proc_mapping/ObjectiveReset.h"
 #include <proc_mapping/PingerLocationService.h>
-
-#include "proc_mapping/position.h"
-#include "proc_mapping/debug.h"
 
 namespace proc_mapping {
 
@@ -76,47 +68,26 @@ class ProcMappingNode {
 
     ros::NodeHandlePtr nh_;
 
-    ros::Publisher map_pub_;
-    ros::Publisher markers_pub_;
-
-    ros::Subscriber global_mapping_request_sub_;
-    ros::Subscriber local_mapping_request_sub_;
-    ros::Publisher global_mapping_response_pub_;
-    ros::Publisher local_mapping_response_pub_;
+    ros::Subscriber reset_map_sub_;
+    ros::Subscriber hydro_sub_;
+    ros::Subscriber odom_sub_;
 
     ros::Publisher pingerLocationPublisher;
     ros::Publisher pingerLocationDebugPublisher;
 
-    ros::Subscriber reset_map_sub_;
-
     ros::ServiceServer objective_reset_srv_;
     ros::ServiceServer pingerLocationService;
-
-    ros::Subscriber hydro_sub_;
-    ros::Subscriber proc_image_sub_;
-
-    visualization_msgs::MarkerArray markers;
-
-    const Position position_;
-
-    Objective::Ptr buoys_;
-    Objective::Ptr fence_;
-    Objective::Ptr pinger_;
 
     HydroObjective pingObjective;
 
     void PingsCallback(const proc_hydrophone::PingPoseConstPtr &ping);
 
-    void MarkersCallback(const visualization_msgs::MarkerArray::ConstPtr &markers);
-    void GlobalMappingRequestCallback(const proc_mapping::GlobalMappingRequest::ConstPtr &request);
-    void LocalMappingRequestCallback(const proc_mapping::LocalMappingRequest::ConstPtr &request);
-    //void MappingRequestCallback(const proc_mapping::MappingRequest::ConstPtr &request);
     bool ObjectiveResetCallback(proc_mapping::ObjectiveReset::Request &request,
                                     proc_mapping::ObjectiveReset::Response &response);
     bool PingerLocationServiceCallback(proc_mapping::PingerLocationService::Request &request,
                                 proc_mapping::PingerLocationService::Response &response);
 
-    Debug * debug = 0;
+    void OdomCallback(const nav_msgs::OdometryConstPtr &odom);
 
 };
 

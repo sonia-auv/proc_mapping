@@ -1,2 +1,0 @@
-proc_mapping/GlobalMappingRequest request
-geometry_msgs/Point point

@@ -66,11 +66,6 @@ find_package(
 
 add_message_files(DIRECTORY msg
         FILES
-        GlobalMappingRequest.msg
-        GlobalMappingResponse.msg
-        LocalMappingRequest.msg
-        LocalMappingResponse.msg
-        KeyValueIdPose.msg
         PoseSavedRequest.msg
         PingerLocation.msg)
 
