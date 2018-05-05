@@ -139,7 +139,7 @@ namespace proc_mapping {
     void ProcMappingNode::OdomCallback(const nav_msgs::OdometryConstPtr &odom) {
 
         // TODO Prepare a reset-method
-        pingObjective.setOdom(odom);
+        //pingObjective.setOdom(odom);
 
     }
 
