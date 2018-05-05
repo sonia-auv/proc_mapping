@@ -25,28 +25,6 @@ set(proc_mapping_SRC_DIR "src")
 
 #===============================================================================
 # C A T K I N   C O N F I G U R A T I O N
-# Store the mlpack include directory in MLPACK_INCLUDE_DIR.
-# The PATHS variable may be specified to give hints for where to find core.hpp.
-find_path(MLPACK_INCLUDE_DIR
-        NAMES core.hpp prereqs.hpp
-        PATHS /usr/include/mlpack
-        )
-
-# Find libmlpack.so (or equivalent) and store it in MLPACK_LIBRARY.
-# If this example script were smarter, it would also find other dependencies of mlpack and store them in
-# an MLPACK_LIBRARIES variable instead.
-find_library(MLPACK_LIBRARY
-        NAMES mlpack
-        PATHS /usr/lib/x86_64-linux-gnu /usr/local/lib/x86_64-linux-gnu /usr/lib64/ /usr/lib/ /usr/local/lib64/ /usr/local/)
-
-find_library(ARMADILLO_LIBRARY
-        NAMES armadillo
-        PATHS /usr/lib/x86_64-linux-gnu /usr/local/lib/x86_64-linux-gnu /usr/lib64/ /usr/lib/ /usr/local/lib64/ /usr/local/
-        )
-find_path(ARMADILLO_INCLUDE_DIR
-        NAMES armadillo
-        PATHS /usr/include
-        )
 
 
 find_package(
@@ -103,8 +81,6 @@ list(REMOVE_ITEM proc_mapping_FILES
 include_directories(
         ${catkin_INCLUDE_DIRS}
         ${proc_mapping_SRC_DIR}
-        ${MLPACK_INCLUDE_DIR}
-        ${ARMADILLO_INCLUDE_DIR}
 )
 
 #==========================================================================
@@ -113,8 +89,7 @@ include_directories(
 add_executable(${PROJECT_NAME}_node ${proc_mapping_SRC_DIR}/${PROJECT_NAME}/main.cc ${proc_mapping_FILES})
 target_link_libraries(${PROJECT_NAME}_node
         ${catkin_LIBRARIES}
-        ${MLPACK_LIBRARY}
-        ${ARMADILLO_LIBRARY}
+        ${catkin_LIBRARIES}
         yaml-cpp
         )
 
