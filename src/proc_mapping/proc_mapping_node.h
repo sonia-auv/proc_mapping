@@ -27,16 +27,8 @@
 #define PROC_MAPPING_PROC_MAPPING_NODE_H_
 
 #include <ros/node_handle.h>
-#include <memory>
-#include <vector>
-#include <visualization_msgs/MarkerArray.h>
-#include <nav_msgs/Odometry.h>
 #include <proc_hydrophone/PingPose.h>
-
 #include <proc_mapping/objectives/HydroObjective.h>
-
-#include "proc_mapping/PingerLocation.h"
-
 #include "proc_mapping/ObjectiveReset.h"
 #include <proc_mapping/PingerLocationService.h>
 
@@ -70,7 +62,6 @@ class ProcMappingNode {
 
     ros::Subscriber reset_map_sub_;
     ros::Subscriber hydro_sub_;
-    ros::Subscriber odom_sub_;
 
     ros::Publisher pingerLocationPublisher;
     ros::Publisher pingerLocationDebugPublisher;
@@ -86,8 +77,6 @@ class ProcMappingNode {
                                     proc_mapping::ObjectiveReset::Response &response);
     bool PingerLocationServiceCallback(proc_mapping::PingerLocationService::Request &request,
                                 proc_mapping::PingerLocationService::Response &response);
-
-    void OdomCallback(const nav_msgs::OdometryConstPtr &odom);
 
 };
 

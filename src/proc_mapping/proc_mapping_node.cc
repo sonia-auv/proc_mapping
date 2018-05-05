@@ -35,7 +35,6 @@ namespace proc_mapping {
         : nh_(nh),
           reset_map_sub_(),
           hydro_sub_(nh_->subscribe("/proc_hydrophone/ping", 100, &ProcMappingNode::PingsCallback, this)),
-          odom_sub_(nh_->subscribe("/proc_navigation/odom", 100, &ProcMappingNode::OdomCallback, this)),
           pingerLocationPublisher(nh_->advertise<PingerLocation>("/proc_mapping/pinger_location", 100)),
           pingerLocationDebugPublisher(nh_->advertise<geometry_msgs::Point>("/proc_mapping/debug/pinger_location", 100)),
           objective_reset_srv_(nh_->advertiseService("/proc_mapping/objective_reset/", &ProcMappingNode::ObjectiveResetCallback, this)),
@@ -130,16 +129,7 @@ namespace proc_mapping {
 
     void ProcMappingNode::PingsCallback(const proc_hydrophone::PingPoseConstPtr &ping) {
 
-        //std::cout << "Ping callback" << std::endl;
-
         pingObjective.addPing(ping);
-
-    }
-
-    void ProcMappingNode::OdomCallback(const nav_msgs::OdometryConstPtr &odom) {
-
-        // TODO Prepare a reset-method
-        //pingObjective.setOdom(odom);
 
     }
 
