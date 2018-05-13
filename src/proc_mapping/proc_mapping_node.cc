@@ -121,7 +121,7 @@ namespace proc_mapping {
     {
         // TODO Manage frequency. To test
 
-        response.pingerLocation.point = *(pingObjective.getPoint());
+        response.pingerLocation.pose = *(pingObjective.getPoint());
         response.pingerLocation.frequency = request.frequency;
 
         return true;

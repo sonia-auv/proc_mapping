@@ -18,17 +18,21 @@ namespace proc_mapping
 
         //ping->pose.position
 
-        geometry_msgs::PointPtr point(new geometry_msgs::Point());
+        geometry_msgs::PosePtr pose(new geometry_msgs::Pose());
 
-        point->x = ping->pose.position.x + distance * sin(ping->pose.orientation.z);
-        point->y = ping->pose.position.y + distance * cos(ping->pose.orientation.z);
-        point->z = ping->pose.position.z;
+        pose->position.x = ping->pose.position.x + distance * sin(ping->pose.orientation.z);
+        pose->position.y = ping->pose.position.y + distance * cos(ping->pose.orientation.z);
+        pose->position.z = ping->pose.position.z;
 
-        this->point = point;
+
+        pose->orientation.z = ping->pose.orientation.z;
+        pose->orientation.y = ping->pose.orientation.y;
+
+        this->point = pose;
 
     }
 
-    geometry_msgs::PointConstPtr HydroObjective::getPoint() {
+    geometry_msgs::PoseConstPtr HydroObjective::getPoint() {
         return point;
     }
 

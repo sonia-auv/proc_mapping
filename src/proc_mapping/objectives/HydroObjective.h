@@ -6,6 +6,7 @@
 #define PROC_MAPPING_HYDROOBJECTIVE_H
 
 #include <proc_hydrophone/PingPose.h>
+#include <geometry_msgs/Pose.h>
 
 namespace proc_mapping{
     class HydroObjective {
@@ -14,11 +15,11 @@ namespace proc_mapping{
         ~HydroObjective();
 
         void addPing(const proc_hydrophone::PingPoseConstPtr &ping);
-        geometry_msgs::PointConstPtr getPoint();
+        geometry_msgs::PoseConstPtr getPoint();
 
     private:
 
-        geometry_msgs::PointConstPtr point;
+        geometry_msgs::PoseConstPtr point;
         double distance = 1;
 
     };

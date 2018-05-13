@@ -1,2 +1,2 @@
-geometry_msgs/Point point
+geometry_msgs/Pose pose
 uint8 frequency
