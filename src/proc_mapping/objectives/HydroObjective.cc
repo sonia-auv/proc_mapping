@@ -20,8 +20,8 @@ namespace proc_mapping
 
         geometry_msgs::PosePtr pose(new geometry_msgs::Pose());
 
-        pose->position.x = ping->pose.position.x + distance * sin(ping->pose.orientation.z);
-        pose->position.y = ping->pose.position.y + distance * cos(ping->pose.orientation.z);
+        pose->position.x = ping->pose.position.x + distance * cos(ping->pose.orientation.z);
+        pose->position.y = ping->pose.position.y + distance * sin(ping->pose.orientation.z);
         pose->position.z = ping->pose.position.z;
 
 
