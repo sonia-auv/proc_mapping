@@ -50,7 +50,8 @@ add_message_files(DIRECTORY msg
 add_service_files(DIRECTORY srv
         FILES
         ObjectiveReset.srv
-        PingerLocationService.srv)
+        PingerLocationService.srv
+        SimulationMappingSrv.srv)
 
 generate_messages(DEPENDENCIES visualization_msgs)
 
