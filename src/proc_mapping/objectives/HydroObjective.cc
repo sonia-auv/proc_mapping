@@ -36,9 +36,9 @@ namespace proc_mapping
 
         geometry_msgs::PosePtr pose(new geometry_msgs::Pose());
 
-        pose->position.x = point->position.x + distance * cos(point->orientation.z);
-        pose->position.y = point->position.y + distance * sin(point->orientation.z);
-        pose->position.z = point->position.z;
+        pose->position.x = odom_->pose.pose.position.x + distance * cos(point->orientation.z);
+        pose->position.y = odom_->pose.pose.position.y + distance * sin(point->orientation.z);
+        pose->position.z = odom_->pose.pose.position.z;
 
 
         pose->orientation.z = point->orientation.z;

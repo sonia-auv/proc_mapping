@@ -17,9 +17,7 @@ namespace proc_mapping{
 
         void addPing(const proc_hydrophone::PingPoseConstPtr &ping);
 
-        inline void setOdom(const nav_msgs::OdometryConstPtr &odom){
-            odom_ = odom;
-        }
+        inline void setOdom(const nav_msgs::OdometryConstPtr &odom){ odom_ = odom; }
 
         geometry_msgs::PoseConstPtr getPoint();
 
