@@ -7,6 +7,7 @@
 
 #include <proc_hydrophone/PingPose.h>
 #include <geometry_msgs/Pose.h>
+#include <nav_msgs/Odometry.h>
 
 namespace proc_mapping{
     class HydroObjective {
@@ -15,12 +16,18 @@ namespace proc_mapping{
         ~HydroObjective();
 
         void addPing(const proc_hydrophone::PingPoseConstPtr &ping);
+
+        inline void setOdom(const nav_msgs::OdometryConstPtr &odom){
+            odom_ = odom;
+        }
+
         geometry_msgs::PoseConstPtr getPoint();
 
     private:
 
         geometry_msgs::PoseConstPtr point;
         double distance = 1;
+        nav_msgs::OdometryConstPtr odom_;
 
     };
 }

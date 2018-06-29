@@ -20,8 +20,8 @@ namespace proc_mapping
 
         geometry_msgs::PosePtr pose(new geometry_msgs::Pose());
 
-        pose->position.x = ping->pose.position.x + distance * cos(ping->pose.orientation.z);
-        pose->position.y = ping->pose.position.y + distance * sin(ping->pose.orientation.z);
+        pose->position.x = ping->pose.position.x;// + distance * cos(ping->pose.orientation.z);
+        pose->position.y = ping->pose.position.y;// + distance * sin(ping->pose.orientation.z);
         pose->position.z = ping->pose.position.z;
 
 
@@ -33,7 +33,19 @@ namespace proc_mapping
     }
 
     geometry_msgs::PoseConstPtr HydroObjective::getPoint() {
-        return point;
+
+        geometry_msgs::PosePtr pose(new geometry_msgs::Pose());
+
+        pose->position.x = point->position.x + distance * cos(point->orientation.z);
+        pose->position.y = point->position.y + distance * sin(point->orientation.z);
+        pose->position.z = point->position.z;
+
+
+        pose->orientation.z = point->orientation.z;
+        pose->orientation.y = point->orientation.y;
+
+
+        return pose;
     }
 
 
