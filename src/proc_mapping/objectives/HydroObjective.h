@@ -23,7 +23,7 @@ namespace proc_mapping{
 
     private:
 
-        geometry_msgs::PoseConstPtr point;
+        std::list<geometry_msgs::PoseConstPtr> points_;
         double distance = 1;
         nav_msgs::OdometryConstPtr odom_;
 
