@@ -23,6 +23,7 @@ namespace proc_mapping{
         geometry_msgs::PoseConstPtr getPoint();
 
         inline void setDistance(double_t distance) { ROS_INFO_STREAM("Setting distance to " << distance << "m"); distance_ = distance; };
+        void resetQueue();
 
     private:
 

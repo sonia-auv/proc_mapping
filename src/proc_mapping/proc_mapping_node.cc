@@ -80,26 +80,6 @@ namespace proc_mapping {
 
             ros::spinOnce();
 
-//            if ((ros::Time::now() - previousStamp).sec >= 10)
-//            {
-//
-//                auto point = pingObjective.getPoint();
-//
-//                if (point)
-//                {
-//                    PingerLocationPtr pingerLocation(new PingerLocation());
-//
-//                    pingerLocation->point = *point;
-//                    pingerLocation->frequency = 40;
-//
-//                    pingerLocationPublisher.publish(pingerLocation);
-//
-//                    pingerLocationDebugPublisher.publish(point);
-//                }
-//
-//                previousStamp = ros::Time::now();
-//            }
-
             r.sleep();
         }
     }
@@ -110,21 +90,16 @@ namespace proc_mapping {
         switch (request.objectiveType)
         {
             case proc_mapping::ObjectiveReset::Request::ALL:
-//                buoys_->reset();
-//                fence_->reset();
-//                pinger_->reset();
                 break;
 
             case proc_mapping::ObjectiveReset::Request::BUOY:
-//                buoys_->reset();
                 break;
 
             case proc_mapping::ObjectiveReset::Request::FENCE:
-//                fence_->reset();
                 break;
 
             case proc_mapping::ObjectiveReset::Request::PINGER:
-//                pinger_->reset();
+                pingObjective.resetQueue();
                 break;
 
             default:
