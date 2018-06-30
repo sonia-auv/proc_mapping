@@ -6,7 +6,7 @@
 
 namespace proc_mapping
 {
-    HydroObjective::HydroObjective() {
+    HydroObjective::HydroObjective(double_t distance) : distance_(distance) {
 
     }
 
@@ -19,8 +19,8 @@ namespace proc_mapping
         //ping->pose.position
 
         geometry_msgs::PosePtr pose(new geometry_msgs::Pose());
-        pose->position.x = ping->pose.position.x;// + distance * cos(ping->pose.orientation.z);
-        pose->position.y = ping->pose.position.y;// + distance * sin(ping->pose.orientation.z);
+        pose->position.x = ping->pose.position.x;
+        pose->position.y = ping->pose.position.y;
         pose->position.z = ping->pose.position.z;
 
 
@@ -75,8 +75,8 @@ namespace proc_mapping
 
         geometry_msgs::PosePtr pose(new geometry_msgs::Pose());
 
-        pose->position.x = odom_->pose.pose.position.x + distance * cos(heading);
-        pose->position.y = odom_->pose.pose.position.y + distance * sin(heading);
+        pose->position.x = odom_->pose.pose.position.x + distance_ * cos(heading);
+        pose->position.y = odom_->pose.pose.position.y + distance_ * sin(heading);
         pose->position.z = odom_->pose.pose.position.z;
 
 

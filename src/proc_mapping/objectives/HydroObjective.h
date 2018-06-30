@@ -5,6 +5,7 @@
 #ifndef PROC_MAPPING_HYDROOBJECTIVE_H
 #define PROC_MAPPING_HYDROOBJECTIVE_H
 
+#include <ros/node_handle.h>
 #include <proc_hydrophone/PingPose.h>
 #include <geometry_msgs/Pose.h>
 #include <nav_msgs/Odometry.h>
@@ -12,7 +13,7 @@
 namespace proc_mapping{
     class HydroObjective {
     public:
-        HydroObjective();
+        HydroObjective(double_t distance = 1);
         ~HydroObjective();
 
         void addPing(const proc_hydrophone::PingPoseConstPtr &ping);
@@ -21,10 +22,12 @@ namespace proc_mapping{
 
         geometry_msgs::PoseConstPtr getPoint();
 
+        inline void setDistance(double_t distance) { ROS_INFO_STREAM("Setting distance to " << distance << "m"); distance_ = distance; };
+
     private:
 
         std::list<geometry_msgs::PoseConstPtr> points_;
-        double distance = 1;
+        double_t distance_;
         nav_msgs::OdometryConstPtr odom_;
 
     };

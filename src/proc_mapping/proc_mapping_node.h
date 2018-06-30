@@ -54,7 +54,6 @@ class ProcMappingNode {
   //  void ResetMapCallback(const sonia_msgs::ResetMap::ConstPtr &msg);
 
 
-
  private:
   //==========================================================================
   // P R I V A T E   M E M B E R S
@@ -81,6 +80,10 @@ class ProcMappingNode {
                                 proc_mapping::PingerLocationService::Response &response);
 
     void OdomCallback(const nav_msgs::OdometryConstPtr &odom);
+
+    static const double_t distanceDefaultValue_;// = 1;
+    static const std::string distanceParamName_;// = "/proc_mapping/hydro/distance";
+
 
 };
 

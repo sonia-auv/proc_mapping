@@ -27,6 +27,9 @@
 
 namespace proc_mapping {
 
+    const double_t ProcMappingNode::distanceDefaultValue_ = 1;
+    const std::string ProcMappingNode::distanceParamName_ = "/proc_mapping/hydro/distance";
+
     //==============================================================================
     // C / D T O R S   S E C T I O N
     //------------------------------------------------------------------------------
@@ -40,7 +43,24 @@ namespace proc_mapping {
           pingerLocationDebugPublisher(nh_->advertise<geometry_msgs::Point>("/proc_mapping/debug/pinger_location", 100)),
           objective_reset_srv_(nh_->advertiseService("/proc_mapping/objective_reset/", &ProcMappingNode::ObjectiveResetCallback, this)),
           pingerLocationService(nh_->advertiseService("/proc_mapping/pinger_location_service", &ProcMappingNode::PingerLocationServiceCallback, this))
-    {}
+    {
+
+        double_t distance;
+
+
+        if (nh_->hasParam(distanceParamName_))
+        {
+            nh_->getParam(distanceParamName_, distance);
+        }
+        else
+        {
+            distance = distanceDefaultValue_;
+            ROS_INFO_STREAM("No param found for " << distanceParamName_ << ". Using default value of " << distanceDefaultValue_);
+        }
+
+        pingObjective.setDistance(distance);
+
+    }
 
     //------------------------------------------------------------------------------
     //

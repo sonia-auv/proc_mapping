@@ -13,4 +13,6 @@
 # Distance in meters of data to eliminate (turbulence in front must be rejected from the dataset)
 /proc_mapping/map/sonar_threshold: 3.0
 
+/proc_mapping/hydro/distance: 3
+
 /proc_mapping/debug: true
