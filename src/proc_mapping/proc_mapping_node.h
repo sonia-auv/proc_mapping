@@ -70,7 +70,12 @@ class ProcMappingNode {
     ros::ServiceServer objective_reset_srv_;
     ros::ServiceServer pingerLocationService;
 
-    HydroObjective pingObjective;
+    std::map<uint8_t , HydroObjective> hydroObjectives_;
+
+//    HydroObjective pingObjective25khz_;
+//    HydroObjective pingObjective30khz_;
+//    HydroObjective pingObjective35khz_;
+//    HydroObjective pingObjective40khz_;
 
     void PingsCallback(const proc_hydrophone::PingPoseConstPtr &ping);
 

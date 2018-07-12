@@ -58,7 +58,10 @@ namespace proc_mapping {
             ROS_INFO_STREAM("No param found for " << distanceParamName_ << ". Using default value of " << distanceDefaultValue_);
         }
 
-        pingObjective.setDistance(distance);
+        hydroObjectives_[25] = HydroObjective(distance);
+        hydroObjectives_[30] = HydroObjective(distance);
+        hydroObjectives_[35] = HydroObjective(distance);
+        hydroObjectives_[40] = HydroObjective(distance);
 
     }
 
@@ -99,7 +102,10 @@ namespace proc_mapping {
                 break;
 
             case proc_mapping::ObjectiveReset::Request::PINGER:
-                pingObjective.resetQueue();
+                for (auto hydroObjective : hydroObjectives_) {
+                    hydroObjective.second.resetQueue();
+                }
+
                 break;
 
             default:
@@ -115,9 +121,15 @@ namespace proc_mapping {
     bool ProcMappingNode::PingerLocationServiceCallback(proc_mapping::PingerLocationService::Request &request,
                                        proc_mapping::PingerLocationService::Response &response)
     {
-        // TODO Manage frequency. To test
 
-        response.pingerLocation.pose = *(pingObjective.getPoint());
+
+        // If key doesn't exist
+        if (hydroObjectives_.find(request.frequency) == hydroObjectives_.end())
+            return false;
+
+        HydroObjective objective = hydroObjectives_[request.frequency];
+
+        response.pingerLocation.pose = *(objective.getPoint());
         response.pingerLocation.frequency = request.frequency;
 
         return true;
@@ -125,13 +137,25 @@ namespace proc_mapping {
 
     void ProcMappingNode::PingsCallback(const proc_hydrophone::PingPoseConstPtr &ping) {
 
-        pingObjective.addPing(ping);
+        uint8_t frequency = ping->frequency;
+
+        // If key doesn't exist
+        if (hydroObjectives_.find(frequency) == hydroObjectives_.end())
+            return;
+
+        hydroObjectives_[frequency].addPing(ping);
 
     }
 
     void ProcMappingNode::OdomCallback(const nav_msgs::OdometryConstPtr &odom)
     {
-        pingObjective.setOdom(odom);
+
+        for (auto keyValue : hydroObjectives_)
+        {
+            hydroObjectives_[keyValue.first].setOdom(odom);
+        }
+
+
     }
 
 }  // namespace proc_mapping
