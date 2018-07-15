@@ -27,12 +27,12 @@ namespace proc_mapping
         pose->orientation.z = ping->pose.orientation.z;
         pose->orientation.y = ping->pose.orientation.y;
 
-        ROS_INFO_STREAM("Adding point to queue");
+        ROS_DEBUG_STREAM("Adding point to queue");
         points_.push_back(pose);
 
         while (points_.size() > 5)
         {
-            ROS_INFO_STREAM("Removing first point in queue");
+            ROS_DEBUG_STREAM("Removing first point in queue");
             points_.pop_front();
         }
 
