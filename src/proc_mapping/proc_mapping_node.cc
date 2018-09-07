@@ -77,8 +77,6 @@ namespace proc_mapping {
 
         ros::Rate r(15);  // 15 hz
 
-        auto previousStamp = ros::Time::now();
-
         while (ros::ok()) {
 
             ros::spinOnce();
