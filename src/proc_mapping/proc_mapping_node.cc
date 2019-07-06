@@ -143,6 +143,14 @@ namespace proc_mapping {
 
         hydroObjectives_[frequency].addPing(ping);
 
+        HydroObjective objective = hydroObjectives_[frequency];
+
+        PingerLocation pingerLocation;
+        pingerLocation.pose = *(objective.getPoint());
+        pingerLocation.frequency = frequency;
+
+        pingerLocationPublisher.publish(pingerLocation);
+
     }
 
     void ProcMappingNode::OdomCallback(const nav_msgs::OdometryConstPtr &odom)
