@@ -133,7 +133,7 @@ namespace proc_mapping {
         return true;
     }
 
-    void ProcMappingNode::PingsCallback(const proc_hydrophone::PingPoseConstPtr &ping) {
+    void ProcMappingNode::PingsCallback(const sonia_msgs::PingPoseConstPtr &ping) {
 
         uint8_t frequency = ping->frequency;
 
