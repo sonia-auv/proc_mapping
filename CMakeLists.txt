@@ -36,7 +36,6 @@ find_package(
         visualization_msgs
         message_generation
         message_runtime
-        proc_hydrophone
 )
 
 #===============================================================================
@@ -64,7 +63,6 @@ catkin_package(
         sensor_msgs
         nav_msgs
         visualization_msgs
-        proc_hydrophone
 )
 
 
@@ -94,7 +92,7 @@ target_link_libraries(${PROJECT_NAME}_node
         yaml-cpp
         )
 
-add_dependencies(${PROJECT_NAME}_node ${PROJECT_NAME}_generate_messages_cpp)
+add_dependencies(${PROJECT_NAME}_node ${PROJECT_NAME}_generate_messages_cpp ${catkin_EXPORTED_TARGETS})
 
 #==========================================================================
 # U N I T   T E S T S
