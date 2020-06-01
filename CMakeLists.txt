@@ -34,35 +34,18 @@ find_package(
         roscpp
         std_msgs
         visualization_msgs
-        message_generation
-        message_runtime
+        sonia_msgs
 )
-
-#===============================================================================
-# G E N E R A T E   M E S S A G E S   &   S E R V I C E S
-
-add_message_files(DIRECTORY msg
-        FILES
-        PoseSavedRequest.msg
-        PingerLocation.msg)
-
-add_service_files(DIRECTORY srv
-        FILES
-        ObjectiveReset.srv
-        PingerLocationService.srv
-        SimulationMappingSrv.srv)
-
-generate_messages(DEPENDENCIES visualization_msgs)
 
 catkin_package(
         CATKIN_DEPENDS
         roscpp
         std_msgs
         message_runtime
-        geometry_msgs
         sensor_msgs
         nav_msgs
         visualization_msgs
+        sonia_msgs
 )
 
 
@@ -92,7 +75,7 @@ target_link_libraries(${PROJECT_NAME}_node
         yaml-cpp
         )
 
-add_dependencies(${PROJECT_NAME}_node ${PROJECT_NAME}_generate_messages_cpp ${catkin_EXPORTED_TARGETS})
+add_dependencies(${PROJECT_NAME}_node ${catkin_EXPORTED_TARGETS})
 
 #==========================================================================
 # U N I T   T E S T S
