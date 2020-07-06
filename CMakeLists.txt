@@ -80,6 +80,7 @@ add_dependencies(${PROJECT_NAME}_node ${catkin_EXPORTED_TARGETS})
 #==========================================================================
 # U N I T   T E S T S
 
-if (CATKIN_ENABLE_TESTING)
-    add_subdirectory(test)
-endif ()
+# Uncomment to enable testing
+#if (CATKIN_ENABLE_TESTING)
+#    add_subdirectory(test)
+#endif ()
