@@ -27,10 +27,10 @@
 #define PROC_MAPPING_PROC_MAPPING_NODE_H_
 
 #include <ros/node_handle.h>
-#include <proc_hydrophone/PingPose.h>
+#include <sonia_msgs/PingPose.h>
 #include <proc_mapping/objectives/HydroObjective.h>
-#include "proc_mapping/ObjectiveReset.h"
-#include <proc_mapping/PingerLocationService.h>
+#include <sonia_msgs/ObjectiveReset.h>
+#include <sonia_msgs/PingerLocationService.h>
 #include <nav_msgs/Odometry.h>
 
 namespace proc_mapping {
@@ -77,12 +77,12 @@ class ProcMappingNode {
 //    HydroObjective pingObjective35khz_;
 //    HydroObjective pingObjective40khz_;
 
-    void PingsCallback(const proc_hydrophone::PingPoseConstPtr &ping);
+    void PingsCallback(const sonia_msgs::PingPoseConstPtr &ping);
 
-    bool ObjectiveResetCallback(proc_mapping::ObjectiveReset::Request &request,
-                                    proc_mapping::ObjectiveReset::Response &response);
-    bool PingerLocationServiceCallback(proc_mapping::PingerLocationService::Request &request,
-                                proc_mapping::PingerLocationService::Response &response);
+    bool ObjectiveResetCallback(sonia_msgs::ObjectiveReset::Request &request,
+                                    sonia_msgs::ObjectiveReset::Response &response);
+    bool PingerLocationServiceCallback(sonia_msgs::PingerLocationService::Request &request,
+                                sonia_msgs::PingerLocationService::Response &response);
 
     void OdomCallback(const nav_msgs::OdometryConstPtr &odom);
 
