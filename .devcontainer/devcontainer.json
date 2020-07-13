@@ -14,6 +14,8 @@
 	"extensions": [
 		"ms-iot.vscode-ros"
 	],
+	"workspaceMount": "source=${localWorkspaceFolder},target=/home/sonia/ros_sonia_ws/src/proc_mapping,type=bind,consistency=cached",
+	"workspaceFolder": "/home/sonia/ros_sonia_ws"
 	// Use 'forwardPorts' to make a list of ports inside the container available locally.
 	// "forwardPorts": [],
 	// Uncomment the next line to run commands after the container is created - for example installing curl.

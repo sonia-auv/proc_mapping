@@ -5,7 +5,7 @@
 #ifndef PROC_MAPPING_HYDROOBJECTIVE_H
 #define PROC_MAPPING_HYDROOBJECTIVE_H
 
-#include <ros/node_handle.h>
+#include <ros/ros.h>
 #include <sonia_msgs/PingPose.h>
 #include <geometry_msgs/Pose.h>
 #include <nav_msgs/Odometry.h>
