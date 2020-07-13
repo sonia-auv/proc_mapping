@@ -28,7 +28,7 @@
 
 #include <ros/node_handle.h>
 #include <sonia_msgs/PingPose.h>
-#include <proc_mapping/objectives/HydroObjective.h>
+#include "objectives/HydroObjective.h"
 #include <sonia_msgs/ObjectiveReset.h>
 #include <sonia_msgs/PingerLocationService.h>
 #include <nav_msgs/Odometry.h>

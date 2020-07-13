@@ -23,7 +23,7 @@
  * along with S.O.N.I.A. software. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "proc_mapping/proc_mapping_node.h"
+#include "proc_mapping_node.h"
 
 namespace proc_mapping {
 
