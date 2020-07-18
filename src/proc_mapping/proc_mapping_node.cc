@@ -27,7 +27,7 @@
 
 namespace proc_mapping
 {
-    // Testing
+    // Testing changes trought git in remote container
 
     const double_t ProcMappingNode::distanceDefaultValue_ = 1;
     const std::string ProcMappingNode::distanceParamName_ = "/proc_mapping/hydro/distance";
