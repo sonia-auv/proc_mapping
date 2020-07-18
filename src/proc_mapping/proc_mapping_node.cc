@@ -28,7 +28,6 @@
 namespace proc_mapping
 {
 
-    //Test comment
     const double_t ProcMappingNode::distanceDefaultValue_ = 1;
     const std::string ProcMappingNode::distanceParamName_ = "/proc_mapping/hydro/distance";
 
