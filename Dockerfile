@@ -31,7 +31,7 @@ WORKDIR ${SONIA_WS}
 COPY . ${NODE_PATH}
 RUN bash -c "source ${ROS_WS_SETUP}; source ${BASE_LIB_WS_SETUP}; catkin_make"
 
-RUN apt-get install git
+RUN apt-get install openssh-client -y
 RUN chown -R ${SONIA_USER}: ${SONIA_WS}
 USER ${SONIA_USER}
 
