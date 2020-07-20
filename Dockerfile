@@ -31,7 +31,6 @@ WORKDIR ${SONIA_WS}
 COPY . ${NODE_PATH}
 RUN bash -c "source ${ROS_WS_SETUP}; source ${BASE_LIB_WS_SETUP}; catkin_make"
 
-RUN apt-get install openssh-client -y
 RUN chown -R ${SONIA_USER}: ${SONIA_WS}
 USER ${SONIA_USER}
 
@@ -41,10 +40,7 @@ RUN echo "roslaunch --wait $LAUNCH_ABSPATH" > ${SCRIPT_DIR}/launch.sh
 
 RUN chmod +x ${SCRIPT_DIR}/entrypoint.sh && chmod +x ${SCRIPT_DIR}/launch.sh
 
-RUN echo "source /opt/ros/$ROS_DISTRO/setup.bash" >> ~/.bashrc
-
-
-
+RUN echo "source ${SONIA_WS_SETUP}" >> ~/.bashrc
 
 ENTRYPOINT ["./scripts/entrypoint.sh"]
 CMD ["./scripts/launch.sh"]
