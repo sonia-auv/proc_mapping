@@ -1,4 +1,4 @@
-# PROC_MAPPING
+# proc_mapping
 
 This module does map position of targets for the mission objectives.
 
