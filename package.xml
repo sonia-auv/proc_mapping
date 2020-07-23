@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <package>
   <name>proc_mapping</name>
-  <version>1.0.1</version>
+  <version>1.0.2</version>
   <description>
     The proc_mapping package is responsible for integrating all the information from the navigation, sonar
     and vision to dynamically create a map of its environment
