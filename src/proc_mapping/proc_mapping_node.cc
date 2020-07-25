@@ -23,9 +23,11 @@
  * along with S.O.N.I.A. software. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "proc_mapping/proc_mapping_node.h"
+#include "proc_mapping_node.h"
 
-namespace proc_mapping {
+namespace proc_mapping
+{
+    // Testing changes trought git in remote container
 
     const double_t ProcMappingNode::distanceDefaultValue_ = 1;
     const std::string ProcMappingNode::distanceParamName_ = "/proc_mapping/hydro/distance";
@@ -47,7 +49,6 @@ namespace proc_mapping {
 
         double_t distance;
 
-
         if (nh_->hasParam(distanceParamName_))
         {
             nh_->getParam(distanceParamName_, distance);
@@ -62,7 +63,6 @@ namespace proc_mapping {
         hydroObjectives_[30] = HydroObjective(distance);
         hydroObjectives_[35] = HydroObjective(distance);
         hydroObjectives_[40] = HydroObjective(distance);
-
     }
 
     //------------------------------------------------------------------------------
@@ -73,11 +73,13 @@ namespace proc_mapping {
     // M E T H O D   S E C T I O N
     //------------------------------------------------------------------------------
     //
-    void ProcMappingNode::Spin() {
+    void ProcMappingNode::Spin()
+    {
 
-        ros::Rate r(15);  // 15 hz
+        ros::Rate r(15); // 15 hz
 
-        while (ros::ok()) {
+        while (ros::ok())
+        {
 
             ros::spinOnce();
 
@@ -86,40 +88,39 @@ namespace proc_mapping {
     }
 
     bool ProcMappingNode::ObjectiveResetCallback(sonia_msgs::ObjectiveReset::Request &request,
-                                                     sonia_msgs::ObjectiveReset::Response &response) {
+                                                 sonia_msgs::ObjectiveReset::Response &response)
+    {
 
         switch (request.objectiveType)
         {
-            case sonia_msgs::ObjectiveReset::Request::ALL:
-                break;
+        case sonia_msgs::ObjectiveReset::Request::ALL:
+            break;
 
-            case sonia_msgs::ObjectiveReset::Request::BUOY:
-                break;
+        case sonia_msgs::ObjectiveReset::Request::BUOY:
+            break;
 
-            case sonia_msgs::ObjectiveReset::Request::FENCE:
-                break;
+        case sonia_msgs::ObjectiveReset::Request::FENCE:
+            break;
 
-            case sonia_msgs::ObjectiveReset::Request::PINGER:
-                for (auto hydroObjective : hydroObjectives_) {
-                    hydroObjective.second.resetQueue();
-                }
+        case sonia_msgs::ObjectiveReset::Request::PINGER:
+            for (auto hydroObjective : hydroObjectives_)
+            {
+                hydroObjective.second.resetQueue();
+            }
 
-                break;
+            break;
 
-            default:
-                ROS_WARN("Invalid value for ObjectiveReset::Request::objectiveType");
-                break;
-
+        default:
+            ROS_WARN("Invalid value for ObjectiveReset::Request::objectiveType");
+            break;
         }
 
         return true;
-
     }
 
     bool ProcMappingNode::PingerLocationServiceCallback(sonia_msgs::PingerLocationService::Request &request,
-                                       sonia_msgs::PingerLocationService::Response &response)
+                                                        sonia_msgs::PingerLocationService::Response &response)
     {
-
 
         // If key doesn't exist
         if (hydroObjectives_.find(request.frequency) == hydroObjectives_.end())
@@ -133,7 +134,8 @@ namespace proc_mapping {
         return true;
     }
 
-    void ProcMappingNode::PingsCallback(const sonia_msgs::PingPoseConstPtr &ping) {
+    void ProcMappingNode::PingsCallback(const sonia_msgs::PingPoseConstPtr &ping)
+    {
 
         uint8_t frequency = ping->frequency;
 
@@ -150,7 +152,6 @@ namespace proc_mapping {
         pingerLocation.frequency = frequency;
 
         pingerLocationPublisher.publish(pingerLocation);
-
     }
 
     void ProcMappingNode::OdomCallback(const nav_msgs::OdometryConstPtr &odom)
@@ -160,8 +161,6 @@ namespace proc_mapping {
         {
             hydroObjectives_[keyValue.first].setOdom(odom);
         }
-
-
     }
 
-}  // namespace proc_mapping
+} // namespace proc_mapping

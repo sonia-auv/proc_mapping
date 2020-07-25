@@ -26,9 +26,9 @@
 #ifndef PROC_MAPPING_PROC_MAPPING_NODE_H_
 #define PROC_MAPPING_PROC_MAPPING_NODE_H_
 
-#include <ros/node_handle.h>
+#include <ros/ros.h>
 #include <sonia_msgs/PingPose.h>
-#include <proc_mapping/objectives/HydroObjective.h>
+#include "objectives/HydroObjective.h"
 #include <sonia_msgs/ObjectiveReset.h>
 #include <sonia_msgs/PingerLocationService.h>
 #include <nav_msgs/Odometry.h>
