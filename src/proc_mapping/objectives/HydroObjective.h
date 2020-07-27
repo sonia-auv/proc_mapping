@@ -6,7 +6,7 @@
 #define PROC_MAPPING_HYDROOBJECTIVE_H
 
 #include <ros/ros.h>
-#include <sonia_msgs/PingPose.h>
+#include <sonia_common/PingPose.h>
 #include <geometry_msgs/Pose.h>
 #include <nav_msgs/Odometry.h>
 
@@ -16,7 +16,7 @@ namespace proc_mapping{
         HydroObjective(double_t distance = 1);
         ~HydroObjective();
 
-        void addPing(const sonia_msgs::PingPoseConstPtr &ping);
+        void addPing(const sonia_common::PingPoseConstPtr &ping);
 
         inline void setOdom(const nav_msgs::OdometryConstPtr &odom){ odom_ = odom; }
 

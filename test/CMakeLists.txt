@@ -1,7 +1,7 @@
 include_directories(
         ${catkin_INCLUDE_DIRS}
         ${proc_mapping_SRC_DIR}
-        ${lib_atlas_INCLUDE_DIRS}
+        ${sonia_common_INCLUDE_DIRS}
         ${Eigen_INCLUDE_DIRS}
         ${PCL_INCLUDE_DIRS}
         ${OpenCV_INCLUDE_DIRS}
@@ -21,8 +21,8 @@ find_package(
         cv_bridge
         pcl_ros
         pcl_conversions
-        lib_atlas
-        sonia_msgs
+        sonia_common
+        sonia_common
 )
 
 find_package(Eigen3 REQUIRED)
@@ -32,6 +32,6 @@ find_package(PCL REQUIRED)
 catkin_add_gtest(SonarMapperTest SonarMapperTest.cc  ${proc_mapping_FILES} TestUtils/OdometrySimulator.h TestUtils/SonarSimulator.h)
 target_link_libraries(SonarMapperTest
         ${catkin_LIBRARIES}
-        ${lib_atlas_LIBRARIES}
+        ${sonia_common_LIBRARIES}
         ${Eigen_LIBRARIES}
         ${PCL_LIBRARIES})

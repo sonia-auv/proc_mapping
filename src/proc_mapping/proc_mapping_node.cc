@@ -41,7 +41,7 @@ namespace proc_mapping
           reset_map_sub_(),
           hydro_sub_(nh_->subscribe("/proc_hydrophone/ping", 100, &ProcMappingNode::PingsCallback, this)),
           odom_sub_(nh_->subscribe("/proc_navigation/odom", 100, &ProcMappingNode::OdomCallback, this)),
-          pingerLocationPublisher(nh_->advertise<sonia_msgs::PingerLocation>("/proc_mapping/pinger_location", 100)),
+          pingerLocationPublisher(nh_->advertise<sonia_common::PingerLocation>("/proc_mapping/pinger_location", 100)),
           pingerLocationDebugPublisher(nh_->advertise<geometry_msgs::Point>("/proc_mapping/debug/pinger_location", 100)),
           objective_reset_srv_(nh_->advertiseService("/proc_mapping/objective_reset/", &ProcMappingNode::ObjectiveResetCallback, this)),
           pingerLocationService(nh_->advertiseService("/proc_mapping/pinger_location_service", &ProcMappingNode::PingerLocationServiceCallback, this))
@@ -87,22 +87,22 @@ namespace proc_mapping
         }
     }
 
-    bool ProcMappingNode::ObjectiveResetCallback(sonia_msgs::ObjectiveReset::Request &request,
-                                                 sonia_msgs::ObjectiveReset::Response &response)
+    bool ProcMappingNode::ObjectiveResetCallback(sonia_common::ObjectiveReset::Request &request,
+                                                 sonia_common::ObjectiveReset::Response &response)
     {
 
         switch (request.objectiveType)
         {
-        case sonia_msgs::ObjectiveReset::Request::ALL:
+        case sonia_common::ObjectiveReset::Request::ALL:
             break;
 
-        case sonia_msgs::ObjectiveReset::Request::BUOY:
+        case sonia_common::ObjectiveReset::Request::BUOY:
             break;
 
-        case sonia_msgs::ObjectiveReset::Request::FENCE:
+        case sonia_common::ObjectiveReset::Request::FENCE:
             break;
 
-        case sonia_msgs::ObjectiveReset::Request::PINGER:
+        case sonia_common::ObjectiveReset::Request::PINGER:
             for (auto hydroObjective : hydroObjectives_)
             {
                 hydroObjective.second.resetQueue();
@@ -118,8 +118,8 @@ namespace proc_mapping
         return true;
     }
 
-    bool ProcMappingNode::PingerLocationServiceCallback(sonia_msgs::PingerLocationService::Request &request,
-                                                        sonia_msgs::PingerLocationService::Response &response)
+    bool ProcMappingNode::PingerLocationServiceCallback(sonia_common::PingerLocationService::Request &request,
+                                                        sonia_common::PingerLocationService::Response &response)
     {
 
         // If key doesn't exist
@@ -134,7 +134,7 @@ namespace proc_mapping
         return true;
     }
 
-    void ProcMappingNode::PingsCallback(const sonia_msgs::PingPoseConstPtr &ping)
+    void ProcMappingNode::PingsCallback(const sonia_common::PingPoseConstPtr &ping)
     {
 
         uint8_t frequency = ping->frequency;
@@ -147,7 +147,7 @@ namespace proc_mapping
 
         HydroObjective objective = hydroObjectives_[frequency];
 
-        sonia_msgs::PingerLocation pingerLocation;
+        sonia_common::PingerLocation pingerLocation;
         pingerLocation.pose = *(objective.getPoint());
         pingerLocation.frequency = frequency;
 
