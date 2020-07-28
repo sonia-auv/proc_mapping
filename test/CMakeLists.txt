@@ -22,7 +22,6 @@ find_package(
         pcl_ros
         pcl_conversions
         sonia_common
-        sonia_common
 )
 
 find_package(Eigen3 REQUIRED)
