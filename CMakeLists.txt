@@ -34,7 +34,7 @@ find_package(
         roscpp
         std_msgs
         visualization_msgs
-        sonia_msgs
+        sonia_common
 )
 
 catkin_package(
@@ -45,7 +45,7 @@ catkin_package(
         sensor_msgs
         nav_msgs
         visualization_msgs
-        sonia_msgs
+        sonia_common
 )
 
 

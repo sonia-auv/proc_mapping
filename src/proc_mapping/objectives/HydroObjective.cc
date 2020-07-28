@@ -14,7 +14,7 @@ namespace proc_mapping
 
     }
 
-    void HydroObjective::addPing(const sonia_msgs::PingPoseConstPtr &ping) {
+    void HydroObjective::addPing(const sonia_common::PingPoseConstPtr &ping) {
 
         //ping->pose.position
 
@@ -97,5 +97,3 @@ namespace proc_mapping
 
 
 }
-
-

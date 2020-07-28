@@ -27,10 +27,10 @@
 #define PROC_MAPPING_PROC_MAPPING_NODE_H_
 
 #include <ros/ros.h>
-#include <sonia_msgs/PingPose.h>
+#include <sonia_common/PingPose.h>
 #include "objectives/HydroObjective.h"
-#include <sonia_msgs/ObjectiveReset.h>
-#include <sonia_msgs/PingerLocationService.h>
+#include <sonia_common/ObjectiveReset.h>
+#include <sonia_common/PingerLocationService.h>
 #include <nav_msgs/Odometry.h>
 
 namespace proc_mapping {
@@ -51,7 +51,7 @@ class ProcMappingNode {
   /// Each iteration of the loop, this will take the objects in the object
   /// registery, empty it and publish the objects.
   void Spin();
-  //  void ResetMapCallback(const sonia_msgs::ResetMap::ConstPtr &msg);
+  //  void ResetMapCallback(const sonia_common::ResetMap::ConstPtr &msg);
 
 
  private:
@@ -77,12 +77,12 @@ class ProcMappingNode {
 //    HydroObjective pingObjective35khz_;
 //    HydroObjective pingObjective40khz_;
 
-    void PingsCallback(const sonia_msgs::PingPoseConstPtr &ping);
+    void PingsCallback(const sonia_common::PingPoseConstPtr &ping);
 
-    bool ObjectiveResetCallback(sonia_msgs::ObjectiveReset::Request &request,
-                                    sonia_msgs::ObjectiveReset::Response &response);
-    bool PingerLocationServiceCallback(sonia_msgs::PingerLocationService::Request &request,
-                                sonia_msgs::PingerLocationService::Response &response);
+    bool ObjectiveResetCallback(sonia_common::ObjectiveReset::Request &request,
+                                    sonia_common::ObjectiveReset::Response &response);
+    bool PingerLocationServiceCallback(sonia_common::PingerLocationService::Request &request,
+                                sonia_common::PingerLocationService::Response &response);
 
     void OdomCallback(const nav_msgs::OdometryConstPtr &odom);
 

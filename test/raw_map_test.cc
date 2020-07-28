@@ -33,8 +33,8 @@
 #include "nav_msgs/Odometry.h"
 #include <sensor_msgs/PointCloud2.h>
 #include <geometry_msgs/Quaternion.h>
-#include "lib_atlas/maths.h"
-#include "lib_atlas/pattern/runnable.h"
+#include "sonia_common/maths.h"
+#include "sonia_common/pattern/runnable.h"
 #include <eigen3/Eigen/Geometry>
 #include <proc_mapping/proc_mapping_node.h>
 #include "proc_mapping/sonar/SonarMapper.h"
@@ -253,8 +253,8 @@ int main(int argc, char **argv) {
 #ifndef PROC_MAPPING_RAW_MAP_H_
 #define PROC_MAPPING_RAW_MAP_H_
 
-#include <lib_atlas/macros.h>
-#include <lib_atlas/ros/image_publisher.h>
+#include <sonia_common/macros.h>
+#include <sonia_common/ros/image_publisher.h>
 #include <opencv/cv.h>
 #include <pcl/point_cloud.h>
 #include <pcl/point_types.h>
