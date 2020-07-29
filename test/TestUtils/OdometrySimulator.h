@@ -27,7 +27,7 @@
 #include "ros/ros.h"
 #include <thread>
 #include "nav_msgs/Odometry.h"
-#include "lib_atlas/maths.h"
+#include "sonia_common/maths.h"
 #include <eigen3/Eigen/Geometry>
 
 

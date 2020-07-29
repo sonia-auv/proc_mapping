@@ -4,24 +4,25 @@ import numpy
 import roslib
 import math
 
-roslib.load_manifest('proc_mapping')
+roslib.load_manifest("proc_mapping")
 import rospy
 
 import sys, select, termios, tty
 
-from sonia_msgs.msg import MapObject
-from sonia_msgs.msg import SemanticMap
+from sonia_common.msg import MapObject
+from sonia_common.msg import SemanticMap
 
 move_bindings = {
-    'w': (0.5, 0, 0, 0),
-    's': (-0.5, 0, 0, 0),
-    'a': (0, 0.5, 0, 0),
-    'd': (0, -0.5, 0, 0),
-    'r': (0, 0, 0.5, 0),
-    'f': (0, 0, -0.5, 0),
-    'q': (0, 0, 0, 0.5),
-    'e': (0, 0, 0, -0.5),
+    "w": (0.5, 0, 0, 0),
+    "s": (-0.5, 0, 0, 0),
+    "a": (0, 0.5, 0, 0),
+    "d": (0, -0.5, 0, 0),
+    "r": (0, 0, 0.5, 0),
+    "f": (0, 0, -0.5, 0),
+    "q": (0, 0, 0, 0.5),
+    "e": (0, 0, 0, -0.5),
 }
+
 
 def get_key():
     tty.setraw(sys.stdin.fileno())
@@ -29,7 +30,7 @@ def get_key():
     key = sys.stdin.read(1)
     termios.tcsetattr(sys.stdin, termios.TCSADRAIN, settings)
 
-    if key == '\x1b' or key == '\x03':
+    if key == "\x1b" or key == "\x03":
         exit(0)
     return key
 
@@ -46,11 +47,10 @@ def get_odom_from_key():
         y += move_bindings[key][1]
         size += move_bindings[key][2]
 
-
         theta += move_bindings[key][3]
         theta = clamp(theta, -math.pi, math.pi)
 
-    elif key == ' ':
+    elif key == " ":
         if flag_buoy == True:
             type = MapObject.FENCE
             flag_buoy = False
@@ -68,9 +68,9 @@ def get_odom_from_key():
 if __name__ == "__main__":
     settings = termios.tcgetattr(sys.stdin)
 
-    sementic_pub = rospy.Publisher('proc_mapping/sementic', SemanticMap, queue_size=100)
+    sementic_pub = rospy.Publisher("proc_mapping/sementic", SemanticMap, queue_size=100)
 
-    rospy.init_node('teleop_keyboard_map')
+    rospy.init_node("teleop_keyboard_map")
 
     current_key = None
     first = False
@@ -97,10 +97,6 @@ if __name__ == "__main__":
         map_object.pose.y = y
         map_object.pose.theta = theta
         map_object.type = type
-        
-
-
-
 
         sementic_map = SemanticMap()
         sementic_map.objects.append(map_object)
