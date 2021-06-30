@@ -3,8 +3,8 @@
 import rospy
 import numpy as np
 import threading
-from proc_mapping.srv import SimulationMappingSrv, SimulationMappingSrvResponse, PingerLocationService, PingerLocationServiceResponse
-from proc_mapping.msg import PingerLocation
+from sonia_common.srv import SimulationMappingSrv, SimulationMappingSrvResponse, PingerLocationService, PingerLocationServiceResponse
+from sonia_common.msg import PingerLocation
 from nav_msgs.msg import Odometry
 from geometry_msgs.msg import Pose, Point
 
