@@ -1,86 +1,76 @@
-# \file     CMakeLists.txt
-# \author   Thibaut Mattio <thibaut.mattio@gmail.com>
-# \date     06/02/2016
-# \copyright    2015 Club SONIA AUV, ETS. All rights reserved.
-# Use of this source code is governed by the GNU GPLv3 license that can be
-# found in the LICENSE file.
-
-#===============================================================================
-# G L O B A L   P R O J E C T   C O N F I G U R A T I O N
-
-cmake_minimum_required(VERSION 2.8.0)
+cmake_minimum_required(VERSION 3.0.2)
 project(proc_mapping)
+set(CMAKE_VERBOSE_MAKEFILE ON)
 
-if (NOT CMAKE_BUILD_TYPE)
-    set(CMAKE_BUILD_TYPE Debug CACHE STRING
-            "Choose the type of build, options are: None Debug Release
-      RelWithDebInfo MinSizeRel."
-            FORCE)
-endif (NOT CMAKE_BUILD_TYPE)
-
-set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -std=c++11 -Wall")
-set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -std=c++11 -O3 -s")
-
-set(proc_mapping_SRC_DIR "src")
-
-#===============================================================================
-# C A T K I N   C O N F I G U R A T I O N
+## Make top-level project name available in all nested projects.
+set(MW_TOP_LEVEL_PROJECT_NAME ${PROJECT_NAME})
+set(PROJECT_SRC_FILES "src")
 
 
-find_package(
-        catkin REQUIRED COMPONENTS
-        roscpp
-        cmake_modules
-        roscpp
-        std_msgs
-        visualization_msgs
-        sonia_common
+## Find catkin macros and libraries
+## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
+## is used, also find other catkin packages
+find_package(catkin REQUIRED COMPONENTS
+geometry_msgs
+nav_msgs
+roscpp
+sensor_msgs
+sonia_common
+std_msgs
+trajectory_msgs
 )
 
+add_definitions(
+-DMODEL=proc_mapping -DNUMST=6 -DNCSTATES=21 -DHAVESTDIO -DMODEL_HAS_DYNAMICALLY_LOADED_SFCNS=0 -DCLASSIC_INTERFACE=0 -DALLOCATIONFCN=0 -DTID01EQ=1 -DTERMFCN=1 -DONESTEPFCN=1 -DMAT_FILE=0 -DMULTI_INSTANCE_CODE=1 -DINTEGER_CODE=0 -DMT=0 -DROS_PROJECT -DMW_SCHED_OTHER -DSTACK_SIZE=64 -D__MW_TARGET_USE_HARDWARE_RESOURCES_H__ -DRT=RT )
+
+## The catkin_package macro generates cmake config files for your package
+## Declare things to be passed to dependent projects
+## INCLUDE_DIRS: uncomment this if you package contains header files
+## LIBRARIES: libraries you create in this project that dependent projects also need
+## CATKIN_DEPENDS: catkin_packages dependent projects also need
+## DEPENDS: system dependencies of this project that dependent projects also need
 catkin_package(
-        CATKIN_DEPENDS
-        roscpp
-        std_msgs
-        message_runtime
-        sensor_msgs
-        nav_msgs
-        visualization_msgs
-        sonia_common
+   CATKIN_DEPENDS gazebo_msgs geometry_msgs nav_msgs roscpp sensor_msgs sonia_common std_msgs trajectory_msgs
 )
 
+###########
+## Build ##
+###########
 
-
-#===============================================================================
-# I N C L U D E   F I L E S
-
-file(GLOB_RECURSE proc_mapping_FILES
-        "${proc_mapping_SRC_DIR}/*.cc"
-        "${proc_mapping_SRC_DIR}/*.h")
-
-list(REMOVE_ITEM proc_mapping_FILES
-        ${CMAKE_CURRENT_SOURCE_DIR}/${proc_mapping_SRC_DIR}/${PROJECT_NAME}/main.cc)
-
+## Specify additional locations of header files
+## Your package locations should be listed before other locations
+# include_directories(include)
 include_directories(
-        ${catkin_INCLUDE_DIRS}
-        ${proc_mapping_SRC_DIR}
+  include
+  ${PROJECT_SOURCE_DIR}
+  ${Boost_INCLUDE_DIRS}
+  ${catkin_INCLUDE_DIRS}
 )
 
-#==========================================================================
-# C R E A T E   E X E C U T A B L E
+## Get list of .c files in project source directory
+file(GLOB ${PROJECT_NAME}_C_SOURCES RELATIVE ${PROJECT_SOURCE_DIR} ${PROJECT_SRC_FILES}/*.c)
+## Get list of .cpp files in project source directory
+file(GLOB ${PROJECT_NAME}_CPP_SOURCES RELATIVE ${PROJECT_SOURCE_DIR} ${PROJECT_SRC_FILES}/*.cpp)
 
-add_executable(${PROJECT_NAME}_node ${proc_mapping_SRC_DIR}/${PROJECT_NAME}/main.cc ${proc_mapping_FILES})
-target_link_libraries(${PROJECT_NAME}_node
-        ${catkin_LIBRARIES}
-        ${catkin_LIBRARIES}
-        yaml-cpp
-        )
+## Declare executable
+add_executable(${PROJECT_NAME}_node
+   ${PROJECT_SRC_FILES}/proc_mapping.cpp
+   ${${PROJECT_NAME}_C_SOURCES}
+   ${${PROJECT_NAME}_CPP_SOURCES}
+)
 
+## Add cmake target dependencies of the executable/library
+## as an example, message headers may need to be generated before nodes
 add_dependencies(${PROJECT_NAME}_node ${catkin_EXPORTED_TARGETS})
 
-#==========================================================================
-# U N I T   T E S T S
+## Specify libraries to link a library or executable target against
+target_link_libraries(${PROJECT_NAME}_node
+   ${catkin_LIBRARIES}
+   ${Boost_LIBRARIES}
+   rt
+   ${CMAKE_DL_LIBS}
+)
 
-# Uncomment to enable testing
-#if (CATKIN_ENABLE_TESTING)
-#    add_subdirectory(test)
-#endif ()
+set_target_properties(${PROJECT_NAME}_node PROPERTIES COMPILE_FLAGS " ")
+SET( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++0x -fpermissive" )
+SET( CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -include stdbool.h" )

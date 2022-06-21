@@ -9,14 +9,7 @@
             "type": "ros",
             "request": "launch",
             "preLaunchTask": "build",
-            "target": "/home/sonia/ros_sonia_ws/src/proc_mapping/launch/proc_mapping.launch"
-        },
-        {
-            "name": "ROS: Launch Simulation",
-            "type": "ros",
-            "request": "launch",
-            "preLaunchTask": "build",
-            "target": "/home/sonia/ros_sonia_ws/src/proc_mapping/launch/proc_mapping_simulation.launch"
+            "target": "/home/sonia/ros_sonia_ws/src/proc_mapping/launch/proc_mapping.launch", // change launch file to proc_control when matlab is fixed
         }
     ]
 }
