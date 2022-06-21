@@ -1,0 +1,4 @@
+<launch>
+    <node name="proc_mapping_node" pkg="proc_mapping" type="proc_mapping_node" output="screen"/>
+
+</launch> 

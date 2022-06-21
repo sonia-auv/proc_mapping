@@ -1,0 +1,6 @@
+<launch>
+    <node name="proc_mapping_config_server"
+        pkg="proc_mapping_config_server"
+        type="server.py"
+        output="screen" />
+</launch>
