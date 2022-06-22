@@ -23,6 +23,9 @@
 namespace coder {
 class pointCloud {
 public:
+  pointCloud *init(const ::coder::array<double, 2U> &varargin_1,
+                   const ::coder::array<double, 1U> &varargin_3,
+                   ::coder::vision::internal::codegen::Kdtree *iobj_0);
   void subsetImpl(const ::coder::array<bool, 1U> &indices,
                   ::coder::array<double, 2U> &loc,
                   ::coder::array<unsigned char, 2U> &c,

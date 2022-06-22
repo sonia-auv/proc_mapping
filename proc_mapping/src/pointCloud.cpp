@@ -468,6 +468,37 @@ void pointCloud::get_ZLimits(::coder::array<double, 2U> &zlim)
   }
 }
 
+pointCloud *pointCloud::init(const ::coder::array<double, 2U> &varargin_1,
+                             const ::coder::array<double, 1U> &varargin_3,
+                             ::coder::vision::internal::codegen::Kdtree *iobj_0)
+{
+  pointCloud *this_;
+  int loop_ub;
+  this_ = this;
+  this_->Location.set_size(varargin_1.size(0), 3);
+  loop_ub = varargin_1.size(0) * 3;
+  for (int i{0}; i < loop_ub; i++) {
+    this_->Location[i] = varargin_1[i];
+  }
+  this_->Color.set_size(0, 0);
+  this_->Normal.set_size(0, 0);
+  this_->Intensity.set_size(varargin_3.size(0));
+  loop_ub = varargin_3.size(0);
+  for (int i{0}; i < loop_ub; i++) {
+    this_->Intensity[i] = varargin_3[i];
+  }
+  pointclouds::internal::codegen::pc::pointCloudArray r;
+  this_->RangeData.set_size(0, 0);
+  this_->PointCloudArrayData.set_size(1, 1);
+  this_->PointCloudArrayData[0] = r;
+  this_->XLimitsInternal.set_size(0, 0);
+  this_->YLimitsInternal.set_size(0, 0);
+  this_->ZLimitsInternal.set_size(0, 0);
+  this_->Kdtree = iobj_0;
+  this_->matlabCodegenIsDeleted = false;
+  return this_;
+}
+
 pointCloud *
 pointCloud::init(const ::coder::array<double, 2U> &varargin_1,
                  const ::coder::array<unsigned char, 2U> &varargin_3,

@@ -23,15 +23,17 @@
 class PointCloudBundler {
 public:
   static void persistentDataStore_init();
-  coder::array<double, 2U> bundle;
+  coder::array<double, 2U> mBundle;
   Preprocessing mPreprocessing;
-  coder::ros::c_Subscriber *startStopSub;
-  coder::ros::d_Subscriber *poseSub;
-  coder::ros::e_Subscriber *sonarSub;
-  bool lastBundleState;
-  coder::ros::e_Subscriber _pobj0;
-  coder::ros::d_Subscriber _pobj1;
-  coder::ros::c_Subscriber _pobj2;
+  coder::ros::c_Subscriber *mStartStopSub;
+  coder::ros::d_Subscriber *mClearBundleSub;
+  coder::ros::e_Subscriber *mPoseSub;
+  coder::ros::f_Subscriber *mSonarSub;
+  bool mLastBundleState;
+  coder::ros::f_Subscriber _pobj0;
+  coder::ros::e_Subscriber _pobj1;
+  coder::ros::d_Subscriber _pobj2;
+  coder::ros::c_Subscriber _pobj3;
 };
 
 #endif

@@ -78,6 +78,22 @@ public:
   d_Subscriber *init();
   void callback();
   double get_MessageCount() const;
+  char TopicName[26];
+  double BufferSize;
+  double MessageCount;
+
+private:
+  std::unique_ptr<MATLABSubscriber<std_msgs::Bool, std_msgs_BoolStruct_T>>
+      SubscriberHelper;
+  std_msgs_BoolStruct_T MsgStruct;
+  bool IsInitialized;
+};
+
+class e_Subscriber {
+public:
+  e_Subscriber *init();
+  void callback();
+  double get_MessageCount() const;
   void get_LatestMessage(double *lastSubMsg_Position_X,
                          double *lastSubMsg_Position_Y,
                          double *lastSubMsg_Position_Z,
@@ -96,9 +112,9 @@ private:
   geometry_msgs_PoseStruct_T MsgStruct;
 };
 
-class e_Subscriber {
+class f_Subscriber {
 public:
-  e_Subscriber *init();
+  f_Subscriber *init();
   void callback();
   double get_MessageCount() const;
   void get_LatestMessage(sensor_msgs_PointCloud2Struct_T *lastSubMsg) const;

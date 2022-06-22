@@ -21,6 +21,7 @@ extern double freq;
 extern bool freq_not_empty;
 extern bool newSonarMsg;
 extern bool bundleStarted;
+extern bool newClearBundleMsg;
 extern double minIntensityValue;
 extern double maxIntensityValue;
 extern double minRangeValue;

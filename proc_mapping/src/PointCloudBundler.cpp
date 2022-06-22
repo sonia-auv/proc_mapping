@@ -19,6 +19,7 @@ void PointCloudBundler::persistentDataStore_init()
 {
   newSonarMsg = false;
   bundleStarted = false;
+  newClearBundleMsg = false;
 }
 
 // End of code generation (PointCloudBundler.cpp)

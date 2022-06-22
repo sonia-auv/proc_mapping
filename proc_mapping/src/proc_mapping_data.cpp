@@ -22,6 +22,8 @@ bool newSonarMsg;
 
 bool bundleStarted;
 
+bool newClearBundleMsg;
+
 double minIntensityValue;
 
 double maxIntensityValue;

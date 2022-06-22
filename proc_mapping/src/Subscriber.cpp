@@ -24,19 +24,6 @@
 // Function Definitions
 namespace coder {
 namespace ros {
-void b_Subscriber::b_callback()
-{
-  MessageCount = get_MessageCount() + 1.0;
-  if (IsInitialized) {
-    // minIntensityState maxIntensityState minRangeState maxRangeState;
-    //  Initial variables
-    //  SET
-    maxRangeValue = MsgStruct.Data;
-    printf("INFO : proc mapping : max Range filter changed \n");
-    fflush(stdout);
-  }
-}
-
 void Subscriber::b_callback()
 {
   MessageCount = get_MessageCount() + 1.0;
@@ -50,22 +37,16 @@ void Subscriber::b_callback()
   }
 }
 
-void c_Subscriber::callback()
+void b_Subscriber::b_callback()
 {
   MessageCount = get_MessageCount() + 1.0;
   if (IsInitialized) {
-    bundleStarted = MsgStruct.Data;
+    // minIntensityState maxIntensityState minRangeState maxRangeState;
     //  Initial variables
     //  SET
-    //  Initial variables
-    //  GET
-    if (bundleStarted) {
-      printf("INFO : proc mapping : Bundle record started \n");
-      fflush(stdout);
-    } else {
-      printf("INFO : proc mapping : Bundle record stopped \n");
-      fflush(stdout);
-    }
+    maxRangeValue = MsgStruct.Data;
+    printf("INFO : proc mapping : max Range filter changed \n");
+    fflush(stdout);
   }
 }
 
@@ -97,7 +78,7 @@ void Subscriber::callback()
   }
 }
 
-void e_Subscriber::callback()
+void f_Subscriber::callback()
 {
   MessageCount = get_MessageCount() + 1.0;
   if (IsInitialized) {
@@ -107,9 +88,43 @@ void e_Subscriber::callback()
   }
 }
 
+void e_Subscriber::callback()
+{
+  MessageCount = get_MessageCount() + 1.0;
+}
+
 void d_Subscriber::callback()
 {
   MessageCount = get_MessageCount() + 1.0;
+  if (IsInitialized) {
+    //  Initial variables
+    //  SET
+    newClearBundleMsg = true;
+  }
+}
+
+void c_Subscriber::callback()
+{
+  MessageCount = get_MessageCount() + 1.0;
+  if (IsInitialized) {
+    bundleStarted = MsgStruct.Data;
+    //  Initial variables
+    //  SET
+    //  Initial variables
+    //  GET
+    if (bundleStarted) {
+      printf("INFO : proc mapping : Bundle record started \n");
+      fflush(stdout);
+    } else {
+      printf("INFO : proc mapping : Bundle record stopped \n");
+      fflush(stdout);
+    }
+  }
+}
+
+double b_Subscriber::get_MessageCount() const
+{
+  return MessageCount;
 }
 
 double d_Subscriber::get_MessageCount() const
@@ -122,7 +137,7 @@ double e_Subscriber::get_MessageCount() const
   return MessageCount;
 }
 
-double Subscriber::get_MessageCount() const
+double f_Subscriber::get_MessageCount() const
 {
   return MessageCount;
 }
@@ -132,36 +147,9 @@ double c_Subscriber::get_MessageCount() const
   return MessageCount;
 }
 
-double b_Subscriber::get_MessageCount() const
+double Subscriber::get_MessageCount() const
 {
   return MessageCount;
-}
-
-Subscriber *Subscriber::b_init()
-{
-  static const char topic[40]{'/', 'p', 'r', 'o', 'c', '_', 'm', 'a', 'p', 'p',
-                              'i', 'n', 'g', '/', 'p', 'r', 'e', 'p', 'r', 'o',
-                              'c', 'e', 's', 's', 'i', 'n', 'g', '/', 'm', 'a',
-                              'x', 'I', 'n', 't', 'e', 'n', 's', 'i', 't', 'y'};
-  Subscriber *obj;
-  obj = this;
-  obj->IsInitialized = false;
-  for (int i{0}; i < 40; i++) {
-    obj->TopicName[i] = topic[i];
-  }
-  obj->BufferSize = 1.0;
-  obj->MessageCount = 0.0;
-  obj->MsgStruct = std_msgs_Float32Struct();
-  auto structPtr = (&obj->MsgStruct);
-  obj->SubscriberHelper = std::unique_ptr<
-      MATLABSubscriber<std_msgs::Float32, std_msgs_Float32Struct_T>>(
-      new MATLABSubscriber<std_msgs::Float32, std_msgs_Float32Struct_T>(
-          structPtr, [this] { this->callback(); })); //();
-  MATLABSUBSCRIBER_createSubscriber(obj->SubscriberHelper, &obj->TopicName[0],
-                                    40.0, obj->BufferSize);
-  obj->b_callback();
-  obj->IsInitialized = true;
-  return obj;
 }
 
 b_Subscriber *b_Subscriber::b_init()
@@ -191,7 +179,34 @@ b_Subscriber *b_Subscriber::b_init()
   return obj;
 }
 
-void e_Subscriber::get_LatestMessage(
+Subscriber *Subscriber::b_init()
+{
+  static const char topic[40]{'/', 'p', 'r', 'o', 'c', '_', 'm', 'a', 'p', 'p',
+                              'i', 'n', 'g', '/', 'p', 'r', 'e', 'p', 'r', 'o',
+                              'c', 'e', 's', 's', 'i', 'n', 'g', '/', 'm', 'a',
+                              'x', 'I', 'n', 't', 'e', 'n', 's', 'i', 't', 'y'};
+  Subscriber *obj;
+  obj = this;
+  obj->IsInitialized = false;
+  for (int i{0}; i < 40; i++) {
+    obj->TopicName[i] = topic[i];
+  }
+  obj->BufferSize = 1.0;
+  obj->MessageCount = 0.0;
+  obj->MsgStruct = std_msgs_Float32Struct();
+  auto structPtr = (&obj->MsgStruct);
+  obj->SubscriberHelper = std::unique_ptr<
+      MATLABSubscriber<std_msgs::Float32, std_msgs_Float32Struct_T>>(
+      new MATLABSubscriber<std_msgs::Float32, std_msgs_Float32Struct_T>(
+          structPtr, [this] { this->callback(); })); //();
+  MATLABSUBSCRIBER_createSubscriber(obj->SubscriberHelper, &obj->TopicName[0],
+                                    40.0, obj->BufferSize);
+  obj->b_callback();
+  obj->IsInitialized = true;
+  return obj;
+}
+
+void f_Subscriber::get_LatestMessage(
     sensor_msgs_PointCloud2Struct_T *lastSubMsg) const
 {
   MATLABSUBSCRIBER_lock(SubscriberHelper);
@@ -199,7 +214,7 @@ void e_Subscriber::get_LatestMessage(
   MATLABSUBSCRIBER_unlock(SubscriberHelper);
 }
 
-void d_Subscriber::get_LatestMessage(double *lastSubMsg_Position_X,
+void e_Subscriber::get_LatestMessage(double *lastSubMsg_Position_X,
                                      double *lastSubMsg_Position_Y,
                                      double *lastSubMsg_Position_Z,
                                      double *lastSubMsg_Orientation_X,
@@ -218,29 +233,28 @@ void d_Subscriber::get_LatestMessage(double *lastSubMsg_Position_X,
   MATLABSUBSCRIBER_unlock(SubscriberHelper);
 }
 
-e_Subscriber *e_Subscriber::init()
+b_Subscriber *b_Subscriber::init()
 {
-  static const char topic[28]{'/', 'p', 'r', 'o', 'v', 'i', 'd', 'e', 'r', '_',
-                              's', 'o', 'n', 'a', 'r', '/', 'p', 'o', 'i', 'n',
-                              't', '_', 'c', 'l', 'o', 'u', 'd', '2'};
-  e_Subscriber *obj;
+  static const char topic[36]{'/', 'p', 'r', 'o', 'c', '_', 'm', 'a', 'p',
+                              'p', 'i', 'n', 'g', '/', 'p', 'r', 'e', 'p',
+                              'r', 'o', 'c', 'e', 's', 's', 'i', 'n', 'g',
+                              '/', 'm', 'i', 'n', 'R', 'a', 'n', 'g', 'e'};
+  b_Subscriber *obj;
   obj = this;
   obj->IsInitialized = false;
-  for (int i{0}; i < 28; i++) {
+  for (int i{0}; i < 36; i++) {
     obj->TopicName[i] = topic[i];
   }
   obj->BufferSize = 1.0;
   obj->MessageCount = 0.0;
-  sensor_msgs_PointCloud2Struct(&obj->MsgStruct);
+  obj->MsgStruct = std_msgs_Float32Struct();
   auto structPtr = (&obj->MsgStruct);
-  obj->SubscriberHelper =
-      std::unique_ptr<MATLABSubscriber<sensor_msgs::PointCloud2,
-                                       sensor_msgs_PointCloud2Struct_T>>(
-          new MATLABSubscriber<sensor_msgs::PointCloud2,
-                               sensor_msgs_PointCloud2Struct_T>(
-              structPtr, [this] { this->callback(); })); //();
+  obj->SubscriberHelper = std::unique_ptr<
+      MATLABSubscriber<std_msgs::Float32, std_msgs_Float32Struct_T>>(
+      new MATLABSubscriber<std_msgs::Float32, std_msgs_Float32Struct_T>(
+          structPtr, [this] { this->callback(); })); //();
   MATLABSUBSCRIBER_createSubscriber(obj->SubscriberHelper, &obj->TopicName[0],
-                                    28.0, obj->BufferSize);
+                                    36.0, obj->BufferSize);
   obj->callback();
   obj->IsInitialized = true;
   return obj;
@@ -273,11 +287,39 @@ Subscriber *Subscriber::init()
   return obj;
 }
 
-d_Subscriber *d_Subscriber::init()
+f_Subscriber *f_Subscriber::init()
+{
+  static const char topic[28]{'/', 'p', 'r', 'o', 'v', 'i', 'd', 'e', 'r', '_',
+                              's', 'o', 'n', 'a', 'r', '/', 'p', 'o', 'i', 'n',
+                              't', '_', 'c', 'l', 'o', 'u', 'd', '2'};
+  f_Subscriber *obj;
+  obj = this;
+  obj->IsInitialized = false;
+  for (int i{0}; i < 28; i++) {
+    obj->TopicName[i] = topic[i];
+  }
+  obj->BufferSize = 1.0;
+  obj->MessageCount = 0.0;
+  sensor_msgs_PointCloud2Struct(&obj->MsgStruct);
+  auto structPtr = (&obj->MsgStruct);
+  obj->SubscriberHelper =
+      std::unique_ptr<MATLABSubscriber<sensor_msgs::PointCloud2,
+                                       sensor_msgs_PointCloud2Struct_T>>(
+          new MATLABSubscriber<sensor_msgs::PointCloud2,
+                               sensor_msgs_PointCloud2Struct_T>(
+              structPtr, [this] { this->callback(); })); //();
+  MATLABSUBSCRIBER_createSubscriber(obj->SubscriberHelper, &obj->TopicName[0],
+                                    28.0, obj->BufferSize);
+  obj->callback();
+  obj->IsInitialized = true;
+  return obj;
+}
+
+e_Subscriber *e_Subscriber::init()
 {
   static const char topic[18]{'/', 'p', 'r', 'o', 'c', '_', 'n', 'a', 'v',
                               '/', 'a', 'u', 'v', '_', 'p', 'o', 's', 'e'};
-  d_Subscriber *obj;
+  e_Subscriber *obj;
   obj = this;
   for (int i{0}; i < 18; i++) {
     obj->TopicName[i] = topic[i];
@@ -296,28 +338,27 @@ d_Subscriber *d_Subscriber::init()
   return obj;
 }
 
-b_Subscriber *b_Subscriber::init()
+d_Subscriber *d_Subscriber::init()
 {
-  static const char topic[36]{'/', 'p', 'r', 'o', 'c', '_', 'm', 'a', 'p',
-                              'p', 'i', 'n', 'g', '/', 'p', 'r', 'e', 'p',
-                              'r', 'o', 'c', 'e', 's', 's', 'i', 'n', 'g',
-                              '/', 'm', 'i', 'n', 'R', 'a', 'n', 'g', 'e'};
-  b_Subscriber *obj;
+  static const char topic[26]{'/', 'p', 'r', 'o', 'c', '_', 'm', 'a', 'p',
+                              'p', 'i', 'n', 'g', '/', 'c', 'l', 'e', 'a',
+                              'r', '_', 'b', 'u', 'n', 'd', 'l', 'e'};
+  d_Subscriber *obj;
   obj = this;
   obj->IsInitialized = false;
-  for (int i{0}; i < 36; i++) {
+  for (int i{0}; i < 26; i++) {
     obj->TopicName[i] = topic[i];
   }
   obj->BufferSize = 1.0;
   obj->MessageCount = 0.0;
-  obj->MsgStruct = std_msgs_Float32Struct();
+  obj->MsgStruct = std_msgs_BoolStruct();
   auto structPtr = (&obj->MsgStruct);
-  obj->SubscriberHelper = std::unique_ptr<
-      MATLABSubscriber<std_msgs::Float32, std_msgs_Float32Struct_T>>(
-      new MATLABSubscriber<std_msgs::Float32, std_msgs_Float32Struct_T>(
-          structPtr, [this] { this->callback(); })); //();
+  obj->SubscriberHelper =
+      std::unique_ptr<MATLABSubscriber<std_msgs::Bool, std_msgs_BoolStruct_T>>(
+          new MATLABSubscriber<std_msgs::Bool, std_msgs_BoolStruct_T>(
+              structPtr, [this] { this->callback(); })); //();
   MATLABSUBSCRIBER_createSubscriber(obj->SubscriberHelper, &obj->TopicName[0],
-                                    36.0, obj->BufferSize);
+                                    26.0, obj->BufferSize);
   obj->callback();
   obj->IsInitialized = true;
   return obj;
