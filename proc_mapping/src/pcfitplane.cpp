@@ -58,7 +58,8 @@ static void evalPlane(const ::coder::array<double, 2U> &model,
 
 void pcfitplane(const pointCloud *varargin_1, planeModel *iobj_0,
                 planeModel **model, ::coder::array<double, 1U> &inlierIndices,
-                ::coder::array<double, 1U> &outlierIndices)
+                ::coder::array<double, 1U> &outlierIndices,
+                ::coder::array<double, 2U> &meanError)
 {
   pointCloud pc;
   pointCloud *b_pc;
@@ -71,65 +72,29 @@ void pcfitplane(const pointCloud *varargin_1, planeModel *iobj_0,
   array<double, 1U> hashTbl;
   array<double, 1U> link;
   array<double, 1U> loc;
+  array<int, 1U> r2;
   array<int, 1U> val;
-  array<int, 1U> y;
+  array<int, 1U> validPtCloudIndices;
   array<unsigned char, 2U> color;
   array<bool, 2U> r;
-  array<bool, 2U> r1;
-  array<bool, 2U> x;
-  array<bool, 1U> b_x;
   array<bool, 1U> bestInliers;
-  array<bool, 1U> r2;
+  array<bool, 1U> r1;
+  array<bool, 1U> x;
   int status;
-  int vstride;
-  int xoffset;
+  int vlen;
+  int y;
   pc.matlabCodegenIsDeleted = true;
-  x.set_size(varargin_1->Location.size(0), 3);
-  vstride = varargin_1->Location.size(0) * 3;
-  for (xoffset = 0; xoffset < vstride; xoffset++) {
-    x[xoffset] = std::isinf(varargin_1->Location[xoffset]);
-  }
-  r.set_size(varargin_1->Location.size(0), 3);
-  vstride = varargin_1->Location.size(0) * 3;
-  for (xoffset = 0; xoffset < vstride; xoffset++) {
-    r[xoffset] = std::isnan(varargin_1->Location[xoffset]);
-  }
-  vstride = x.size(0) * 3;
-  x.set_size(x.size(0), 3);
-  for (xoffset = 0; xoffset < vstride; xoffset++) {
-    x[xoffset] = ((!x[xoffset]) && (!r[xoffset]));
-  }
-  if (x.size(0) == 0) {
-    y.set_size(0);
-  } else {
-    vstride = x.size(0);
-    y.set_size(x.size(0));
-    for (status = 0; status < vstride; status++) {
-      y[status] = x[status];
-    }
-    for (int k{0}; k < 2; k++) {
-      xoffset = (k + 1) * vstride;
-      for (status = 0; status < vstride; status++) {
-        y[status] = y[status] + x[xoffset + status];
-      }
-    }
-  }
-  bestInliers.set_size(y.size(0));
-  vstride = y.size(0);
-  for (xoffset = 0; xoffset < vstride; xoffset++) {
-    bestInliers[xoffset] = (y[xoffset] == 3);
-  }
-  varargin_1->subsetImpl(bestInliers, location, color, modelParams, hashTbl,
-                         b_modelParams);
+  varargin_1->extractValidPoints(location, color, modelParams, hashTbl,
+                                 b_modelParams, bestInliers);
   b_pc = pc.init(location, color, modelParams, hashTbl, &lobj_1);
   b_pc->RangeData.set_size(b_modelParams.size(0), b_modelParams.size(1));
-  vstride = b_modelParams.size(0) * b_modelParams.size(1);
-  for (xoffset = 0; xoffset < vstride; xoffset++) {
-    b_pc->RangeData[xoffset] = b_modelParams[xoffset];
+  vlen = b_modelParams.size(0) * b_modelParams.size(1);
+  for (y = 0; y < vlen; y++) {
+    b_pc->RangeData[y] = b_modelParams[y];
   }
-  b_eml_find(bestInliers, y);
-  vstride = b_pc->Location.size(0);
-  status = (vstride < 3);
+  b_eml_find(bestInliers, validPtCloudIndices);
+  vlen = b_pc->Location.size(0);
+  status = (vlen < 3);
   modelParams.set_size(1, 4);
   modelParams[0] = 0.0;
   modelParams[1] = 0.0;
@@ -144,9 +109,9 @@ void pcfitplane(const pointCloud *varargin_1, planeModel *iobj_0,
     bool b_y;
     bool exitg1;
     location.set_size(pc.Location.size(0), 3);
-    vstride = pc.Location.size(0) * 3;
-    for (xoffset = 0; xoffset < vstride; xoffset++) {
-      location[xoffset] = pc.Location[xoffset];
+    vlen = pc.Location.size(0) * 3;
+    for (y = 0; y < vlen; y++) {
+      location[y] = pc.Location[y];
     }
     numPts = location.size(0);
     idxTrial = 1;
@@ -155,9 +120,9 @@ void pcfitplane(const pointCloud *varargin_1, planeModel *iobj_0,
     modelParams.set_size(0, 0);
     skipTrials = 0;
     bestInliers.set_size(location.size(0));
-    vstride = location.size(0);
-    for (xoffset = 0; xoffset < vstride; xoffset++) {
-      bestInliers[xoffset] = false;
+    vlen = location.size(0);
+    for (y = 0; y < vlen; y++) {
+      bestInliers[y] = false;
     }
     while ((idxTrial <= numTrials) && (skipTrials < 10000)) {
       double a[3];
@@ -296,18 +261,14 @@ void pcfitplane(const pointCloud *varargin_1, planeModel *iobj_0,
         }
       }
       samplePoints.set_size(3, 3);
-      for (xoffset = 0; xoffset < 3; xoffset++) {
-        for (vstride = 0; vstride < 3; vstride++) {
-          samplePoints[vstride + samplePoints.size(0) * xoffset] =
-              location[(static_cast<int>(indices[vstride]) +
-                        location.size(0) * xoffset) -
-                       1];
+      for (y = 0; y < 3; y++) {
+        for (vlen = 0; vlen < 3; vlen++) {
+          samplePoints[vlen + samplePoints.size(0) * y] = location
+              [(static_cast<int>(indices[vlen]) + location.size(0) * y) - 1];
         }
-        selectedLoc = samplePoints[samplePoints.size(0) * xoffset];
-        a[xoffset] =
-            samplePoints[samplePoints.size(0) * xoffset + 1] - selectedLoc;
-        b[xoffset] =
-            samplePoints[samplePoints.size(0) * xoffset + 2] - selectedLoc;
+        selectedLoc = samplePoints[samplePoints.size(0) * y];
+        a[y] = samplePoints[samplePoints.size(0) * y + 1] - selectedLoc;
+        b[y] = samplePoints[samplePoints.size(0) * y + 2] - selectedLoc;
       }
       t = a[1] * b[2] - b[1] * a[2];
       normal_idx_1 = b[0] * a[2] - a[0] * b[2];
@@ -331,35 +292,35 @@ void pcfitplane(const pointCloud *varargin_1, planeModel *iobj_0,
         b_modelParams[2] = i;
         b_modelParams[3] = j;
       }
-      b_x.set_size(b_modelParams.size(0) * b_modelParams.size(1));
-      vstride = b_modelParams.size(0) * b_modelParams.size(1);
-      for (xoffset = 0; xoffset < vstride; xoffset++) {
-        b_x[xoffset] = std::isinf(b_modelParams[xoffset]);
+      x.set_size(b_modelParams.size(0) * b_modelParams.size(1));
+      vlen = b_modelParams.size(0) * b_modelParams.size(1);
+      for (y = 0; y < vlen; y++) {
+        x[y] = std::isinf(b_modelParams[y]);
       }
-      r2.set_size(b_modelParams.size(0) * b_modelParams.size(1));
-      vstride = b_modelParams.size(0) * b_modelParams.size(1);
-      for (xoffset = 0; xoffset < vstride; xoffset++) {
-        r2[xoffset] = std::isnan(b_modelParams[xoffset]);
+      r1.set_size(b_modelParams.size(0) * b_modelParams.size(1));
+      vlen = b_modelParams.size(0) * b_modelParams.size(1);
+      for (y = 0; y < vlen; y++) {
+        r1[y] = std::isnan(b_modelParams[y]);
       }
-      vstride = b_x.size(0);
-      for (xoffset = 0; xoffset < vstride; xoffset++) {
-        b_x[xoffset] = ((!b_x[xoffset]) && (!r2[xoffset]));
+      vlen = x.size(0);
+      for (y = 0; y < vlen; y++) {
+        x[y] = ((!x[y]) && (!r1[y]));
       }
       b_y = true;
-      vstride = 1;
+      vlen = 1;
       exitg1 = false;
-      while ((!exitg1) && (vstride <= b_x.size(0))) {
-        if (!b_x[vstride - 1]) {
+      while ((!exitg1) && (vlen <= x.size(0))) {
+        if (!x[vlen - 1]) {
           b_y = false;
           exitg1 = true;
         } else {
-          vstride++;
+          vlen++;
         }
       }
       if ((b_modelParams.size(0) * b_modelParams.size(1) == 4) && b_y) {
         evalPlane(b_modelParams, location, hashTbl);
-        xoffset = hashTbl.size(0);
-        for (int k{0}; k < xoffset; k++) {
+        y = hashTbl.size(0);
+        for (int k{0}; k < y; k++) {
           if (hashTbl[k] > 0.02) {
             hashTbl[k] = 0.02;
           }
@@ -368,46 +329,46 @@ void pcfitplane(const pointCloud *varargin_1, planeModel *iobj_0,
         if (selectedLoc < bestDis) {
           bestDis = selectedLoc;
           bestInliers.set_size(hashTbl.size(0));
-          vstride = hashTbl.size(0);
-          for (xoffset = 0; xoffset < vstride; xoffset++) {
-            bestInliers[xoffset] = (hashTbl[xoffset] < 0.02);
+          vlen = hashTbl.size(0);
+          for (y = 0; y < vlen; y++) {
+            bestInliers[y] = (hashTbl[y] < 0.02);
           }
           modelParams.set_size(b_modelParams.size(0), b_modelParams.size(1));
-          vstride = b_modelParams.size(0) * b_modelParams.size(1);
-          for (xoffset = 0; xoffset < vstride; xoffset++) {
-            modelParams[xoffset] = b_modelParams[xoffset];
+          vlen = b_modelParams.size(0) * b_modelParams.size(1);
+          for (y = 0; y < vlen; y++) {
+            modelParams[y] = b_modelParams[y];
           }
-          b_x.set_size(hashTbl.size(0));
-          vstride = hashTbl.size(0);
-          for (xoffset = 0; xoffset < vstride; xoffset++) {
-            b_x[xoffset] = (hashTbl[xoffset] < 0.02);
+          x.set_size(hashTbl.size(0));
+          vlen = hashTbl.size(0);
+          for (y = 0; y < vlen; y++) {
+            x[y] = (hashTbl[y] < 0.02);
           }
-          vstride = b_x.size(0);
-          if (b_x.size(0) == 0) {
-            xoffset = 0;
+          vlen = x.size(0);
+          if (x.size(0) == 0) {
+            y = 0;
           } else {
-            xoffset = b_x[0];
-            for (int k{2}; k <= vstride; k++) {
-              xoffset += b_x[k - 1];
+            y = x[0];
+            for (int k{2}; k <= vlen; k++) {
+              y += x[k - 1];
             }
           }
           selectedLoc = rt_powd_snf(
-              static_cast<double>(xoffset) / static_cast<double>(numPts), 3.0);
+              static_cast<double>(y) / static_cast<double>(numPts), 3.0);
           if (selectedLoc < 2.2204460492503131E-16) {
-            vstride = MAX_int32_T;
+            vlen = MAX_int32_T;
           } else {
             selectedLoc =
                 std::ceil(-1.9999999999999996 / std::log10(1.0 - selectedLoc));
             if (selectedLoc < 2.147483648E+9) {
-              vstride = static_cast<int>(selectedLoc);
+              vlen = static_cast<int>(selectedLoc);
             } else if (selectedLoc >= 2.147483648E+9) {
-              vstride = MAX_int32_T;
+              vlen = MAX_int32_T;
             } else {
-              vstride = 0;
+              vlen = 0;
             }
           }
-          if (numTrials > vstride) {
-            numTrials = vstride;
+          if (numTrials > vlen) {
+            numTrials = vlen;
           }
         }
         idxTrial++;
@@ -415,39 +376,39 @@ void pcfitplane(const pointCloud *varargin_1, planeModel *iobj_0,
         skipTrials++;
       }
     }
-    b_x.set_size(modelParams.size(0) * modelParams.size(1));
-    vstride = modelParams.size(0) * modelParams.size(1);
-    for (xoffset = 0; xoffset < vstride; xoffset++) {
-      b_x[xoffset] = std::isinf(modelParams[xoffset]);
+    x.set_size(modelParams.size(0) * modelParams.size(1));
+    vlen = modelParams.size(0) * modelParams.size(1);
+    for (y = 0; y < vlen; y++) {
+      x[y] = std::isinf(modelParams[y]);
     }
-    r2.set_size(modelParams.size(0) * modelParams.size(1));
-    vstride = modelParams.size(0) * modelParams.size(1);
-    for (xoffset = 0; xoffset < vstride; xoffset++) {
-      r2[xoffset] = std::isnan(modelParams[xoffset]);
+    r1.set_size(modelParams.size(0) * modelParams.size(1));
+    vlen = modelParams.size(0) * modelParams.size(1);
+    for (y = 0; y < vlen; y++) {
+      r1[y] = std::isnan(modelParams[y]);
     }
-    vstride = b_x.size(0);
-    for (xoffset = 0; xoffset < vstride; xoffset++) {
-      b_x[xoffset] = ((!b_x[xoffset]) && (!r2[xoffset]));
+    vlen = x.size(0);
+    for (y = 0; y < vlen; y++) {
+      x[y] = ((!x[y]) && (!r1[y]));
     }
     b_y = true;
-    vstride = 1;
+    vlen = 1;
     exitg1 = false;
-    while ((!exitg1) && (vstride <= b_x.size(0))) {
-      if (!b_x[vstride - 1]) {
+    while ((!exitg1) && (vlen <= x.size(0))) {
+      if (!x[vlen - 1]) {
         b_y = false;
         exitg1 = true;
       } else {
-        vstride++;
+        vlen++;
       }
     }
     if ((modelParams.size(0) * modelParams.size(1) == 4) && b_y &&
         (bestInliers.size(0) != 0)) {
-      vstride = bestInliers.size(0);
-      xoffset = bestInliers[0];
-      for (int k{2}; k <= vstride; k++) {
-        xoffset += bestInliers[k - 1];
+      vlen = bestInliers.size(0);
+      y = bestInliers[0];
+      for (int k{2}; k <= vlen; k++) {
+        y += bestInliers[k - 1];
       }
-      if (xoffset < 3) {
+      if (y < 3) {
         status = 2;
       }
     } else {
@@ -463,55 +424,84 @@ void pcfitplane(const pointCloud *varargin_1, planeModel *iobj_0,
   }
   *model = iobj_0;
   iobj_0->Parameters.set_size(1, modelParams.size(1));
-  vstride = modelParams.size(1);
-  for (xoffset = 0; xoffset < vstride; xoffset++) {
-    iobj_0->Parameters[xoffset] = modelParams[xoffset];
+  vlen = modelParams.size(1);
+  for (y = 0; y < vlen; y++) {
+    iobj_0->Parameters[y] = modelParams[y];
   }
   if (status == 0) {
     evalPlane(modelParams, pc.Location, hashTbl);
-    r1.set_size(hashTbl.size(0), 1);
-    vstride = hashTbl.size(0);
-    for (xoffset = 0; xoffset < vstride; xoffset++) {
-      r1[xoffset] = (hashTbl[xoffset] < 0.02);
+    r.set_size(hashTbl.size(0), 1);
+    vlen = hashTbl.size(0);
+    for (y = 0; y < vlen; y++) {
+      r[y] = (hashTbl[y] < 0.02);
     }
-    xoffset = r1.size(0) - 1;
-    vstride = 0;
-    for (int k{0}; k <= xoffset; k++) {
-      if (r1[k]) {
-        vstride++;
+    y = r.size(0) - 1;
+    vlen = 0;
+    for (int k{0}; k <= y; k++) {
+      if (r[k]) {
+        vlen++;
       }
     }
-    inlierIndices.set_size(vstride);
-    vstride = 0;
-    for (int k{0}; k <= xoffset; k++) {
-      if (r1[k]) {
-        inlierIndices[vstride] = y[k];
-        vstride++;
+    inlierIndices.set_size(vlen);
+    vlen = 0;
+    for (int k{0}; k <= y; k++) {
+      if (r[k]) {
+        inlierIndices[vlen] = validPtCloudIndices[k];
+        vlen++;
       }
     }
-    vstride = varargin_1->Location.size(0);
-    bestInliers.set_size(vstride);
-    for (xoffset = 0; xoffset < vstride; xoffset++) {
-      bestInliers[xoffset] = true;
+    vlen = varargin_1->Location.size(0);
+    bestInliers.set_size(vlen);
+    for (y = 0; y < vlen; y++) {
+      bestInliers[y] = true;
     }
-    y.set_size(inlierIndices.size(0));
-    vstride = inlierIndices.size(0);
-    for (xoffset = 0; xoffset < vstride; xoffset++) {
-      y[xoffset] = static_cast<int>(inlierIndices[xoffset]);
+    validPtCloudIndices.set_size(inlierIndices.size(0));
+    vlen = inlierIndices.size(0);
+    for (y = 0; y < vlen; y++) {
+      validPtCloudIndices[y] = static_cast<int>(inlierIndices[y]);
     }
-    vstride = y.size(0);
-    for (xoffset = 0; xoffset < vstride; xoffset++) {
-      bestInliers[y[xoffset] - 1] = false;
+    vlen = validPtCloudIndices.size(0);
+    for (y = 0; y < vlen; y++) {
+      bestInliers[validPtCloudIndices[y] - 1] = false;
     }
-    b_eml_find(bestInliers, y);
-    outlierIndices.set_size(y.size(0));
-    vstride = y.size(0);
-    for (xoffset = 0; xoffset < vstride; xoffset++) {
-      outlierIndices[xoffset] = y[xoffset];
+    b_eml_find(bestInliers, validPtCloudIndices);
+    outlierIndices.set_size(validPtCloudIndices.size(0));
+    vlen = validPtCloudIndices.size(0);
+    for (y = 0; y < vlen; y++) {
+      outlierIndices[y] = validPtCloudIndices[y];
     }
+    r.set_size(hashTbl.size(0), 1);
+    vlen = hashTbl.size(0);
+    for (y = 0; y < vlen; y++) {
+      r[y] = (hashTbl[y] < 0.02);
+    }
+    y = r.size(0) - 1;
+    vlen = 0;
+    for (int k{0}; k <= y; k++) {
+      if (r[k]) {
+        vlen++;
+      }
+    }
+    r2.set_size(vlen);
+    vlen = 0;
+    for (int k{0}; k <= y; k++) {
+      if (r[k]) {
+        r2[vlen] = k + 1;
+        vlen++;
+      }
+    }
+    link.set_size(r2.size(0));
+    vlen = r2.size(0);
+    for (y = 0; y < vlen; y++) {
+      link[y] = hashTbl[r2[y] - 1];
+    }
+    meanError.set_size(1, 1);
+    meanError[0] =
+        blockedSummation(link, r2.size(0)) / static_cast<double>(r2.size(0));
   } else {
     inlierIndices.set_size(0);
     outlierIndices.set_size(0);
+    meanError.set_size(0, 0);
   }
 }
 

@@ -18,16 +18,36 @@
 
 // Type Definitions
 struct struct_T {
+  double minIntensity;
+  double maxIntensity;
+  double minRange;
+  double maxRange;
+};
+
+struct b_struct_T {
+  struct_T preprocessing;
+};
+
+struct c_struct_T {
   int xstart;
   int xend;
 };
 
-struct cell_wrap_13 {
+struct cell_wrap_17 {
   coder::array<char, 2U> f1;
 };
 
-struct b_struct_T {
+struct cell_wrap_41 {
+  coder::array<double, 2U> f1;
+};
+
+struct d_struct_T {
   coder::array<double, 1U> D;
+  coder::array<unsigned int, 1U> b_I;
+};
+
+struct e_struct_T {
+  coder::array<float, 1U> D;
   coder::array<unsigned int, 1U> b_I;
 };
 

@@ -20,9 +20,11 @@
 // Function Declarations
 namespace coder {
 namespace internal {
+void sort(::coder::array<float, 1U> &x, ::coder::array<int, 1U> &idx);
+
 void sort(::coder::array<double, 1U> &x, ::coder::array<int, 1U> &idx);
 
-}
+} // namespace internal
 } // namespace coder
 
 #endif

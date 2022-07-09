@@ -29,9 +29,9 @@ void rosReadXYZ(
     const ::coder::array<unsigned char, 1U> &msg_Data,
     ::coder::array<float, 2U> &xyz)
 {
-  array<cell_wrap_13, 2U> allFieldNames;
-  array<cell_wrap_13, 2U> b_allFieldNames;
-  array<cell_wrap_13, 2U> c_allFieldNames;
+  array<cell_wrap_17, 2U> allFieldNames;
+  array<cell_wrap_17, 2U> b_allFieldNames;
+  array<cell_wrap_17, 2U> c_allFieldNames;
   array<double, 2U> byteIdx;
   array<double, 2U> c;
   array<double, 2U> y;

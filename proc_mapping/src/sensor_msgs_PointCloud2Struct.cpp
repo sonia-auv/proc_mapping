@@ -23,17 +23,17 @@ void sensor_msgs_PointCloud2Struct(sensor_msgs_PointCloud2Struct_T *msg)
   static const char b_cv[23]{'s', 'e', 'n', 's', 'o', 'r', '_', 'm',
                              's', 'g', 's', '/', 'P', 'o', 'i', 'n',
                              't', 'C', 'l', 'o', 'u', 'd', '2'};
-  sensor_msgs_PointFieldStruct_T t1_Fields;
+  sensor_msgs_PointFieldStruct_T t4_Fields;
   //  Message struct definition for sensor_msgs/PointCloud2
   std_msgs_HeaderStruct(&msg->Header);
-  sensor_msgs_PointFieldStruct(&t1_Fields);
+  sensor_msgs_PointFieldStruct(&t4_Fields);
   for (int i{0}; i < 23; i++) {
     msg->MessageType[i] = b_cv[i];
   }
   msg->Height = 0U;
   msg->Width = 0U;
   msg->Fields.set_size(1);
-  msg->Fields[0] = t1_Fields;
+  msg->Fields[0] = t4_Fields;
   msg->IsBigendian = false;
   msg->PointStep = 0U;
   msg->RowStep = 0U;

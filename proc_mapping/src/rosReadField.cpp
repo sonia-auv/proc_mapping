@@ -11,7 +11,6 @@
 // Include files
 #include "rosReadField.h"
 #include "PointCloud2Types.h"
-#include "proc_mapping_data.h"
 #include "proc_mapping_internal_types.h"
 #include "proc_mapping_rtwutil.h"
 #include "proc_mapping_types.h"
@@ -66,7 +65,8 @@ void rosReadField(
     const ::coder::array<unsigned char, 1U> &msg_Data,
     ::coder::array<float, 2U> &fieldData)
 {
-  array<cell_wrap_13, 2U> allFieldNames;
+  static const char b_cv[9]{'i', 'n', 't', 'e', 'n', 's', 'i', 't', 'y'};
+  array<cell_wrap_17, 2U> allFieldNames;
   array<double, 2U> b_y;
   array<double, 2U> byteIdx;
   array<double, 2U> c;
@@ -125,7 +125,7 @@ void rosReadField(
       do {
         exitg1 = 0;
         if (sz_idx_1 < 9) {
-          if (allFieldNames[sz_idx_0].f1[sz_idx_1] != cv[sz_idx_1]) {
+          if (allFieldNames[sz_idx_0].f1[sz_idx_1] != b_cv[sz_idx_1]) {
             exitg1 = 1;
           } else {
             sz_idx_1++;

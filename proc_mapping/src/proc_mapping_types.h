@@ -21,11 +21,6 @@ struct ros_TimeStruct_T {
   unsigned int Nsec;
 };
 
-struct std_msgs_Float32Struct_T {
-  char MessageType[16];
-  float Data;
-};
-
 struct std_msgs_BoolStruct_T {
   char MessageType[13];
   bool Data;
@@ -50,6 +45,41 @@ struct geometry_msgs_PoseStruct_T {
   char MessageType[18];
   geometry_msgs_PointStruct_T Position;
   geometry_msgs_QuaternionStruct_T Orientation;
+};
+
+struct geometry_msgs_PoseWithCovarianceStruct_T {
+  char MessageType[32];
+  geometry_msgs_PoseStruct_T Pose;
+  double Covariance[36];
+};
+
+struct geometry_msgs_Vector3Struct_T {
+  char MessageType[21];
+  double X;
+  double Y;
+  double Z;
+};
+
+struct geometry_msgs_TwistStruct_T {
+  char MessageType[19];
+  geometry_msgs_Vector3Struct_T Linear;
+  geometry_msgs_Vector3Struct_T Angular;
+};
+
+struct geometry_msgs_TwistWithCovarianceStruct_T {
+  char MessageType[33];
+  geometry_msgs_TwistStruct_T Twist;
+  double Covariance[36];
+};
+
+struct sonia_common_AddPoseStruct_T {
+  char MessageType[20];
+  geometry_msgs_PointStruct_T Position;
+  geometry_msgs_Vector3Struct_T Orientation;
+  unsigned char Frame;
+  unsigned char Speed;
+  double Fine;
+  bool Rotation;
 };
 
 struct uint64m_T {
@@ -79,6 +109,14 @@ struct std_msgs_HeaderStruct_T {
   coder::array<char, 2U> FrameId;
 };
 
+struct nav_msgs_OdometryStruct_T {
+  char MessageType[17];
+  std_msgs_HeaderStruct_T Header;
+  coder::array<char, 2U> ChildFrameId;
+  geometry_msgs_PoseWithCovarianceStruct_T Pose;
+  geometry_msgs_TwistWithCovarianceStruct_T Twist;
+};
+
 struct sensor_msgs_PointCloud2Struct_T {
   char MessageType[23];
   std_msgs_HeaderStruct_T Header;
@@ -90,6 +128,13 @@ struct sensor_msgs_PointCloud2Struct_T {
   unsigned int RowStep;
   coder::array<unsigned char, 1U> Data;
   bool IsDense;
+};
+
+struct sensor_msgs_CompressedImageStruct_T {
+  char MessageType[27];
+  std_msgs_HeaderStruct_T Header;
+  coder::array<char, 2U> Format;
+  coder::array<unsigned char, 1U> Data;
 };
 
 #endif

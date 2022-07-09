@@ -17,6 +17,8 @@
 #include <cstdlib>
 
 // Function Declarations
+extern int div_nzp_s32_floor(int numerator, int denominator);
+
 extern unsigned int mul_u32_sat(unsigned int a, unsigned int b);
 
 extern void mul_wide_u32(unsigned int in0, unsigned int in1,

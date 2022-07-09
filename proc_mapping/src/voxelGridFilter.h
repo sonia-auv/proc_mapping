@@ -34,19 +34,7 @@ void voxelGridFilter(const ::coder::array<double, 2U> &location,
                      ::coder::array<double, 1U> &filteredIntensity,
                      ::coder::array<double, 2U> &filteredRangeData);
 
-void voxelGridFilter(const ::coder::array<double, 2U> &location,
-                     const ::coder::array<unsigned char, 2U> &color,
-                     const ::coder::array<double, 2U> &normal,
-                     const ::coder::array<double, 1U> &intensity,
-                     const ::coder::array<double, 2U> &rangeData,
-                     const ::coder::array<double, 2U> &rangeIn,
-                     ::coder::array<double, 2U> &filteredLocation,
-                     ::coder::array<unsigned char, 2U> &filteredColor,
-                     ::coder::array<double, 2U> &filteredNormal,
-                     ::coder::array<double, 1U> &filteredIntensity,
-                     ::coder::array<double, 2U> &filteredRangeData);
-
-} // namespace pc
+}
 } // namespace codegen
 } // namespace internal
 } // namespace vision

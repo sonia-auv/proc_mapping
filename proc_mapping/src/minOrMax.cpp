@@ -118,7 +118,7 @@ double maximum(const ::coder::array<double, 1U> &x)
   return ex;
 }
 
-double minimum(const double x[3])
+double maximum(const double x[3])
 {
   double ex;
   int idx;
@@ -147,7 +147,7 @@ double minimum(const double x[3])
     for (k = idx; k < 4; k++) {
       double d;
       d = x[k - 1];
-      if (ex > d) {
+      if (ex < d) {
         ex = d;
       }
     }
@@ -205,6 +205,43 @@ double minimum(const ::coder::array<double, 2U> &x)
   return ex;
 }
 
+float minimum(const float x[3])
+{
+  float ex;
+  int idx;
+  int k;
+  if (!std::isnan(x[0])) {
+    idx = 1;
+  } else {
+    bool exitg1;
+    idx = 0;
+    k = 2;
+    exitg1 = false;
+    while ((!exitg1) && (k <= 3)) {
+      if (!std::isnan(x[k - 1])) {
+        idx = k;
+        exitg1 = true;
+      } else {
+        k++;
+      }
+    }
+  }
+  if (idx == 0) {
+    ex = x[0];
+  } else {
+    ex = x[idx - 1];
+    idx++;
+    for (k = idx; k < 4; k++) {
+      float f;
+      f = x[k - 1];
+      if (ex > f) {
+        ex = f;
+      }
+    }
+  }
+  return ex;
+}
+
 double minimum(const ::coder::array<double, 1U> &x)
 {
   double ex;
@@ -249,6 +286,43 @@ double minimum(const ::coder::array<double, 1U> &x)
         if (ex > d) {
           ex = d;
         }
+      }
+    }
+  }
+  return ex;
+}
+
+double minimum(const double x[3])
+{
+  double ex;
+  int idx;
+  int k;
+  if (!std::isnan(x[0])) {
+    idx = 1;
+  } else {
+    bool exitg1;
+    idx = 0;
+    k = 2;
+    exitg1 = false;
+    while ((!exitg1) && (k <= 3)) {
+      if (!std::isnan(x[k - 1])) {
+        idx = k;
+        exitg1 = true;
+      } else {
+        k++;
+      }
+    }
+  }
+  if (idx == 0) {
+    ex = x[0];
+  } else {
+    ex = x[idx - 1];
+    idx++;
+    for (k = idx; k < 4; k++) {
+      double d;
+      d = x[k - 1];
+      if (ex > d) {
+        ex = d;
       }
     }
   }

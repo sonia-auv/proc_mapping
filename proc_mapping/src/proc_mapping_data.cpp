@@ -24,14 +24,6 @@ bool bundleStarted;
 
 bool newClearBundleMsg;
 
-double minIntensityValue;
-
-double maxIntensityValue;
-
-double minRangeValue;
-
-double maxRangeValue;
-
 unsigned int method;
 
 unsigned int state;
@@ -39,8 +31,6 @@ unsigned int state;
 unsigned int b_state[2];
 
 unsigned int c_state[625];
-
-const char cv[9]{'i', 'n', 't', 'e', 'n', 's', 'i', 't', 'y'};
 
 bool isInitialized_proc_mapping{false};
 

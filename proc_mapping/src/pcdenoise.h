@@ -18,7 +18,7 @@
 
 // Type Declarations
 namespace coder {
-class b_pointCloud;
+class c_pointCloud;
 
 namespace vision {
 namespace internal {
@@ -34,7 +34,7 @@ class pointCloud;
 
 // Function Declarations
 namespace coder {
-pointCloud *pcdenoise(b_pointCloud *ptCloudIn,
+pointCloud *pcdenoise(c_pointCloud *ptCloudIn,
                       vision::internal::codegen::Kdtree *iobj_0,
                       pointCloud *iobj_1);
 

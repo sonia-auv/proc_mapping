@@ -20,12 +20,17 @@
 // Function Declarations
 namespace coder {
 namespace internal {
+void merge_block(::coder::array<int, 1U> &idx, ::coder::array<float, 1U> &x,
+                 int offset, int n, int preSortLevel,
+                 ::coder::array<int, 1U> &iwork,
+                 ::coder::array<float, 1U> &xwork);
+
 void merge_block(::coder::array<int, 1U> &idx, ::coder::array<double, 1U> &x,
                  int offset, int n, int preSortLevel,
                  ::coder::array<int, 1U> &iwork,
                  ::coder::array<double, 1U> &xwork);
 
-}
+} // namespace internal
 } // namespace coder
 
 #endif

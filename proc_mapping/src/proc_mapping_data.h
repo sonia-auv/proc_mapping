@@ -22,15 +22,10 @@ extern bool freq_not_empty;
 extern bool newSonarMsg;
 extern bool bundleStarted;
 extern bool newClearBundleMsg;
-extern double minIntensityValue;
-extern double maxIntensityValue;
-extern double minRangeValue;
-extern double maxRangeValue;
 extern unsigned int method;
 extern unsigned int state;
 extern unsigned int b_state[2];
 extern unsigned int c_state[625];
-extern const char cv[9];
 extern bool isInitialized_proc_mapping;
 
 #endif

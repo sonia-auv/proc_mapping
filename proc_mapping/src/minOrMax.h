@@ -24,11 +24,15 @@ double maximum(const ::coder::array<double, 2U> &x);
 
 double maximum(const ::coder::array<double, 1U> &x);
 
-double minimum(const double x[3]);
+double maximum(const double x[3]);
 
 double minimum(const ::coder::array<double, 2U> &x);
 
+float minimum(const float x[3]);
+
 double minimum(const ::coder::array<double, 1U> &x);
+
+double minimum(const double x[3]);
 
 } // namespace internal
 } // namespace coder

@@ -10,106 +10,123 @@
 
 // Include files
 #include "proc_mapping.h"
+#include "Buoys.h"
 #include "Kdtree.h"
+#include "ParameterTree.h"
 #include "PointCloudBundler.h"
 #include "Preprocessing.h"
 #include "Publisher.h"
 #include "Rate.h"
+#include "RosNode.h"
 #include "Subscriber.h"
-#include "any1.h"
-#include "nullAssignment.h"
+#include "affine3d.h"
+#include "combineVectorElements.h"
+#include "find.h"
+#include "kmeans.h"
 #include "pcdenoise.h"
 #include "pcdownsample.h"
 #include "pcfitplane.h"
-#include "pcmerge.h"
+#include "pcregistericp.h"
+#include "pcsegdist.h"
+#include "pctransform.h"
 #include "planeModel.h"
 #include "pointCloud.h"
 #include "proc_mapping_data.h"
 #include "proc_mapping_initialize.h"
-#include "proc_mapping_types.h"
+#include "proc_mapping_internal_types.h"
+#include "quat2rotm.h"
 #include "quatUtilities.h"
-#include "rosReadField.h"
-#include "rosReadXYZ.h"
+#include "rigid3d.h"
+#include "rigid3dImpl.h"
 #include "rt_nonfinite.h"
-#include "sensor_msgs_PointCloud2Struct.h"
-#include "sensor_msgs_PointFieldStruct.h"
 #include "tic.h"
 #include "toc.h"
 #include "coder_array.h"
 #include "coder_posix_time.h"
-#include "mlroscpp_pub.h"
+#include "mlroscpp_param.h"
 #include "mlroscpp_rate.h"
-#include <cmath>
-#include <cstddef>
-#include <cstring>
+#include <algorithm>
+#include <functional>
 #include <stdio.h>
 #include <string.h>
 
 // Function Definitions
 void proc_mapping()
 {
-  PointCloudBundler ptBundler;
-  Preprocessing *b_this;
-  coder::b_pointCloud b_lobj_1;
-  coder::planeModel model1;
-  coder::planeModel model2;
-  coder::planeModel *b_model1;
-  coder::planeModel *b_model2;
-  coder::pointCloud lobj_3[5];
+  static coder::b_pointCloud b_lobj_2;
+  static coder::b_pointCloud buoyTformed;
+  Buoys buoys;
+  PointCloudBundler b_lobj_1;
+  RosNode rosNode;
+  coder::c_pointCloud d_lobj_1;
+  coder::images::internal::rigid3dImpl r1;
+  coder::planeModel c_model;
+  coder::planeModel model;
+  coder::planeModel *b_model;
+  coder::planeModel *d_model;
+  coder::pointCloud b_clusterPT;
+  coder::pointCloud b_plane;
+  coder::pointCloud clusterPT;
+  coder::pointCloud d_lobj_2;
   coder::pointCloud filt;
-  coder::pointCloud plane1;
-  coder::pointCloud plane2;
+  coder::pointCloud pct;
+  coder::pointCloud plane;
   coder::pointCloud rawPT;
-  coder::pointCloud remainCloud;
-  coder::pointCloud *iobj_1;
-  coder::pointCloud *output;
-  coder::ros::Publisher lobj_1;
-  coder::ros::Publisher *pub;
+  coder::pointCloud *ptCloudOut;
+  coder::pointCloud *subPT;
+  coder::rigid3d tf;
+  coder::rigid3d tformICP;
+  coder::ros::ParameterTree c_lobj_1;
+  coder::ros::ParameterTree lobj_1;
+  coder::ros::Publisher lobj_3;
   coder::ros::Rate r;
-  coder::ros::Subscriber *e_sub;
-  coder::ros::b_Subscriber *f_sub;
-  coder::ros::c_Subscriber *sub;
-  coder::ros::d_Subscriber *b_sub;
-  coder::ros::e_Subscriber *c_sub;
-  coder::ros::f_Subscriber *d_sub;
-  coder::vision::internal::codegen::Kdtree b_lobj_2[5];
-  coder::vision::internal::codegen::Kdtree lobj_5[3];
-  coder::vision::internal::codegen::Kdtree lobj_2;
+  coder::ros::Subscriber *sub;
+  coder::ros::b_Publisher lobj_2;
+  coder::ros::b_Subscriber *b_sub;
+  coder::ros::c_Subscriber *c_sub;
+  coder::ros::d_Subscriber *d_sub;
+  coder::ros::e_Subscriber *e_sub;
+  coder::vision::internal::codegen::Kdtree c_lobj_3[2];
+  coder::vision::internal::codegen::Kdtree b_lobj_3;
+  coder::vision::internal::codegen::Kdtree c_lobj_2;
+  coder::vision::internal::codegen::Kdtree d_lobj_3;
+  coder::vision::internal::codegen::Kdtree e_lobj_1;
+  coder::vision::internal::codegen::Kdtree e_lobj_3;
+  coder::vision::internal::codegen::Kdtree f_lobj_1;
+  coder::vision::internal::codegen::Kdtree g_lobj_1;
   coder::vision::internal::codegen::Kdtree lobj_4;
   coder::vision::internal::codegen::Kdtree *iobj_0;
-  coder::array<double, 2U> b_ptBundler;
-  coder::array<double, 2U> b_xyzi;
-  coder::array<double, 2U> r1;
-  coder::array<double, 2U> xyzi;
-  coder::array<double, 1U> b_x;
-  coder::array<double, 1U> outlierIndices;
-  coder::array<double, 1U> r2;
-  coder::array<double, 1U> x;
-  coder::array<float, 2U> XYZ;
-  coder::array<float, 2U> b_r;
-  coder::array<float, 1U> RGB;
-  coder::array<bool, 1U> c_xyzi;
-  coder::array<bool, 1U> r3;
-  sensor_msgs_PointCloud2Struct_T pack;
-  double poseMsg_Orientation_Z;
-  double poseMsg_Position_X;
-  double poseMsg_Position_Y;
-  double poseMsg_Position_Z;
-  double t10;
-  double t11;
-  double t12;
-  double t13;
-  double t17;
-  double t18;
-  double t19;
-  double t20;
-  double t21;
-  double t5;
-  double t6;
-  double t7;
-  double t8;
-  double t9;
+  coder::array<double, 2U> b_bundle;
+  coder::array<double, 2U> b_pct;
+  coder::array<double, 2U> bundle;
+  coder::array<double, 2U> c_pct;
+  coder::array<double, 2U> c_r;
+  coder::array<double, 2U> goodCluster;
+  coder::array<double, 2U> meanError;
+  coder::array<double, 2U> r5;
+  coder::array<double, 2U> r6;
+  coder::array<double, 1U> a__1;
+  coder::array<double, 1U> c_bundle;
+  coder::array<int, 2U> r3;
+  coder::array<unsigned int, 1U> b_r;
+  coder::array<int, 1U> kmeansIndex;
+  coder::array<int, 1U> r4;
+  coder::array<unsigned char, 2U> c;
+  coder::array<char, 2U> in;
+  coder::array<char, 2U> parameterName;
+  coder::array<bool, 2U> b_goodCluster;
+  coder::array<bool, 2U> r2;
+  coder::array<bool, 1U> b_kmeansIndex;
+  double b_varargin_1[16];
+  double area;
+  double expl_temp;
+  double param_maxRange;
+  double param_minRange;
+  int b_loop_ub;
   int i;
+  int loop_ub;
+  int unnamed_idx_0;
+  bool nameExists;
   if (!isInitialized_proc_mapping) {
     proc_mapping_initialize();
   }
@@ -117,484 +134,479 @@ void proc_mapping()
   r.init();
   //  Proc_mapping startup
   //         %% ROS Node constructor
-  pub = lobj_1.init();
-  for (i = 0; i < 5; i++) {
-    lobj_3[i].matlabCodegenIsDeleted = true;
+  //  ROS Publishers
+  lobj_3.init();
+  lobj_2.init();
+  //  ROS parameters
+  lobj_1.ParameterHelper = MATLABROSParameter();
+  UNUSED_PARAM(lobj_1.ParameterHelper);
+  // ROSPARAM Construct an instance of this class
+  //    Detailed explanation goes here
+  //         %% get rosparam number
+  coder::ros::ParameterTree::canonicalizeName(&lobj_1, in);
+  parameterName.set_size(1, in.size(1) + 1);
+  loop_ub = in.size(1);
+  for (i = 0; i < loop_ub; i++) {
+    parameterName[i] = in[i];
   }
+  parameterName[in.size(1)] = '\x00';
+  nameExists = std::mem_fn(&MATLABROSParameter::hasParam)(
+      lobj_1.ParameterHelper, &parameterName[0]);
+  if (nameExists) {
+    coder::ros::ParameterTree::canonicalizeName(&lobj_1, in);
+    parameterName.set_size(1, in.size(1) + 1);
+    loop_ub = in.size(1);
+    for (i = 0; i < loop_ub; i++) {
+      parameterName[i] = in[i];
+    }
+    parameterName[in.size(1)] = '\x00';
+    rosNode.param.preprocessing.minIntensity = 0.0;
+    std::mem_fn (&MATLABROSParameter::getParameter<double>)(
+        &lobj_1.ParameterHelper, &parameterName[0],
+        &rosNode.param.preprocessing.minIntensity);
+    //  fprintf("%s : %f \n", value, val);
+  } else {
+    rosNode.param.preprocessing.minIntensity = 0.1;
+  }
+  //         %% get rosparam number
+  coder::ros::ParameterTree::b_canonicalizeName(&lobj_1, in);
+  parameterName.set_size(1, in.size(1) + 1);
+  loop_ub = in.size(1);
+  for (i = 0; i < loop_ub; i++) {
+    parameterName[i] = in[i];
+  }
+  parameterName[in.size(1)] = '\x00';
+  nameExists = std::mem_fn(&MATLABROSParameter::hasParam)(
+      lobj_1.ParameterHelper, &parameterName[0]);
+  if (nameExists) {
+    rosNode.param.preprocessing.maxIntensity = lobj_1.get();
+    //  fprintf("%s : %f \n", value, val);
+  } else {
+    rosNode.param.preprocessing.maxIntensity = 1.0;
+  }
+  //         %% get rosparam number
+  coder::ros::ParameterTree::c_canonicalizeName(&lobj_1, in);
+  parameterName.set_size(1, in.size(1) + 1);
+  loop_ub = in.size(1);
+  for (i = 0; i < loop_ub; i++) {
+    parameterName[i] = in[i];
+  }
+  parameterName[in.size(1)] = '\x00';
+  nameExists = std::mem_fn(&MATLABROSParameter::hasParam)(
+      lobj_1.ParameterHelper, &parameterName[0]);
+  if (nameExists) {
+    rosNode.param.preprocessing.minRange = lobj_1.b_get();
+    //  fprintf("%s : %f \n", value, val);
+  } else {
+    rosNode.param.preprocessing.minRange = 0.1;
+  }
+  //         %% get rosparam number
+  coder::ros::ParameterTree::d_canonicalizeName(&lobj_1, in);
+  parameterName.set_size(1, in.size(1) + 1);
+  loop_ub = in.size(1);
+  for (i = 0; i < loop_ub; i++) {
+    parameterName[i] = in[i];
+  }
+  parameterName[in.size(1)] = '\x00';
+  nameExists = std::mem_fn(&MATLABROSParameter::hasParam)(
+      lobj_1.ParameterHelper, &parameterName[0]);
+  if (nameExists) {
+    rosNode.param.preprocessing.maxRange = lobj_1.c_get();
+    //  fprintf("%s : %f \n", value, val);
+  } else {
+    rosNode.param.preprocessing.maxRange = 5.0;
+  }
+  //  seconds
+  rosNode.counter = 0.0;
   filt.matlabCodegenIsDeleted = true;
+  b_lobj_2.matlabCodegenIsDeleted = true;
   //         %% ROS Spin
   MATLABRate_reset(r.RateHelper);
-  coder::tic(&t10, &t5);
+  coder::tic(&area, &expl_temp);
   printf("INFO : proc mapping : Node is started. \n");
   fflush(stdout);
   printf("INFO : proc mapping : Wait for point cloud. \n");
   fflush(stdout);
   //  Instances
   //         %% PointCloudBundler Constructor
-  ptBundler.mBundle.set_size(3, 4);
+  //  Graphics functions
+  b_lobj_1.mBundle.set_size(3, 4);
   for (i = 0; i < 12; i++) {
-    ptBundler.mBundle[i] = 0.0;
+    b_lobj_1.mBundle[i] = 0.0;
   }
-  ptBundler.mBundle.set_size(1, 4);
-  ptBundler.mBundle[0] = 0.0;
-  ptBundler.mBundle[1] = 0.0;
-  ptBundler.mBundle[2] = 0.0;
-  ptBundler.mBundle[3] = 0.0;
+  b_lobj_1.mBundle.set_size(1, 4);
+  b_lobj_1.mBundle[0] = 0.0;
+  b_lobj_1.mBundle[1] = 0.0;
+  b_lobj_1.mBundle[2] = 0.0;
+  b_lobj_1.mBundle[3] = 0.0;
   //  Subscribers
-  sub = ptBundler._pobj3.init();
-  ptBundler.mStartStopSub = sub;
-  b_sub = ptBundler._pobj2.init();
-  ptBundler.mClearBundleSub = b_sub;
-  c_sub = ptBundler._pobj1.init();
-  ptBundler.mPoseSub = c_sub;
-  d_sub = ptBundler._pobj0.init();
-  ptBundler.mSonarSub = d_sub;
-  ptBundler.mLastBundleState = false;
-  b_this = &ptBundler.mPreprocessing;
+  sub = b_lobj_1._pobj4.init();
+  b_lobj_1.mStartStopSub = sub;
+  b_sub = b_lobj_1._pobj3.init();
+  b_lobj_1.mClearBundleSub = b_sub;
+  c_sub = b_lobj_1._pobj2.init();
+  b_lobj_1.mPoseSub = c_sub;
+  d_sub = b_lobj_1._pobj1.init();
+  b_lobj_1.mSonarSub = d_sub;
+  e_sub = b_lobj_1._pobj0.init();
+  b_lobj_1.mImageSub = e_sub;
+  b_lobj_1.mLastBundleState = false;
+  //  ROS params
+  b_lobj_1.param = rosNode.param;
+  area = b_lobj_1.param.preprocessing.minIntensity;
+  expl_temp = b_lobj_1.param.preprocessing.maxIntensity;
+  param_minRange = b_lobj_1.param.preprocessing.minRange;
+  param_maxRange = b_lobj_1.param.preprocessing.maxRange;
   //         %% Preprocessing Constructor
-  //  General preprocessing value
-  //              this.minIntensityState = true;
-  //              this.maxIntensityState = false;
-  //              this.minRangeState = true;
-  //              this.maxRangeState = false;
-  //              this.minIntensity = 0.07;
-  //              this.maxIntensity = 1;
-  //              this.minRange = 0.1;
-  //              this.maxRange = 100;
-  //  Subscribers
-  e_sub = b_this->_pobj3.init();
-  ptBundler.mPreprocessing.minIntensitySub = e_sub;
-  e_sub = b_this->_pobj2.b_init();
-  ptBundler.mPreprocessing.maxIntensitySub = e_sub;
-  f_sub = b_this->_pobj1.init();
-  ptBundler.mPreprocessing.minRangeSub = f_sub;
-  f_sub = b_this->_pobj0.b_init();
-  ptBundler.mPreprocessing.maxRangeSub = f_sub;
+  //  ROS Subscribers
+  b_lobj_1.mPreprocessing.minIntensity = area;
+  b_lobj_1.mPreprocessing.maxIntensity = expl_temp;
+  b_lobj_1.mPreprocessing.minRange = param_minRange;
+  b_lobj_1.mPreprocessing.maxRange = param_maxRange;
   while (1) {
-    //         %% Step function
-    //  Verifiy if we just stop the record.
-    if (ptBundler.mLastBundleState && (!bundleStarted)) {
-      int nx;
-      //  Initial variables
-      //  GET
-      //  Record finished.
-      ptBundler.mLastBundleState = false;
+    if (!b_lobj_1.step()) {
       printf("INFO : proc mapping : Not bundling. \n");
       fflush(stdout);
       //         %% Getters / Setters
-      xyzi.set_size(ptBundler.mBundle.size(0), 4);
-      nx = ptBundler.mBundle.size(0) * 4;
-      for (i = 0; i < nx; i++) {
-        xyzi[i] = ptBundler.mBundle[i];
+      bundle.set_size(b_lobj_1.mBundle.size(0), 4);
+      loop_ub = b_lobj_1.mBundle.size(0) * 4;
+      for (i = 0; i < loop_ub; i++) {
+        bundle[i] = b_lobj_1.mBundle[i];
       }
-      if (xyzi.size(0) > 1) {
-        unsigned int q0;
+      if (bundle.size(0) > 1) {
+        double varargin_1[9];
+        double q[4];
+        double normal[3];
+        int i1;
+        int varargin_1_tmp;
+        //  Create and filter pointcloud form bundle
         filt.matlabCodegenDestructor();
         rawPT.matlabCodegenIsDeleted = true;
-        b_lobj_1.matlabCodegenIsDeleted = true;
+        d_lobj_1.matlabCodegenIsDeleted = true;
         //  Create the point cloud and apply denoise filter plus a downsample.
-        nx = xyzi.size(0);
-        b_xyzi.set_size(xyzi.size(0), 3);
+        loop_ub = bundle.size(0);
+        b_bundle.set_size(bundle.size(0), 3);
         for (i = 0; i < 3; i++) {
-          for (int k{0}; k < nx; k++) {
-            b_xyzi[k + b_xyzi.size(0) * i] = xyzi[k + xyzi.size(0) * i];
+          for (i1 = 0; i1 < loop_ub; i1++) {
+            b_bundle[i1 + b_bundle.size(0) * i] =
+                bundle[i1 + bundle.size(0) * i];
           }
         }
-        nx = xyzi.size(0);
-        x.set_size(xyzi.size(0));
-        for (i = 0; i < nx; i++) {
-          x[i] = xyzi[i + xyzi.size(0) * 3];
+        loop_ub = bundle.size(0);
+        c_bundle.set_size(bundle.size(0));
+        for (i = 0; i < loop_ub; i++) {
+          c_bundle[i] = bundle[i + bundle.size(0) * 3];
         }
-        rawPT.init(b_xyzi, x, &lobj_2);
-        coder::pcdenoise(coder::pcdownsample(&rawPT, &b_lobj_1), &lobj_4,
+        rawPT.init(b_bundle, c_bundle, &c_lobj_2);
+        coder::pcdenoise(coder::pcdownsample(&rawPT, &d_lobj_1), &b_lobj_3,
                          &filt);
-        b_lobj_1.matlabCodegenDestructor();
+        d_lobj_1.matlabCodegenDestructor();
         rawPT.matlabCodegenDestructor();
-        for (i = 0; i < 5; i++) {
-          lobj_3[i].matlabCodegenDestructor();
+        b_lobj_2.matlabCodegenDestructor();
+        // WALLCORNER Construct an instance of this class
+        //    Detailed explanation goes here
+        buoys.buoyPT = b_lobj_2.init(&e_lobj_1);
+        buoys.buoyPT->Intensity.set_size(7439, 1);
+        for (i = 0; i < 7439; i++) {
+          buoys.buoyPT->Intensity[i] = 0.1F;
         }
-        double q1[4];
-        double in4[3];
-        iobj_0 = &b_lobj_2[0];
-        iobj_1 = &lobj_3[0];
-        plane2.matlabCodegenIsDeleted = true;
-        remainCloud.matlabCodegenIsDeleted = true;
-        plane1.matlabCodegenIsDeleted = true;
-        //  Get first wall
-        coder::pcfitplane(&filt, &model1, &b_model1, x, outlierIndices);
-        filt.b_select(x, &lobj_5[0], &plane1);
-        filt.b_select(outlierIndices, &lobj_5[1], &remainCloud);
-        coder::pcfitplane(&remainCloud, &model2, &b_model2, x, outlierIndices);
-        remainCloud.b_select(x, &lobj_5[2], &plane2);
-        //  Extraire les point orienté
-        quatUtilities::getOrientedPointOnPlanarFace(&model1, &plane1, in4, q1);
-        quatUtilities::getOrientedPointOnPlanarFace(&model2, &plane2, in4, q1);
-        output = coder::pcmerge(&plane1, &plane2, &iobj_0[0], &iobj_1[0]);
-        plane1.matlabCodegenDestructor();
-        remainCloud.matlabCodegenDestructor();
-        plane2.matlabCodegenDestructor();
-        XYZ.set_size(output->Location.size(0), 3);
-        nx = output->Location.size(0) * 3;
-        for (i = 0; i < nx; i++) {
-          XYZ[i] = static_cast<float>(output->Location[i]);
+        buoys.buoyPT->Normal.set_size(7439, 3);
+        for (i = 0; i < 22317; i++) {
+          buoys.buoyPT->Normal[i] = 0.0F;
         }
-        RGB.set_size(output->Intensity.size(0));
-        nx = output->Intensity.size(0);
-        for (i = 0; i < nx; i++) {
-          RGB[i] = static_cast<float>(output->Intensity[i]);
+        d_lobj_2.matlabCodegenIsDeleted = true;
+        clusterPT.matlabCodegenIsDeleted = true;
+        //  Get clusters
+        coder::pcsegdist(&filt, b_r, &area);
+        i = static_cast<int>(area);
+        goodCluster.set_size(1, i);
+        if (static_cast<int>(area) - 1 >= 0) {
+          unnamed_idx_0 = b_r.size(0);
+          b_loop_ub = b_r.size(0);
         }
-        sensor_msgs_PointCloud2Struct(&pack);
-        pack.IsBigendian = false;
-        pack.IsDense = true;
-        pack.Header.FrameId.set_size(1, 4);
-        pack.Header.FrameId[0] = 'B';
-        pack.Header.FrameId[1] = 'O';
-        pack.Header.FrameId[2] = 'D';
-        pack.Header.FrameId[3] = 'Y';
-        //  Calculate number of points
-        //  Assign metadata
-        pack.Height = 1U;
-        pack.Width = static_cast<unsigned int>(XYZ.size(0));
-        pack.PointStep = 16U;
-        t10 = 16.0 * static_cast<double>(XYZ.size(0));
-        if (t10 < 4.294967296E+9) {
-          q0 = static_cast<unsigned int>(t10);
-        } else {
-          q0 = MAX_uint32_T;
-        }
-        pack.RowStep = q0;
-        //  Assign point field data
-        pack.Data.set_size(static_cast<int>(q0));
-        nx = static_cast<int>(q0);
-        for (i = 0; i < nx; i++) {
-          pack.Data[i] = 0U;
-        }
-        sensor_msgs_PointFieldStruct(&(pack.Fields.data())[0]);
-        pack.Fields[0].Name[0] = 'x';
-        pack.Fields[0].Datatype = 7U;
-        pack.Fields[0].Count = 1U;
-        sensor_msgs_PointFieldStruct(&pack.Fields[1]);
-        pack.Fields[1].Name[0] = 'y';
-        pack.Fields[1].Datatype = 7U;
-        pack.Fields[1].Count = 1U;
-        sensor_msgs_PointFieldStruct(&pack.Fields[2]);
-        pack.Fields[2].Name[0] = 'z';
-        pack.Fields[2].Datatype = 7U;
-        pack.Fields[2].Count = 1U;
-        sensor_msgs_PointFieldStruct(&pack.Fields[3]);
-        for (i = 0; i < 9; i++) {
-          pack.Fields[3].Name[i] = cv[i];
-        }
-        pack.Fields[3].Datatype = 7U;
-        pack.Fields[3].Count = 1U;
-        pack.Fields[0].Offset = 0U;
-        pack.Fields[1].Offset = 4U;
-        pack.Fields[2].Offset = 8U;
-        pack.Fields[3].Offset = 12U;
-        //  Assign raw point cloud data in uint8 format
-        i = XYZ.size(0);
-        for (nx = 0; nx < i; nx++) {
-          float c_x[3];
-          unsigned int qY;
-          unsigned char y[12];
-          unsigned char b_y[4];
-          t10 = ((static_cast<double>(nx) + 1.0) - 1.0) * 16.0;
-          if (t10 < 4.294967296E+9) {
-            q0 = static_cast<unsigned int>(t10);
-          } else {
-            q0 = MAX_uint32_T;
+        for (int b_i{0}; b_i < i; b_i++) {
+          plane.matlabCodegenIsDeleted = true;
+          b_clusterPT.matlabCodegenIsDeleted = true;
+          //  extract pointCloud
+          r2.set_size(unnamed_idx_0, 1);
+          for (i1 = 0; i1 < b_loop_ub; i1++) {
+            r2[i1] = (b_r[i1] == b_i + 1U);
           }
-          qY = q0 + 1U;
-          if (q0 + 1U < q0) {
-            qY = MAX_uint32_T;
+          filt.b_select(r2, &c_lobj_3[0], &b_clusterPT);
+          //  fit plane on cluster
+          coder::pcfitplane(&b_clusterPT, &model, &b_model, c_bundle, a__1,
+                            meanError);
+          iobj_0 = &c_lobj_3[1];
+          b_clusterPT.subsetImpl(c_bundle, b_bundle, c, meanError, a__1, c_r);
+          ptCloudOut = plane.init(b_bundle, c, meanError, a__1, iobj_0);
+          ptCloudOut->RangeData.set_size(c_r.size(0), c_r.size(1));
+          loop_ub = c_r.size(0) * c_r.size(1);
+          for (i1 = 0; i1 < loop_ub; i1++) {
+            ptCloudOut->RangeData[i1] = c_r[i1];
           }
-          c_x[0] = XYZ[nx];
-          c_x[1] = XYZ[nx + XYZ.size(0)];
-          c_x[2] = XYZ[nx + XYZ.size(0) * 2];
-          std::memcpy((void *)&y[0], (void *)&c_x[0],
-                      (unsigned int)((size_t)12 * sizeof(unsigned char)));
-          for (int k{0}; k < 12; k++) {
-            q0 = qY + k;
-            if (q0 < qY) {
-              q0 = MAX_uint32_T;
+          double p[3];
+          //  Get Z normal
+          normal[2] = model.Parameters[2];
+          //  Ratio in plane
+          loop_ub = b_clusterPT.Location.size(0);
+          //  Extract pose of the plane.
+          quatUtilities::getOrientedPointOnPlanarFace(&model, &plane, p, q);
+          //  extract bounding box
+          pct.matlabCodegenIsDeleted = true;
+          coder::quat2rotm(q, varargin_1);
+          for (i1 = 0; i1 < 3; i1++) {
+            varargin_1_tmp = i1 << 2;
+            tf.AffineTform.T[varargin_1_tmp] = varargin_1[3 * i1];
+            tf.AffineTform.T[varargin_1_tmp + 1] = varargin_1[3 * i1 + 1];
+            tf.AffineTform.T[varargin_1_tmp + 2] = varargin_1[3 * i1 + 2];
+            tf.AffineTform.T[i1 + 12] = 0.0;
+          }
+          tf.AffineTform.T[3] = 0.0;
+          tf.AffineTform.T[7] = 0.0;
+          tf.AffineTform.T[11] = 0.0;
+          tf.AffineTform.T[15] = 1.0;
+          coder::rigid3d::isTransformationMatrixRigid(tf.AffineTform.T);
+          for (i1 = 0; i1 < 3; i1++) {
+            varargin_1_tmp = i1 << 2;
+            b_varargin_1[varargin_1_tmp] = varargin_1[3 * i1];
+            b_varargin_1[varargin_1_tmp + 1] = varargin_1[3 * i1 + 1];
+            b_varargin_1[varargin_1_tmp + 2] = varargin_1[3 * i1 + 2];
+            b_varargin_1[i1 + 12] = 0.0;
+          }
+          b_varargin_1[3] = 0.0;
+          b_varargin_1[7] = 0.0;
+          b_varargin_1[11] = 0.0;
+          b_varargin_1[15] = 1.0;
+          coder::rigid3d::isTransformationMatrixRigid(b_varargin_1);
+          tf.Data.set_size(1, 1);
+          tf.Data[0] = r1;
+          coder::pctransform(&plane, &tf, &g_lobj_1, &pct);
+          pct.get_XLimits(b_pct);
+          pct.get_XLimits(c_pct);
+          pct.get_YLimits(meanError);
+          pct.get_YLimits(c_r);
+          pct.get_ZLimits(r5);
+          pct.get_ZLimits(r6);
+          pct.matlabCodegenDestructor();
+          //  find area
+          area = (meanError[1] - c_r[0]) * (r5[1] - r6[0]);
+          //  Check if cluster is a potential buoys
+          if (normal[2] < 0.2) {
+            if (c_bundle.size(0) < 1) {
+              i1 = 1;
+            } else {
+              i1 = c_bundle.size(0);
             }
-            pack.Data[static_cast<int>(q0) - 1] = y[k];
+            if ((static_cast<double>(i1) / static_cast<double>(loop_ub) >
+                 0.4) &&
+                (area > 0.6) && (area < 2.5)) {
+              goodCluster[b_i] = 1.0;
+            } else {
+              goodCluster[b_i] = 0.0;
+            }
+          } else {
+            goodCluster[b_i] = 0.0;
           }
-          std::memcpy((void *)&b_y[0], (void *)&RGB[nx],
-                      (unsigned int)((size_t)4 * sizeof(unsigned char)));
-          q0 = qY + 12U;
-          if (qY + 12U < qY) {
-            q0 = MAX_uint32_T;
-          }
-          pack.Data[static_cast<int>(q0) - 1] = b_y[0];
-          q0 = qY + 13U;
-          if (qY + 13U < qY) {
-            q0 = MAX_uint32_T;
-          }
-          pack.Data[static_cast<int>(q0) - 1] = b_y[1];
-          q0 = qY + 14U;
-          if (qY + 14U < qY) {
-            q0 = MAX_uint32_T;
-          }
-          pack.Data[static_cast<int>(q0) - 1] = b_y[2];
-          q0 = qY + 15U;
-          if (qY + 15U < qY) {
-            q0 = MAX_uint32_T;
-          }
-          pack.Data[static_cast<int>(q0) - 1] = b_y[3];
-          //  NOTE: The 16th byte remains empty
+          b_clusterPT.matlabCodegenDestructor();
+          plane.matlabCodegenDestructor();
         }
-        MATLABPUBLISHER_publish(pub->PublisherHelper, &pack);
+        if (static_cast<int>(coder::combineVectorElements(goodCluster)) == 1) {
+          //  Suspect 2 buyos in the same clusters
+          //  get the good cluster
+          b_goodCluster.set_size(1, goodCluster.size(1));
+          loop_ub = goodCluster.size(1);
+          for (i = 0; i < loop_ub; i++) {
+            b_goodCluster[i] = (goodCluster[i] == 1.0);
+          }
+          coder::eml_find(b_goodCluster, r3);
+          if (r3.size(1) == 1) {
+            unnamed_idx_0 = b_r.size(0);
+            r2.set_size(b_r.size(0), 1);
+            for (i = 0; i < unnamed_idx_0; i++) {
+              r2[i] = (static_cast<double>(b_r[i]) == r3[0]);
+            }
+            filt.b_select(r2, &d_lobj_3, &clusterPT);
+          } else {
+            d_lobj_3 = binary_expand_op(&filt, b_r, r3, d_lobj_3, &clusterPT);
+          }
+          //  split cluster with kmeans
+          b_bundle.set_size(clusterPT.Location.size(0), 3);
+          loop_ub = clusterPT.Location.size(0) * clusterPT.Location.size(1) - 1;
+          for (i = 0; i <= loop_ub; i++) {
+            b_bundle[i] = clusterPT.Location[i];
+          }
+          coder::kmeans(b_bundle, kmeansIndex);
+          // for each buoys
+          loop_ub = kmeansIndex.size(0);
+          for (int b_i{0}; b_i < 2; b_i++) {
+            b_kmeansIndex.set_size(kmeansIndex.size(0));
+            for (i = 0; i < loop_ub; i++) {
+              b_kmeansIndex[i] = (kmeansIndex[i] == b_i + 1);
+            }
+            coder::b_eml_find(b_kmeansIndex, r4);
+            c_bundle.set_size(r4.size(0));
+            varargin_1_tmp = r4.size(0);
+            for (i = 0; i < varargin_1_tmp; i++) {
+              c_bundle[i] = r4[i];
+            }
+            clusterPT.subsetImpl(c_bundle, b_bundle, c, meanError, a__1, c_r);
+            subPT = d_lobj_2.init(b_bundle, c, meanError, a__1, &f_lobj_1);
+            subPT->RangeData.set_size(c_r.size(0), c_r.size(1));
+            varargin_1_tmp = c_r.size(0) * c_r.size(1);
+            for (i = 0; i < varargin_1_tmp; i++) {
+              subPT->RangeData[i] = c_r[i];
+            }
+            b_plane.matlabCodegenIsDeleted = true;
+            buoyTformed.matlabCodegenIsDeleted = true;
+            //  Apply ransac
+            coder::pcfitplane(subPT, &c_model, &d_model, c_bundle, a__1,
+                              meanError);
+            subPT->subsetImpl(c_bundle, b_bundle, c, meanError, a__1, c_r);
+            ptCloudOut = b_plane.init(b_bundle, c, meanError, a__1, &lobj_4);
+            ptCloudOut->RangeData.set_size(c_r.size(0), c_r.size(1));
+            varargin_1_tmp = c_r.size(0) * c_r.size(1);
+            for (i = 0; i < varargin_1_tmp; i++) {
+              ptCloudOut->RangeData[i] = c_r[i];
+            }
+            //  Get ransac plane pose approximation
+            quatUtilities::getOrientedPointOnPlanarFace(&c_model, subPT, normal,
+                                                        q);
+            //  Transform the buoy on the plane.
+            area = ((q[0] * q[0] + q[1] * q[1]) + q[2] * q[2]) + q[3] * q[3];
+            q[0] /= area;
+            q[1] = -q[1] / area;
+            q[2] = -q[2] / area;
+            q[3] = -q[3] / area;
+            coder::quat2rotm(q, varargin_1);
+            tf.init(varargin_1, normal);
+            coder::pctransform(buoys.buoyPT, &tf, &e_lobj_3, &buoyTformed);
+            //  Apply icp.
+            coder::pcregistericp(&buoyTformed, &b_plane, &tformICP);
+            //  Get buoys transformation.
+            for (i = 0; i < 4; i++) {
+              area = tf.AffineTform.T[i];
+              expl_temp = tf.AffineTform.T[i + 4];
+              param_minRange = tf.AffineTform.T[i + 8];
+              param_maxRange = tf.AffineTform.T[i + 12];
+              for (i1 = 0; i1 < 4; i1++) {
+                varargin_1_tmp = i1 << 2;
+                b_varargin_1[i + varargin_1_tmp] =
+                    ((area * tformICP.AffineTform.T[varargin_1_tmp] +
+                      expl_temp * tformICP.AffineTform.T[varargin_1_tmp + 1]) +
+                     param_minRange *
+                         tformICP.AffineTform.T[varargin_1_tmp + 2]) +
+                    param_maxRange * tformICP.AffineTform.T[varargin_1_tmp + 3];
+              }
+            }
+            std::copy(&b_varargin_1[0], &b_varargin_1[16],
+                      &tf.AffineTform.T[0]);
+            coder::rigid3d::isTransformationMatrixRigid(tf.AffineTform.T);
+            coder::rigid3d::isTransformationMatrixRigid(tf.AffineTform.T);
+            //  return transform
+            buoyTformed.matlabCodegenDestructor();
+            b_plane.matlabCodegenDestructor();
+            d_lobj_2.matlabCodegenDestructor();
+          }
+        }
+        clusterPT.matlabCodegenDestructor();
+        // pack = packagePointCloud(single(output.Location),
+        // single(output.Intensity)); send(this.outputCloudPublisher, pack);
       }
     } else {
-      bool out;
-      //  Recording or waiting.
-      //  Initial variables
-      //  GET
-      out = newSonarMsg;
-      if (out && bundleStarted) {
-        int nx;
-        //  Initial variables
-        //  GET
-        ptBundler.mSonarSub->get_LatestMessage(&pack);
-        ptBundler.mPoseSub->get_LatestMessage(
-            &poseMsg_Position_X, &poseMsg_Position_Y, &poseMsg_Position_Z, &t11,
-            &t12, &poseMsg_Orientation_Z, &t13);
-        //         %% Adding to the point cloud.
-        printf("INFO : proc mapping : Append to point cloud. \n");
-        fflush(stdout);
-        //  scan = rosReadLidarScan(sonarMsg);
-        //  Getting the sub pose.
-        printf("INFO : proc mapping : Pose received. \n");
-        fflush(stdout);
-        xyzi.set_size(static_cast<int>(pack.Width), 4);
-        nx = static_cast<int>(pack.Width) << 2;
-        for (i = 0; i < nx; i++) {
-          xyzi[i] = 0.0;
-        }
-        coder::rosReadXYZ(pack.Height, pack.Width, pack.Fields, pack.PointStep,
-                          pack.Data, XYZ);
-        nx = XYZ.size(0);
-        for (i = 0; i < 3; i++) {
-          for (int k{0}; k < nx; k++) {
-            xyzi[k + xyzi.size(0) * i] = XYZ[k + XYZ.size(0) * i];
-          }
-        }
-        //  Temporary swap.
-        //              v = xyzi(:, 1);
-        //              xyzi(:, 1) = xyzi(:, 2);
-        //              xyzi(:, 2) = v;
-        coder::rosReadField(pack.Height, pack.Width, pack.Fields,
-                            pack.PointStep, pack.Data, b_r);
-        r1.set_size(b_r.size(0), b_r.size(1));
-        nx = b_r.size(0) * b_r.size(1);
-        for (i = 0; i < nx; i++) {
-          r1[i] = b_r[i];
-        }
-        nx = xyzi.size(0);
-        for (i = 0; i < nx; i++) {
-          xyzi[i + xyzi.size(0) * 3] = r1[i];
-        }
-        // minIntensityState maxIntensityState minRangeState maxRangeState;
-        //  Initial variables
-        //  GET
-        //                          out2 = minIntensityState;
-        // minIntensityState maxIntensityState minRangeState maxRangeState;
-        //  Initial variables
-        //  GET
-        //                          out2 = maxIntensityState;
-        // minIntensityState maxIntensityState minRangeState maxRangeState;
-        //  Initial variables
-        //  GET
-        //                          out2 = minRangeState;
-        // minIntensityState maxIntensityState minRangeState maxRangeState;
-        //  Initial variables
-        //  GET
-        //                          out2 = maxRangeState;
-        nx = xyzi.size(0);
-        x.set_size(xyzi.size(0));
-        for (i = 0; i < nx; i++) {
-          t10 = xyzi[i];
-          x[i] = t10 * t10;
-        }
-        nx = xyzi.size(0);
-        outlierIndices.set_size(xyzi.size(0));
-        for (i = 0; i < nx; i++) {
-          t10 = xyzi[i + xyzi.size(0)];
-          outlierIndices[i] = t10 * t10;
-        }
-        nx = xyzi.size(0);
-        r2.set_size(xyzi.size(0));
-        for (i = 0; i < nx; i++) {
-          t10 = xyzi[i + xyzi.size(0) * 2];
-          r2[i] = t10 * t10;
-        }
-        if (x.size(0) == 1) {
-          i = outlierIndices.size(0);
-        } else {
-          i = x.size(0);
-        }
-        if ((x.size(0) == outlierIndices.size(0)) && (i == r2.size(0))) {
-          nx = x.size(0);
-          for (i = 0; i < nx; i++) {
-            x[i] = (x[i] + outlierIndices[i]) + r2[i];
-          }
-        } else {
-          b_binary_expand_op(x, outlierIndices, r2);
-        }
-        nx = x.size(0);
-        for (int k{0}; k < nx; k++) {
-          x[k] = std::sqrt(x[k]);
-        }
-        nx = xyzi.size(0);
-        b_x.set_size(xyzi.size(0));
-        for (i = 0; i < nx; i++) {
-          t10 = xyzi[i];
-          b_x[i] = t10 * t10;
-        }
-        nx = xyzi.size(0);
-        outlierIndices.set_size(xyzi.size(0));
-        for (i = 0; i < nx; i++) {
-          t10 = xyzi[i + xyzi.size(0)];
-          outlierIndices[i] = t10 * t10;
-        }
-        nx = xyzi.size(0);
-        r2.set_size(xyzi.size(0));
-        for (i = 0; i < nx; i++) {
-          t10 = xyzi[i + xyzi.size(0) * 2];
-          r2[i] = t10 * t10;
-        }
-        if (b_x.size(0) == 1) {
-          i = outlierIndices.size(0);
-        } else {
-          i = b_x.size(0);
-        }
-        if ((b_x.size(0) == outlierIndices.size(0)) && (i == r2.size(0))) {
-          nx = b_x.size(0);
-          for (i = 0; i < nx; i++) {
-            b_x[i] = (b_x[i] + outlierIndices[i]) + r2[i];
-          }
-        } else {
-          b_binary_expand_op(b_x, outlierIndices, r2);
-        }
-        nx = b_x.size(0);
-        for (int k{0}; k < nx; k++) {
-          b_x[k] = std::sqrt(b_x[k]);
-        }
-        if (xyzi.size(0) == 1) {
-          i = x.size(0);
-        } else {
-          i = xyzi.size(0);
-        }
-        if ((xyzi.size(0) == x.size(0)) && (i == b_x.size(0))) {
-          nx = xyzi.size(0);
-          c_xyzi.set_size(xyzi.size(0));
-          for (i = 0; i < nx; i++) {
-            t10 = xyzi[i + xyzi.size(0) * 3];
-            c_xyzi[i] =
-                ((t10 < minIntensityValue) || (t10 > maxIntensityValue) ||
-                 (x[i] < minRangeValue) || (b_x[i] > maxRangeValue));
-          }
-          coder::any(c_xyzi, r3);
-        } else {
-          binary_expand_op(r3, xyzi, minIntensityValue, maxIntensityValue, x,
-                           minRangeValue, b_x, maxRangeValue);
-        }
-        coder::internal::nullAssignment(xyzi, r3);
-        //              rowsToDelete = any(xyzi(:,4) < 0.07 |
-        //              sqrt(xyzi(:,1).^2+xyzi(:,2).^2+xyzi(:,3).^2) > 0.1, 2);
-        //              xyzi(rowsToDelete, :) = [];
-        i = xyzi.size(0);
-        if (xyzi.size(0) - 1 >= 0) {
-          t5 = t11 * t12 * 2.0;
-          t6 = t11 * poseMsg_Orientation_Z * 2.0;
-          t7 = t12 * poseMsg_Orientation_Z * 2.0;
-          t8 = t13 * t11 * 2.0;
-          t9 = t13 * t12 * 2.0;
-          t10 = t13 * poseMsg_Orientation_Z * 2.0;
-          t11 = t11 * t11 * 2.0;
-          t12 = t12 * t12 * 2.0;
-          t13 = poseMsg_Orientation_Z * poseMsg_Orientation_Z * 2.0;
-          t17 = t5 + t10;
-          t18 = t6 + t9;
-          t19 = t7 + t8;
-          t20 = t5 + -t10;
-          t21 = t6 + -t9;
-          t7 += -t8;
-          t8 = (t11 + t12) - 1.0;
-          t9 = (t11 + t13) - 1.0;
-          t6 = (t12 + t13) - 1.0;
-        }
-        for (nx = 0; nx < i; nx++) {
-          double in4[3];
-          in4[0] = xyzi[nx];
-          in4[1] = xyzi[nx + xyzi.size(0)];
-          // sonar2NED
-          //     OUT1 = sonar2NED(IN1,IN2,IN3,IN4)
-          //     This function was generated by the Symbolic Math Toolbox
-          //     version 9.1. 11-May-2022 11:36:02
-          xyzi[nx] = (((((poseMsg_Position_X - 0.358 * t6) + 0.0 * t20) +
-                        -0.118 * t18) -
-                       t6 * in4[0]) +
-                      t20 * in4[1]) +
-                     t18 * 0.0;
-          xyzi[nx + xyzi.size(0)] =
-              (((((poseMsg_Position_Y + 0.358 * t17) - 0.0 * t9) +
-                 -0.118 * t7) +
-                t17 * in4[0]) -
-               t9 * in4[1]) +
-              t7 * 0.0;
-          xyzi[nx + xyzi.size(0) * 2] =
-              (((((poseMsg_Position_Z + 0.358 * t21) + 0.0 * t19) -
-                 -0.118 * t8) +
-                t21 * in4[0]) +
-               t19 * in4[1]) -
-              t8 * 0.0;
-        }
-        b_ptBundler.set_size(ptBundler.mBundle.size(0) + xyzi.size(0), 4);
-        for (i = 0; i < 4; i++) {
-          nx = ptBundler.mBundle.size(0);
-          for (int k{0}; k < nx; k++) {
-            b_ptBundler[k + b_ptBundler.size(0) * i] =
-                ptBundler.mBundle[k + ptBundler.mBundle.size(0) * i];
-          }
-        }
-        nx = xyzi.size(0);
-        for (i = 0; i < 4; i++) {
-          for (int k{0}; k < nx; k++) {
-            b_ptBundler[(k + ptBundler.mBundle.size(0)) +
-                        b_ptBundler.size(0) * i] = xyzi[k + xyzi.size(0) * i];
-          }
-        }
-        ptBundler.mBundle.set_size(b_ptBundler.size(0), 4);
-        nx = b_ptBundler.size(0) * 4;
-        for (i = 0; i < nx; i++) {
-          ptBundler.mBundle[i] = b_ptBundler[i];
-        }
-        //  Initial variables
-        //  SET
-        newSonarMsg = false;
-      }
-      //  Clear the buffer if requested.
-      //  Initial variables
-      //  GET
-      out = newClearBundleMsg;
-      if (out) {
-        printf("INFO : proc mapping : Clearing the bundle \n");
-        fflush(stdout);
-        ptBundler.mBundle.set_size(1, 4);
-        ptBundler.mBundle[0] = 0.0;
-        ptBundler.mBundle[1] = 0.0;
-        ptBundler.mBundle[2] = 0.0;
-        ptBundler.mBundle[3] = 0.0;
-        //  Initial variables
-        //  SET
-        newClearBundleMsg = false;
-      }
-      //  Initial variables
-      //  GET
-      ptBundler.mLastBundleState = bundleStarted;
       //  fprintf('INFO : proc mapping : Bundling or waiting. \n');
+    }
+    rosNode.counter++;
+    if (rosNode.counter >= 40.0) {
+      rosNode.counter = 0.0;
+      c_lobj_1.ParameterHelper = MATLABROSParameter();
+      UNUSED_PARAM(c_lobj_1.ParameterHelper);
+      // ROSPARAM Construct an instance of this class
+      //    Detailed explanation goes here
+      //         %% get rosparam number
+      coder::ros::ParameterTree::canonicalizeName(&c_lobj_1, in);
+      parameterName.set_size(1, in.size(1) + 1);
+      loop_ub = in.size(1);
+      for (i = 0; i < loop_ub; i++) {
+        parameterName[i] = in[i];
+      }
+      parameterName[in.size(1)] = '\x00';
+      nameExists = std::mem_fn(&MATLABROSParameter::hasParam)(
+          c_lobj_1.ParameterHelper, &parameterName[0]);
+      if (nameExists) {
+        coder::ros::ParameterTree::canonicalizeName(&c_lobj_1, in);
+        parameterName.set_size(1, in.size(1) + 1);
+        loop_ub = in.size(1);
+        for (i = 0; i < loop_ub; i++) {
+          parameterName[i] = in[i];
+        }
+        parameterName[in.size(1)] = '\x00';
+        area = 0.0;
+        std::mem_fn (&MATLABROSParameter::getParameter<double>)(
+            &c_lobj_1.ParameterHelper, &parameterName[0], &area);
+        //  fprintf("%s : %f \n", value, val);
+      } else {
+        area = 0.1;
+      }
+      //         %% get rosparam number
+      coder::ros::ParameterTree::b_canonicalizeName(&c_lobj_1, in);
+      parameterName.set_size(1, in.size(1) + 1);
+      loop_ub = in.size(1);
+      for (i = 0; i < loop_ub; i++) {
+        parameterName[i] = in[i];
+      }
+      parameterName[in.size(1)] = '\x00';
+      nameExists = std::mem_fn(&MATLABROSParameter::hasParam)(
+          c_lobj_1.ParameterHelper, &parameterName[0]);
+      if (nameExists) {
+        expl_temp = c_lobj_1.get();
+        //  fprintf("%s : %f \n", value, val);
+      } else {
+        expl_temp = 1.0;
+      }
+      //         %% get rosparam number
+      coder::ros::ParameterTree::c_canonicalizeName(&c_lobj_1, in);
+      parameterName.set_size(1, in.size(1) + 1);
+      loop_ub = in.size(1);
+      for (i = 0; i < loop_ub; i++) {
+        parameterName[i] = in[i];
+      }
+      parameterName[in.size(1)] = '\x00';
+      nameExists = std::mem_fn(&MATLABROSParameter::hasParam)(
+          c_lobj_1.ParameterHelper, &parameterName[0]);
+      if (nameExists) {
+        param_minRange = c_lobj_1.b_get();
+        //  fprintf("%s : %f \n", value, val);
+      } else {
+        param_minRange = 0.1;
+      }
+      //         %% get rosparam number
+      coder::ros::ParameterTree::d_canonicalizeName(&c_lobj_1, in);
+      parameterName.set_size(1, in.size(1) + 1);
+      loop_ub = in.size(1);
+      for (i = 0; i < loop_ub; i++) {
+        parameterName[i] = in[i];
+      }
+      parameterName[in.size(1)] = '\x00';
+      nameExists = std::mem_fn(&MATLABROSParameter::hasParam)(
+          c_lobj_1.ParameterHelper, &parameterName[0]);
+      if (nameExists) {
+        param_maxRange = c_lobj_1.c_get();
+        //  fprintf("%s : %f \n", value, val);
+      } else {
+        param_maxRange = 5.0;
+      }
+      b_lobj_1.param.preprocessing.minIntensity = area;
+      b_lobj_1.param.preprocessing.maxIntensity = expl_temp;
+      b_lobj_1.param.preprocessing.minRange = param_minRange;
+      b_lobj_1.param.preprocessing.maxRange = param_maxRange;
+      area = b_lobj_1.param.preprocessing.minIntensity;
+      expl_temp = b_lobj_1.param.preprocessing.maxIntensity;
+      param_minRange = b_lobj_1.param.preprocessing.minRange;
+      param_maxRange = b_lobj_1.param.preprocessing.maxRange;
+      b_lobj_1.mPreprocessing.minIntensity = area;
+      b_lobj_1.mPreprocessing.maxIntensity = expl_temp;
+      b_lobj_1.mPreprocessing.minRange = param_minRange;
+      b_lobj_1.mPreprocessing.maxRange = param_maxRange;
     }
     MATLABRate_sleep(r.RateHelper);
     coder::toc(r.PreviousPeriod.tv_sec, r.PreviousPeriod.tv_nsec);

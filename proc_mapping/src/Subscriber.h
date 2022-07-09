@@ -14,6 +14,7 @@
 // Include files
 #include "proc_mapping_types.h"
 #include "rtwtypes.h"
+#include "coder_array.h"
 #include "mlroscpp_sub.h"
 #include <cstddef>
 #include <cstdlib>
@@ -24,42 +25,6 @@ namespace ros {
 class Subscriber {
 public:
   Subscriber *init();
-  void callback();
-  double get_MessageCount() const;
-  Subscriber *b_init();
-  void b_callback();
-  char TopicName[40];
-  double BufferSize;
-  double MessageCount;
-
-private:
-  std::unique_ptr<MATLABSubscriber<std_msgs::Float32, std_msgs_Float32Struct_T>>
-      SubscriberHelper;
-  std_msgs_Float32Struct_T MsgStruct;
-  bool IsInitialized;
-};
-
-class b_Subscriber {
-public:
-  b_Subscriber *init();
-  void callback();
-  double get_MessageCount() const;
-  b_Subscriber *b_init();
-  void b_callback();
-  char TopicName[36];
-  double BufferSize;
-  double MessageCount;
-
-private:
-  std::unique_ptr<MATLABSubscriber<std_msgs::Float32, std_msgs_Float32Struct_T>>
-      SubscriberHelper;
-  std_msgs_Float32Struct_T MsgStruct;
-  bool IsInitialized;
-};
-
-class c_Subscriber {
-public:
-  c_Subscriber *init();
   void callback();
   double get_MessageCount() const;
   char TopicName[24];
@@ -73,9 +38,9 @@ private:
   bool IsInitialized;
 };
 
-class d_Subscriber {
+class b_Subscriber {
 public:
-  d_Subscriber *init();
+  b_Subscriber *init();
   void callback();
   double get_MessageCount() const;
   char TopicName[26];
@@ -89,35 +54,39 @@ private:
   bool IsInitialized;
 };
 
-class e_Subscriber {
+class c_Subscriber {
 public:
-  e_Subscriber *init();
+  c_Subscriber *init();
   void callback();
   double get_MessageCount() const;
-  void get_LatestMessage(double *lastSubMsg_Position_X,
-                         double *lastSubMsg_Position_Y,
-                         double *lastSubMsg_Position_Z,
-                         double *lastSubMsg_Orientation_X,
-                         double *lastSubMsg_Orientation_Y,
-                         double *lastSubMsg_Orientation_Z,
-                         double *lastSubMsg_Orientation_W) const;
-  char TopicName[18];
+  void get_LatestMessage(double *lastSubMsg_Pose_Pose_Position_X,
+                         double *lastSubMsg_Pose_Pose_Position_Y,
+                         double *lastSubMsg_Pose_Pose_Position_Z,
+                         double *lastSubMsg_Pose_Pose_Orientation_X,
+                         double *lastSubMsg_Pose_Pose_Orientation_Y,
+                         double *lastSubMsg_Pose_Pose_Orientation_Z,
+                         double *lastSubMsg_Pose_Pose_Orientation_W) const;
+  char TopicName[20];
   double BufferSize;
   double MessageCount;
 
 private:
   std::unique_ptr<
-      MATLABSubscriber<geometry_msgs::Pose, geometry_msgs_PoseStruct_T>>
+      MATLABSubscriber<nav_msgs::Odometry, nav_msgs_OdometryStruct_T>>
       SubscriberHelper;
-  geometry_msgs_PoseStruct_T MsgStruct;
+  nav_msgs_OdometryStruct_T MsgStruct;
 };
 
-class f_Subscriber {
+class d_Subscriber {
 public:
-  f_Subscriber *init();
+  d_Subscriber *init();
   void callback();
   double get_MessageCount() const;
-  void get_LatestMessage(sensor_msgs_PointCloud2Struct_T *lastSubMsg) const;
+  void get_LatestMessage(
+      unsigned int *lastSubMsg_Height, unsigned int *lastSubMsg_Width,
+      ::coder::array<sensor_msgs_PointFieldStruct_T, 1U> &lastSubMsg_Fields,
+      unsigned int *lastSubMsg_PointStep,
+      ::coder::array<unsigned char, 1U> &lastSubMsg_Data) const;
   char TopicName[28];
   double BufferSize;
   double MessageCount;
@@ -128,6 +97,22 @@ private:
       SubscriberHelper;
   sensor_msgs_PointCloud2Struct_T MsgStruct;
   bool IsInitialized;
+};
+
+class e_Subscriber {
+public:
+  e_Subscriber *init();
+  void callback();
+  double get_MessageCount() const;
+  char TopicName[40];
+  double BufferSize;
+  double MessageCount;
+
+private:
+  std::unique_ptr<MATLABSubscriber<sensor_msgs::CompressedImage,
+                                   sensor_msgs_CompressedImageStruct_T>>
+      SubscriberHelper;
+  sensor_msgs_CompressedImageStruct_T MsgStruct;
 };
 
 } // namespace ros

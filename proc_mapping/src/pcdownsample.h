@@ -20,13 +20,13 @@
 namespace coder {
 class pointCloud;
 
-class b_pointCloud;
+class c_pointCloud;
 
 } // namespace coder
 
 // Function Declarations
 namespace coder {
-b_pointCloud *pcdownsample(const pointCloud *ptCloudIn, b_pointCloud *iobj_0);
+c_pointCloud *pcdownsample(const pointCloud *ptCloudIn, c_pointCloud *iobj_0);
 
 }
 

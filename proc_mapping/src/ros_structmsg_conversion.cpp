@@ -41,6 +41,25 @@ void msg2struct(geometry_msgs_PoseStruct_T* structPtr, geometry_msgs::Pose const
 }
 
 
+// Conversions between geometry_msgs_PoseWithCovarianceStruct_T and geometry_msgs::PoseWithCovariance
+
+void struct2msg(geometry_msgs::PoseWithCovariance* msgPtr, geometry_msgs_PoseWithCovarianceStruct_T const* structPtr)
+{
+  const std::string rosMessageType("geometry_msgs/PoseWithCovariance");
+
+  convertFromStructPrimitiveArray(msgPtr->covariance, structPtr->Covariance);
+  struct2msg(&msgPtr->pose, &structPtr->Pose);
+}
+
+void msg2struct(geometry_msgs_PoseWithCovarianceStruct_T* structPtr, geometry_msgs::PoseWithCovariance const* msgPtr)
+{
+  const std::string rosMessageType("geometry_msgs/PoseWithCovariance");
+
+  convertToStructPrimitiveArray(structPtr->Covariance, msgPtr->covariance);
+  msg2struct(&structPtr->Pose, &msgPtr->pose);
+}
+
+
 // Conversions between geometry_msgs_QuaternionStruct_T and geometry_msgs::Quaternion
 
 void struct2msg(geometry_msgs::Quaternion* msgPtr, geometry_msgs_QuaternionStruct_T const* structPtr)
@@ -64,6 +83,88 @@ void msg2struct(geometry_msgs_QuaternionStruct_T* structPtr, geometry_msgs::Quat
 }
 
 
+// Conversions between geometry_msgs_TwistStruct_T and geometry_msgs::Twist
+
+void struct2msg(geometry_msgs::Twist* msgPtr, geometry_msgs_TwistStruct_T const* structPtr)
+{
+  const std::string rosMessageType("geometry_msgs/Twist");
+
+  struct2msg(&msgPtr->angular, &structPtr->Angular);
+  struct2msg(&msgPtr->linear, &structPtr->Linear);
+}
+
+void msg2struct(geometry_msgs_TwistStruct_T* structPtr, geometry_msgs::Twist const* msgPtr)
+{
+  const std::string rosMessageType("geometry_msgs/Twist");
+
+  msg2struct(&structPtr->Angular, &msgPtr->angular);
+  msg2struct(&structPtr->Linear, &msgPtr->linear);
+}
+
+
+// Conversions between geometry_msgs_TwistWithCovarianceStruct_T and geometry_msgs::TwistWithCovariance
+
+void struct2msg(geometry_msgs::TwistWithCovariance* msgPtr, geometry_msgs_TwistWithCovarianceStruct_T const* structPtr)
+{
+  const std::string rosMessageType("geometry_msgs/TwistWithCovariance");
+
+  convertFromStructPrimitiveArray(msgPtr->covariance, structPtr->Covariance);
+  struct2msg(&msgPtr->twist, &structPtr->Twist);
+}
+
+void msg2struct(geometry_msgs_TwistWithCovarianceStruct_T* structPtr, geometry_msgs::TwistWithCovariance const* msgPtr)
+{
+  const std::string rosMessageType("geometry_msgs/TwistWithCovariance");
+
+  convertToStructPrimitiveArray(structPtr->Covariance, msgPtr->covariance);
+  msg2struct(&structPtr->Twist, &msgPtr->twist);
+}
+
+
+// Conversions between geometry_msgs_Vector3Struct_T and geometry_msgs::Vector3
+
+void struct2msg(geometry_msgs::Vector3* msgPtr, geometry_msgs_Vector3Struct_T const* structPtr)
+{
+  const std::string rosMessageType("geometry_msgs/Vector3");
+
+  msgPtr->x =  structPtr->X;
+  msgPtr->y =  structPtr->Y;
+  msgPtr->z =  structPtr->Z;
+}
+
+void msg2struct(geometry_msgs_Vector3Struct_T* structPtr, geometry_msgs::Vector3 const* msgPtr)
+{
+  const std::string rosMessageType("geometry_msgs/Vector3");
+
+  structPtr->X =  msgPtr->x;
+  structPtr->Y =  msgPtr->y;
+  structPtr->Z =  msgPtr->z;
+}
+
+
+// Conversions between nav_msgs_OdometryStruct_T and nav_msgs::Odometry
+
+void struct2msg(nav_msgs::Odometry* msgPtr, nav_msgs_OdometryStruct_T const* structPtr)
+{
+  const std::string rosMessageType("nav_msgs/Odometry");
+
+  convertFromStructPrimitiveArray(msgPtr->child_frame_id, structPtr->ChildFrameId);
+  struct2msg(&msgPtr->header, &structPtr->Header);
+  struct2msg(&msgPtr->pose, &structPtr->Pose);
+  struct2msg(&msgPtr->twist, &structPtr->Twist);
+}
+
+void msg2struct(nav_msgs_OdometryStruct_T* structPtr, nav_msgs::Odometry const* msgPtr)
+{
+  const std::string rosMessageType("nav_msgs/Odometry");
+
+  convertToStructPrimitiveArray(structPtr->ChildFrameId, msgPtr->child_frame_id);
+  msg2struct(&structPtr->Header, &msgPtr->header);
+  msg2struct(&structPtr->Pose, &msgPtr->pose);
+  msg2struct(&structPtr->Twist, &msgPtr->twist);
+}
+
+
 // Conversions between ros_TimeStruct_T and ros::Time
 
 void struct2msg(ros::Time* msgPtr, ros_TimeStruct_T const* structPtr)
@@ -80,6 +181,27 @@ void msg2struct(ros_TimeStruct_T* structPtr, ros::Time const* msgPtr)
 
   structPtr->Nsec =  msgPtr->nsec;
   structPtr->Sec =  msgPtr->sec;
+}
+
+
+// Conversions between sensor_msgs_CompressedImageStruct_T and sensor_msgs::CompressedImage
+
+void struct2msg(sensor_msgs::CompressedImage* msgPtr, sensor_msgs_CompressedImageStruct_T const* structPtr)
+{
+  const std::string rosMessageType("sensor_msgs/CompressedImage");
+
+  convertFromStructPrimitiveArray(msgPtr->data, structPtr->Data);
+  convertFromStructPrimitiveArray(msgPtr->format, structPtr->Format);
+  struct2msg(&msgPtr->header, &structPtr->Header);
+}
+
+void msg2struct(sensor_msgs_CompressedImageStruct_T* structPtr, sensor_msgs::CompressedImage const* msgPtr)
+{
+  const std::string rosMessageType("sensor_msgs/CompressedImage");
+
+  convertToStructPrimitiveArray(structPtr->Data, msgPtr->data);
+  convertToStructPrimitiveArray(structPtr->Format, msgPtr->format);
+  msg2struct(&structPtr->Header, &msgPtr->header);
 }
 
 
@@ -139,6 +261,33 @@ void msg2struct(sensor_msgs_PointFieldStruct_T* structPtr, sensor_msgs::PointFie
 }
 
 
+// Conversions between sonia_common_AddPoseStruct_T and sonia_common::AddPose
+
+void struct2msg(sonia_common::AddPose* msgPtr, sonia_common_AddPoseStruct_T const* structPtr)
+{
+  const std::string rosMessageType("sonia_common/AddPose");
+
+  msgPtr->fine =  structPtr->Fine;
+  msgPtr->frame =  structPtr->Frame;
+  struct2msg(&msgPtr->orientation, &structPtr->Orientation);
+  struct2msg(&msgPtr->position, &structPtr->Position);
+  msgPtr->rotation =  structPtr->Rotation;
+  msgPtr->speed =  structPtr->Speed;
+}
+
+void msg2struct(sonia_common_AddPoseStruct_T* structPtr, sonia_common::AddPose const* msgPtr)
+{
+  const std::string rosMessageType("sonia_common/AddPose");
+
+  structPtr->Fine =  msgPtr->fine;
+  structPtr->Frame =  msgPtr->frame;
+  msg2struct(&structPtr->Orientation, &msgPtr->orientation);
+  msg2struct(&structPtr->Position, &msgPtr->position);
+  structPtr->Rotation =  msgPtr->rotation;
+  structPtr->Speed =  msgPtr->speed;
+}
+
+
 // Conversions between std_msgs_BoolStruct_T and std_msgs::Bool
 
 void struct2msg(std_msgs::Bool* msgPtr, std_msgs_BoolStruct_T const* structPtr)
@@ -151,23 +300,6 @@ void struct2msg(std_msgs::Bool* msgPtr, std_msgs_BoolStruct_T const* structPtr)
 void msg2struct(std_msgs_BoolStruct_T* structPtr, std_msgs::Bool const* msgPtr)
 {
   const std::string rosMessageType("std_msgs/Bool");
-
-  structPtr->Data =  msgPtr->data;
-}
-
-
-// Conversions between std_msgs_Float32Struct_T and std_msgs::Float32
-
-void struct2msg(std_msgs::Float32* msgPtr, std_msgs_Float32Struct_T const* structPtr)
-{
-  const std::string rosMessageType("std_msgs/Float32");
-
-  msgPtr->data =  structPtr->Data;
-}
-
-void msg2struct(std_msgs_Float32Struct_T* structPtr, std_msgs::Float32 const* msgPtr)
-{
-  const std::string rosMessageType("std_msgs/Float32");
 
   structPtr->Data =  msgPtr->data;
 }

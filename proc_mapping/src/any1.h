@@ -19,9 +19,11 @@
 
 // Function Declarations
 namespace coder {
-void any(const ::coder::array<bool, 1U> &x, ::coder::array<bool, 1U> &y);
+void any(const ::coder::array<bool, 2U> &x, ::coder::array<bool, 1U> &y);
 
-void b_any(const ::coder::array<bool, 2U> &x, ::coder::array<bool, 1U> &y);
+void b_any(const bool x[22317], bool y[7439]);
+
+bool c_any(const double x[6]);
 
 } // namespace coder
 

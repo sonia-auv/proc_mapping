@@ -12,7 +12,6 @@
 #include "proc_mapping_initialize.h"
 #include "CoderTimeAPI.h"
 #include "PointCloudBundler.h"
-#include "Preprocessing.h"
 #include "eml_rand.h"
 #include "eml_rand_mcg16807_stateful.h"
 #include "eml_rand_mt19937ar_stateful.h"
@@ -26,7 +25,6 @@ void proc_mapping_initialize()
 {
   freq_not_empty_init();
   PointCloudBundler::persistentDataStore_init();
-  Preprocessing::persistentDataStore_init();
   eml_rand_init();
   eml_rand_mcg16807_stateful_init();
   eml_rand_shr3cong_stateful_init();

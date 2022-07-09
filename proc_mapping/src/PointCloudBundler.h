@@ -14,6 +14,7 @@
 // Include files
 #include "Preprocessing.h"
 #include "Subscriber.h"
+#include "proc_mapping_internal_types.h"
 #include "rtwtypes.h"
 #include "coder_array.h"
 #include <cstddef>
@@ -22,18 +23,22 @@
 // Type Definitions
 class PointCloudBundler {
 public:
+  bool step();
   static void persistentDataStore_init();
   coder::array<double, 2U> mBundle;
   Preprocessing mPreprocessing;
-  coder::ros::c_Subscriber *mStartStopSub;
-  coder::ros::d_Subscriber *mClearBundleSub;
-  coder::ros::e_Subscriber *mPoseSub;
-  coder::ros::f_Subscriber *mSonarSub;
+  coder::ros::Subscriber *mStartStopSub;
+  coder::ros::b_Subscriber *mClearBundleSub;
+  coder::ros::c_Subscriber *mPoseSub;
+  coder::ros::d_Subscriber *mSonarSub;
+  coder::ros::e_Subscriber *mImageSub;
   bool mLastBundleState;
-  coder::ros::f_Subscriber _pobj0;
-  coder::ros::e_Subscriber _pobj1;
-  coder::ros::d_Subscriber _pobj2;
-  coder::ros::c_Subscriber _pobj3;
+  b_struct_T param;
+  coder::ros::e_Subscriber _pobj0;
+  coder::ros::d_Subscriber _pobj1;
+  coder::ros::c_Subscriber _pobj2;
+  coder::ros::b_Subscriber _pobj3;
+  coder::ros::Subscriber _pobj4;
 };
 
 #endif

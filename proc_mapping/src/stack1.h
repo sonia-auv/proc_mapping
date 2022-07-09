@@ -23,7 +23,7 @@ namespace coder {
 namespace internal {
 class stack {
 public:
-  array<struct_T, 1U> d;
+  array<c_struct_T, 1U> d;
   int n;
 };
 

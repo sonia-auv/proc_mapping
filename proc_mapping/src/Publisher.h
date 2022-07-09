@@ -26,8 +26,23 @@ public:
   char TopicName[20];
   double BufferSize;
   bool IsLatching;
+
+private:
   std::unique_ptr<MATLABPublisher<sensor_msgs::PointCloud2,
                                   sensor_msgs_PointCloud2Struct_T>>
+      PublisherHelper;
+};
+
+class b_Publisher {
+public:
+  b_Publisher *init();
+  char TopicName[25];
+  double BufferSize;
+  bool IsLatching;
+
+private:
+  std::unique_ptr<
+      MATLABPublisher<sonia_common::AddPose, sonia_common_AddPoseStruct_T>>
       PublisherHelper;
 };
 
