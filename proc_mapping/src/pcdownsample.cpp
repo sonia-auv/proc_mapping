@@ -20,7 +20,8 @@
 
 // Function Definitions
 namespace coder {
-c_pointCloud *pcdownsample(const pointCloud *ptCloudIn, c_pointCloud *iobj_0)
+c_pointCloud *pcdownsample(const pointCloud *ptCloudIn, double varargin_2,
+                           c_pointCloud *iobj_0)
 {
   c_pointCloud *ptCloudOut;
   pointCloud pc;
@@ -46,8 +47,8 @@ c_pointCloud *pcdownsample(const pointCloud *ptCloudIn, c_pointCloud *iobj_0)
     b_ptCloudOut->RangeData[i] = rangeData[i];
   }
   vision::internal::codegen::pc::voxelGridFilter(
-      pc.Location, pc.Color, pc.Normal, pc.Intensity, pc.RangeData, location,
-      C_, tempNV, tempI, b_rangeData);
+      pc.Location, pc.Color, pc.Normal, pc.Intensity, pc.RangeData, varargin_2,
+      location, C_, tempNV, tempI, b_rangeData);
   pc.matlabCodegenDestructor();
   ptCloudOut = iobj_0;
   iobj_0->Location.set_size(location.size(0), 3);

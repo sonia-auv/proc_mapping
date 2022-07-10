@@ -21,14 +21,14 @@
 // Function Definitions
 void nav_msgs_OdometryStruct(nav_msgs_OdometryStruct_T *msg)
 {
-  static const char b_cv[17]{'n', 'a', 'v', '_', 'm', 's', 'g', 's', '/',
-                             'O', 'd', 'o', 'm', 'e', 't', 'r', 'y'};
+  static const char cv[17]{'n', 'a', 'v', '_', 'm', 's', 'g', 's', '/',
+                           'O', 'd', 'o', 'm', 'e', 't', 'r', 'y'};
   //  Message struct definition for nav_msgs/Odometry
   std_msgs_HeaderStruct(&msg->Header);
   geometry_msgs_PoseWithCovarianceStruct(&msg->Pose);
   geometry_msgs_TwistWithCovarianceStruct(&msg->Twist);
   for (int i{0}; i < 17; i++) {
-    msg->MessageType[i] = b_cv[i];
+    msg->MessageType[i] = cv[i];
   }
   msg->ChildFrameId.set_size(1, 0);
   //(msg);

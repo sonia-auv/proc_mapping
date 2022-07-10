@@ -17,7 +17,7 @@
 
 // Function Definitions
 namespace coder {
-void pcsegdist(const pointCloud *ptCloud,
+void pcsegdist(const pointCloud *ptCloud, double minDistance,
                ::coder::array<unsigned int, 1U> &labels, double *numClusters)
 {
   c_pointCloud pc;
@@ -63,7 +63,7 @@ void pcsegdist(const pointCloud *ptCloud,
       c_pc[0] = pc.Location[b_i];
       c_pc[1] = pc.Location[b_i + pc.Location.size(0)];
       c_pc[2] = pc.Location[b_i + pc.Location.size(0) * 2];
-      pc.findNeighborsInRadius(c_pc, ind);
+      pc.findNeighborsInRadius(c_pc, minDistance, ind);
       b_newLabel = newLabel;
       i1 = ind.size(0);
       for (k = 0; k < i1; k++) {

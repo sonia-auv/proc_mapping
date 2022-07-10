@@ -20,9 +20,13 @@
 namespace coder {
 namespace internal {
 namespace blas {
+void b_xrot(int n, double x[16], int ix0, int iy0, double c, double s);
+
 void xrot(float x[9], int ix0, int iy0, float c, float s);
 
 void xrot(double x[9], int ix0, int iy0, double c, double s);
+
+void xrot(int n, double x[16], int ix0, int iy0, double c, double s);
 
 } // namespace blas
 } // namespace internal

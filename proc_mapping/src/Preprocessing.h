@@ -12,6 +12,7 @@
 #define PREPROCESSING_H
 
 // Include files
+#include "proc_mapping_internal_types.h"
 #include "rtwtypes.h"
 #include "coder_array.h"
 #include <cstddef>
@@ -23,10 +24,7 @@ class PointCloudBundler;
 // Type Definitions
 class Preprocessing {
 public:
-  double minIntensity;
-  double maxIntensity;
-  double minRange;
-  double maxRange;
+  struct_T param;
 };
 
 // Function Declarations

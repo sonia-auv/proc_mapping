@@ -25,7 +25,7 @@ class pointCloud;
 
 // Function Declarations
 namespace coder {
-void pcsegdist(const pointCloud *ptCloud,
+void pcsegdist(const pointCloud *ptCloud, double minDistance,
                ::coder::array<unsigned int, 1U> &labels, double *numClusters);
 
 }

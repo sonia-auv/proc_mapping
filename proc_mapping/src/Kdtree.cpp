@@ -42,7 +42,7 @@ namespace codegen {
 void Kdtree::searchNode(const ::coder::array<double, 2U> &X,
                         const double queryPt[3],
                         const ::coder::array<unsigned int, 1U> &nodeIdxStart,
-                        int numNN, d_struct_T *pq)
+                        int numNN, h_struct_T *pq)
 {
   array<double, 2U> b_diffAllDim;
   array<double, 2U> diffAllDim;
@@ -700,7 +700,7 @@ void b_Kdtree::knnSearch(const ::coder::array<double, 2U> &queryPoints,
   array<int, 1U> r2;
   array<bool, 2U> r;
   array<bool, 1U> wasNaNY;
-  d_struct_T pq;
+  h_struct_T pq;
   double b_pRadIn[3];
   double pRadIn[3];
   double startNode;
@@ -945,7 +945,7 @@ void b_Kdtree::knnSearch(const ::coder::array<double, 2U> &queryPoints,
 void Kdtree::searchNode(const ::coder::array<float, 2U> &X,
                         const float queryPt[3],
                         const ::coder::array<unsigned int, 1U> &nodeIdxStart,
-                        int numNN, e_struct_T *pq)
+                        int numNN, i_struct_T *pq)
 {
   array<float, 2U> diffAllDim;
   array<float, 1U> aDistOut;
@@ -1099,7 +1099,8 @@ void Kdtree::searchNode(const ::coder::array<float, 2U> &X,
 
 void Kdtree::searchNodeRadius(
     const ::coder::array<double, 2U> &X, const double queryPt[3],
-    const ::coder::array<unsigned int, 1U> &nodeIdxThis, d_struct_T *pq)
+    const ::coder::array<unsigned int, 1U> &nodeIdxThis, double powRadius,
+    h_struct_T *pq)
 {
   array<double, 2U> b_diffAllDim;
   array<double, 2U> diffAllDim;
@@ -1161,7 +1162,7 @@ void Kdtree::searchNodeRadius(
   b_acoef = distInP.size(0);
   b_k = 0;
   for (int k{0}; k < b_acoef; k++) {
-    if (distInP[k] <= 0.16000000000000003) {
+    if (distInP[k] <= powRadius) {
       b_k++;
     }
   }
@@ -1206,14 +1207,14 @@ void Kdtree::searchNodeRadius(
     b_acoef = distInP.size(0) - 1;
     acoef = 0;
     for (int k{0}; k <= b_acoef; k++) {
-      if (distInP[k] <= 0.16000000000000003) {
+      if (distInP[k] <= powRadius) {
         acoef++;
       }
     }
     r2.set_size(acoef);
     acoef = 0;
     for (int k{0}; k <= b_acoef; k++) {
-      if (distInP[k] <= 0.16000000000000003) {
+      if (distInP[k] <= powRadius) {
         r2[acoef] = k + 1;
         acoef++;
       }
@@ -1230,14 +1231,14 @@ void Kdtree::searchNodeRadius(
     b_acoef = distInP.size(0) - 1;
     acoef = 0;
     for (int k{0}; k <= b_acoef; k++) {
-      if (distInP[k] <= 0.16000000000000003) {
+      if (distInP[k] <= powRadius) {
         acoef++;
       }
     }
     r3.set_size(acoef);
     acoef = 0;
     for (int k{0}; k <= b_acoef; k++) {
-      if (distInP[k] <= 0.16000000000000003) {
+      if (distInP[k] <= powRadius) {
         r3[acoef] = k + 1;
         acoef++;
       }

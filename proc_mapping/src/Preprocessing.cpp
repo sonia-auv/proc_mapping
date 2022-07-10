@@ -11,6 +11,7 @@
 // Include files
 #include "Preprocessing.h"
 #include "PointCloudBundler.h"
+#include "proc_mapping_internal_types.h"
 #include "rt_nonfinite.h"
 #include "coder_array.h"
 #include <string.h>
@@ -53,10 +54,10 @@ void b_binary_expand_op(coder::array<bool, 1U> &in1,
   for (i = 0; i < loop_ub; i++) {
     double d;
     d = in2[i * stride_0_0 + in2.size(0) * 3];
-    in1[i] = ((d < in3->mPreprocessing.minIntensity) ||
-              (d > in3->mPreprocessing.maxIntensity) ||
-              (in4[i * stride_1_0] < in3->mPreprocessing.minRange) ||
-              (in5[i * stride_2_0] > in3->mPreprocessing.maxRange));
+    in1[i] = ((d < in3->mPreprocessing.param.minIntensity) ||
+              (d > in3->mPreprocessing.param.maxIntensity) ||
+              (in4[i * stride_1_0] < in3->mPreprocessing.param.minRange) ||
+              (in5[i * stride_2_0] > in3->mPreprocessing.param.maxRange));
   }
 }
 

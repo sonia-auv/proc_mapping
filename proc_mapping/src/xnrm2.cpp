@@ -18,6 +18,38 @@
 namespace coder {
 namespace internal {
 namespace blas {
+double b_xnrm2(int n, const double x[16], int ix0)
+{
+  double y;
+  y = 0.0;
+  if (n >= 1) {
+    if (n == 1) {
+      y = std::abs(x[ix0 - 1]);
+    } else {
+      double scale;
+      int kend;
+      scale = 3.3121686421112381E-170;
+      kend = (ix0 + n) - 1;
+      for (int k{ix0}; k <= kend; k++) {
+        double absxk;
+        absxk = std::abs(x[k - 1]);
+        if (absxk > scale) {
+          double t;
+          t = scale / absxk;
+          y = y * t * t + 1.0;
+          scale = absxk;
+        } else {
+          double t;
+          t = absxk / scale;
+          y += t * t;
+        }
+      }
+      y = scale * std::sqrt(y);
+    }
+  }
+  return y;
+}
+
 float xnrm2(int n, const float x[9], int ix0)
 {
   float y;
@@ -71,6 +103,38 @@ float xnrm2(const float x[3])
     }
   }
   return scale * std::sqrt(y);
+}
+
+double xnrm2(int n, const double x[3])
+{
+  double y;
+  y = 0.0;
+  if (n >= 1) {
+    if (n == 1) {
+      y = std::abs(x[1]);
+    } else {
+      double scale;
+      int kend;
+      scale = 3.3121686421112381E-170;
+      kend = n + 1;
+      for (int k{2}; k <= kend; k++) {
+        double absxk;
+        absxk = std::abs(x[k - 1]);
+        if (absxk > scale) {
+          double t;
+          t = scale / absxk;
+          y = y * t * t + 1.0;
+          scale = absxk;
+        } else {
+          double t;
+          t = absxk / scale;
+          y += t * t;
+        }
+      }
+      y = scale * std::sqrt(y);
+    }
+  }
+  return y;
 }
 
 double xnrm2(int n, const double x[9], int ix0)

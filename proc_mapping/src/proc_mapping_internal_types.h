@@ -25,10 +25,34 @@ struct struct_T {
 };
 
 struct b_struct_T {
-  struct_T preprocessing;
+  double clusterDist;
+  double planeTol;
+  double icpInlierRatio;
+  double zNormalThres;
+  double inPlaneThres;
+  double minArea;
+  double maxArea;
 };
 
 struct c_struct_T {
+  b_struct_T buoys;
+};
+
+struct d_struct_T {
+  double boxSize;
+};
+
+struct e_struct_T {
+  d_struct_T general;
+};
+
+struct f_struct_T {
+  struct_T preprocessing;
+  e_struct_T filter;
+  c_struct_T segmentation;
+};
+
+struct g_struct_T {
   int xstart;
   int xend;
 };
@@ -41,12 +65,12 @@ struct cell_wrap_41 {
   coder::array<double, 2U> f1;
 };
 
-struct d_struct_T {
+struct h_struct_T {
   coder::array<double, 1U> D;
   coder::array<unsigned int, 1U> b_I;
 };
 
-struct e_struct_T {
+struct i_struct_T {
   coder::array<float, 1U> D;
   coder::array<unsigned int, 1U> b_I;
 };

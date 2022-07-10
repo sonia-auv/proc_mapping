@@ -25,6 +25,10 @@ extern void mul_wide_u32(unsigned int in0, unsigned int in1,
                          unsigned int *ptrOutBitsHi,
                          unsigned int *ptrOutBitsLo);
 
+extern double rt_atan2d_snf(double u0, double u1);
+
+extern double rt_hypotd_snf(double u0, double u1);
+
 extern double rt_powd_snf(double u0, double u1);
 
 #endif

@@ -32,14 +32,14 @@
 
 // Function Declarations
 namespace coder {
-static void getChangesInTransformation(const captured_var *i,
-                                       const b_captured_var *qs,
-                                       const c_captured_var *Ts, double *dR,
+static void getChangesInTransformation(const e_captured_var *i,
+                                       const c_captured_var *qs,
+                                       const b_captured_var *Ts, double *dR,
                                        double *dT, double *rdiff,
                                        double *tdiff);
 
-static void parseInputs(double *inlierRatio, double tolerance[2],
-                        rigid3d *initTformParsed);
+static void parseInputs(double varargin_2, double *inlierRatio,
+                        double tolerance[2], rigid3d *initTformParsed);
 
 static void preparePointClouds(const b_pointCloud *moving,
                                const pointCloud *fixed, c_pointCloud *iobj_0,
@@ -50,9 +50,9 @@ static void preparePointClouds(const b_pointCloud *moving,
 
 // Function Definitions
 namespace coder {
-static void getChangesInTransformation(const captured_var *i,
-                                       const b_captured_var *qs,
-                                       const c_captured_var *Ts, double *dR,
+static void getChangesInTransformation(const e_captured_var *i,
+                                       const c_captured_var *qs,
+                                       const b_captured_var *Ts, double *dR,
                                        double *dT, double *rdiff, double *tdiff)
 {
   double count;
@@ -189,8 +189,8 @@ static void getChangesInTransformation(const captured_var *i,
   *dR /= count;
 }
 
-static void parseInputs(double *inlierRatio, double tolerance[2],
-                        rigid3d *initTformParsed)
+static void parseInputs(double varargin_2, double *inlierRatio,
+                        double tolerance[2], rigid3d *initTformParsed)
 {
   static const signed char T[16]{1, 0, 0, 0, 0, 1, 0, 0,
                                  0, 0, 1, 0, 0, 0, 0, 1};
@@ -222,7 +222,7 @@ static void parseInputs(double *inlierRatio, double tolerance[2],
   }
   tolerance[0] = 0.01;
   tolerance[1] = 0.0087266462599716477;
-  *inlierRatio = 0.1;
+  *inlierRatio = varargin_2;
 }
 
 static void preparePointClouds(const b_pointCloud *moving,
@@ -232,6 +232,7 @@ static void preparePointClouds(const b_pointCloud *moving,
 {
   c_pointCloud *b_ptCloudB;
   array<double, 1U> validPtCloudIndices;
+  array<float, 2U> intensity;
   array<float, 2U> tempI;
   array<float, 2U> tempNV;
   array<short, 1U> r;
@@ -239,14 +240,20 @@ static void preparePointClouds(const b_pointCloud *moving,
   array<short, 1U> r2;
   array<short, 1U> r3;
   array<unsigned char, 2U> C_;
+  array<unsigned char, 2U> color;
+  float x[22317];
   int nz[7439];
   int i;
   int xoffset;
   bool tf[22317];
   bool indices[7439];
   for (int k{0}; k < 22317; k++) {
-    tf[k] = ((!std::isinf(moving->Location[k])) &&
-             (!std::isnan(moving->Location[k])));
+    x[k] = moving->Location[k];
+  }
+  for (int k{0}; k < 22317; k++) {
+    float f;
+    f = x[k];
+    tf[k] = ((!std::isinf(f)) && (!std::isnan(f)));
   }
   for (i = 0; i < 7439; i++) {
     nz[i] = tf[i];
@@ -257,12 +264,30 @@ static void preparePointClouds(const b_pointCloud *moving,
       nz[i] += tf[xoffset + i];
     }
   }
+  for (i = 0; i < 7439; i++) {
+    indices[i] = (nz[i] == 3);
+  }
+  for (int k{0}; k < 22317; k++) {
+    x[k] = moving->Location[k];
+  }
+  color.set_size(moving->Color.size(0), moving->Color.size(1));
+  xoffset = moving->Color.size(0) * moving->Color.size(1);
+  for (int k{0}; k < xoffset; k++) {
+    color[k] = moving->Color[k];
+  }
+  tempI.set_size(moving->Normal.size(0), moving->Normal.size(1));
+  xoffset = moving->Normal.size(0) * moving->Normal.size(1);
+  for (int k{0}; k < xoffset; k++) {
+    tempI[k] = moving->Normal[k];
+  }
+  intensity.set_size(moving->Intensity.size(0), moving->Intensity.size(1));
+  xoffset = moving->Intensity.size(0) * moving->Intensity.size(1);
+  for (int k{0}; k < xoffset; k++) {
+    intensity[k] = moving->Intensity[k];
+  }
   xoffset = 0;
   for (i = 0; i < 7439; i++) {
-    bool b;
-    b = (nz[i] == 3);
-    indices[i] = b;
-    if (b) {
+    if (indices[i]) {
       xoffset++;
     }
   }
@@ -274,7 +299,7 @@ static void preparePointClouds(const b_pointCloud *moving,
       xoffset++;
     }
   }
-  if ((moving->Color.size(0) != 0) && (moving->Color.size(1) != 0)) {
+  if ((color.size(0) != 0) && (color.size(1) != 0)) {
     xoffset = 0;
     for (i = 0; i < 7439; i++) {
       if (indices[i]) {
@@ -289,19 +314,18 @@ static void preparePointClouds(const b_pointCloud *moving,
         xoffset++;
       }
     }
-    xoffset = moving->Color.size(1);
-    C_.set_size(r1.size(0), xoffset);
+    xoffset = color.size(1);
+    C_.set_size(r1.size(0), color.size(1));
+    i = r1.size(0);
     for (int k{0}; k < xoffset; k++) {
-      i = r1.size(0);
       for (int b_i{0}; b_i < i; b_i++) {
-        C_[b_i + C_.size(0) * k] =
-            moving->Color[(r1[b_i] + moving->Color.size(0) * k) - 1];
+        C_[b_i + C_.size(0) * k] = color[(r1[b_i] + color.size(0) * k) - 1];
       }
     }
   } else {
     C_.set_size(0, 0);
   }
-  if ((moving->Normal.size(0) != 0) && (moving->Normal.size(1) != 0)) {
+  if ((tempI.size(0) != 0) && (tempI.size(1) != 0)) {
     xoffset = 0;
     for (i = 0; i < 7439; i++) {
       if (indices[i]) {
@@ -316,19 +340,19 @@ static void preparePointClouds(const b_pointCloud *moving,
         xoffset++;
       }
     }
-    xoffset = moving->Normal.size(1);
-    tempNV.set_size(r2.size(0), xoffset);
+    xoffset = tempI.size(1);
+    tempNV.set_size(r2.size(0), tempI.size(1));
+    i = r2.size(0);
     for (int k{0}; k < xoffset; k++) {
-      i = r2.size(0);
       for (int b_i{0}; b_i < i; b_i++) {
         tempNV[b_i + tempNV.size(0) * k] =
-            moving->Normal[(r2[b_i] + moving->Normal.size(0) * k) - 1];
+            tempI[(r2[b_i] + tempI.size(0) * k) - 1];
       }
     }
   } else {
     tempNV.set_size(0, 0);
   }
-  if ((moving->Intensity.size(0) != 0) && (moving->Intensity.size(1) != 0)) {
+  if ((intensity.size(0) != 0) && (intensity.size(1) != 0)) {
     xoffset = 0;
     for (i = 0; i < 7439; i++) {
       if (indices[i]) {
@@ -343,13 +367,13 @@ static void preparePointClouds(const b_pointCloud *moving,
         xoffset++;
       }
     }
-    xoffset = moving->Intensity.size(1);
-    tempI.set_size(r3.size(0), xoffset);
+    xoffset = intensity.size(1);
+    tempI.set_size(r3.size(0), intensity.size(1));
+    i = r3.size(0);
     for (int k{0}; k < xoffset; k++) {
-      i = r3.size(0);
       for (int b_i{0}; b_i < i; b_i++) {
         tempI[b_i + tempI.size(0) * k] =
-            moving->Intensity[(r3[b_i] + moving->Intensity.size(0) * k) - 1];
+            intensity[(r3[b_i] + intensity.size(0) * k) - 1];
       }
     }
   } else {
@@ -361,7 +385,7 @@ static void preparePointClouds(const b_pointCloud *moving,
   for (int k{0}; k < 3; k++) {
     for (int b_i{0}; b_i < xoffset; b_i++) {
       iobj_1->Location[b_i + iobj_1->Location.size(0) * k] =
-          moving->Location[(r[b_i] + 7439 * k) - 1];
+          x[(r[b_i] + 7439 * k) - 1];
     }
   }
   iobj_1->Color.set_size(C_.size(0), C_.size(1));
@@ -385,7 +409,7 @@ static void preparePointClouds(const b_pointCloud *moving,
   *ptCloudB = b_ptCloudB;
 }
 
-void pcregistericp(const b_pointCloud *moving, pointCloud *fixed,
+void pcregistericp(b_pointCloud *moving, pointCloud *fixed, double varargin_2,
                    rigid3d *tform)
 {
   static const signed char iv[147]{
@@ -395,13 +419,13 @@ void pcregistericp(const b_pointCloud *moving, pointCloud *fixed,
       0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0,
       0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0,
       0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0};
-  b_captured_var qs;
-  c_captured_var Ts;
+  b_captured_var Ts;
+  c_captured_var qs;
   c_pointCloud ptCloudB;
   c_pointCloud *r2;
-  captured_var c_i;
-  d_captured_var Rs;
-  e_captured_var locA;
+  captured_var Rs;
+  d_captured_var locA;
+  e_captured_var c_i;
   f_captured_var ptCloudA;
   f_pointCloud r;
   f_pointCloud *r1;
@@ -451,7 +475,7 @@ void pcregistericp(const b_pointCloud *moving, pointCloud *fixed,
   r.matlabCodegenIsDeleted = true;
   ptCloudB.matlabCodegenIsDeleted = true;
   ptCloudA.matlabCodegenIsDeleted = false;
-  parseInputs(&inlierRatio, tolerance, &initialTransform);
+  parseInputs(varargin_2, &inlierRatio, tolerance, &initialTransform);
   useAllMatches = (inlierRatio == 1.0);
   preparePointClouds(moving, fixed, &ptCloudB, &r, &r1, &r2);
   ptCloudA.contents = &r;

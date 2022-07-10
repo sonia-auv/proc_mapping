@@ -27,14 +27,15 @@ public:
   Subscriber *init();
   void callback();
   double get_MessageCount() const;
-  char TopicName[24];
+  void get_LatestMessage(::coder::array<char, 2U> &lastSubMsg_Data) const;
+  char TopicName[19];
   double BufferSize;
   double MessageCount;
 
 private:
-  std::unique_ptr<MATLABSubscriber<std_msgs::Bool, std_msgs_BoolStruct_T>>
+  std::unique_ptr<MATLABSubscriber<std_msgs::String, std_msgs_StringStruct_T>>
       SubscriberHelper;
-  std_msgs_BoolStruct_T MsgStruct;
+  std_msgs_StringStruct_T MsgStruct;
   bool IsInitialized;
 };
 
@@ -43,7 +44,7 @@ public:
   b_Subscriber *init();
   void callback();
   double get_MessageCount() const;
-  char TopicName[26];
+  char TopicName[18];
   double BufferSize;
   double MessageCount;
 
@@ -59,13 +60,24 @@ public:
   c_Subscriber *init();
   void callback();
   double get_MessageCount() const;
-  void get_LatestMessage(double *lastSubMsg_Pose_Pose_Position_X,
-                         double *lastSubMsg_Pose_Pose_Position_Y,
-                         double *lastSubMsg_Pose_Pose_Position_Z,
-                         double *lastSubMsg_Pose_Pose_Orientation_X,
-                         double *lastSubMsg_Pose_Pose_Orientation_Y,
-                         double *lastSubMsg_Pose_Pose_Orientation_Z,
-                         double *lastSubMsg_Pose_Pose_Orientation_W) const;
+  char TopicName[26];
+  double BufferSize;
+  double MessageCount;
+
+private:
+  std::unique_ptr<MATLABSubscriber<std_msgs::Bool, std_msgs_BoolStruct_T>>
+      SubscriberHelper;
+  std_msgs_BoolStruct_T MsgStruct;
+  bool IsInitialized;
+};
+
+class d_Subscriber {
+public:
+  d_Subscriber *init();
+  void callback();
+  double get_MessageCount() const;
+  void get_LatestMessage(
+      geometry_msgs_PoseWithCovarianceStruct_T *lastSubMsg_Pose) const;
   char TopicName[20];
   double BufferSize;
   double MessageCount;
@@ -77,9 +89,9 @@ private:
   nav_msgs_OdometryStruct_T MsgStruct;
 };
 
-class d_Subscriber {
+class e_Subscriber {
 public:
-  d_Subscriber *init();
+  e_Subscriber *init();
   void callback();
   double get_MessageCount() const;
   void get_LatestMessage(
@@ -99,9 +111,9 @@ private:
   bool IsInitialized;
 };
 
-class e_Subscriber {
+class f_Subscriber {
 public:
-  e_Subscriber *init();
+  f_Subscriber *init();
   void callback();
   double get_MessageCount() const;
   char TopicName[40];

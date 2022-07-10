@@ -12,6 +12,7 @@
 #define BUOYS_H
 
 // Include files
+#include "proc_mapping_internal_types.h"
 #include "rtwtypes.h"
 #include "coder_array.h"
 #include <cstddef>
@@ -36,19 +37,12 @@ class Kdtree;
 // Type Definitions
 class Buoys {
 public:
-  coder::b_pointCloud *buoyPT;
-
-protected:
+  void getBuoyPose(coder::pointCloud *subPT, const double auvQuat[4],
+                   double p[3], double q[4]) const;
   coder::pointCloud *filteredPT;
-
-private:
-  double clusterDist;
-  double planeTol;
-  double icpInlierRation;
-  double zNormalThres;
-  double inPlaneThres;
-  double areaThres[2];
   coder::array<unsigned int, 2U> PTlabels;
+  coder::b_pointCloud *buoyPT;
+  b_struct_T param;
 };
 
 // Function Declarations

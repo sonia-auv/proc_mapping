@@ -36,13 +36,11 @@ private:
 class b_Publisher {
 public:
   b_Publisher *init();
-  char TopicName[25];
+  char TopicName[28];
   double BufferSize;
   bool IsLatching;
-
-private:
-  std::unique_ptr<
-      MATLABPublisher<sonia_common::AddPose, sonia_common_AddPoseStruct_T>>
+  std::unique_ptr<MATLABPublisher<sonia_common::ObstacleArray,
+                                  sonia_common_ObstacleArrayStruct_T>>
       PublisherHelper;
 };
 

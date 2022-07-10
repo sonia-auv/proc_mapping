@@ -26,7 +26,8 @@ class c_pointCloud;
 
 // Function Declarations
 namespace coder {
-c_pointCloud *pcdownsample(const pointCloud *ptCloudIn, c_pointCloud *iobj_0);
+c_pointCloud *pcdownsample(const pointCloud *ptCloudIn, double varargin_2,
+                           c_pointCloud *iobj_0);
 
 }
 

@@ -24,7 +24,6 @@ namespace coder {
 class rigid3d {
 public:
   static bool isTransformationMatrixRigid(const double T[16]);
-  void init(const double varargin_1[9], const double varargin_2[3]);
   affine3d AffineTform;
   array<images::internal::rigid3dImpl, 2U> Data;
 };

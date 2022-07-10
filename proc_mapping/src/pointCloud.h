@@ -80,7 +80,6 @@ private:
 
 class b_pointCloud {
 public:
-  b_pointCloud *init(::coder::vision::internal::codegen::Kdtree *iobj_0);
   void matlabCodegenDestructor();
   ~b_pointCloud();
   b_pointCloud();
@@ -97,9 +96,9 @@ public:
 
 class c_pointCloud {
 public:
-  void matlabCodegenDestructor();
-  void findNeighborsInRadius(const double varargin_1[3],
+  void findNeighborsInRadius(const double varargin_1[3], double varargin_2,
                              ::coder::array<unsigned int, 1U> &indices);
+  void matlabCodegenDestructor();
   ~c_pointCloud();
   c_pointCloud();
   bool matlabCodegenIsDeleted;

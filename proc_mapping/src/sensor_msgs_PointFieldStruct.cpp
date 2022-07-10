@@ -18,12 +18,12 @@
 // Function Definitions
 void sensor_msgs_PointFieldStruct(sensor_msgs_PointFieldStruct_T *msg)
 {
-  static const char b_cv[22]{'s', 'e', 'n', 's', 'o', 'r', '_', 'm',
-                             's', 'g', 's', '/', 'P', 'o', 'i', 'n',
-                             't', 'F', 'i', 'e', 'l', 'd'};
+  static const char cv[22]{'s', 'e', 'n', 's', 'o', 'r', '_', 'm',
+                           's', 'g', 's', '/', 'P', 'o', 'i', 'n',
+                           't', 'F', 'i', 'e', 'l', 'd'};
   //  Message struct definition for sensor_msgs/PointField
   for (int i{0}; i < 22; i++) {
-    msg->MessageType[i] = b_cv[i];
+    msg->MessageType[i] = cv[i];
   }
   msg->INT8 = 1U;
   msg->UINT8 = 2U;

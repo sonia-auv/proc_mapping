@@ -1,4 +1,3 @@
 <launch>
-    <node name="proc_mapping_config_server" pkg="proc_mapping_config_server" type="server.py" output="screen" />
     <node name="proc_mapping_node" pkg="proc_mapping" type="proc_mapping_node" output="screen"/>
 </launch> 

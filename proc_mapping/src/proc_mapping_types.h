@@ -72,16 +72,6 @@ struct geometry_msgs_TwistWithCovarianceStruct_T {
   double Covariance[36];
 };
 
-struct sonia_common_AddPoseStruct_T {
-  char MessageType[20];
-  geometry_msgs_PointStruct_T Position;
-  geometry_msgs_Vector3Struct_T Orientation;
-  unsigned char Frame;
-  unsigned char Speed;
-  double Fine;
-  bool Rotation;
-};
-
 struct uint64m_T {
   unsigned int chunks[2];
 };
@@ -100,6 +90,11 @@ struct sensor_msgs_PointFieldStruct_T {
   unsigned int Offset;
   unsigned char Datatype;
   unsigned int Count;
+};
+
+struct std_msgs_StringStruct_T {
+  char MessageType[15];
+  coder::array<char, 2U> Data;
 };
 
 struct std_msgs_HeaderStruct_T {
@@ -135,6 +130,20 @@ struct sensor_msgs_CompressedImageStruct_T {
   std_msgs_HeaderStruct_T Header;
   coder::array<char, 2U> Format;
   coder::array<unsigned char, 1U> Data;
+};
+
+struct sonia_common_ObstacleInfoStruct_T {
+  char MessageType[25];
+  coder::array<char, 2U> Name;
+  bool IsValid;
+  float Confidence;
+  geometry_msgs_PoseStruct_T Pose;
+};
+
+struct sonia_common_ObstacleArrayStruct_T {
+  char MessageType[26];
+  std_msgs_HeaderStruct_T Header;
+  coder::array<sonia_common_ObstacleInfoStruct_T, 1U> Obstacles;
 };
 
 #endif

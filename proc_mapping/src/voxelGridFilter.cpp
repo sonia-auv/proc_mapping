@@ -17,7 +17,6 @@
 #include "rt_nonfinite.h"
 #include "stack1.h"
 #include "coder_array.h"
-#include "rt_defines.h"
 #include <cmath>
 #include <math.h>
 #include <string.h>
@@ -43,8 +42,6 @@ static void sortVoxelIndex(::coder::array<uint64m_T, 2U> &x, int xend,
 } // namespace internal
 } // namespace vision
 } // namespace coder
-static double rt_atan2d_snf(double u0, double u1);
-
 static void sLong2uMultiWordSat(int u1, unsigned int y[]);
 
 static void sMultiWord2uMultiWordSat(const unsigned int u1[], unsigned int y[]);
@@ -144,9 +141,9 @@ static void sortVoxelIndex(::coder::array<uint64m_T, 2U> &x, int xend,
                            int arrLen)
 {
   ::coder::internal::stack st;
-  c_struct_T frame;
-  c_struct_T r;
-  c_struct_T r1;
+  g_struct_T frame;
+  g_struct_T r;
+  g_struct_T r1;
   if (xend > 1) {
     if (xend <= 32) {
       insertion(x, 1, xend, arrLen);
@@ -275,39 +272,6 @@ static void sortVoxelIndex(::coder::array<uint64m_T, 2U> &x, int xend,
 } // namespace internal
 } // namespace vision
 } // namespace coder
-static double rt_atan2d_snf(double u0, double u1)
-{
-  double y;
-  if (std::isnan(u0) || std::isnan(u1)) {
-    y = rtNaN;
-  } else if (std::isinf(u0) && std::isinf(u1)) {
-    int b_u0;
-    int b_u1;
-    if (u0 > 0.0) {
-      b_u0 = 1;
-    } else {
-      b_u0 = -1;
-    }
-    if (u1 > 0.0) {
-      b_u1 = 1;
-    } else {
-      b_u1 = -1;
-    }
-    y = std::atan2(static_cast<double>(b_u0), static_cast<double>(b_u1));
-  } else if (u1 == 0.0) {
-    if (u0 > 0.0) {
-      y = RT_PI / 2.0;
-    } else if (u0 < 0.0) {
-      y = -(RT_PI / 2.0);
-    } else {
-      y = 0.0;
-    }
-  } else {
-    y = std::atan2(u0, u1);
-  }
-  return y;
-}
-
 static void sLong2uMultiWordSat(int u1, unsigned int y[])
 {
   unsigned int u;
@@ -395,6 +359,7 @@ void voxelGridFilter(const ::coder::array<double, 2U> &location,
                      const ::coder::array<double, 2U> &normal,
                      const ::coder::array<double, 1U> &intensity,
                      const ::coder::array<double, 2U> &rangeData,
+                     double voxelSize,
                      ::coder::array<double, 2U> &filteredLocation,
                      ::coder::array<unsigned char, 2U> &filteredColor,
                      ::coder::array<double, 2U> &filteredNormal,
@@ -410,9 +375,9 @@ void voxelGridFilter(const ::coder::array<double, 2U> &location,
   array<uint64m_T, 2U> ptrIndexVector;
   array<double, 2U> b_location;
   uint64m_T r;
+  double inverseVoxelSize;
   double ix;
   double numxy;
-  double nz;
   double range_idx_0;
   double range_idx_2;
   double range_idx_4;
@@ -490,44 +455,45 @@ void voxelGridFilter(const ::coder::array<double, 2U> &location,
     b_location[cz_tmp] = location[numx + cz_tmp];
   }
   range_idx_4 = ::coder::internal::minimum(b_location);
+  inverseVoxelSize = 1.0 / voxelSize;
   b_location.set_size(1, matrixIndex);
   for (numx = 0; numx < matrixIndex; numx++) {
     b_location[numx] = location[numx];
   }
-  numx = (static_cast<int>(
-              std::floor(::coder::internal::maximum(b_location) * 20.0)) -
-          static_cast<int>(std::floor(range_idx_0 * 20.0))) +
+  numx = (static_cast<int>(std::floor(::coder::internal::maximum(b_location) *
+                                      inverseVoxelSize)) -
+          static_cast<int>(std::floor(range_idx_0 * inverseVoxelSize))) +
          1;
   matrixIndex = i1 - i;
   b_location.set_size(1, matrixIndex);
   for (i1 = 0; i1 < matrixIndex; i1++) {
     b_location[i1] = location[i + i1];
   }
-  numxy =
-      static_cast<double>(numx) *
-      static_cast<double>((static_cast<int>(std::floor(
-                               ::coder::internal::maximum(b_location) * 20.0)) -
-                           static_cast<int>(std::floor(range_idx_2 * 20.0))) +
-                          1);
+  numxy = static_cast<double>(numx) *
+          static_cast<double>(
+              (static_cast<int>(std::floor(
+                   ::coder::internal::maximum(b_location) * inverseVoxelSize)) -
+               static_cast<int>(std::floor(range_idx_2 * inverseVoxelSize))) +
+              1);
   numOut = 0;
   ptrIndexVector.set_size(location.size(0), 2);
   ptrIndexVectorEnd = location.size(0);
   for (n = 0; n < ptrIndexVectorEnd; n++) {
-    nz = (std::floor((location[n] - range_idx_0) * 20.0) +
+    ix = (std::floor((location[n] - range_idx_0) * inverseVoxelSize) +
           std::floor((location[n + static_cast<int>(numPoints)] - range_idx_2) *
-                     20.0) *
+                     inverseVoxelSize) *
               static_cast<double>(numx)) +
          std::floor(
              (location[n + (static_cast<int>(numPoints) << 1)] - range_idx_4) *
-             20.0) *
+             inverseVoxelSize) *
              numxy;
-    if (nz < 1.8446744073709552E+19) {
-      if (nz >= 0.0) {
-        Double2MultiWord(nz, (unsigned int *)&r.chunks[0U]);
+    if (ix < 1.8446744073709552E+19) {
+      if (ix >= 0.0) {
+        Double2MultiWord(ix, (unsigned int *)&r.chunks[0U]);
       } else {
         r = r1;
       }
-    } else if (nz >= 1.8446744073709552E+19) {
+    } else if (ix >= 1.8446744073709552E+19) {
       r = r2;
     } else {
       r = r1;
@@ -604,8 +570,8 @@ void voxelGridFilter(const ::coder::array<double, 2U> &location,
     }
     if (needNormalFlag) {
       range_idx_4 = normal[matrixIndex];
-      numxy = normal[numx];
-      nz = normal[ptrIndexVectorEnd];
+      inverseVoxelSize = normal[numx];
+      numxy = normal[ptrIndexVectorEnd];
     }
     if (needIntensityFlag) {
       ix = intensity[matrixIndex];
@@ -633,8 +599,8 @@ void voxelGridFilter(const ::coder::array<double, 2U> &location,
       }
       if (needNormalFlag) {
         range_idx_4 += normal[matrixIndex];
-        numxy += normal[numx];
-        nz += normal[matrixIndex + (static_cast<int>(numPoints) << 1)];
+        inverseVoxelSize += normal[numx];
+        numxy += normal[matrixIndex + (static_cast<int>(numPoints) << 1)];
       }
       if (needIntensityFlag) {
         ix += intensity[matrixIndex];
@@ -699,11 +665,11 @@ void voxelGridFilter(const ::coder::array<double, 2U> &location,
     }
     if (needNormalFlag) {
       range_idx_4 /= static_cast<double>(ptrIndexVectorEnd);
+      inverseVoxelSize /= static_cast<double>(ptrIndexVectorEnd);
       numxy /= static_cast<double>(ptrIndexVectorEnd);
-      nz /= static_cast<double>(ptrIndexVectorEnd);
       filteredNormal[c_index] = range_idx_4;
-      filteredNormal[i] = numxy;
-      filteredNormal[i1] = nz;
+      filteredNormal[i] = inverseVoxelSize;
+      filteredNormal[i1] = numxy;
     }
     if (needIntensityFlag) {
       ix /= static_cast<double>(ptrIndexVectorEnd);

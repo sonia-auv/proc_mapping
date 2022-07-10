@@ -27,18 +27,20 @@ public:
   static void persistentDataStore_init();
   coder::array<double, 2U> mBundle;
   Preprocessing mPreprocessing;
-  coder::ros::Subscriber *mStartStopSub;
-  coder::ros::b_Subscriber *mClearBundleSub;
-  coder::ros::c_Subscriber *mPoseSub;
-  coder::ros::d_Subscriber *mSonarSub;
-  coder::ros::e_Subscriber *mImageSub;
+  coder::ros::Subscriber *mStartSub;
+  coder::ros::b_Subscriber *mStopSub;
+  coder::ros::c_Subscriber *mClearBundleSub;
+  coder::ros::d_Subscriber *mPoseSub;
+  coder::ros::e_Subscriber *mSonarSub;
+  coder::ros::f_Subscriber *mImageSub;
   bool mLastBundleState;
-  b_struct_T param;
-  coder::ros::e_Subscriber _pobj0;
-  coder::ros::d_Subscriber _pobj1;
-  coder::ros::c_Subscriber _pobj2;
-  coder::ros::b_Subscriber _pobj3;
-  coder::ros::Subscriber _pobj4;
+  f_struct_T param;
+  coder::ros::f_Subscriber _pobj0;
+  coder::ros::e_Subscriber _pobj1;
+  coder::ros::d_Subscriber _pobj2;
+  coder::ros::c_Subscriber _pobj3;
+  coder::ros::b_Subscriber _pobj4;
+  coder::ros::Subscriber _pobj5;
 };
 
 #endif

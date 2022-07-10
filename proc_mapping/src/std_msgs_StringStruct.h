@@ -3,13 +3,13 @@
 // course requirements at degree granting institutions only.  Not for
 // government, commercial, or other organizational use.
 //
-// sonia_common_AddPoseStruct.h
+// std_msgs_StringStruct.h
 //
-// Code generation for function 'sonia_common_AddPoseStruct'
+// Code generation for function 'std_msgs_StringStruct'
 //
 
-#ifndef SONIA_COMMON_ADDPOSESTRUCT_H
-#define SONIA_COMMON_ADDPOSESTRUCT_H
+#ifndef STD_MSGS_STRINGSTRUCT_H
+#define STD_MSGS_STRINGSTRUCT_H
 
 // Include files
 #include "rtwtypes.h"
@@ -17,10 +17,10 @@
 #include <cstdlib>
 
 // Type Declarations
-struct sonia_common_AddPoseStruct_T;
+struct std_msgs_StringStruct_T;
 
 // Function Declarations
-void sonia_common_AddPoseStruct(sonia_common_AddPoseStruct_T *msg);
+void std_msgs_StringStruct(std_msgs_StringStruct_T *msg);
 
 #endif
-// End of code generation (sonia_common_AddPoseStruct.h)
+// End of code generation (std_msgs_StringStruct.h)

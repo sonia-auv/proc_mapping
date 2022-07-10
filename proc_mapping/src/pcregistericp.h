@@ -28,7 +28,7 @@ class rigid3d;
 
 // Function Declarations
 namespace coder {
-void pcregistericp(const b_pointCloud *moving, pointCloud *fixed,
+void pcregistericp(b_pointCloud *moving, pointCloud *fixed, double varargin_2,
                    rigid3d *tform);
 
 }

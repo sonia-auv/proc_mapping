@@ -20,9 +20,13 @@
 namespace coder {
 namespace internal {
 namespace blas {
+double b_xnrm2(int n, const double x[16], int ix0);
+
 float xnrm2(int n, const float x[9], int ix0);
 
 float xnrm2(const float x[3]);
+
+double xnrm2(int n, const double x[3]);
 
 double xnrm2(int n, const double x[9], int ix0);
 

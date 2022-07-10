@@ -27,8 +27,9 @@ class planeModel;
 
 // Function Declarations
 namespace coder {
-void pcfitplane(const pointCloud *varargin_1, planeModel *iobj_0,
-                planeModel **model, ::coder::array<double, 1U> &inlierIndices,
+void pcfitplane(const pointCloud *varargin_1, double varargin_2,
+                planeModel *iobj_0, planeModel **model,
+                ::coder::array<double, 1U> &inlierIndices,
                 ::coder::array<double, 1U> &outlierIndices,
                 ::coder::array<double, 2U> &meanError);
 

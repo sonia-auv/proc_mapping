@@ -18,9 +18,9 @@
 #include <cstdlib>
 
 // Type Declarations
-struct d_struct_T;
+struct h_struct_T;
 
-struct e_struct_T;
+struct i_struct_T;
 
 // Type Definitions
 namespace coder {
@@ -40,15 +40,15 @@ public:
   static void searchNode(const ::coder::array<double, 2U> &X,
                          const double queryPt[3],
                          const ::coder::array<unsigned int, 1U> &nodeIdxStart,
-                         int numNN, d_struct_T *pq);
-  static void searchNode(const ::coder::array<float, 2U> &X,
-                         const float queryPt[3],
-                         const ::coder::array<unsigned int, 1U> &nodeIdxStart,
-                         int numNN, e_struct_T *pq);
+                         int numNN, h_struct_T *pq);
   static void
   searchNodeRadius(const ::coder::array<double, 2U> &X, const double queryPt[3],
                    const ::coder::array<unsigned int, 1U> &nodeIdxThis,
-                   d_struct_T *pq);
+                   double powRadius, h_struct_T *pq);
+  static void searchNode(const ::coder::array<float, 2U> &X,
+                         const float queryPt[3],
+                         const ::coder::array<unsigned int, 1U> &nodeIdxStart,
+                         int numNN, i_struct_T *pq);
 };
 
 class b_Kdtree {

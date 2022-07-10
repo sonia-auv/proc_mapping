@@ -27,27 +27,27 @@ class f_pointCloud;
 namespace coder {
 class captured_var {
 public:
-  double contents;
+  double contents[189];
 };
 
 class b_captured_var {
 public:
-  double contents[147];
+  double contents[63];
 };
 
 class c_captured_var {
 public:
-  double contents[63];
+  double contents[147];
 };
 
 class d_captured_var {
 public:
-  double contents[189];
+  array<float, 2U> contents;
 };
 
 class e_captured_var {
 public:
-  array<float, 2U> contents;
+  double contents;
 };
 
 class f_captured_var {

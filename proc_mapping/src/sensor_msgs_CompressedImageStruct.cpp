@@ -19,13 +19,13 @@
 // Function Definitions
 void sensor_msgs_CompressedImageStruct(sensor_msgs_CompressedImageStruct_T *msg)
 {
-  static const char b_cv[27]{'s', 'e', 'n', 's', 'o', 'r', '_', 'm', 's',
-                             'g', 's', '/', 'C', 'o', 'm', 'p', 'r', 'e',
-                             's', 's', 'e', 'd', 'I', 'm', 'a', 'g', 'e'};
+  static const char cv[27]{'s', 'e', 'n', 's', 'o', 'r', '_', 'm', 's',
+                           'g', 's', '/', 'C', 'o', 'm', 'p', 'r', 'e',
+                           's', 's', 'e', 'd', 'I', 'm', 'a', 'g', 'e'};
   //  Message struct definition for sensor_msgs/CompressedImage
   std_msgs_HeaderStruct(&msg->Header);
   for (int i{0}; i < 27; i++) {
-    msg->MessageType[i] = b_cv[i];
+    msg->MessageType[i] = cv[i];
   }
   msg->Format.set_size(1, 0);
   msg->Data.set_size(0);

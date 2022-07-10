@@ -13,6 +13,7 @@
 
 // Include files
 #include "proc_mapping_internal_types.h"
+#include "proc_mapping_types.h"
 #include "rtwtypes.h"
 #include <cstddef>
 #include <cstdlib>
@@ -31,12 +32,25 @@ class PointCloudBundler;
 // Type Definitions
 class RosNode {
 public:
-  b_struct_T param;
+  static void getRosParams(double *param_preprocessing_minIntensity,
+                           double *param_preprocessing_maxIntensity,
+                           double *param_preprocessing_minRange,
+                           double *param_preprocessing_maxRange,
+                           double *param_filter_general_boxSize,
+                           double *param_segmentation_buoys_clusterDist,
+                           double *param_segmentation_buoys_planeTol,
+                           double *param_segmentation_buoys_icpInlierRatio,
+                           double *param_segmentation_buoys_zNormalThres,
+                           double *param_segmentation_buoys_inPlaneThres,
+                           double *param_segmentation_buoys_minArea,
+                           double *param_segmentation_buoys_maxArea);
+  f_struct_T param;
   double counter;
+  sonia_common_ObstacleArrayStruct_T obstacleArray;
 
 private:
   coder::ros::Publisher *outputCloudPublisher;
-  coder::ros::b_Publisher *outputPosePublisher;
+  coder::ros::b_Publisher *obstacleArrayPublisher;
   PointCloudBundler *mPtBundler;
   double paramUpdateRate;
   double rate;

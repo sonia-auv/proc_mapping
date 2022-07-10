@@ -14,9 +14,11 @@
 #include <sensor_msgs/CompressedImage.h>
 #include <sensor_msgs/PointCloud2.h>
 #include <sensor_msgs/PointField.h>
-#include <sonia_common/AddPose.h>
+#include <sonia_common/ObstacleArray.h>
+#include <sonia_common/ObstacleInfo.h>
 #include <std_msgs/Bool.h>
 #include <std_msgs/Header.h>
+#include <std_msgs/String.h>
 #include "proc_mapping_types.h"
 #include "mlroscpp_msgconvert_utils.h"
 
@@ -57,14 +59,20 @@ void msg2struct(sensor_msgs_PointCloud2Struct_T* structPtr, sensor_msgs::PointCl
 void struct2msg(sensor_msgs::PointField* msgPtr, sensor_msgs_PointFieldStruct_T const* structPtr);
 void msg2struct(sensor_msgs_PointFieldStruct_T* structPtr, sensor_msgs::PointField const* msgPtr);
 
-void struct2msg(sonia_common::AddPose* msgPtr, sonia_common_AddPoseStruct_T const* structPtr);
-void msg2struct(sonia_common_AddPoseStruct_T* structPtr, sonia_common::AddPose const* msgPtr);
+void struct2msg(sonia_common::ObstacleArray* msgPtr, sonia_common_ObstacleArrayStruct_T const* structPtr);
+void msg2struct(sonia_common_ObstacleArrayStruct_T* structPtr, sonia_common::ObstacleArray const* msgPtr);
+
+void struct2msg(sonia_common::ObstacleInfo* msgPtr, sonia_common_ObstacleInfoStruct_T const* structPtr);
+void msg2struct(sonia_common_ObstacleInfoStruct_T* structPtr, sonia_common::ObstacleInfo const* msgPtr);
 
 void struct2msg(std_msgs::Bool* msgPtr, std_msgs_BoolStruct_T const* structPtr);
 void msg2struct(std_msgs_BoolStruct_T* structPtr, std_msgs::Bool const* msgPtr);
 
 void struct2msg(std_msgs::Header* msgPtr, std_msgs_HeaderStruct_T const* structPtr);
 void msg2struct(std_msgs_HeaderStruct_T* structPtr, std_msgs::Header const* msgPtr);
+
+void struct2msg(std_msgs::String* msgPtr, std_msgs_StringStruct_T const* structPtr);
+void msg2struct(std_msgs_StringStruct_T* structPtr, std_msgs::String const* msgPtr);
 
 
 #endif

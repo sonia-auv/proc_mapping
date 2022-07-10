@@ -10,47 +10,15 @@
 
 // Include files
 #include "rigid3d.h"
-#include "affine3d.h"
 #include "minOrMax.h"
-#include "rigid3dImpl.h"
 #include "rt_nonfinite.h"
 #include "svd.h"
-#include "coder_array.h"
 #include <cmath>
 #include <math.h>
 #include <string.h>
 
 // Function Definitions
 namespace coder {
-void rigid3d::init(const double varargin_1[9], const double varargin_2[3])
-{
-  images::internal::rigid3dImpl r;
-  double b_varargin_1[16];
-  int varargin_1_tmp;
-  for (int i{0}; i < 3; i++) {
-    varargin_1_tmp = i << 2;
-    AffineTform.T[varargin_1_tmp] = varargin_1[3 * i];
-    AffineTform.T[varargin_1_tmp + 1] = varargin_1[3 * i + 1];
-    AffineTform.T[varargin_1_tmp + 2] = varargin_1[3 * i + 2];
-    AffineTform.T[i + 12] = 0.0;
-    AffineTform.T[varargin_1_tmp + 3] = varargin_2[i];
-  }
-  AffineTform.T[15] = 1.0;
-  rigid3d::isTransformationMatrixRigid(AffineTform.T);
-  for (int i{0}; i < 3; i++) {
-    varargin_1_tmp = i << 2;
-    b_varargin_1[varargin_1_tmp] = varargin_1[3 * i];
-    b_varargin_1[varargin_1_tmp + 1] = varargin_1[3 * i + 1];
-    b_varargin_1[varargin_1_tmp + 2] = varargin_1[3 * i + 2];
-    b_varargin_1[i + 12] = 0.0;
-    b_varargin_1[varargin_1_tmp + 3] = varargin_2[i];
-  }
-  b_varargin_1[15] = 1.0;
-  rigid3d::isTransformationMatrixRigid(b_varargin_1);
-  Data.set_size(1, 1);
-  Data[0] = r;
-}
-
 bool rigid3d::isTransformationMatrixRigid(const double T[16])
 {
   double b_T[9];

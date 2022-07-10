@@ -20,13 +20,13 @@
 void geometry_msgs_TwistWithCovarianceStruct(
     geometry_msgs_TwistWithCovarianceStruct_T *msg)
 {
-  static const char b_cv[33]{'g', 'e', 'o', 'm', 'e', 't', 'r', 'y', '_',
-                             'm', 's', 'g', 's', '/', 'T', 'w', 'i', 's',
-                             't', 'W', 'i', 't', 'h', 'C', 'o', 'v', 'a',
-                             'r', 'i', 'a', 'n', 'c', 'e'};
+  static const char cv[33]{'g', 'e', 'o', 'm', 'e', 't', 'r', 'y', '_',
+                           'm', 's', 'g', 's', '/', 'T', 'w', 'i', 's',
+                           't', 'W', 'i', 't', 'h', 'C', 'o', 'v', 'a',
+                           'r', 'i', 'a', 'n', 'c', 'e'};
   //  Message struct definition for geometry_msgs/TwistWithCovariance
   for (int i{0}; i < 33; i++) {
-    msg->MessageType[i] = b_cv[i];
+    msg->MessageType[i] = cv[i];
   }
   geometry_msgs_TwistStruct(&msg->Twist);
   std::memset(&msg->Covariance[0], 0, 36U * sizeof(double));

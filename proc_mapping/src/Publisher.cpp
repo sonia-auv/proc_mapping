@@ -13,7 +13,7 @@
 #include "proc_mapping_types.h"
 #include "rt_nonfinite.h"
 #include "sensor_msgs_PointCloud2Struct.h"
-#include "sonia_common_AddPoseStruct.h"
+#include "sonia_common_ObstacleArrayStruct.h"
 #include "mlroscpp_pub.h"
 #include <string.h>
 
@@ -45,24 +45,25 @@ Publisher *Publisher::init()
 
 b_Publisher *b_Publisher::init()
 {
-  static const char topic[25]{'/', 'p', 'r', 'o', 'c', '_', 'm', 'a', 'p',
-                              'p', 'i', 'n', 'g', '/', 'o', 'u', 't', 'p',
-                              'u', 't', '_', 'p', 'o', 's', 'e'};
+  static const char topic[28]{'/', 'p', 'r', 'o', 'c', '_', 'm', 'a', 'p', 'p',
+                              'i', 'n', 'g', '/', 'o', 'b', 's', 't', 'a', 'c',
+                              'l', 'e', '_', 'i', 'n', 'f', 'o', 's'};
   b_Publisher *obj;
-  sonia_common_AddPoseStruct_T unusedExpr;
+  sonia_common_ObstacleArrayStruct_T r;
   obj = this;
-  for (int i{0}; i < 25; i++) {
+  for (int i{0}; i < 28; i++) {
     obj->TopicName[i] = topic[i];
   }
   obj->BufferSize = 1.0;
   obj->IsLatching = true;
-  sonia_common_AddPoseStruct(&unusedExpr);
-  obj->PublisherHelper = std::unique_ptr<
-      MATLABPublisher<sonia_common::AddPose, sonia_common_AddPoseStruct_T>>(
-      new MATLABPublisher<sonia_common::AddPose,
-                          sonia_common_AddPoseStruct_T>()); //();
+  sonia_common_ObstacleArrayStruct(&r);
+  obj->PublisherHelper =
+      std::unique_ptr<MATLABPublisher<sonia_common::ObstacleArray,
+                                      sonia_common_ObstacleArrayStruct_T>>(
+          new MATLABPublisher<sonia_common::ObstacleArray,
+                              sonia_common_ObstacleArrayStruct_T>()); //();
   MATLABPUBLISHER_createPublisher(obj->PublisherHelper, &obj->TopicName[0],
-                                  25.0, obj->BufferSize, obj->IsLatching);
+                                  28.0, obj->BufferSize, obj->IsLatching);
   return obj;
 }
 

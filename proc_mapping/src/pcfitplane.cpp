@@ -56,8 +56,9 @@ static void evalPlane(const ::coder::array<double, 2U> &model,
   }
 }
 
-void pcfitplane(const pointCloud *varargin_1, planeModel *iobj_0,
-                planeModel **model, ::coder::array<double, 1U> &inlierIndices,
+void pcfitplane(const pointCloud *varargin_1, double varargin_2,
+                planeModel *iobj_0, planeModel **model,
+                ::coder::array<double, 1U> &inlierIndices,
                 ::coder::array<double, 1U> &outlierIndices,
                 ::coder::array<double, 2U> &meanError)
 {
@@ -116,7 +117,7 @@ void pcfitplane(const pointCloud *varargin_1, planeModel *iobj_0,
     numPts = location.size(0);
     idxTrial = 1;
     numTrials = 1000;
-    bestDis = 0.02 * static_cast<double>(location.size(0));
+    bestDis = varargin_2 * static_cast<double>(location.size(0));
     modelParams.set_size(0, 0);
     skipTrials = 0;
     bestInliers.set_size(location.size(0));
@@ -321,8 +322,8 @@ void pcfitplane(const pointCloud *varargin_1, planeModel *iobj_0,
         evalPlane(b_modelParams, location, hashTbl);
         y = hashTbl.size(0);
         for (int k{0}; k < y; k++) {
-          if (hashTbl[k] > 0.02) {
-            hashTbl[k] = 0.02;
+          if (hashTbl[k] > varargin_2) {
+            hashTbl[k] = varargin_2;
           }
         }
         selectedLoc = blockedSummation(hashTbl, hashTbl.size(0));
@@ -331,7 +332,7 @@ void pcfitplane(const pointCloud *varargin_1, planeModel *iobj_0,
           bestInliers.set_size(hashTbl.size(0));
           vlen = hashTbl.size(0);
           for (y = 0; y < vlen; y++) {
-            bestInliers[y] = (hashTbl[y] < 0.02);
+            bestInliers[y] = (hashTbl[y] < varargin_2);
           }
           modelParams.set_size(b_modelParams.size(0), b_modelParams.size(1));
           vlen = b_modelParams.size(0) * b_modelParams.size(1);
@@ -341,7 +342,7 @@ void pcfitplane(const pointCloud *varargin_1, planeModel *iobj_0,
           x.set_size(hashTbl.size(0));
           vlen = hashTbl.size(0);
           for (y = 0; y < vlen; y++) {
-            x[y] = (hashTbl[y] < 0.02);
+            x[y] = (hashTbl[y] < varargin_2);
           }
           vlen = x.size(0);
           if (x.size(0) == 0) {
@@ -433,7 +434,7 @@ void pcfitplane(const pointCloud *varargin_1, planeModel *iobj_0,
     r.set_size(hashTbl.size(0), 1);
     vlen = hashTbl.size(0);
     for (y = 0; y < vlen; y++) {
-      r[y] = (hashTbl[y] < 0.02);
+      r[y] = (hashTbl[y] < varargin_2);
     }
     y = r.size(0) - 1;
     vlen = 0;
@@ -473,7 +474,7 @@ void pcfitplane(const pointCloud *varargin_1, planeModel *iobj_0,
     r.set_size(hashTbl.size(0), 1);
     vlen = hashTbl.size(0);
     for (y = 0; y < vlen; y++) {
-      r[y] = (hashTbl[y] < 0.02);
+      r[y] = (hashTbl[y] < varargin_2);
     }
     y = r.size(0) - 1;
     vlen = 0;
