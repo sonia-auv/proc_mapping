@@ -1,6 +1,0 @@
-<launch>
-	<node name="proc_mapping"
-	    pkg="proc_mapping"
-	    type="SimulationProcMapping.py"
-	    output="screen" />
-</launch>

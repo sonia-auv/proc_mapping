@@ -1,4 +1,4 @@
-ARG BASE_IMAGE="docker.pkg.github.com/sonia-auv/sonia_common/sonia_common:x86-perception-latest"
+ARG BASE_IMAGE="ghcr.io/sonia-auv/sonia_common/sonia_common:x86-perception-latest"
 
 FROM ${BASE_IMAGE}
 
@@ -16,7 +16,7 @@ LABEL net.etsmtl.sonia-auv.node.name=${NODE_NAME}
 
 ENV SONIA_WS=${SONIA_HOME}/ros_sonia_ws
 
-ENV NODE_NAME=${NODE_NAME}
+
 ENV NODE_PATH=${SONIA_WS}/src/${NODE_NAME}
 ENV LAUNCH_FILE=${NODE_NAME}.launch
 ENV SCRIPT_DIR=${SONIA_WS}/scripts
@@ -40,7 +40,7 @@ RUN echo "roslaunch --wait $LAUNCH_ABSPATH" > ${SCRIPT_DIR}/launch.sh
 
 RUN chmod +x ${SCRIPT_DIR}/entrypoint.sh && chmod +x ${SCRIPT_DIR}/launch.sh
 
-RUN echo "source ${SONIA_WS_SETUP}" >> ~/.bashrc
+RUN echo "source $SONIA_WS_SETUP" >> ~/.bashrc
 
 ENTRYPOINT ["./scripts/entrypoint.sh"]
 CMD ["./scripts/launch.sh"]

@@ -5,18 +5,18 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "ROS: Launch",
+            "name": "ROS: Launch proc",
             "type": "ros",
             "request": "launch",
             "preLaunchTask": "build",
-            "target": "/home/sonia/ros_sonia_ws/src/proc_mapping/launch/proc_mapping.launch"
+            "target": "/home/sonia/ros_sonia_ws/src/proc_mapping/launch/proc_mapping_node.launch",
         },
         {
-            "name": "ROS: Launch Simulation",
+            "name": "ROS: Launch server",
             "type": "ros",
             "request": "launch",
             "preLaunchTask": "build",
-            "target": "/home/sonia/ros_sonia_ws/src/proc_mapping/launch/proc_mapping_simulation.launch"
+            "target": "/home/sonia/ros_sonia_ws/src/proc_mapping_config_server/launch/proc_mapping_config_server.launch",
         }
     ]
 }
