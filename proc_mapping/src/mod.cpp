@@ -2,19 +2,23 @@
 // Academic License - for use in teaching, academic research, and meeting
 // course requirements at degree granting institutions only.  Not for
 // government, commercial, or other organizational use.
+// File: mod.cpp
 //
-// mod.cpp
-//
-// Code generation for function 'mod'
+// MATLAB Coder version            : 5.4
+// C/C++ source code generated on  : 31-Jul-2022 13:03:34
 //
 
-// Include files
+// Include Files
 #include "mod.h"
 #include "rt_nonfinite.h"
 #include <cmath>
 #include <string.h>
 
 // Function Definitions
+//
+// Arguments    : double x
+// Return Type  : double
+//
 namespace coder {
 double b_mod(double x)
 {
@@ -36,4 +40,8 @@ double b_mod(double x)
 
 } // namespace coder
 
-// End of code generation (mod.cpp)
+//
+// File trailer for mod.cpp
+//
+// [EOF]
+//

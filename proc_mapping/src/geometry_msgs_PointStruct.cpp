@@ -2,19 +2,25 @@
 // Academic License - for use in teaching, academic research, and meeting
 // course requirements at degree granting institutions only.  Not for
 // government, commercial, or other organizational use.
+// File: geometry_msgs_PointStruct.cpp
 //
-// geometry_msgs_PointStruct.cpp
-//
-// Code generation for function 'geometry_msgs_PointStruct'
+// MATLAB Coder version            : 5.4
+// C/C++ source code generated on  : 31-Jul-2022 13:03:34
 //
 
-// Include files
+// Include Files
 #include "geometry_msgs_PointStruct.h"
 #include "proc_mapping_types.h"
 #include "rt_nonfinite.h"
 #include <string.h>
 
 // Function Definitions
+//
+// Message struct definition for geometry_msgs/Point
+//
+// Arguments    : void
+// Return Type  : geometry_msgs_PointStruct_T
+//
 geometry_msgs_PointStruct_T geometry_msgs_PointStruct()
 {
   static const geometry_msgs_PointStruct_T b_msg{
@@ -26,9 +32,12 @@ geometry_msgs_PointStruct_T geometry_msgs_PointStruct()
   };
   geometry_msgs_PointStruct_T msg;
   msg = b_msg;
-  //  Message struct definition for geometry_msgs/Point
   //(&b_msg);
   return msg;
 }
 
-// End of code generation (geometry_msgs_PointStruct.cpp)
+//
+// File trailer for geometry_msgs_PointStruct.cpp
+//
+// [EOF]
+//

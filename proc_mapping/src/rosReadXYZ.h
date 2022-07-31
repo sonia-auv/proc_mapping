@@ -2,16 +2,16 @@
 // Academic License - for use in teaching, academic research, and meeting
 // course requirements at degree granting institutions only.  Not for
 // government, commercial, or other organizational use.
+// File: rosReadXYZ.h
 //
-// rosReadXYZ.h
-//
-// Code generation for function 'rosReadXYZ'
+// MATLAB Coder version            : 5.4
+// C/C++ source code generated on  : 31-Jul-2022 13:03:34
 //
 
 #ifndef ROSREADXYZ_H
 #define ROSREADXYZ_H
 
-// Include files
+// Include Files
 #include "proc_mapping_types.h"
 #include "rtwtypes.h"
 #include "coder_array.h"
@@ -30,4 +30,8 @@ void rosReadXYZ(
 }
 
 #endif
-// End of code generation (rosReadXYZ.h)
+//
+// File trailer for rosReadXYZ.h
+//
+// [EOF]
+//

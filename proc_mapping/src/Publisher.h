@@ -2,16 +2,16 @@
 // Academic License - for use in teaching, academic research, and meeting
 // course requirements at degree granting institutions only.  Not for
 // government, commercial, or other organizational use.
+// File: Publisher.h
 //
-// Publisher.h
-//
-// Code generation for function 'Publisher'
+// MATLAB Coder version            : 5.4
+// C/C++ source code generated on  : 31-Jul-2022 13:03:34
 //
 
 #ifndef PUBLISHER_H
 #define PUBLISHER_H
 
-// Include files
+// Include Files
 #include "rtwtypes.h"
 #include "mlroscpp_pub.h"
 #include <cstddef>
@@ -26,8 +26,21 @@ public:
   char TopicName[20];
   double BufferSize;
   bool IsLatching;
+
+private:
   std::unique_ptr<MATLABPublisher<sensor_msgs::PointCloud2,
                                   sensor_msgs_PointCloud2Struct_T>>
+      PublisherHelper;
+};
+
+class b_Publisher {
+public:
+  b_Publisher *init();
+  char TopicName[28];
+  double BufferSize;
+  bool IsLatching;
+  std::unique_ptr<MATLABPublisher<sonia_common::ObstacleArray,
+                                  sonia_common_ObstacleArrayStruct_T>>
       PublisherHelper;
 };
 
@@ -35,4 +48,8 @@ public:
 } // namespace coder
 
 #endif
-// End of code generation (Publisher.h)
+//
+// File trailer for Publisher.h
+//
+// [EOF]
+//

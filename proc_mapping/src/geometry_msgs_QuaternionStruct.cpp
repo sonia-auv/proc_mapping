@@ -2,19 +2,25 @@
 // Academic License - for use in teaching, academic research, and meeting
 // course requirements at degree granting institutions only.  Not for
 // government, commercial, or other organizational use.
+// File: geometry_msgs_QuaternionStruct.cpp
 //
-// geometry_msgs_QuaternionStruct.cpp
-//
-// Code generation for function 'geometry_msgs_QuaternionStruct'
+// MATLAB Coder version            : 5.4
+// C/C++ source code generated on  : 31-Jul-2022 13:03:34
 //
 
-// Include files
+// Include Files
 #include "geometry_msgs_QuaternionStruct.h"
 #include "proc_mapping_types.h"
 #include "rt_nonfinite.h"
 #include <string.h>
 
 // Function Definitions
+//
+// Message struct definition for geometry_msgs/Quaternion
+//
+// Arguments    : void
+// Return Type  : geometry_msgs_QuaternionStruct_T
+//
 geometry_msgs_QuaternionStruct_T geometry_msgs_QuaternionStruct()
 {
   static const geometry_msgs_QuaternionStruct_T b_msg{
@@ -27,9 +33,12 @@ geometry_msgs_QuaternionStruct_T geometry_msgs_QuaternionStruct()
   };
   geometry_msgs_QuaternionStruct_T msg;
   msg = b_msg;
-  //  Message struct definition for geometry_msgs/Quaternion
   //(&b_msg);
   return msg;
 }
 
-// End of code generation (geometry_msgs_QuaternionStruct.cpp)
+//
+// File trailer for geometry_msgs_QuaternionStruct.cpp
+//
+// [EOF]
+//

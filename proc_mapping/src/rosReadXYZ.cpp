@@ -2,13 +2,13 @@
 // Academic License - for use in teaching, academic research, and meeting
 // course requirements at degree granting institutions only.  Not for
 // government, commercial, or other organizational use.
+// File: rosReadXYZ.cpp
 //
-// rosReadXYZ.cpp
-//
-// Code generation for function 'rosReadXYZ'
+// MATLAB Coder version            : 5.4
+// C/C++ source code generated on  : 31-Jul-2022 13:03:34
 //
 
-// Include files
+// Include Files
 #include "rosReadXYZ.h"
 #include "PointCloud2Types.h"
 #include "SpecialMsgUtil.h"
@@ -21,6 +21,15 @@
 #include <string.h>
 
 // Function Definitions
+//
+// Arguments    : unsigned int msg_Height
+//                unsigned int msg_Width
+//                const ::coder::array<sensor_msgs_PointFieldStruct_T, 1U>
+//                &msg_Fields unsigned int msg_PointStep const
+//                ::coder::array<unsigned char, 1U> &msg_Data
+//                ::coder::array<float, 2U> &xyz
+// Return Type  : void
+//
 namespace coder {
 void rosReadXYZ(
     unsigned int msg_Height, unsigned int msg_Width,
@@ -29,9 +38,9 @@ void rosReadXYZ(
     const ::coder::array<unsigned char, 1U> &msg_Data,
     ::coder::array<float, 2U> &xyz)
 {
-  array<cell_wrap_13, 2U> allFieldNames;
-  array<cell_wrap_13, 2U> b_allFieldNames;
-  array<cell_wrap_13, 2U> c_allFieldNames;
+  array<cell_wrap_17, 2U> allFieldNames;
+  array<cell_wrap_17, 2U> b_allFieldNames;
+  array<cell_wrap_17, 2U> c_allFieldNames;
   array<double, 2U> byteIdx;
   array<double, 2U> c;
   array<double, 2U> y;
@@ -305,4 +314,8 @@ void rosReadXYZ(
 
 } // namespace coder
 
-// End of code generation (rosReadXYZ.cpp)
+//
+// File trailer for rosReadXYZ.cpp
+//
+// [EOF]
+//

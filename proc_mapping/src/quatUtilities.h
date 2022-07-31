@@ -2,16 +2,16 @@
 // Academic License - for use in teaching, academic research, and meeting
 // course requirements at degree granting institutions only.  Not for
 // government, commercial, or other organizational use.
+// File: quatUtilities.h
 //
-// quatUtilities.h
-//
-// Code generation for function 'quatUtilities'
+// MATLAB Coder version            : 5.4
+// C/C++ source code generated on  : 31-Jul-2022 13:03:34
 //
 
 #ifndef QUATUTILITIES_H
 #define QUATUTILITIES_H
 
-// Include files
+// Include Files
 #include "rtwtypes.h"
 #include <cstddef>
 #include <cstdlib>
@@ -33,4 +33,8 @@ public:
 };
 
 #endif
-// End of code generation (quatUtilities.h)
+//
+// File trailer for quatUtilities.h
+//
+// [EOF]
+//

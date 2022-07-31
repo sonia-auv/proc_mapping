@@ -2,13 +2,13 @@
 // Academic License - for use in teaching, academic research, and meeting
 // course requirements at degree granting institutions only.  Not for
 // government, commercial, or other organizational use.
+// File: minOrMax.cpp
 //
-// minOrMax.cpp
-//
-// Code generation for function 'minOrMax'
+// MATLAB Coder version            : 5.4
+// C/C++ source code generated on  : 31-Jul-2022 13:03:34
 //
 
-// Include files
+// Include Files
 #include "minOrMax.h"
 #include "rt_nonfinite.h"
 #include "coder_array.h"
@@ -16,6 +16,10 @@
 #include <string.h>
 
 // Function Definitions
+//
+// Arguments    : const ::coder::array<double, 2U> &x
+// Return Type  : double
+//
 namespace coder {
 namespace internal {
 double maximum(const ::coder::array<double, 2U> &x)
@@ -68,6 +72,51 @@ double maximum(const ::coder::array<double, 2U> &x)
   return ex;
 }
 
+//
+// Arguments    : const double x[3]
+// Return Type  : double
+//
+double maximum(const double x[3])
+{
+  double ex;
+  int idx;
+  int k;
+  if (!std::isnan(x[0])) {
+    idx = 1;
+  } else {
+    bool exitg1;
+    idx = 0;
+    k = 2;
+    exitg1 = false;
+    while ((!exitg1) && (k <= 3)) {
+      if (!std::isnan(x[k - 1])) {
+        idx = k;
+        exitg1 = true;
+      } else {
+        k++;
+      }
+    }
+  }
+  if (idx == 0) {
+    ex = x[0];
+  } else {
+    ex = x[idx - 1];
+    idx++;
+    for (k = idx; k < 4; k++) {
+      double d;
+      d = x[k - 1];
+      if (ex < d) {
+        ex = d;
+      }
+    }
+  }
+  return ex;
+}
+
+//
+// Arguments    : const ::coder::array<double, 1U> &x
+// Return Type  : double
+//
 double maximum(const ::coder::array<double, 1U> &x)
 {
   double ex;
@@ -118,43 +167,82 @@ double maximum(const ::coder::array<double, 1U> &x)
   return ex;
 }
 
-double minimum(const double x[3])
+//
+// Arguments    : const ::coder::array<float, 2U> &x
+//                float ex[3]
+// Return Type  : void
+//
+void maximum(const ::coder::array<float, 2U> &x, float ex[3])
 {
-  double ex;
-  int idx;
+  int m;
+  m = x.size(0);
+  for (int j{0}; j < 3; j++) {
+    ex[j] = x[x.size(0) * j];
+    for (int i{2}; i <= m; i++) {
+      float b;
+      bool p;
+      b = x[(i + x.size(0) * j) - 1];
+      if (std::isnan(b)) {
+        p = false;
+      } else if (std::isnan(ex[j])) {
+        p = true;
+      } else {
+        p = (ex[j] < b);
+      }
+      if (p) {
+        ex[j] = b;
+      }
+    }
+  }
+}
+
+//
+// Arguments    : const float x[3]
+//                float *ex
+//                int *idx
+// Return Type  : void
+//
+void maximum(const float x[3], float *ex, int *idx)
+{
   int k;
   if (!std::isnan(x[0])) {
-    idx = 1;
+    *idx = 1;
   } else {
     bool exitg1;
-    idx = 0;
+    *idx = 0;
     k = 2;
     exitg1 = false;
-    while ((!exitg1) && (k <= 3)) {
+    while ((!exitg1) && (k < 4)) {
       if (!std::isnan(x[k - 1])) {
-        idx = k;
+        *idx = k;
         exitg1 = true;
       } else {
         k++;
       }
     }
   }
-  if (idx == 0) {
-    ex = x[0];
+  if (*idx == 0) {
+    *ex = x[0];
+    *idx = 1;
   } else {
-    ex = x[idx - 1];
-    idx++;
-    for (k = idx; k < 4; k++) {
-      double d;
-      d = x[k - 1];
-      if (ex > d) {
-        ex = d;
+    int i;
+    *ex = x[*idx - 1];
+    i = *idx + 1;
+    for (k = i; k < 4; k++) {
+      float f;
+      f = x[k - 1];
+      if (*ex < f) {
+        *ex = f;
+        *idx = k;
       }
     }
   }
-  return ex;
 }
 
+//
+// Arguments    : const ::coder::array<double, 2U> &x
+// Return Type  : double
+//
 double minimum(const ::coder::array<double, 2U> &x)
 {
   double ex;
@@ -205,6 +293,10 @@ double minimum(const ::coder::array<double, 2U> &x)
   return ex;
 }
 
+//
+// Arguments    : const ::coder::array<double, 1U> &x
+// Return Type  : double
+//
 double minimum(const ::coder::array<double, 1U> &x)
 {
   double ex;
@@ -255,7 +347,122 @@ double minimum(const ::coder::array<double, 1U> &x)
   return ex;
 }
 
+//
+// Arguments    : const double x[3]
+// Return Type  : double
+//
+double minimum(const double x[3])
+{
+  double ex;
+  int idx;
+  int k;
+  if (!std::isnan(x[0])) {
+    idx = 1;
+  } else {
+    bool exitg1;
+    idx = 0;
+    k = 2;
+    exitg1 = false;
+    while ((!exitg1) && (k <= 3)) {
+      if (!std::isnan(x[k - 1])) {
+        idx = k;
+        exitg1 = true;
+      } else {
+        k++;
+      }
+    }
+  }
+  if (idx == 0) {
+    ex = x[0];
+  } else {
+    ex = x[idx - 1];
+    idx++;
+    for (k = idx; k < 4; k++) {
+      double d;
+      d = x[k - 1];
+      if (ex > d) {
+        ex = d;
+      }
+    }
+  }
+  return ex;
+}
+
+//
+// Arguments    : const float x[3]
+// Return Type  : float
+//
+float minimum(const float x[3])
+{
+  float ex;
+  int idx;
+  int k;
+  if (!std::isnan(x[0])) {
+    idx = 1;
+  } else {
+    bool exitg1;
+    idx = 0;
+    k = 2;
+    exitg1 = false;
+    while ((!exitg1) && (k <= 3)) {
+      if (!std::isnan(x[k - 1])) {
+        idx = k;
+        exitg1 = true;
+      } else {
+        k++;
+      }
+    }
+  }
+  if (idx == 0) {
+    ex = x[0];
+  } else {
+    ex = x[idx - 1];
+    idx++;
+    for (k = idx; k < 4; k++) {
+      float f;
+      f = x[k - 1];
+      if (ex > f) {
+        ex = f;
+      }
+    }
+  }
+  return ex;
+}
+
+//
+// Arguments    : const ::coder::array<float, 2U> &x
+//                float ex[3]
+// Return Type  : void
+//
+void minimum(const ::coder::array<float, 2U> &x, float ex[3])
+{
+  int m;
+  m = x.size(0);
+  for (int j{0}; j < 3; j++) {
+    ex[j] = x[x.size(0) * j];
+    for (int i{2}; i <= m; i++) {
+      float b;
+      bool p;
+      b = x[(i + x.size(0) * j) - 1];
+      if (std::isnan(b)) {
+        p = false;
+      } else if (std::isnan(ex[j])) {
+        p = true;
+      } else {
+        p = (ex[j] > b);
+      }
+      if (p) {
+        ex[j] = b;
+      }
+    }
+  }
+}
+
 } // namespace internal
 } // namespace coder
 
-// End of code generation (minOrMax.cpp)
+//
+// File trailer for minOrMax.cpp
+//
+// [EOF]
+//

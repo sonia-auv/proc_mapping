@@ -2,16 +2,16 @@
 // Academic License - for use in teaching, academic research, and meeting
 // course requirements at degree granting institutions only.  Not for
 // government, commercial, or other organizational use.
+// File: rand.h
 //
-// rand.h
-//
-// Code generation for function 'rand'
+// MATLAB Coder version            : 5.4
+// C/C++ source code generated on  : 31-Jul-2022 13:03:34
 //
 
 #ifndef RAND_H
 #define RAND_H
 
-// Include files
+// Include Files
 #include "rtwtypes.h"
 #include <cstddef>
 #include <cstdlib>
@@ -23,4 +23,8 @@ double b_rand();
 }
 
 #endif
-// End of code generation (rand.h)
+//
+// File trailer for rand.h
+//
+// [EOF]
+//

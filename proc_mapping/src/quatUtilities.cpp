@@ -2,13 +2,13 @@
 // Academic License - for use in teaching, academic research, and meeting
 // course requirements at degree granting institutions only.  Not for
 // government, commercial, or other organizational use.
+// File: quatUtilities.cpp
 //
-// quatUtilities.cpp
-//
-// Code generation for function 'quatUtilities'
+// MATLAB Coder version            : 5.4
+// C/C++ source code generated on  : 31-Jul-2022 13:03:34
 //
 
-// Include files
+// Include Files
 #include "quatUtilities.h"
 #include "planeModel.h"
 #include "pointCloud.h"
@@ -18,6 +18,15 @@
 #include <string.h>
 
 // Function Definitions
+//
+// vecteur initial
+//
+// Arguments    : const coder::planeModel *model
+//                coder::pointCloud *plane
+//                double p[3]
+//                double q[4]
+// Return Type  : void
+//
 void quatUtilities::getOrientedPointOnPlanarFace(const coder::planeModel *model,
                                                  coder::pointCloud *plane,
                                                  double p[3], double q[4])
@@ -32,7 +41,6 @@ void quatUtilities::getOrientedPointOnPlanarFace(const coder::planeModel *model,
   double n_tmp;
   double scale;
   double t;
-  //  vecteur initial
   //  Trouver la transformaion angulaire du plan
   // =================================================================
   //  Fonction qui calcule la rotation entre 2 vector
@@ -86,4 +94,8 @@ void quatUtilities::getOrientedPointOnPlanarFace(const coder::planeModel *model,
   p[2] = (r[1] - r1[0]) / 2.0 + r2[0];
 }
 
-// End of code generation (quatUtilities.cpp)
+//
+// File trailer for quatUtilities.cpp
+//
+// [EOF]
+//

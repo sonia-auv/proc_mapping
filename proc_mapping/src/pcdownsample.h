@@ -2,16 +2,16 @@
 // Academic License - for use in teaching, academic research, and meeting
 // course requirements at degree granting institutions only.  Not for
 // government, commercial, or other organizational use.
+// File: pcdownsample.h
 //
-// pcdownsample.h
-//
-// Code generation for function 'pcdownsample'
+// MATLAB Coder version            : 5.4
+// C/C++ source code generated on  : 31-Jul-2022 13:03:34
 //
 
 #ifndef PCDOWNSAMPLE_H
 #define PCDOWNSAMPLE_H
 
-// Include files
+// Include Files
 #include "rtwtypes.h"
 #include <cstddef>
 #include <cstdlib>
@@ -20,15 +20,20 @@
 namespace coder {
 class pointCloud;
 
-class b_pointCloud;
+class d_pointCloud;
 
 } // namespace coder
 
 // Function Declarations
 namespace coder {
-b_pointCloud *pcdownsample(const pointCloud *ptCloudIn, b_pointCloud *iobj_0);
+d_pointCloud *pcdownsample(const pointCloud *ptCloudIn, double varargin_2,
+                           d_pointCloud *iobj_0);
 
 }
 
 #endif
-// End of code generation (pcdownsample.h)
+//
+// File trailer for pcdownsample.h
+//
+// [EOF]
+//

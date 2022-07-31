@@ -2,17 +2,17 @@
 // Academic License - for use in teaching, academic research, and meeting
 // course requirements at degree granting institutions only.  Not for
 // government, commercial, or other organizational use.
+// File: proc_mapping_initialize.cpp
 //
-// proc_mapping_initialize.cpp
-//
-// Code generation for function 'proc_mapping_initialize'
+// MATLAB Coder version            : 5.4
+// C/C++ source code generated on  : 31-Jul-2022 13:03:34
 //
 
-// Include files
+// Include Files
 #include "proc_mapping_initialize.h"
 #include "CoderTimeAPI.h"
 #include "PointCloudBundler.h"
-#include "Preprocessing.h"
+#include "SoundCloudBundler.h"
 #include "eml_rand.h"
 #include "eml_rand_mcg16807_stateful.h"
 #include "eml_rand_mt19937ar_stateful.h"
@@ -22,11 +22,15 @@
 #include <string.h>
 
 // Function Definitions
+//
+// Arguments    : void
+// Return Type  : void
+//
 void proc_mapping_initialize()
 {
   freq_not_empty_init();
   PointCloudBundler::persistentDataStore_init();
-  Preprocessing::persistentDataStore_init();
+  SoundCloudBundler::persistentDataStore_init();
   eml_rand_init();
   eml_rand_mcg16807_stateful_init();
   eml_rand_shr3cong_stateful_init();
@@ -34,4 +38,8 @@ void proc_mapping_initialize()
   isInitialized_proc_mapping = true;
 }
 
-// End of code generation (proc_mapping_initialize.cpp)
+//
+// File trailer for proc_mapping_initialize.cpp
+//
+// [EOF]
+//

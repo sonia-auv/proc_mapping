@@ -2,13 +2,13 @@
 // Academic License - for use in teaching, academic research, and meeting
 // course requirements at degree granting institutions only.  Not for
 // government, commercial, or other organizational use.
+// File: tic.cpp
 //
-// tic.cpp
-//
-// Code generation for function 'tic'
+// MATLAB Coder version            : 5.4
+// C/C++ source code generated on  : 31-Jul-2022 13:03:34
 //
 
-// Include files
+// Include Files
 #include "tic.h"
 #include "proc_mapping_data.h"
 #include "rt_nonfinite.h"
@@ -16,6 +16,11 @@
 #include <string.h>
 
 // Function Definitions
+//
+// Arguments    : double *tstart_tv_sec
+//                double *tstart_tv_nsec
+// Return Type  : void
+//
 namespace coder {
 void tic(double *tstart_tv_sec, double *tstart_tv_nsec)
 {
@@ -31,4 +36,8 @@ void tic(double *tstart_tv_sec, double *tstart_tv_nsec)
 
 } // namespace coder
 
-// End of code generation (tic.cpp)
+//
+// File trailer for tic.cpp
+//
+// [EOF]
+//

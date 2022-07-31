@@ -2,13 +2,13 @@
 // Academic License - for use in teaching, academic research, and meeting
 // course requirements at degree granting institutions only.  Not for
 // government, commercial, or other organizational use.
+// File: proc_mapping_data.cpp
 //
-// proc_mapping_data.cpp
-//
-// Code generation for function 'proc_mapping_data'
+// MATLAB Coder version            : 5.4
+// C/C++ source code generated on  : 31-Jul-2022 13:03:34
 //
 
-// Include files
+// Include Files
 #include "proc_mapping_data.h"
 #include "rt_nonfinite.h"
 #include <string.h>
@@ -24,13 +24,11 @@ bool bundleStarted;
 
 bool newClearBundleMsg;
 
-double minIntensityValue;
+bool newHydroMsg;
 
-double maxIntensityValue;
+bool b_bundleStarted;
 
-double minRangeValue;
-
-double maxRangeValue;
+bool b_newClearBundleMsg;
 
 unsigned int method;
 
@@ -40,8 +38,10 @@ unsigned int b_state[2];
 
 unsigned int c_state[625];
 
-const char cv[9]{'i', 'n', 't', 'e', 'n', 's', 'i', 't', 'y'};
-
 bool isInitialized_proc_mapping{false};
 
-// End of code generation (proc_mapping_data.cpp)
+//
+// File trailer for proc_mapping_data.cpp
+//
+// [EOF]
+//

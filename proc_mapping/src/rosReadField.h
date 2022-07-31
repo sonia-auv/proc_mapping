@@ -2,16 +2,16 @@
 // Academic License - for use in teaching, academic research, and meeting
 // course requirements at degree granting institutions only.  Not for
 // government, commercial, or other organizational use.
+// File: rosReadField.h
 //
-// rosReadField.h
-//
-// Code generation for function 'rosReadField'
+// MATLAB Coder version            : 5.4
+// C/C++ source code generated on  : 31-Jul-2022 13:03:34
 //
 
 #ifndef ROSREADFIELD_H
 #define ROSREADFIELD_H
 
-// Include files
+// Include Files
 #include "proc_mapping_types.h"
 #include "rtwtypes.h"
 #include "coder_array.h"
@@ -30,4 +30,8 @@ void rosReadField(
 }
 
 #endif
-// End of code generation (rosReadField.h)
+//
+// File trailer for rosReadField.h
+//
+// [EOF]
+//

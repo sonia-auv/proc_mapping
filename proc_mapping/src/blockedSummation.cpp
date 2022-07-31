@@ -2,19 +2,24 @@
 // Academic License - for use in teaching, academic research, and meeting
 // course requirements at degree granting institutions only.  Not for
 // government, commercial, or other organizational use.
+// File: blockedSummation.cpp
 //
-// blockedSummation.cpp
-//
-// Code generation for function 'blockedSummation'
+// MATLAB Coder version            : 5.4
+// C/C++ source code generated on  : 31-Jul-2022 13:03:34
 //
 
-// Include files
+// Include Files
 #include "blockedSummation.h"
 #include "rt_nonfinite.h"
 #include "coder_array.h"
 #include <string.h>
 
 // Function Definitions
+//
+// Arguments    : const ::coder::array<double, 1U> &x
+//                int vlen
+// Return Type  : double
+//
 namespace coder {
 double blockedSummation(const ::coder::array<double, 1U> &x, int vlen)
 {
@@ -64,4 +69,8 @@ double blockedSummation(const ::coder::array<double, 1U> &x, int vlen)
 
 } // namespace coder
 
-// End of code generation (blockedSummation.cpp)
+//
+// File trailer for blockedSummation.cpp
+//
+// [EOF]
+//

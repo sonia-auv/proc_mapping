@@ -2,23 +2,23 @@
 // Academic License - for use in teaching, academic research, and meeting
 // course requirements at degree granting institutions only.  Not for
 // government, commercial, or other organizational use.
+// File: pcdenoise.h
 //
-// pcdenoise.h
-//
-// Code generation for function 'pcdenoise'
+// MATLAB Coder version            : 5.4
+// C/C++ source code generated on  : 31-Jul-2022 13:03:34
 //
 
 #ifndef PCDENOISE_H
 #define PCDENOISE_H
 
-// Include files
+// Include Files
 #include "rtwtypes.h"
 #include <cstddef>
 #include <cstdlib>
 
 // Type Declarations
 namespace coder {
-class b_pointCloud;
+class d_pointCloud;
 
 namespace vision {
 namespace internal {
@@ -34,11 +34,15 @@ class pointCloud;
 
 // Function Declarations
 namespace coder {
-pointCloud *pcdenoise(b_pointCloud *ptCloudIn,
+pointCloud *pcdenoise(d_pointCloud *ptCloudIn,
                       vision::internal::codegen::Kdtree *iobj_0,
                       pointCloud *iobj_1);
 
 }
 
 #endif
-// End of code generation (pcdenoise.h)
+//
+// File trailer for pcdenoise.h
+//
+// [EOF]
+//

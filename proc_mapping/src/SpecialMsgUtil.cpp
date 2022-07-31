@@ -2,13 +2,13 @@
 // Academic License - for use in teaching, academic research, and meeting
 // course requirements at degree granting institutions only.  Not for
 // government, commercial, or other organizational use.
+// File: SpecialMsgUtil.cpp
 //
-// SpecialMsgUtil.cpp
-//
-// Code generation for function 'SpecialMsgUtil'
+// MATLAB Coder version            : 5.4
+// C/C++ source code generated on  : 31-Jul-2022 13:03:34
 //
 
-// Include files
+// Include Files
 #include "SpecialMsgUtil.h"
 #include "rt_nonfinite.h"
 #include "coder_array.h"
@@ -17,6 +17,13 @@
 #include <string.h>
 
 // Function Definitions
+//
+// Arguments    : const ::coder::array<unsigned char, 1U> &data
+//                const ::coder::array<double, 2U> &byteIdx
+//                const ::coder::array<bool, 2U> &pointIdxIsValid
+//                ::coder::array<float, 1U> &fieldPoints
+// Return Type  : void
+//
 namespace coder {
 namespace ros {
 namespace internal {
@@ -136,4 +143,8 @@ void SpecialMsgUtil::readFieldFromData(
 } // namespace ros
 } // namespace coder
 
-// End of code generation (SpecialMsgUtil.cpp)
+//
+// File trailer for SpecialMsgUtil.cpp
+//
+// [EOF]
+//

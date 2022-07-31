@@ -2,16 +2,16 @@
 // Academic License - for use in teaching, academic research, and meeting
 // course requirements at degree granting institutions only.  Not for
 // government, commercial, or other organizational use.
+// File: eml_rand_mcg16807_stateful.h
 //
-// eml_rand_mcg16807_stateful.h
-//
-// Code generation for function 'eml_rand_mcg16807_stateful'
+// MATLAB Coder version            : 5.4
+// C/C++ source code generated on  : 31-Jul-2022 13:03:34
 //
 
 #ifndef EML_RAND_MCG16807_STATEFUL_H
 #define EML_RAND_MCG16807_STATEFUL_H
 
-// Include files
+// Include Files
 #include "rtwtypes.h"
 #include <cstddef>
 #include <cstdlib>
@@ -20,4 +20,8 @@
 void eml_rand_mcg16807_stateful_init();
 
 #endif
-// End of code generation (eml_rand_mcg16807_stateful.h)
+//
+// File trailer for eml_rand_mcg16807_stateful.h
+//
+// [EOF]
+//

@@ -2,16 +2,16 @@
 // Academic License - for use in teaching, academic research, and meeting
 // course requirements at degree granting institutions only.  Not for
 // government, commercial, or other organizational use.
+// File: PointCloud2Types.h
 //
-// PointCloud2Types.h
-//
-// Code generation for function 'PointCloud2Types'
+// MATLAB Coder version            : 5.4
+// C/C++ source code generated on  : 31-Jul-2022 13:03:34
 //
 
 #ifndef POINTCLOUD2TYPES_H
 #define POINTCLOUD2TYPES_H
 
-// Include files
+// Include Files
 #include "rtwtypes.h"
 #include "coder_array.h"
 #include <cstddef>
@@ -37,4 +37,8 @@ public:
 } // namespace coder
 
 #endif
-// End of code generation (PointCloud2Types.h)
+//
+// File trailer for PointCloud2Types.h
+//
+// [EOF]
+//

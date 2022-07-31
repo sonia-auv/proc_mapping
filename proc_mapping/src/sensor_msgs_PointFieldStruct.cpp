@@ -2,13 +2,13 @@
 // Academic License - for use in teaching, academic research, and meeting
 // course requirements at degree granting institutions only.  Not for
 // government, commercial, or other organizational use.
+// File: sensor_msgs_PointFieldStruct.cpp
 //
-// sensor_msgs_PointFieldStruct.cpp
-//
-// Code generation for function 'sensor_msgs_PointFieldStruct'
+// MATLAB Coder version            : 5.4
+// C/C++ source code generated on  : 31-Jul-2022 13:03:34
 //
 
-// Include files
+// Include Files
 #include "sensor_msgs_PointFieldStruct.h"
 #include "proc_mapping_types.h"
 #include "rt_nonfinite.h"
@@ -16,12 +16,17 @@
 #include <string.h>
 
 // Function Definitions
+//
+// Message struct definition for sensor_msgs/PointField
+//
+// Arguments    : sensor_msgs_PointFieldStruct_T *msg
+// Return Type  : void
+//
 void sensor_msgs_PointFieldStruct(sensor_msgs_PointFieldStruct_T *msg)
 {
   static const char b_cv[22]{'s', 'e', 'n', 's', 'o', 'r', '_', 'm',
                              's', 'g', 's', '/', 'P', 'o', 'i', 'n',
                              't', 'F', 'i', 'e', 'l', 'd'};
-  //  Message struct definition for sensor_msgs/PointField
   for (int i{0}; i < 22; i++) {
     msg->MessageType[i] = b_cv[i];
   }
@@ -40,4 +45,8 @@ void sensor_msgs_PointFieldStruct(sensor_msgs_PointFieldStruct_T *msg)
   //(msg);
 }
 
-// End of code generation (sensor_msgs_PointFieldStruct.cpp)
+//
+// File trailer for sensor_msgs_PointFieldStruct.cpp
+//
+// [EOF]
+//

@@ -2,16 +2,16 @@
 // Academic License - for use in teaching, academic research, and meeting
 // course requirements at degree granting institutions only.  Not for
 // government, commercial, or other organizational use.
+// File: proc_mapping_types.h
 //
-// proc_mapping_types.h
-//
-// Code generation for function 'proc_mapping'
+// MATLAB Coder version            : 5.4
+// C/C++ source code generated on  : 31-Jul-2022 13:03:34
 //
 
 #ifndef PROC_MAPPING_TYPES_H
 #define PROC_MAPPING_TYPES_H
 
-// Include files
+// Include Files
 #include "rtwtypes.h"
 #include "coder_array.h"
 
@@ -19,11 +19,6 @@
 struct ros_TimeStruct_T {
   unsigned int Sec;
   unsigned int Nsec;
-};
-
-struct std_msgs_Float32Struct_T {
-  char MessageType[16];
-  float Data;
 };
 
 struct std_msgs_BoolStruct_T {
@@ -52,6 +47,36 @@ struct geometry_msgs_PoseStruct_T {
   geometry_msgs_QuaternionStruct_T Orientation;
 };
 
+struct geometry_msgs_PoseWithCovarianceStruct_T {
+  char MessageType[32];
+  geometry_msgs_PoseStruct_T Pose;
+  double Covariance[36];
+};
+
+struct geometry_msgs_Vector3Struct_T {
+  char MessageType[21];
+  double X;
+  double Y;
+  double Z;
+};
+
+struct geometry_msgs_TwistStruct_T {
+  char MessageType[19];
+  geometry_msgs_Vector3Struct_T Linear;
+  geometry_msgs_Vector3Struct_T Angular;
+};
+
+struct geometry_msgs_TwistWithCovarianceStruct_T {
+  char MessageType[33];
+  geometry_msgs_TwistStruct_T Twist;
+  double Covariance[36];
+};
+
+struct std_msgs_UInt16Struct_T {
+  char MessageType[15];
+  unsigned short Data;
+};
+
 struct uint64m_T {
   unsigned int chunks[2];
 };
@@ -72,11 +97,24 @@ struct sensor_msgs_PointFieldStruct_T {
   unsigned int Count;
 };
 
+struct std_msgs_StringStruct_T {
+  char MessageType[15];
+  coder::array<char, 2U> Data;
+};
+
 struct std_msgs_HeaderStruct_T {
   char MessageType[15];
   unsigned int Seq;
   ros_TimeStruct_T Stamp;
   coder::array<char, 2U> FrameId;
+};
+
+struct nav_msgs_OdometryStruct_T {
+  char MessageType[17];
+  std_msgs_HeaderStruct_T Header;
+  coder::array<char, 2U> ChildFrameId;
+  geometry_msgs_PoseWithCovarianceStruct_T Pose;
+  geometry_msgs_TwistWithCovarianceStruct_T Twist;
 };
 
 struct sensor_msgs_PointCloud2Struct_T {
@@ -92,5 +130,32 @@ struct sensor_msgs_PointCloud2Struct_T {
   bool IsDense;
 };
 
+struct sonia_common_PingAnglesStruct_T {
+  char MessageType[23];
+  std_msgs_HeaderStruct_T Header;
+  double Heading;
+  double Elevation;
+  unsigned short Frequency;
+  unsigned short Snr;
+};
+
+struct sonia_common_ObstacleInfoStruct_T {
+  char MessageType[25];
+  coder::array<char, 2U> Name;
+  bool IsValid;
+  float Confidence;
+  geometry_msgs_PoseStruct_T Pose;
+};
+
+struct sonia_common_ObstacleArrayStruct_T {
+  char MessageType[26];
+  std_msgs_HeaderStruct_T Header;
+  coder::array<sonia_common_ObstacleInfoStruct_T, 1U> Obstacles;
+};
+
 #endif
-// End of code generation (proc_mapping_types.h)
+//
+// File trailer for proc_mapping_types.h
+//
+// [EOF]
+//

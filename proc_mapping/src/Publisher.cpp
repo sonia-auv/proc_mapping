@@ -2,21 +2,26 @@
 // Academic License - for use in teaching, academic research, and meeting
 // course requirements at degree granting institutions only.  Not for
 // government, commercial, or other organizational use.
+// File: Publisher.cpp
 //
-// Publisher.cpp
-//
-// Code generation for function 'Publisher'
+// MATLAB Coder version            : 5.4
+// C/C++ source code generated on  : 31-Jul-2022 13:03:34
 //
 
-// Include files
+// Include Files
 #include "Publisher.h"
 #include "proc_mapping_types.h"
 #include "rt_nonfinite.h"
 #include "sensor_msgs_PointCloud2Struct.h"
+#include "sonia_common_ObstacleArrayStruct.h"
 #include "mlroscpp_pub.h"
 #include <string.h>
 
 // Function Definitions
+//
+// Arguments    : void
+// Return Type  : Publisher *
+//
 namespace coder {
 namespace ros {
 Publisher *Publisher::init()
@@ -42,7 +47,39 @@ Publisher *Publisher::init()
   return obj;
 }
 
+//
+// Arguments    : void
+// Return Type  : b_Publisher *
+//
+b_Publisher *b_Publisher::init()
+{
+  static const char topic[28]{'/', 'p', 'r', 'o', 'c', '_', 'm', 'a', 'p', 'p',
+                              'i', 'n', 'g', '/', 'o', 'b', 's', 't', 'a', 'c',
+                              'l', 'e', '_', 'i', 'n', 'f', 'o', 's'};
+  b_Publisher *obj;
+  sonia_common_ObstacleArrayStruct_T r;
+  obj = this;
+  for (int i{0}; i < 28; i++) {
+    obj->TopicName[i] = topic[i];
+  }
+  obj->BufferSize = 1.0;
+  obj->IsLatching = true;
+  sonia_common_ObstacleArrayStruct(&r);
+  obj->PublisherHelper =
+      std::unique_ptr<MATLABPublisher<sonia_common::ObstacleArray,
+                                      sonia_common_ObstacleArrayStruct_T>>(
+          new MATLABPublisher<sonia_common::ObstacleArray,
+                              sonia_common_ObstacleArrayStruct_T>()); //();
+  MATLABPUBLISHER_createPublisher(obj->PublisherHelper, &obj->TopicName[0],
+                                  28.0, obj->BufferSize, obj->IsLatching);
+  return obj;
+}
+
 } // namespace ros
 } // namespace coder
 
-// End of code generation (Publisher.cpp)
+//
+// File trailer for Publisher.cpp
+//
+// [EOF]
+//

@@ -2,16 +2,16 @@
 // Academic License - for use in teaching, academic research, and meeting
 // course requirements at degree granting institutions only.  Not for
 // government, commercial, or other organizational use.
+// File: rtGetInf.h
 //
-// rtGetInf.h
-//
-// Code generation for function 'proc_mapping'
+// MATLAB Coder version            : 5.4
+// C/C++ source code generated on  : 31-Jul-2022 13:03:34
 //
 
 #ifndef RTGETINF_H
 #define RTGETINF_H
 
-// Include files
+// Include Files
 #include "rtwtypes.h"
 
 #ifdef __cplusplus
@@ -27,4 +27,8 @@ extern real32_T rtGetMinusInfF(void);
 }
 #endif
 #endif
-// End of code generation (rtGetInf.h)
+//
+// File trailer for rtGetInf.h
+//
+// [EOF]
+//

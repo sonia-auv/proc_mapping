@@ -2,16 +2,16 @@
 // Academic License - for use in teaching, academic research, and meeting
 // course requirements at degree granting institutions only.  Not for
 // government, commercial, or other organizational use.
+// File: Rate.h
 //
-// Rate.h
-//
-// Code generation for function 'Rate'
+// MATLAB Coder version            : 5.4
+// C/C++ source code generated on  : 31-Jul-2022 13:03:34
 //
 
 #ifndef RATE_H
 #define RATE_H
 
-// Include files
+// Include Files
 #include "rtwtypes.h"
 #include "coder_posix_time.h"
 #include "mlroscpp_rate.h"
@@ -33,4 +33,8 @@ public:
 } // namespace coder
 
 #endif
-// End of code generation (Rate.h)
+//
+// File trailer for Rate.h
+//
+// [EOF]
+//

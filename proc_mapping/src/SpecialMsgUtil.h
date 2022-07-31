@@ -2,16 +2,16 @@
 // Academic License - for use in teaching, academic research, and meeting
 // course requirements at degree granting institutions only.  Not for
 // government, commercial, or other organizational use.
+// File: SpecialMsgUtil.h
 //
-// SpecialMsgUtil.h
-//
-// Code generation for function 'SpecialMsgUtil'
+// MATLAB Coder version            : 5.4
+// C/C++ source code generated on  : 31-Jul-2022 13:03:34
 //
 
 #ifndef SPECIALMSGUTIL_H
 #define SPECIALMSGUTIL_H
 
-// Include files
+// Include Files
 #include "rtwtypes.h"
 #include "coder_array.h"
 #include <cstddef>
@@ -34,4 +34,8 @@ public:
 } // namespace coder
 
 #endif
-// End of code generation (SpecialMsgUtil.h)
+//
+// File trailer for SpecialMsgUtil.h
+//
+// [EOF]
+//
