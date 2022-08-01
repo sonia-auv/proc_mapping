@@ -5,7 +5,7 @@
 // File: RosNode.cpp
 //
 // MATLAB Coder version            : 5.4
-// C/C++ source code generated on  : 31-Jul-2022 13:03:34
+// C/C++ source code generated on  : 01-Aug-2022 08:26:09
 //
 
 // Include Files
@@ -1169,7 +1169,8 @@ void RosNode::spin(coder::ros::Rate *b_spin, SoundCloudBundler *iobj_0,
                      mScBundler->mParam.filter.hydro.freqThreshold)) &&
               (!(hydroMsg_Frequency <
                  static_cast<double>(t8_Data) -
-                     mScBundler->mParam.filter.hydro.freqThreshold))) {
+                     mScBundler->mParam.filter.hydro.freqThreshold)) &&
+              (hydroMsg_Snr >= 20)) {
             //  Getting the sub pose.
             pos[0] = unusedExpr.Pose.Position.X;
             pos[1] = unusedExpr.Pose.Position.Y;
@@ -1208,11 +1209,11 @@ void RosNode::spin(coder::ros::Rate *b_spin, SoundCloudBundler *iobj_0,
             //  hydro = quatrotate(eul2quat(deg2rad([-150,0,0]),'ZYX'),hydro.');
             center[0] =
                 rho *
-                std::cos(t12_Pose_Pose_Orientation_Y + 3.6651914291880923) *
+                std::cos(t12_Pose_Pose_Orientation_Y + 0.52359877559829882) *
                 expl_temp;
             center[1] =
                 rho *
-                std::sin(t12_Pose_Pose_Orientation_Y + 3.6651914291880923) *
+                std::sin(t12_Pose_Pose_Orientation_Y + 0.52359877559829882) *
                 expl_temp;
             center[2] = z;
             sonar2NED(pos, quat, mScBundler->mHydroPose, center, b_quat);

@@ -5,7 +5,7 @@
 // File: quat2rotm.h
 //
 // MATLAB Coder version            : 5.4
-// C/C++ source code generated on  : 31-Jul-2022 13:03:34
+// C/C++ source code generated on  : 01-Aug-2022 08:26:09
 //
 
 #ifndef QUAT2ROTM_H

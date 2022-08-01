@@ -5,7 +5,7 @@
 // File: schur.h
 //
 // MATLAB Coder version            : 5.4
-// C/C++ source code generated on  : 31-Jul-2022 13:03:34
+// C/C++ source code generated on  : 01-Aug-2022 08:26:09
 //
 
 #ifndef SCHUR_H
@@ -18,7 +18,7 @@
 
 // Function Declarations
 namespace coder {
-void schur(const double A[16], double V[16], double T[16]);
+void schur(double A[16], double V[16]);
 
 }
 

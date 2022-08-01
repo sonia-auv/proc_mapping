@@ -5,7 +5,7 @@
 // File: Subscriber.cpp
 //
 // MATLAB Coder version            : 5.4
-// C/C++ source code generated on  : 31-Jul-2022 13:03:34
+// C/C++ source code generated on  : 01-Aug-2022 08:26:09
 //
 
 // Include Files
@@ -560,14 +560,13 @@ Subscriber *Subscriber::init()
 //
 g_Subscriber *g_Subscriber::init()
 {
-  static const char topic[31]{'/', 'p', 'r', 'o', 'c', '_', 'h', 'y',
-                              'd', 'r', 'o', 'p', 'h', 'o', 'n', 'e',
-                              '/', 'p', 'r', 'e', 'f', 'i', 'l', 't',
-                              'e', 'r', '_', 'p', 'i', 'n', 'g'};
+  static const char topic[21]{'/', 'p', 'r', 'o', 'c', '_', 'h',
+                              'y', 'd', 'r', 'o', 'p', 'h', 'o',
+                              'n', 'e', '/', 'p', 'i', 'n', 'g'};
   g_Subscriber *obj;
   obj = this;
   obj->IsInitialized = false;
-  for (int i{0}; i < 31; i++) {
+  for (int i{0}; i < 21; i++) {
     obj->TopicName[i] = topic[i];
   }
   obj->BufferSize = 1.0;
@@ -581,7 +580,7 @@ g_Subscriber *g_Subscriber::init()
                                sonia_common_PingAnglesStruct_T>(
               structPtr, [this] { this->callback(); })); //();
   MATLABSUBSCRIBER_createSubscriber(obj->SubscriberHelper, &obj->TopicName[0],
-                                    31.0, obj->BufferSize);
+                                    21.0, obj->BufferSize);
   obj->callback();
   obj->IsInitialized = true;
   return obj;

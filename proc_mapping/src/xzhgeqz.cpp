@@ -5,7 +5,7 @@
 // File: xzhgeqz.cpp
 //
 // MATLAB Coder version            : 5.4
-// C/C++ source code generated on  : 31-Jul-2022 13:03:34
+// C/C++ source code generated on  : 01-Aug-2022 08:26:09
 //
 
 // Include Files
@@ -36,7 +36,8 @@ void xzhgeqz(creal_T A[16], int ilo, int ihi, creal_T Z[16], int *info,
              creal_T alpha1[4], creal_T beta1[4])
 {
   creal_T ctemp;
-  creal_T shift;
+  creal_T stemp;
+  creal_T y;
   double anorm;
   double ascale;
   double b_atol;
@@ -170,10 +171,17 @@ void xzhgeqz(creal_T A[16], int ilo, int ihi, creal_T Z[16], int *info,
           goto60 = true;
           b_guard1 = true;
         } else {
-          i = ilast + (ilastm1 << 2);
-          if (std::abs(A[i].re) + std::abs(A[i].im) <= b_atol) {
-            A[i].re = 0.0;
-            A[i].im = 0.0;
+          i = ilastm1 << 2;
+          nm1 = ilast + i;
+          jm1 = ilast + (ilast << 2);
+          i += ilastm1;
+          if (std::abs(A[nm1].re) + std::abs(A[nm1].im) <=
+              std::fmax(2.2250738585072014E-308,
+                        2.2204460492503131E-16 *
+                            ((std::abs(A[jm1].re) + std::abs(A[jm1].im)) +
+                             (std::abs(A[i].re) + std::abs(A[i].im))))) {
+            A[nm1].re = 0.0;
+            A[nm1].im = 0.0;
             goto60 = true;
             b_guard1 = true;
           } else {
@@ -187,7 +195,13 @@ void xzhgeqz(creal_T A[16], int ilo, int ihi, creal_T Z[16], int *info,
                 exitg2 = true;
               } else {
                 i = j + ((j - 1) << 2);
-                if (std::abs(A[i].re) + std::abs(A[i].im) <= b_atol) {
+                nm1 = j + (j << 2);
+                if (std::abs(A[i].re) + std::abs(A[i].im) <=
+                    std::fmax(2.2250738585072014E-308,
+                              2.2204460492503131E-16 *
+                                  ((std::abs(A[nm1].re) + std::abs(A[nm1].im)) +
+                                   (std::abs(A[i - 1].re) +
+                                    std::abs(A[i - 1].im))))) {
                   A[i].re = 0.0;
                   A[i].im = 0.0;
                   guard3 = true;
@@ -248,28 +262,11 @@ void xzhgeqz(creal_T A[16], int ilo, int ihi, creal_T Z[16], int *info,
             }
           } else {
             if (goto70) {
-              creal_T b_ascale;
+              double ad22_im;
+              double ad22_re;
               goto70 = false;
               iiter++;
               if (iiter - div_nzp_s32(iiter, 10) * 10 != 0) {
-                double ad22_im;
-                double ad22_re;
-                double t1_im;
-                double t1_im_tmp;
-                double t1_re;
-                jm1 = ilastm1 + (ilastm1 << 2);
-                anorm = ascale * A[jm1].re;
-                t = ascale * A[jm1].im;
-                if (t == 0.0) {
-                  shift.re = anorm / 0.5;
-                  shift.im = 0.0;
-                } else if (anorm == 0.0) {
-                  shift.re = 0.0;
-                  shift.im = t / 0.5;
-                } else {
-                  shift.re = anorm / 0.5;
-                  shift.im = t / 0.5;
-                }
                 jm1 = ilast + (ilast << 2);
                 anorm = ascale * A[jm1].re;
                 t = ascale * A[jm1].im;
@@ -283,71 +280,192 @@ void xzhgeqz(creal_T A[16], int ilo, int ihi, creal_T Z[16], int *info,
                   ad22_re = anorm / 0.5;
                   ad22_im = t / 0.5;
                 }
-                t1_re = 0.5 * (shift.re + ad22_re);
-                t1_im = 0.5 * (shift.im + ad22_im);
-                t1_im_tmp = t1_re * t1_im;
                 jm1 = ilastm1 + (ilast << 2);
                 anorm = ascale * A[jm1].re;
                 t = ascale * A[jm1].im;
                 if (t == 0.0) {
-                  colscale = anorm / 0.5;
-                  colssq = 0.0;
+                  stemp.re = anorm / 0.5;
+                  stemp.im = 0.0;
                 } else if (anorm == 0.0) {
-                  colscale = 0.0;
-                  colssq = t / 0.5;
+                  stemp.re = 0.0;
+                  stemp.im = t / 0.5;
                 } else {
-                  colscale = anorm / 0.5;
-                  colssq = t / 0.5;
+                  stemp.re = anorm / 0.5;
+                  stemp.im = t / 0.5;
                 }
+                b_sqrt(&stemp);
                 jm1 = ilast + (ilastm1 << 2);
                 anorm = ascale * A[jm1].re;
                 t = ascale * A[jm1].im;
                 if (t == 0.0) {
-                  ssq = anorm / 0.5;
-                  anorm = 0.0;
+                  y.re = anorm / 0.5;
+                  y.im = 0.0;
                 } else if (anorm == 0.0) {
-                  ssq = 0.0;
-                  anorm = t / 0.5;
+                  y.re = 0.0;
+                  y.im = t / 0.5;
                 } else {
-                  ssq = anorm / 0.5;
-                  anorm = t / 0.5;
+                  y.re = anorm / 0.5;
+                  y.im = t / 0.5;
                 }
-                t = shift.re * ad22_re - shift.im * ad22_im;
-                scale = shift.re * ad22_im + shift.im * ad22_re;
-                shift.re = ((t1_re * t1_re - t1_im * t1_im) +
-                            (colscale * ssq - colssq * anorm)) -
-                           t;
-                shift.im = ((t1_im_tmp + t1_im_tmp) +
-                            (colscale * anorm + colssq * ssq)) -
-                           scale;
-                b_sqrt(&shift);
-                if ((t1_re - ad22_re) * shift.re +
-                        (t1_im - ad22_im) * shift.im <=
-                    0.0) {
-                  shift.re += t1_re;
-                  shift.im += t1_im;
-                } else {
-                  shift.re = t1_re - shift.re;
-                  shift.im = t1_im - shift.im;
+                b_sqrt(&y);
+                ctemp.re = stemp.re * y.re - stemp.im * y.im;
+                ctemp.im = stemp.re * y.im + stemp.im * y.re;
+                if ((ctemp.re != 0.0) || (ctemp.im != 0.0)) {
+                  double x_im;
+                  jm1 = ilastm1 + (ilastm1 << 2);
+                  anorm = ascale * A[jm1].re;
+                  t = ascale * A[jm1].im;
+                  if (t == 0.0) {
+                    anorm /= 0.5;
+                    t = 0.0;
+                  } else if (anorm == 0.0) {
+                    anorm = 0.0;
+                    t /= 0.5;
+                  } else {
+                    anorm /= 0.5;
+                    t /= 0.5;
+                  }
+                  colssq = 0.5 * (anorm - ad22_re);
+                  x_im = 0.5 * (t - ad22_im);
+                  colscale = std::abs(colssq) + std::abs(x_im);
+                  ssq = std::fmax(std::abs(ctemp.re) + std::abs(ctemp.im),
+                                  colscale);
+                  if (x_im == 0.0) {
+                    stemp.re = colssq / ssq;
+                    stemp.im = 0.0;
+                  } else if (colssq == 0.0) {
+                    stemp.re = 0.0;
+                    stemp.im = x_im / ssq;
+                  } else {
+                    stemp.re = colssq / ssq;
+                    stemp.im = x_im / ssq;
+                  }
+                  if (ctemp.im == 0.0) {
+                    y.re = ctemp.re / ssq;
+                    y.im = 0.0;
+                  } else if (ctemp.re == 0.0) {
+                    y.re = 0.0;
+                    y.im = ctemp.im / ssq;
+                  } else {
+                    y.re = ctemp.re / ssq;
+                    y.im = ctemp.im / ssq;
+                  }
+                  anorm = stemp.re * stemp.re - stemp.im * stemp.im;
+                  t = stemp.re * stemp.im;
+                  scale = y.re * y.im;
+                  stemp.re = anorm + (y.re * y.re - y.im * y.im);
+                  stemp.im = (t + t) + (scale + scale);
+                  b_sqrt(&stemp);
+                  y.re = ssq * stemp.re;
+                  y.im = ssq * stemp.im;
+                  if (colscale > 0.0) {
+                    if (x_im == 0.0) {
+                      t = colssq / colscale;
+                      anorm = 0.0;
+                    } else {
+                      if (colssq == 0.0) {
+                        t = 0.0;
+                      } else {
+                        t = colssq / colscale;
+                      }
+                      anorm = x_im / colscale;
+                    }
+                    if (t * y.re + anorm * y.im < 0.0) {
+                      y.re = -y.re;
+                      y.im = -y.im;
+                    }
+                  }
+                  scale = colssq + y.re;
+                  ssq = x_im + y.im;
+                  if (ssq == 0.0) {
+                    if (ctemp.im == 0.0) {
+                      colssq = ctemp.re / scale;
+                      anorm = 0.0;
+                    } else if (ctemp.re == 0.0) {
+                      colssq = 0.0;
+                      anorm = ctemp.im / scale;
+                    } else {
+                      colssq = ctemp.re / scale;
+                      anorm = ctemp.im / scale;
+                    }
+                  } else if (scale == 0.0) {
+                    if (ctemp.re == 0.0) {
+                      colssq = ctemp.im / ssq;
+                      anorm = 0.0;
+                    } else if (ctemp.im == 0.0) {
+                      colssq = 0.0;
+                      anorm = -(ctemp.re / ssq);
+                    } else {
+                      colssq = ctemp.im / ssq;
+                      anorm = -(ctemp.re / ssq);
+                    }
+                  } else {
+                    colscale = std::abs(scale);
+                    anorm = std::abs(ssq);
+                    if (colscale > anorm) {
+                      t = ssq / scale;
+                      anorm = scale + t * ssq;
+                      colssq = (ctemp.re + t * ctemp.im) / anorm;
+                      anorm = (ctemp.im - t * ctemp.re) / anorm;
+                    } else if (anorm == colscale) {
+                      if (scale > 0.0) {
+                        t = 0.5;
+                      } else {
+                        t = -0.5;
+                      }
+                      if (ssq > 0.0) {
+                        anorm = 0.5;
+                      } else {
+                        anorm = -0.5;
+                      }
+                      colssq = (ctemp.re * t + ctemp.im * anorm) / colscale;
+                      anorm = (ctemp.im * t - ctemp.re * anorm) / colscale;
+                    } else {
+                      t = scale / ssq;
+                      anorm = ssq + t * scale;
+                      colssq = (t * ctemp.re + ctemp.im) / anorm;
+                      anorm = (t * ctemp.im - ctemp.re) / anorm;
+                    }
+                  }
+                  ad22_re -= ctemp.re * colssq - ctemp.im * anorm;
+                  ad22_im -= ctemp.re * anorm + ctemp.im * colssq;
                 }
               } else {
-                jm1 = ilast + (ilastm1 << 2);
-                anorm = ascale * A[jm1].re;
-                t = ascale * A[jm1].im;
-                if (t == 0.0) {
-                  colscale = anorm / 0.5;
-                  colssq = 0.0;
-                } else if (anorm == 0.0) {
-                  colscale = 0.0;
-                  colssq = t / 0.5;
+                if (iiter - div_nzp_s32(iiter, 20) * 20 == 0) {
+                  jm1 = ilast + (ilast << 2);
+                  anorm = ascale * A[jm1].re;
+                  t = ascale * A[jm1].im;
+                  if (t == 0.0) {
+                    anorm /= 0.5;
+                    t = 0.0;
+                  } else if (anorm == 0.0) {
+                    anorm = 0.0;
+                    t /= 0.5;
+                  } else {
+                    anorm /= 0.5;
+                    t /= 0.5;
+                  }
+                  eshift_re += anorm;
+                  eshift_im += t;
                 } else {
-                  colscale = anorm / 0.5;
-                  colssq = t / 0.5;
+                  jm1 = ilast + (ilastm1 << 2);
+                  anorm = ascale * A[jm1].re;
+                  t = ascale * A[jm1].im;
+                  if (t == 0.0) {
+                    anorm /= 0.5;
+                    t = 0.0;
+                  } else if (anorm == 0.0) {
+                    anorm = 0.0;
+                    t /= 0.5;
+                  } else {
+                    anorm /= 0.5;
+                    t /= 0.5;
+                  }
+                  eshift_re += anorm;
+                  eshift_im += t;
                 }
-                eshift_re += colscale;
-                eshift_im += colssq;
-                shift.re = eshift_re;
-                shift.im = eshift_im;
+                ad22_re = eshift_re;
+                ad22_im = eshift_im;
               }
               j = ilastm1;
               nm1 = ilastm1 + 1;
@@ -356,22 +474,22 @@ void xzhgeqz(creal_T A[16], int ilo, int ihi, creal_T Z[16], int *info,
                 istart = j + 1;
                 col = j << 2;
                 row = j + col;
-                ctemp.re = ascale * A[row].re - shift.re * 0.5;
-                ctemp.im = ascale * A[row].im - shift.im * 0.5;
-                anorm = std::abs(ctemp.re) + std::abs(ctemp.im);
+                ctemp.re = ascale * A[row].re - ad22_re * 0.5;
+                ctemp.im = ascale * A[row].im - ad22_im * 0.5;
+                ssq = std::abs(ctemp.re) + std::abs(ctemp.im);
                 jm1 = nm1 + col;
-                t = ascale * (std::abs(A[jm1].re) + std::abs(A[jm1].im));
-                scale = anorm;
-                if (t > anorm) {
-                  scale = t;
+                colscale = ascale * (std::abs(A[jm1].re) + std::abs(A[jm1].im));
+                anorm = ssq;
+                if (colscale > ssq) {
+                  anorm = colscale;
                 }
-                if ((scale < 1.0) && (scale != 0.0)) {
-                  anorm /= scale;
-                  t /= scale;
+                if ((anorm < 1.0) && (anorm != 0.0)) {
+                  ssq /= anorm;
+                  colscale /= anorm;
                 }
                 i = j + ((j - 1) << 2);
-                if ((std::abs(A[i].re) + std::abs(A[i].im)) * t <=
-                    anorm * b_atol) {
+                if ((std::abs(A[i].re) + std::abs(A[i].im)) * colscale <=
+                    ssq * b_atol) {
                   goto90 = true;
                   exitg2 = true;
                 } else {
@@ -382,106 +500,99 @@ void xzhgeqz(creal_T A[16], int ilo, int ihi, creal_T Z[16], int *info,
               if (!goto90) {
                 istart = ifirst;
                 row = (ifirst + ((ifirst - 1) << 2)) - 1;
-                ctemp.re = ascale * A[row].re - shift.re * 0.5;
-                ctemp.im = ascale * A[row].im - shift.im * 0.5;
+                ctemp.re = ascale * A[row].re - ad22_re * 0.5;
+                ctemp.im = ascale * A[row].im - ad22_im * 0.5;
               }
               goto90 = false;
               jm1 = istart + ((istart - 1) << 2);
-              b_ascale.re = ascale * A[jm1].re;
-              b_ascale.im = ascale * A[jm1].im;
-              xzlartg(ctemp, b_ascale, &anorm, &shift);
+              stemp.re = ascale * A[jm1].re;
+              stemp.im = ascale * A[jm1].im;
+              xzlartg(ctemp, stemp, &colscale, &y);
               j = istart;
               jm1 = istart - 2;
               while (j < ilast + 1) {
                 if (j > istart) {
                   nm1 = j + (jm1 << 2);
-                  xzlartg(A[nm1 - 1], A[nm1], &anorm, &shift,
+                  xzlartg(A[nm1 - 1], A[nm1], &colscale, &y,
                           &A[(j + (jm1 << 2)) - 1]);
                   A[nm1].re = 0.0;
                   A[nm1].im = 0.0;
                 }
-                for (nm1 = j; nm1 < 5; nm1++) {
-                  row = j + ((nm1 - 1) << 2);
-                  t = A[row].im;
-                  scale = A[row].re;
-                  ssq = A[row - 1].re;
-                  colscale = A[row - 1].im;
-                  A[row].re =
-                      anorm * scale - (shift.re * ssq + shift.im * colscale);
-                  A[row].im = anorm * A[row].im -
-                              (shift.re * colscale - shift.im * ssq);
-                  A[row - 1].re =
-                      anorm * ssq + (shift.re * scale - shift.im * t);
-                  A[row - 1].im =
-                      anorm * colscale + (shift.re * t + shift.im * scale);
+                for (col = j; col < 5; col++) {
+                  nm1 = j + ((col - 1) << 2);
+                  anorm = A[nm1].im;
+                  t = A[nm1].re;
+                  scale = A[nm1 - 1].re;
+                  stemp.re = colscale * scale + (y.re * t - y.im * anorm);
+                  ssq = A[nm1 - 1].im;
+                  stemp.im = colscale * ssq + (y.re * anorm + y.im * t);
+                  A[nm1].re = colscale * t - (y.re * scale + y.im * ssq);
+                  A[nm1].im =
+                      colscale * A[nm1].im - (y.re * ssq - y.im * scale);
+                  A[nm1 - 1] = stemp;
                 }
-                shift.re = -shift.re;
-                shift.im = -shift.im;
+                y.re = -y.re;
+                y.im = -y.im;
                 nm1 = j;
                 if (ilast + 1 < j + 2) {
                   nm1 = ilast - 1;
                 }
                 for (jm1 = 1; jm1 <= nm1 + 2; jm1++) {
-                  row = (jm1 + ((j - 1) << 2)) - 1;
-                  t = A[row].im;
+                  col = (jm1 + ((j - 1) << 2)) - 1;
+                  anorm = A[col].im;
+                  t = A[col].re;
+                  row = (jm1 + (j << 2)) - 1;
                   scale = A[row].re;
-                  col = (jm1 + (j << 2)) - 1;
-                  ssq = A[col].re;
-                  colscale = A[col].im;
-                  A[row].re =
-                      anorm * scale - (shift.re * ssq + shift.im * colscale);
-                  A[row].im = anorm * A[row].im -
-                              (shift.re * colscale - shift.im * ssq);
-                  A[col].re = anorm * ssq + (shift.re * scale - shift.im * t);
+                  stemp.re = colscale * scale + (y.re * t - y.im * anorm);
+                  ssq = A[row].im;
+                  stemp.im = colscale * ssq + (y.re * anorm + y.im * t);
+                  A[col].re =
+                      colscale * A[col].re - (y.re * scale + y.im * ssq);
                   A[col].im =
-                      anorm * colscale + (shift.re * t + shift.im * scale);
+                      colscale * A[col].im - (y.re * ssq - y.im * scale);
+                  A[row] = stemp;
                 }
-                row = (j - 1) << 2;
-                t = Z[row].im;
+                nm1 = (j - 1) << 2;
+                anorm = Z[nm1].im;
+                t = Z[nm1].re;
+                row = j << 2;
                 scale = Z[row].re;
-                col = j << 2;
-                ssq = Z[col].re;
-                colscale = Z[col].im;
-                Z[row].re =
-                    anorm * scale - (shift.re * ssq + shift.im * colscale);
-                Z[row].im =
-                    anorm * Z[row].im - (shift.re * colscale - shift.im * ssq);
-                Z[col].re = anorm * ssq + (shift.re * scale - shift.im * t);
-                Z[col].im =
-                    anorm * colscale + (shift.re * t + shift.im * scale);
-                t = Z[row + 1].im;
+                stemp.re = colscale * scale + (y.re * t - y.im * anorm);
+                ssq = Z[row].im;
+                stemp.im = colscale * ssq + (y.re * anorm + y.im * t);
+                Z[nm1].re = colscale * t - (y.re * scale + y.im * ssq);
+                Z[nm1].im = colscale * Z[nm1].im - (y.re * ssq - y.im * scale);
+                Z[row] = stemp;
+                anorm = Z[nm1 + 1].im;
+                t = Z[nm1 + 1].re;
                 scale = Z[row + 1].re;
-                ssq = Z[col + 1].re;
-                colscale = Z[col + 1].im;
-                Z[row + 1].re =
-                    anorm * scale - (shift.re * ssq + shift.im * colscale);
-                Z[row + 1].im = anorm * Z[row + 1].im -
-                                (shift.re * colscale - shift.im * ssq);
-                Z[col + 1].re = anorm * ssq + (shift.re * scale - shift.im * t);
-                Z[col + 1].im =
-                    anorm * colscale + (shift.re * t + shift.im * scale);
-                t = Z[row + 2].im;
+                stemp.re = colscale * scale + (y.re * t - y.im * anorm);
+                ssq = Z[row + 1].im;
+                stemp.im = colscale * ssq + (y.re * anorm + y.im * t);
+                Z[nm1 + 1].re = colscale * t - (y.re * scale + y.im * ssq);
+                Z[nm1 + 1].im =
+                    colscale * Z[nm1 + 1].im - (y.re * ssq - y.im * scale);
+                Z[row + 1] = stemp;
+                anorm = Z[nm1 + 2].im;
+                t = Z[nm1 + 2].re;
                 scale = Z[row + 2].re;
-                ssq = Z[col + 2].re;
-                colscale = Z[col + 2].im;
-                Z[row + 2].re =
-                    anorm * scale - (shift.re * ssq + shift.im * colscale);
-                Z[row + 2].im = anorm * Z[row + 2].im -
-                                (shift.re * colscale - shift.im * ssq);
-                Z[col + 2].re = anorm * ssq + (shift.re * scale - shift.im * t);
-                Z[col + 2].im =
-                    anorm * colscale + (shift.re * t + shift.im * scale);
-                t = Z[row + 3].im;
+                stemp.re = colscale * scale + (y.re * t - y.im * anorm);
+                ssq = Z[row + 2].im;
+                stemp.im = colscale * ssq + (y.re * anorm + y.im * t);
+                Z[nm1 + 2].re = colscale * t - (y.re * scale + y.im * ssq);
+                Z[nm1 + 2].im =
+                    colscale * Z[nm1 + 2].im - (y.re * ssq - y.im * scale);
+                Z[row + 2] = stemp;
+                anorm = Z[nm1 + 3].im;
+                t = Z[nm1 + 3].re;
                 scale = Z[row + 3].re;
-                ssq = Z[col + 3].re;
-                colscale = Z[col + 3].im;
-                Z[row + 3].re =
-                    anorm * scale - (shift.re * ssq + shift.im * colscale);
-                Z[row + 3].im = anorm * Z[row + 3].im -
-                                (shift.re * colscale - shift.im * ssq);
-                Z[col + 3].re = anorm * ssq + (shift.re * scale - shift.im * t);
-                Z[col + 3].im =
-                    anorm * colscale + (shift.re * t + shift.im * scale);
+                stemp.re = colscale * scale + (y.re * t - y.im * anorm);
+                ssq = Z[row + 3].im;
+                stemp.im = colscale * ssq + (y.re * anorm + y.im * t);
+                Z[nm1 + 3].re = colscale * t - (y.re * scale + y.im * ssq);
+                Z[nm1 + 3].im =
+                    colscale * Z[nm1 + 3].im - (y.re * ssq - y.im * scale);
+                Z[row + 3] = stemp;
                 jm1 = j - 1;
                 j++;
               }

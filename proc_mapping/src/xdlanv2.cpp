@@ -5,7 +5,7 @@
 // File: xdlanv2.cpp
 //
 // MATLAB Coder version            : 5.4
-// C/C++ source code generated on  : 31-Jul-2022 13:03:34
+// C/C++ source code generated on  : 01-Aug-2022 08:26:09
 //
 
 // Include Files
@@ -39,18 +39,18 @@ void xdlanv2(double *a, double *b, double *c, double *d, double *rt1r,
     *cs = 1.0;
     *sn = 0.0;
   } else if (*b == 0.0) {
-    double bcmax;
+    double temp;
     *cs = 0.0;
     *sn = 1.0;
-    bcmax = *d;
+    temp = *d;
     *d = *a;
-    *a = bcmax;
+    *a = temp;
     *b = -*c;
     *c = 0.0;
   } else {
-    double tau;
-    tau = *a - *d;
-    if ((tau == 0.0) && ((*b < 0.0) != (*c < 0.0))) {
+    double temp;
+    temp = *a - *d;
+    if ((temp == 0.0) && ((*b < 0.0) != (*c < 0.0))) {
       *cs = 1.0;
       *sn = 0.0;
     } else {
@@ -59,27 +59,28 @@ void xdlanv2(double *a, double *b, double *c, double *d, double *rt1r,
       double p;
       double scale;
       double z;
-      int b_b;
       int b_c;
-      p = 0.5 * tau;
+      int count;
+      p = 0.5 * temp;
       bcmis = std::abs(*b);
       scale = std::abs(*c);
       bcmax = std::fmax(bcmis, scale);
       if (!(*b < 0.0)) {
-        b_b = 1;
+        count = 1;
       } else {
-        b_b = -1;
+        count = -1;
       }
       if (!(*c < 0.0)) {
         b_c = 1;
       } else {
         b_c = -1;
       }
-      bcmis = std::fmin(bcmis, scale) * static_cast<double>(b_b) *
+      bcmis = std::fmin(bcmis, scale) * static_cast<double>(count) *
               static_cast<double>(b_c);
       scale = std::fmax(std::abs(p), bcmax);
       z = p / scale * p + bcmax / scale * bcmis;
       if (z >= 8.8817841970012523E-16) {
+        double tau;
         *a = std::sqrt(scale) * std::sqrt(z);
         if (p < 0.0) {
           *a = -*a;
@@ -93,52 +94,67 @@ void xdlanv2(double *a, double *b, double *c, double *d, double *rt1r,
         *b -= *c;
         *c = 0.0;
       } else {
+        double tau;
         bcmis = *b + *c;
-        tau = rt_hypotd_snf(bcmis, tau);
+        scale = std::fmax(std::abs(temp), std::abs(bcmis));
+        count = 0;
+        while ((scale >= 7.4428285367870146E+137) && (count <= 20)) {
+          bcmis *= 1.3435752215134178E-138;
+          temp *= 1.3435752215134178E-138;
+          scale = std::fmax(std::abs(temp), std::abs(bcmis));
+          count++;
+        }
+        while ((scale <= 1.3435752215134178E-138) && (count <= 20)) {
+          bcmis *= 7.4428285367870146E+137;
+          temp *= 7.4428285367870146E+137;
+          scale = std::fmax(std::abs(temp), std::abs(bcmis));
+          count++;
+        }
+        tau = rt_hypotd_snf(bcmis, temp);
         *cs = std::sqrt(0.5 * (std::abs(bcmis) / tau + 1.0));
         if (!(bcmis < 0.0)) {
-          b_b = 1;
+          count = 1;
         } else {
-          b_b = -1;
+          count = -1;
         }
-        *sn = -(p / (tau * *cs)) * static_cast<double>(b_b);
+        *sn = -(0.5 * temp / (tau * *cs)) * static_cast<double>(count);
         bcmax = *a * *cs + *b * *sn;
         scale = -*a * *sn + *b * *cs;
         z = *c * *cs + *d * *sn;
         bcmis = -*c * *sn + *d * *cs;
         *b = scale * *cs + bcmis * *sn;
         *c = -bcmax * *sn + z * *cs;
-        bcmax = 0.5 * ((bcmax * *cs + z * *sn) + (-scale * *sn + bcmis * *cs));
-        *a = bcmax;
-        *d = bcmax;
+        temp = 0.5 * ((bcmax * *cs + z * *sn) + (-scale * *sn + bcmis * *cs));
+        *a = temp;
+        *d = temp;
         if (*c != 0.0) {
           if (*b != 0.0) {
             if ((*b < 0.0) == (*c < 0.0)) {
               bcmis = std::sqrt(std::abs(*b));
-              z = std::sqrt(std::abs(*c));
-              *a = bcmis * z;
+              scale = std::sqrt(std::abs(*c));
+              *a = bcmis * scale;
               if (!(*c < 0.0)) {
                 p = *a;
               } else {
                 p = -*a;
               }
               tau = 1.0 / std::sqrt(std::abs(*b + *c));
-              *a = bcmax + p;
-              *d = bcmax - p;
+              *a = temp + p;
+              *d = temp - p;
               *b -= *c;
               *c = 0.0;
-              scale = bcmis * tau;
-              bcmis = z * tau;
-              bcmax = *cs * scale - *sn * bcmis;
-              *sn = *cs * bcmis + *sn * scale;
-              *cs = bcmax;
+              bcmax = bcmis * tau;
+              bcmis = scale * tau;
+              temp = *cs * bcmax - *sn * bcmis;
+              *sn = *cs * bcmis + *sn * bcmax;
+              *cs = temp;
             }
           } else {
             *b = -*c;
             *c = 0.0;
-            bcmax = *cs;
+            temp = *cs;
             *cs = -*sn;
-            *sn = bcmax;
+            *sn = temp;
           }
         }
       }

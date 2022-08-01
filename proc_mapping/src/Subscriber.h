@@ -5,7 +5,7 @@
 // File: Subscriber.h
 //
 // MATLAB Coder version            : 5.4
-// C/C++ source code generated on  : 31-Jul-2022 13:03:34
+// C/C++ source code generated on  : 01-Aug-2022 08:26:09
 //
 
 #ifndef SUBSCRIBER_H
@@ -141,7 +141,7 @@ public:
                          double *lastSubMsg_Elevation,
                          unsigned short *lastSubMsg_Frequency,
                          unsigned short *lastSubMsg_Snr) const;
-  char TopicName[31];
+  char TopicName[21];
   double BufferSize;
   double MessageCount;
 

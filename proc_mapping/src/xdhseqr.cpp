@@ -2,14 +2,14 @@
 // Academic License - for use in teaching, academic research, and meeting
 // course requirements at degree granting institutions only.  Not for
 // government, commercial, or other organizational use.
-// File: xhseqr.cpp
+// File: xdhseqr.cpp
 //
 // MATLAB Coder version            : 5.4
-// C/C++ source code generated on  : 31-Jul-2022 13:03:34
+// C/C++ source code generated on  : 01-Aug-2022 08:26:09
 //
 
 // Include Files
-#include "xhseqr.h"
+#include "xdhseqr.h"
 #include "proc_mapping_rtwutil.h"
 #include "rt_nonfinite.h"
 #include "xdlanv2.h"
@@ -26,8 +26,8 @@
 //
 namespace coder {
 namespace internal {
-namespace lapack {
-int xhseqr(double h[16], double z[16])
+namespace reflapack {
+int eml_dlahqr(double h[16], double z[16])
 {
   double v[3];
   double aa;
@@ -41,6 +41,7 @@ int xhseqr(double h[16], double z[16])
   double tst;
   int i;
   int info;
+  int kdefl;
   bool exitg1;
   info = 0;
   v[0] = 0.0;
@@ -49,15 +50,16 @@ int xhseqr(double h[16], double z[16])
   h[2] = 0.0;
   h[3] = 0.0;
   h[7] = 0.0;
+  kdefl = 0;
   i = 3;
   exitg1 = false;
   while ((!exitg1) && (i + 1 >= 1)) {
     int L;
     int b_i;
-    int b_k;
     int hoffset;
     int its;
     int knt;
+    int v_tmp;
     bool exitg2;
     bool goto150;
     L = 1;
@@ -123,17 +125,18 @@ int xhseqr(double h[16], double z[16])
         exitg2 = true;
       } else {
         int m;
-        if (its == 10) {
-          hoffset = k + (k << 2);
-          s = std::abs(h[hoffset + 1]) + std::abs(h[(k + ((k + 1) << 2)) + 2]);
-          tst = 0.75 * s + h[hoffset];
-          aa = -0.4375 * s;
-          ab = s;
-          bb = tst;
-        } else if (its == 20) {
+        kdefl++;
+        if (kdefl - div_nzp_s32(kdefl, 20) * 20 == 0) {
           s = std::abs(h[i + ((i - 1) << 2)]) +
               std::abs(h[(i + ((i - 2) << 2)) - 1]);
           tst = 0.75 * s + h[i + (i << 2)];
+          aa = -0.4375 * s;
+          ab = s;
+          bb = tst;
+        } else if (kdefl - div_nzp_s32(kdefl, 10) * 10 == 0) {
+          s = std::abs(h[(k + (k << 2)) + 1]) +
+              std::abs(h[(k + ((k + 1) << 2)) + 2]);
+          tst = 0.75 * s + h[k + (k << 2)];
           aa = -0.4375 * s;
           ab = s;
           bb = tst;
@@ -180,18 +183,18 @@ int xhseqr(double h[16], double z[16])
         m = i - 1;
         exitg3 = false;
         while ((!exitg3) && (m >= k + 1)) {
-          hoffset = m + ((m - 1) << 2);
-          tst = h[hoffset];
-          s_tmp = h[hoffset - 1];
+          knt = m + ((m - 1) << 2);
+          tst = h[knt];
+          s_tmp = h[knt - 1];
           ab = s_tmp - rt2r;
           s = (std::abs(ab) + std::abs(bb)) + std::abs(tst);
           aa = tst / s;
-          hoffset = m + (m << 2);
+          v_tmp = m + (m << 2);
           v[0] =
-              (aa * h[hoffset - 1] + (s_tmp - rt1r) * (ab / s)) - ba * (bb / s);
-          tst = h[hoffset];
+              (aa * h[v_tmp - 1] + (s_tmp - rt1r) * (ab / s)) - ba * (bb / s);
+          tst = h[v_tmp];
           v[1] = aa * (((s_tmp + tst) - rt1r) - rt2r);
-          v[2] = aa * h[hoffset + 1];
+          v[2] = aa * h[v_tmp + 1];
           s = (std::abs(v[0]) + std::abs(v[1])) + std::abs(v[2]);
           v[0] /= s;
           v[1] /= s;
@@ -210,16 +213,16 @@ int xhseqr(double h[16], double z[16])
             }
           }
         }
-        for (int c_k{m}; c_k <= i; c_k++) {
+        for (int b_k{m}; b_k <= i; b_k++) {
           int nr;
-          hoffset = (i - c_k) + 2;
+          hoffset = (i - b_k) + 2;
           if (hoffset >= 3) {
             nr = 3;
           } else {
             nr = hoffset;
           }
-          if (c_k > m) {
-            hoffset = (c_k + ((c_k - 2) << 2)) - 1;
+          if (b_k > m) {
+            hoffset = (b_k + ((b_k - 2) << 2)) - 1;
             for (int j{0}; j < nr; j++) {
               v[j] = h[j + hoffset];
             }
@@ -237,8 +240,8 @@ int xhseqr(double h[16], double z[16])
                 knt = 0;
                 do {
                   knt++;
-                  for (b_k = 2; b_k <= nr; b_k++) {
-                    v[b_k - 1] *= 9.9792015476736E+291;
+                  for (v_tmp = 2; v_tmp <= nr; v_tmp++) {
+                    v[v_tmp - 1] *= 9.9792015476736E+291;
                   }
                   aa *= 9.9792015476736E+291;
                   ab *= 9.9792015476736E+291;
@@ -250,92 +253,92 @@ int xhseqr(double h[16], double z[16])
                 }
                 bb = (aa - ab) / aa;
                 tst = 1.0 / (ab - aa);
-                for (b_k = 2; b_k <= nr; b_k++) {
-                  v[b_k - 1] *= tst;
+                for (v_tmp = 2; v_tmp <= nr; v_tmp++) {
+                  v[v_tmp - 1] *= tst;
                 }
-                for (b_k = 0; b_k < knt; b_k++) {
+                for (v_tmp = 0; v_tmp < knt; v_tmp++) {
                   aa *= 1.0020841800044864E-292;
                 }
                 ab = aa;
               } else {
                 bb = (aa - v[0]) / aa;
                 tst = 1.0 / (v[0] - aa);
-                for (b_k = 2; b_k <= nr; b_k++) {
-                  v[b_k - 1] *= tst;
+                for (v_tmp = 2; v_tmp <= nr; v_tmp++) {
+                  v[v_tmp - 1] *= tst;
                 }
                 ab = aa;
               }
             }
           }
           v[0] = ab;
-          if (c_k > m) {
-            h[(c_k + ((c_k - 2) << 2)) - 1] = ab;
-            b_i = c_k + ((c_k - 2) << 2);
+          if (b_k > m) {
+            h[(b_k + ((b_k - 2) << 2)) - 1] = ab;
+            b_i = b_k + ((b_k - 2) << 2);
             h[b_i] = 0.0;
-            if (c_k < i) {
+            if (b_k < i) {
               h[b_i + 1] = 0.0;
             }
           } else if (m > k + 1) {
-            h[(c_k + ((c_k - 2) << 2)) - 1] *= 1.0 - bb;
+            h[(b_k + ((b_k - 2) << 2)) - 1] *= 1.0 - bb;
           }
           rt1r = v[1];
           tst = bb * v[1];
           if (nr == 3) {
             s = v[2];
             ba = bb * v[2];
-            for (int j{c_k}; j < 5; j++) {
-              hoffset = c_k + ((j - 1) << 2);
-              aa = (h[hoffset - 1] + rt1r * h[hoffset]) + s * h[hoffset + 1];
-              h[hoffset - 1] -= aa * bb;
-              h[hoffset] -= aa * tst;
-              h[hoffset + 1] -= aa * ba;
+            for (int j{b_k}; j < 5; j++) {
+              v_tmp = b_k + ((j - 1) << 2);
+              aa = (h[v_tmp - 1] + rt1r * h[v_tmp]) + s * h[v_tmp + 1];
+              h[v_tmp - 1] -= aa * bb;
+              h[v_tmp] -= aa * tst;
+              h[v_tmp + 1] -= aa * ba;
             }
-            if (c_k + 3 <= i + 1) {
-              b_i = c_k + 2;
+            if (b_k + 3 <= i + 1) {
+              b_i = b_k + 2;
             } else {
               b_i = i;
             }
             for (int j{0}; j <= b_i; j++) {
-              hoffset = j + ((c_k - 1) << 2);
-              knt = j + (c_k << 2);
-              b_k = j + ((c_k + 1) << 2);
-              aa = (h[hoffset] + rt1r * h[knt]) + s * h[b_k];
-              h[hoffset] -= aa * bb;
-              h[knt] -= aa * tst;
-              h[b_k] -= aa * ba;
+              v_tmp = j + ((b_k - 1) << 2);
+              hoffset = j + (b_k << 2);
+              knt = j + ((b_k + 1) << 2);
+              aa = (h[v_tmp] + rt1r * h[hoffset]) + s * h[knt];
+              h[v_tmp] -= aa * bb;
+              h[hoffset] -= aa * tst;
+              h[knt] -= aa * ba;
             }
             for (int j{0}; j < 4; j++) {
-              hoffset = j + ((c_k - 1) << 2);
-              ab = z[hoffset];
-              knt = j + (c_k << 2);
-              b_k = j + ((c_k + 1) << 2);
-              aa = (ab + rt1r * z[knt]) + s * z[b_k];
-              z[hoffset] = ab - aa * bb;
-              z[knt] -= aa * tst;
-              z[b_k] -= aa * ba;
+              v_tmp = j + ((b_k - 1) << 2);
+              ab = z[v_tmp];
+              hoffset = j + (b_k << 2);
+              knt = j + ((b_k + 1) << 2);
+              aa = (ab + rt1r * z[hoffset]) + s * z[knt];
+              z[v_tmp] = ab - aa * bb;
+              z[hoffset] -= aa * tst;
+              z[knt] -= aa * ba;
             }
           } else if (nr == 2) {
-            for (int j{c_k}; j < 5; j++) {
-              hoffset = c_k + ((j - 1) << 2);
-              ab = h[hoffset - 1];
-              aa = ab + rt1r * h[hoffset];
-              h[hoffset - 1] = ab - aa * bb;
-              h[hoffset] -= aa * tst;
+            for (int j{b_k}; j < 5; j++) {
+              v_tmp = b_k + ((j - 1) << 2);
+              ab = h[v_tmp - 1];
+              aa = ab + rt1r * h[v_tmp];
+              h[v_tmp - 1] = ab - aa * bb;
+              h[v_tmp] -= aa * tst;
             }
             for (int j{0}; j <= i; j++) {
-              hoffset = j + ((c_k - 1) << 2);
-              knt = j + (c_k << 2);
-              aa = h[hoffset] + rt1r * h[knt];
-              h[hoffset] -= aa * bb;
-              h[knt] -= aa * tst;
+              v_tmp = j + ((b_k - 1) << 2);
+              hoffset = j + (b_k << 2);
+              aa = h[v_tmp] + rt1r * h[hoffset];
+              h[v_tmp] -= aa * bb;
+              h[hoffset] -= aa * tst;
             }
             for (int j{0}; j < 4; j++) {
-              hoffset = j + ((c_k - 1) << 2);
-              ab = z[hoffset];
-              knt = j + (c_k << 2);
-              aa = ab + rt1r * z[knt];
-              z[hoffset] = ab - aa * bb;
-              z[knt] -= aa * tst;
+              v_tmp = j + ((b_k - 1) << 2);
+              ab = z[v_tmp];
+              hoffset = j + (b_k << 2);
+              aa = ab + rt1r * z[hoffset];
+              z[v_tmp] = ab - aa * bb;
+              z[hoffset] -= aa * tst;
             }
           }
         }
@@ -347,52 +350,52 @@ int xhseqr(double h[16], double z[16])
       exitg1 = true;
     } else {
       if ((L != i + 1) && (L == i)) {
-        knt = i << 2;
-        b_i = i + knt;
-        rt1r = h[b_i - 1];
-        b_k = (i - 1) << 2;
-        hoffset = i + b_k;
-        s = h[hoffset];
-        tst = h[b_i];
-        reflapack::xdlanv2(&h[(i + ((i - 1) << 2)) - 1], &rt1r, &s, &tst, &ab,
-                           &aa, &ba, &bb, &s_tmp, &rt2r);
-        h[b_i - 1] = rt1r;
-        h[hoffset] = s;
-        h[b_i] = tst;
+        b_i = i << 2;
+        hoffset = i + b_i;
+        rt1r = h[hoffset - 1];
+        knt = (i - 1) << 2;
+        v_tmp = i + knt;
+        s = h[v_tmp];
+        tst = h[hoffset];
+        xdlanv2(&h[(i + ((i - 1) << 2)) - 1], &rt1r, &s, &tst, &ab, &aa, &ba,
+                &bb, &s_tmp, &rt2r);
+        h[hoffset - 1] = rt1r;
+        h[v_tmp] = s;
+        h[hoffset] = tst;
         if (i + 1 < 4) {
-          hoffset = (i + 1) << 2;
-          blas::xrot(3 - i, h, i + hoffset, (i + hoffset) + 1, s_tmp, rt2r);
+          blas::xrot(3 - i, h, i + ((i + 1) << 2), (i + ((i + 1) << 2)) + 1,
+                     s_tmp, rt2r);
         }
-        blas::b_xrot(i - 1, h, b_k + 1, knt + 1, s_tmp, rt2r);
-        tst = s_tmp * z[b_k] + rt2r * z[knt];
-        z[knt] = s_tmp * z[knt] - rt2r * z[b_k];
-        z[b_k] = tst;
-        tst = z[knt + 1];
-        ab = z[b_k + 1];
-        z[knt + 1] = s_tmp * tst - rt2r * ab;
-        z[b_k + 1] = s_tmp * ab + rt2r * tst;
-        tst = z[knt + 2];
-        ab = z[b_k + 2];
-        z[knt + 2] = s_tmp * tst - rt2r * ab;
-        z[b_k + 2] = s_tmp * ab + rt2r * tst;
-        tst = z[knt + 3];
-        ab = z[b_k + 3];
-        z[knt + 3] = s_tmp * tst - rt2r * ab;
-        z[b_k + 3] = s_tmp * ab + rt2r * tst;
+        blas::b_xrot(i - 1, h, ((i - 1) << 2) + 1, (i << 2) + 1, s_tmp, rt2r);
+        tst = s_tmp * z[knt] + rt2r * z[b_i];
+        z[b_i] = s_tmp * z[b_i] - rt2r * z[knt];
+        z[knt] = tst;
+        tst = z[b_i + 1];
+        ab = z[knt + 1];
+        z[b_i + 1] = s_tmp * tst - rt2r * ab;
+        z[knt + 1] = s_tmp * ab + rt2r * tst;
+        tst = z[b_i + 2];
+        ab = z[knt + 2];
+        z[b_i + 2] = s_tmp * tst - rt2r * ab;
+        z[knt + 2] = s_tmp * ab + rt2r * tst;
+        tst = z[b_i + 3];
+        ab = z[knt + 3];
+        z[b_i + 3] = s_tmp * tst - rt2r * ab;
+        z[knt + 3] = s_tmp * ab + rt2r * tst;
       }
+      kdefl = 0;
       i = L - 2;
     }
   }
-  h[3] = 0.0;
   return info;
 }
 
-} // namespace lapack
+} // namespace reflapack
 } // namespace internal
 } // namespace coder
 
 //
-// File trailer for xhseqr.cpp
+// File trailer for xdhseqr.cpp
 //
 // [EOF]
 //

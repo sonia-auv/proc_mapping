@@ -5,7 +5,7 @@
 // File: nav_msgs_OdometryStruct.h
 //
 // MATLAB Coder version            : 5.4
-// C/C++ source code generated on  : 31-Jul-2022 13:03:34
+// C/C++ source code generated on  : 01-Aug-2022 08:26:09
 //
 
 #ifndef NAV_MSGS_ODOMETRYSTRUCT_H

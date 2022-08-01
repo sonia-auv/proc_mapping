@@ -5,14 +5,14 @@
 // File: schur.cpp
 //
 // MATLAB Coder version            : 5.4
-// C/C++ source code generated on  : 31-Jul-2022 13:03:34
+// C/C++ source code generated on  : 01-Aug-2022 08:26:09
 //
 
 // Include Files
 #include "schur.h"
 #include "proc_mapping_rtwutil.h"
 #include "rt_nonfinite.h"
-#include "xhseqr.h"
+#include "xdhseqr.h"
 #include "xnrm2.h"
 #include "xzlarf.h"
 #include <algorithm>
@@ -22,19 +22,24 @@
 
 // Function Definitions
 //
-// Arguments    : const double A[16]
+// Arguments    : double A[16]
 //                double V[16]
-//                double T[16]
 // Return Type  : void
 //
 namespace coder {
-void schur(const double A[16], double V[16], double T[16])
+void schur(double A[16], double V[16])
 {
   double work[4];
+  double xnorm;
   bool p;
   p = true;
   for (int k{0}; k < 16; k++) {
-    if ((!p) || (std::isinf(A[k]) || std::isnan(A[k]))) {
+    if (p) {
+      xnorm = A[k];
+      if (std::isinf(xnorm) || std::isnan(xnorm)) {
+        p = false;
+      }
+    } else {
       p = false;
     }
   }
@@ -44,14 +49,14 @@ void schur(const double A[16], double V[16], double T[16])
       V[i] = rtNaN;
     }
     knt = 2;
-    for (int ix0{0}; ix0 < 3; ix0++) {
+    for (int k{0}; k < 3; k++) {
       if (knt <= 4) {
-        std::memset(&V[(ix0 * 4 + knt) + -1], 0, (-knt + 5) * sizeof(double));
+        std::memset(&V[(k * 4 + knt) + -1], 0, (-knt + 5) * sizeof(double));
       }
       knt++;
     }
     for (int i{0}; i < 16; i++) {
-      T[i] = rtNaN;
+      A[i] = rtNaN;
     }
   } else {
     double tau[3];
@@ -59,14 +64,12 @@ void schur(const double A[16], double V[16], double T[16])
     int ia;
     int ix0;
     int knt;
-    std::copy(&A[0], &A[16], &T[0]);
     work[0] = 0.0;
     work[1] = 0.0;
     work[2] = 0.0;
     work[3] = 0.0;
     for (int b_i{0}; b_i < 3; b_i++) {
       double alpha1_tmp;
-      double xnorm;
       int alpha1_tmp_tmp;
       int ic0;
       int im1n_tmp_tmp;
@@ -76,7 +79,7 @@ void schur(const double A[16], double V[16], double T[16])
       im1n_tmp_tmp = b_i << 2;
       in = (b_i + 1) << 2;
       alpha1_tmp_tmp = (b_i + im1n_tmp_tmp) + 1;
-      alpha1_tmp = T[alpha1_tmp_tmp];
+      alpha1_tmp = A[alpha1_tmp_tmp];
       if (b_i + 3 <= 4) {
         knt = b_i + 1;
       } else {
@@ -84,7 +87,7 @@ void schur(const double A[16], double V[16], double T[16])
       }
       ix0 = (knt + im1n_tmp_tmp) + 2;
       tau[b_i] = 0.0;
-      xnorm = internal::blas::b_xnrm2(2 - b_i, T, ix0);
+      xnorm = internal::blas::b_xnrm2(2 - b_i, A, ix0);
       if (xnorm != 0.0) {
         double beta1;
         beta1 = rt_hypotd_snf(alpha1_tmp, xnorm);
@@ -97,13 +100,13 @@ void schur(const double A[16], double V[16], double T[16])
           do {
             knt++;
             for (int k{ix0}; k <= i; k++) {
-              T[k - 1] *= 9.9792015476736E+291;
+              A[k - 1] *= 9.9792015476736E+291;
             }
             beta1 *= 9.9792015476736E+291;
             alpha1_tmp *= 9.9792015476736E+291;
           } while ((std::abs(beta1) < 1.0020841800044864E-292) && (knt < 20));
           beta1 = rt_hypotd_snf(alpha1_tmp,
-                                internal::blas::b_xnrm2(2 - b_i, T, ix0));
+                                internal::blas::b_xnrm2(2 - b_i, A, ix0));
           if (alpha1_tmp >= 0.0) {
             beta1 = -beta1;
           }
@@ -111,29 +114,30 @@ void schur(const double A[16], double V[16], double T[16])
           xnorm = 1.0 / (alpha1_tmp - beta1);
           i = (ix0 - b_i) + 1;
           for (int k{ix0}; k <= i; k++) {
-            T[k - 1] *= xnorm;
+            A[k - 1] *= xnorm;
           }
           for (int k{0}; k < knt; k++) {
             beta1 *= 1.0020841800044864E-292;
           }
           alpha1_tmp = beta1;
         } else {
-          tau[b_i] = (beta1 - alpha1_tmp) / beta1;
-          xnorm = 1.0 / (alpha1_tmp - beta1);
+          xnorm = A[alpha1_tmp_tmp];
+          tau[b_i] = (beta1 - xnorm) / beta1;
+          xnorm = 1.0 / (xnorm - beta1);
           i = (ix0 - b_i) + 1;
           for (int k{ix0}; k <= i; k++) {
-            T[k - 1] *= xnorm;
+            A[k - 1] *= xnorm;
           }
           alpha1_tmp = beta1;
         }
       }
-      T[alpha1_tmp_tmp] = 1.0;
+      A[alpha1_tmp_tmp] = 1.0;
       ic0 = in + 1;
       if (tau[b_i] != 0.0) {
         bool exitg2;
         lastv = 2 - b_i;
         knt = (alpha1_tmp_tmp - b_i) + 2;
-        while ((lastv + 1 > 0) && (T[knt] == 0.0)) {
+        while ((lastv + 1 > 0) && (A[knt] == 0.0)) {
           lastv--;
           knt--;
         }
@@ -146,7 +150,7 @@ void schur(const double A[16], double V[16], double T[16])
           do {
             exitg1 = 0;
             if (ia <= knt + (lastv << 2)) {
-              if (T[ia - 1] != 0.0) {
+              if (A[ia - 1] != 0.0) {
                 exitg1 = 1;
               } else {
                 ia += 4;
@@ -174,21 +178,21 @@ void schur(const double A[16], double V[16], double T[16])
             i1 = (k + lastc) - 1;
             for (ia = k; ia <= i1; ia++) {
               ix0 = ia - k;
-              work[ix0] += T[ia - 1] * T[knt];
+              work[ix0] += A[ia - 1] * A[knt];
             }
             knt++;
           }
         }
         if (!(-tau[b_i] == 0.0)) {
           knt = in;
-          for (ix0 = 0; ix0 <= lastv; ix0++) {
-            xnorm = T[alpha1_tmp_tmp + ix0];
+          for (int k{0}; k <= lastv; k++) {
+            xnorm = A[alpha1_tmp_tmp + k];
             if (xnorm != 0.0) {
               xnorm *= -tau[b_i];
               i = knt + 1;
               i1 = lastc + knt;
-              for (int k{i}; k <= i1; k++) {
-                T[k - 1] += work[(k - knt) - 1] * xnorm;
+              for (ix0 = i; ix0 <= i1; ix0++) {
+                A[ix0 - 1] += work[(ix0 - knt) - 1] * xnorm;
               }
             }
             knt += 4;
@@ -196,16 +200,16 @@ void schur(const double A[16], double V[16], double T[16])
         }
       }
       internal::reflapack::xzlarf(3 - b_i, 3 - b_i, (b_i + im1n_tmp_tmp) + 2,
-                                  tau[b_i], T, (b_i + in) + 2, work);
-      T[alpha1_tmp_tmp] = alpha1_tmp;
+                                  tau[b_i], A, (b_i + in) + 2, work);
+      A[alpha1_tmp_tmp] = alpha1_tmp;
     }
-    std::copy(&T[0], &T[16], &V[0]);
-    for (ix0 = 2; ix0 >= 0; ix0--) {
-      ia = (ix0 + 1) << 2;
-      for (int b_i{0}; b_i <= ix0; b_i++) {
+    std::copy(&A[0], &A[16], &V[0]);
+    for (int k{2}; k >= 0; k--) {
+      ia = (k + 1) << 2;
+      for (int b_i{0}; b_i <= k; b_i++) {
         V[ia + b_i] = 0.0;
       }
-      i = ix0 + 3;
+      i = k + 3;
       for (int b_i{i}; b_i < 5; b_i++) {
         knt = ia + b_i;
         V[knt - 1] = V[knt - 5];
@@ -232,11 +236,12 @@ void schur(const double A[16], double V[16], double T[16])
         }
       }
       V[knt] = 1.0 - tau[b_i];
-      for (ix0 = 0; ix0 < b_i; ix0++) {
-        V[(knt - ix0) - 1] = 0.0;
+      for (int k{0}; k < b_i; k++) {
+        V[(knt - k) - 1] = 0.0;
       }
     }
-    internal::lapack::xhseqr(T, V);
+    internal::reflapack::eml_dlahqr(A, V);
+    A[3] = 0.0;
   }
 }
 

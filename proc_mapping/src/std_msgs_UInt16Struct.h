@@ -5,7 +5,7 @@
 // File: std_msgs_UInt16Struct.h
 //
 // MATLAB Coder version            : 5.4
-// C/C++ source code generated on  : 31-Jul-2022 13:03:34
+// C/C++ source code generated on  : 01-Aug-2022 08:26:09
 //
 
 #ifndef STD_MSGS_UINT16STRUCT_H
